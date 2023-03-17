@@ -1,0 +1,143 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Base>True</Base>
+        <AppType>Application</AppType>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>Weather.dpr</MainSource>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectGuid>{A040E6B4-3687-407B-AA40-EE0225E77825}</ProjectGuid>
+        <ProjectVersion>19.5</ProjectVersion>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>Weather</SanitizedProjectName>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>FireDACIBDriver;vclwinx;DataSnapServer;frxIBX28;fmx;PKIEDB28;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;aurelius;fsIBX28;appanalytics;IndyProtocols;vclx;frxe28;dbxcds;vcledge;FmxTeeUI;DBXFirebirdDriver;SMImportD11;fsDB28;JvAppFrm;FFmpegFmx_DX11;FireDACSqliteDriver;DbxClientDriver;frxADO28;JclVcl;soapmidas;TeeUI;Jcl;dbexpress;JvManagedThreads;frxDBX28;compufit;inet;vcltouch;SMMsgD11;JvDB;PurposesoftDelphiXE2;FireDACDBXDriver;fmxdae;TMSMQTTPkgDEDXE14;JvCustom;CustomIPTransport;FireDACMSSQLDriver;SVGIconPackage;JvSystem;tmsbcl;JvControls;JvCrypt;madExcept_;JvJans;JvMM;IndySystem;JvGlobus;ibxbindings;frxIntIOIndy28;JclContainers;JvPageComps;vclFireDAC;madDisAsm_;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;CMPackage;DOSCommandDR;bindcompdbx;frxHTML28;rtl;FireDACMySQLDriver;IcsFmxD110Run;remotedb;IcsVclD110Run;DBXSqliteDriver;TMSVCLUIPackPkgExDXE14;VirtualTreesDR;DBXSybaseASEDriver;JvRuntimeDesign;JvXPCtrls;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;TMSVCLUIPackPkgXlsDXE14;JvDlgs;xmlrtl;JvDocking;MQTTComponents;ibxpress;frxPDF28;dsnap;xdata;JvCmp;fsADO28;FireDACDb2Driver;DBXOracleDriver;FFmpegRtl_DX11;DBXInformixDriver;vclib;FFmpegVcl_DX11;fmxobj;bindcompvclsmp;DataSnapNativeClient;DatasnapConnectorsFreePascal;SVGIconImageList;vc2;FixInsight_11;TMSLogging;emshosting;sparkle;TMSCryptoPkgDEDXE14;FireDACCommonDriver;sphinx;TMSMQTTPkgDXE14;IndyIPClient;frxTee28;bindcompvclwinx;emsedge;bindcompfmx;madBasic_;TMSVCLUIPackPkgDXE14;JvBands;inetdb;ibmonitor;pkfindfile;FireDACASADriver;Tee;SVGIconImageListFMX;vclactnband;frxIntIO28;fmxFireDAC;FireDACInfxDriver;DBXMySQLDriver;VclSmp;DataSnapCommon;AWSSDK;JvPascalInterpreter;EurekaLogCore;fmxase;frx28;JvPluginSystem;DBXOdbcDriver;JvTimeFramework;dbrtl;FireDACOracleDriver;TeeDB;FireDACMSAccDriver;SMExportD11;AbbreviaVCLD;DataSnapIndy10ServerTransport;JclDeveloperTools;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;frxDB28;FireDACMongoDBDriver;JvWizards;FireDACTDataDriver;vcldb;IconFontsImageList;SynEditDR;JvCore;fs28;bindcomp;IndyCore;RESTBackendComponents;fsTee28;TMSCryptoPkgDXE14;FireDACADSDriver;MobilePermissions;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;TMSVCLUIPackPkgWizDXE14;JvDotNetCtrls;JvHMI;DBXDb2Driver;frxcs28;IcsCommonD110Run;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;JvPrintPreview;tethering;JvStdCtrls;PKIECtrl28;bindcompvcl;CloudService;DBXSybaseASADriver;IconFontsImageListFMX;FMXTee;soaprtl;soapserver;JvNet;$(DCC_UsePackage)</DCC_UsePackage>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_UnitSearchPath>..\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="frmWeatherMain.pas">
+            <Form>frmWeatherWindow</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Speech\SpeechLib_TLB.pas"/>
+        <DCCReference Include="..\Speech\uWindows.Engine.pas"/>
+        <DCCReference Include="..\Speech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
+        <DCCReference Include="..\Speech\uMicrosoft.Cognitive.REST.pas"/>
+        <DCCReference Include="..\Speech\uGoogleSpeech.pas"/>
+        <DCCReference Include="..\Speech\uGoogleSpeech.DTO.pas"/>
+        <DCCReference Include="..\Speech\uElevenLabs.Voices.DTO.pas"/>
+        <DCCReference Include="..\Speech\uElevenLabs.REST.pas"/>
+        <DCCReference Include="..\Speech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Speech\uAmazon.Polly.pas"/>
+        <DCCReference Include="..\OpenAI.pas"/>
+        <DCCReference Include="udmWeather.pas">
+            <Form>dmWeather</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="uXMLBOMPrecis.pas"/>
+        <DCCReference Include="..\REST.Authenticator.EnhancedOAuth.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">Weather.dpr</Source>
+                </Source>
+                <Excluded_Packages/>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>
