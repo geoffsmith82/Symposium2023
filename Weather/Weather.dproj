@@ -90,24 +90,24 @@
             <Form>frmWeatherWindow</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Speech\SpeechLib_TLB.pas"/>
-        <DCCReference Include="..\Speech\uWindows.Engine.pas"/>
-        <DCCReference Include="..\Speech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
-        <DCCReference Include="..\Speech\uMicrosoft.Cognitive.REST.pas"/>
-        <DCCReference Include="..\Speech\uGoogleSpeech.pas"/>
-        <DCCReference Include="..\Speech\uGoogleSpeech.DTO.pas"/>
-        <DCCReference Include="..\Speech\uElevenLabs.Voices.DTO.pas"/>
-        <DCCReference Include="..\Speech\uElevenLabs.REST.pas"/>
-        <DCCReference Include="..\Speech\uBaseSpeech.pas"/>
-        <DCCReference Include="..\Speech\uAmazon.Polly.pas"/>
-        <DCCReference Include="..\OpenAI.pas"/>
         <DCCReference Include="udmWeather.pas">
             <Form>dmWeather</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="uXMLBOMPrecis.pas"/>
-        <DCCReference Include="..\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="..\Libs\Speech\SpeechLib_TLB.pas"/>
+        <DCCReference Include="..\Libs\Speech\uAmazon.Polly.pas"/>
+        <DCCReference Include="..\Libs\Speech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Libs\Speech\uElevenLabs.REST.pas"/>
+        <DCCReference Include="..\Libs\Speech\uElevenLabs.Voices.DTO.pas"/>
+        <DCCReference Include="..\Libs\Speech\uGoogleSpeech.DTO.pas"/>
+        <DCCReference Include="..\Libs\Speech\uGoogleSpeech.pas"/>
+        <DCCReference Include="..\Libs\Speech\uMicrosoft.Cognitive.REST.pas"/>
+        <DCCReference Include="..\Libs\Speech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
+        <DCCReference Include="..\Libs\Speech\uWindows.Engine.pas"/>
+        <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

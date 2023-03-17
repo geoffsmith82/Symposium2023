@@ -85,7 +85,7 @@ implementation
 
 {$R *.dfm}
 
-{$I APIKEY.INC}
+{$I ..\Libs\apikey.inc}
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin

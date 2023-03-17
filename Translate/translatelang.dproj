@@ -4,7 +4,7 @@
         <AppType>Application</AppType>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>translatelang.dpr</MainSource>
+        <MainSource>TranslateLang.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{88647B7F-FAC7-4CCF-81D8-07A5D8729623}</ProjectGuid>
         <ProjectVersion>19.5</ProjectVersion>
@@ -41,7 +41,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <SanitizedProjectName>translatelang</SanitizedProjectName>
+        <SanitizedProjectName>TranslateLang</SanitizedProjectName>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
@@ -87,10 +87,10 @@
             <Form>frmMainTranslationWindow</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="translate\uGoogle.Translate.pas"/>
-        <DCCReference Include="translate\uBaseTranslate.pas"/>
-        <DCCReference Include="translate\uMicrosoft.Translate.pas"/>
-        <DCCReference Include="translate\uAmazon.Translate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uAmazon.Translate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uGoogle.Translate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -109,7 +109,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">translatelang.dpr</Source>
+                    <Source Name="MainSource">TranslateLang.dpr</Source>
                 </Source>
             </Delphi.Personality>
             <Platforms>

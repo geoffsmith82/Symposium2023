@@ -2,19 +2,19 @@ program DelphiChatGPT;
 
 uses
   Vcl.Forms,
-  REST.Authenticator.EnhancedOAuth in 'REST.Authenticator.EnhancedOAuth.pas',
-  uElevenLabs.Voices.DTO in 'Speech\uElevenLabs.Voices.DTO.pas',
-  uElevenLabs.REST in 'Speech\uElevenLabs.REST.pas',
-  OpenAI in 'OpenAI.pas',
-  uBaseSpeech in 'Speech\uBaseSpeech.pas',
-  uMicrosoft.Cognitive.REST in 'Speech\uMicrosoft.Cognitive.REST.pas',
-  uAmazon.Polly in 'Speech\uAmazon.Polly.pas',
-  uMicrosoft.Cognitive.Voices.DTO in 'Speech\uMicrosoft.Cognitive.Voices.DTO.pas',
-  uGoogleSpeech.DTO in 'Speech\uGoogleSpeech.DTO.pas',
-  uGoogleSpeech in 'Speech\uGoogleSpeech.pas',
-  uWindows.Engine in 'Speech\uWindows.Engine.pas',
-  SpeechLib_TLB in 'Speech\SpeechLib_TLB.pas',
-  UChatGPT in 'UChatGPT.pas' {Form1};
+  UChatGPT in 'UChatGPT.pas' {Form1},
+  SpeechLib_TLB in '..\Libs\Speech\SpeechLib_TLB.pas',
+  uAmazon.Polly in '..\Libs\Speech\uAmazon.Polly.pas',
+  uBaseSpeech in '..\Libs\Speech\uBaseSpeech.pas',
+  uElevenLabs.REST in '..\Libs\Speech\uElevenLabs.REST.pas',
+  uElevenLabs.Voices.DTO in '..\Libs\Speech\uElevenLabs.Voices.DTO.pas',
+  uGoogleSpeech.DTO in '..\Libs\Speech\uGoogleSpeech.DTO.pas',
+  uGoogleSpeech in '..\Libs\Speech\uGoogleSpeech.pas',
+  uMicrosoft.Cognitive.REST in '..\Libs\Speech\uMicrosoft.Cognitive.REST.pas',
+  uMicrosoft.Cognitive.Voices.DTO in '..\Libs\Speech\uMicrosoft.Cognitive.Voices.DTO.pas',
+  uWindows.Engine in '..\Libs\Speech\uWindows.Engine.pas',
+  OpenAI in '..\Libs\OpenAI.pas',
+  REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas';
 
 {$R *.res}
 

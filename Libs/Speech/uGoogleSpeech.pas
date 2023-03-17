@@ -43,7 +43,7 @@ uses
   Winapi.ShellAPI
   ;
 
-{$I apikey.inc}
+{$I ..\apikey.inc}
 
 { TGoogleSpeechService }
 

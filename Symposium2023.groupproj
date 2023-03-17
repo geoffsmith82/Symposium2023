@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{8ABFE449-6D39-4505-BC7D-19E2F5CD0404}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Translate\TranslateLang.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DelphiChatGPT\DelphiChatGPT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Weather\Weather.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="TranslateLang">
+        <MSBuild Projects="Translate\TranslateLang.dproj"/>
+    </Target>
+    <Target Name="TranslateLang:Clean">
+        <MSBuild Projects="Translate\TranslateLang.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TranslateLang:Make">
+        <MSBuild Projects="Translate\TranslateLang.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DelphiChatGPT">
+        <MSBuild Projects="DelphiChatGPT\DelphiChatGPT.dproj"/>
+    </Target>
+    <Target Name="DelphiChatGPT:Clean">
+        <MSBuild Projects="DelphiChatGPT\DelphiChatGPT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DelphiChatGPT:Make">
+        <MSBuild Projects="DelphiChatGPT\DelphiChatGPT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Weather">
+        <MSBuild Projects="Weather\Weather.dproj"/>
+    </Target>
+    <Target Name="Weather:Clean">
+        <MSBuild Projects="Weather\Weather.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Weather:Make">
+        <MSBuild Projects="Weather\Weather.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

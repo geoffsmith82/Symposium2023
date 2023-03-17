@@ -47,7 +47,7 @@ uses
   System.IOUtils
   ;
 
-{$I apikey.inc}
+{$I ..\Libs\apikey.inc}
 
 procedure TfrmWeatherWindow.FormDestroy(Sender: TObject);
 begin

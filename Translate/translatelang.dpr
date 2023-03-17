@@ -1,12 +1,12 @@
-program translatelang;
+program TranslateLang;
 
 uses
   Vcl.Forms,
   Unit3 in 'Unit3.pas' {frmMainTranslationWindow},
-  uGoogle.Translate in 'translate\uGoogle.Translate.pas',
-  uBaseTranslate in 'translate\uBaseTranslate.pas',
-  uMicrosoft.Translate in 'translate\uMicrosoft.Translate.pas',
-  uAmazon.Translate in 'translate\uAmazon.Translate.pas';
+  uAmazon.Translate in '..\Libs\Translate\uAmazon.Translate.pas',
+  uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
+  uGoogle.Translate in '..\Libs\Translate\uGoogle.Translate.pas',
+  uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas';
 
 {$R *.res}
 
