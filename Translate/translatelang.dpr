@@ -2,7 +2,7 @@ program TranslateLang;
 
 uses
   Vcl.Forms,
-  Unit3 in 'Unit3.pas' {frmMainTranslationWindow},
+  frmTranslation in 'frmTranslation.pas' {frmMainTranslationWindow},
   uAmazon.Translate in '..\Libs\Translate\uAmazon.Translate.pas',
   uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
   uGoogle.Translate in '..\Libs\Translate\uGoogle.Translate.pas',

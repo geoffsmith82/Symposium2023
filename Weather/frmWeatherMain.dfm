@@ -2,54 +2,43 @@ object frmWeatherWindow: TfrmWeatherWindow
   Left = 0
   Top = 0
   Caption = 'Bendigo Weather'
-  ClientHeight = 552
-  ClientWidth = 636
+  ClientHeight = 442
+  ClientWidth = 525
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -15
+  Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OldCreateOrder = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 120
-  TextHeight = 20
+  PixelsPerInch = 96
+  TextHeight = 15
   object btnLatestForcast: TButton
-    Left = 20
-    Top = 10
-    Width = 132
-    Height = 32
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Left = 16
+    Top = 8
+    Width = 106
+    Height = 26
     Caption = 'Latest Forcast'
     TabOrder = 0
     OnClick = btnLatestForcastClick
   end
   object Memo1: TMemo
-    Left = 20
-    Top = 50
-    Width = 612
-    Height = 480
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Left = 16
+    Top = 40
+    Width = 490
+    Height = 384
     Lines.Strings = (
       'Memo1')
     ScrollBars = ssVertical
     TabOrder = 1
   end
   object MediaPlayer1: TMediaPlayer
-    Left = 50
-    Top = 420
-    Width = 316
-    Height = 38
-    Margins.Left = 4
-    Margins.Top = 4
-    Margins.Right = 4
-    Margins.Bottom = 4
+    Left = 40
+    Top = 336
+    Width = 253
+    Height = 30
     DoubleBuffered = True
     Visible = False
     ParentDoubleBuffered = False

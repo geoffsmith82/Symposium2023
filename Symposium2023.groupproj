@@ -12,6 +12,12 @@
         <Projects Include="Weather\Weather.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="VoiceRecognition\VoiceRecognition.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ImageGeneration\ImageGeneration.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +53,32 @@
     <Target Name="Weather:Make">
         <MSBuild Projects="Weather\Weather.dproj" Targets="Make"/>
     </Target>
+    <Target Name="VoiceRecognition">
+        <MSBuild Projects="VoiceRecognition\VoiceRecognition.dproj"/>
+    </Target>
+    <Target Name="VoiceRecognition:Clean">
+        <MSBuild Projects="VoiceRecognition\VoiceRecognition.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VoiceRecognition:Make">
+        <MSBuild Projects="VoiceRecognition\VoiceRecognition.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImageGeneration">
+        <MSBuild Projects="ImageGeneration\ImageGeneration.dproj"/>
+    </Target>
+    <Target Name="ImageGeneration:Clean">
+        <MSBuild Projects="ImageGeneration\ImageGeneration.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImageGeneration:Make">
+        <MSBuild Projects="ImageGeneration\ImageGeneration.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather"/>
+        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather;VoiceRecognition;ImageGeneration"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean"/>
+        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean;VoiceRecognition:Clean;ImageGeneration:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make"/>
+        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make;VoiceRecognition:Make;ImageGeneration:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

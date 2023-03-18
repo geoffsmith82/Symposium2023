@@ -83,7 +83,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit3.pas">
+        <DCCReference Include="frmTranslation.pas">
             <Form>frmMainTranslationWindow</Form>
             <FormType>dfm</FormType>
         </DCCReference>
