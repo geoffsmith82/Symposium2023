@@ -29,8 +29,8 @@ type
     procedure btnLatestForcastClick(Sender: TObject);
   private
     { Private declarations }
-    AmazonPolyVoiceService : TAmazonPollyService;
-    procedure PlayTextAmazon(text: string);
+    FAmazonPolyVoiceService : TAmazonPollyService;
+    procedure PlayTextAmazon(const text:string);
   public
     { Public declarations }
   end;
@@ -53,22 +53,22 @@ uses
 
 procedure TfrmWeatherWindow.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(AmazonPolyVoiceService);
+  FreeAndNil(FAmazonPolyVoiceService);
 end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
-  AmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
+  FAmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
 end;
 
-procedure TfrmWeatherWindow.PlayTextAmazon(text:string);
+procedure TfrmWeatherWindow.PlayTextAmazon(const text:string);
 var
   Stream: TMemoryStream;
   FileName: string;
 begin
   Stream := TMemoryStream.Create;
   try
-    Stream := AmazonPolyVoiceService.TextToSpeech(text);
+    Stream := FAmazonPolyVoiceService.TextToSpeech(text);
     FileName := TPath.GetTempFileName + '.mp3';
     Stream.Position := 0;
     Stream.SaveToFile(FileName);

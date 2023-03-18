@@ -21,7 +21,7 @@ type
   public
     property IsHighQuality48K: String read FIsHighQuality48K write FIsHighQuality48K;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TExtendedPropertyMapClass;
+    class function FromJsonString(const AJsonString: string): TExtendedPropertyMapClass;
   end;
 
   TItemClass = class
@@ -56,7 +56,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TItemClass;
+    class function FromJsonString(const AJsonString: string): TItemClass;
   end;
 
   TMicrosoftCognitiveVoicesClass = class
@@ -66,7 +66,7 @@ type
     property Items: TArray<TItemClass> read FItems write FItems;
     destructor Destroy; override;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TMicrosoftCognitiveVoicesClass;
+    class function FromJsonString(const AJsonString: string): TMicrosoftCognitiveVoicesClass;
   end;
 
 implementation
@@ -79,7 +79,7 @@ begin
   result := TJson.ObjectToJsonString(self);
 end;
 
-class function TExtendedPropertyMapClass.FromJsonString(AJsonString: string): TExtendedPropertyMapClass;
+class function TExtendedPropertyMapClass.FromJsonString(const AJsonString: string): TExtendedPropertyMapClass;
 begin
   result := TJson.JsonToObject<TExtendedPropertyMapClass>(AJsonString)
 end;
@@ -103,7 +103,7 @@ begin
   result := TJson.ObjectToJsonString(self);
 end;
 
-class function TItemClass.FromJsonString(AJsonString: string): TItemClass;
+class function TItemClass.FromJsonString(const AJsonString: string): TItemClass;
 begin
   result := TJson.JsonToObject<TItemClass>(AJsonString)
 end;
@@ -126,7 +126,7 @@ begin
   result := TJson.ObjectToJsonString(self);
 end;
 
-class function TMicrosoftCognitiveVoicesClass.FromJsonString(AJsonString: string): TMicrosoftCognitiveVoicesClass;
+class function TMicrosoftCognitiveVoicesClass.FromJsonString(const AJsonString: string): TMicrosoftCognitiveVoicesClass;
 begin
   result := TJson.JsonToObject<TMicrosoftCognitiveVoicesClass>(AJsonString)
 end;

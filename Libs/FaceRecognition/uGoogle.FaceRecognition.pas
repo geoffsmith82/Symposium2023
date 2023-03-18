@@ -14,8 +14,8 @@ uses
 
 type
   TGoogleFaceRecognition = class(TBaseFaceRecognition)
-  private
-    function Base64EncodedFile(filename: string): string;
+  strict private
+    function Base64EncodedFile(const filename:string): string;
     function Base64EncodedStream(stream: TStream): string;
 
   public
@@ -28,13 +28,14 @@ implementation
 
 { TGoogleFaceRecognition }
 
-function TGoogleFaceRecognition.Base64EncodedFile(filename:string):string;
+function TGoogleFaceRecognition.Base64EncodedFile(const filename:string):string;
 var
   fs : TFileStream;
   mem : TStringStream;
 begin
   fs := nil;
   mem := nil;
+  Result := '';
   try
     fs := TFileStream.Create(filename, fmOpenRead);
     mem := TStringStream.Create;
@@ -44,6 +45,7 @@ begin
     end;
   finally
     FreeAndNil(fs);
+    FreeAndNil(mem)
   end;
 end;
 
@@ -52,6 +54,7 @@ var
   mem : TStringStream;
 begin
   mem := nil;
+  Result := '';
   try
     mem := TStringStream.Create;
     if TNetEncoding.Base64.Encode(stream, mem) > 0 then

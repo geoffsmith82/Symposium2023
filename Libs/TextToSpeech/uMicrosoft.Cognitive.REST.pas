@@ -18,7 +18,7 @@ type
     FOutputFormat: string;
   public
     procedure GetAccessToken;
-    constructor Create(AResourceKey: string; AApplicationName:string; AHost: string = 'australiaeast.tts.speech.microsoft.com');
+    constructor Create(const AResourceKey: string; const AApplicationName:string; const AHost: string = 'australiaeast.tts.speech.microsoft.com');
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function GetVoiceList: TMicrosoftCognitiveVoicesClass;
     function SpeechEngineName: string; override;
@@ -29,7 +29,7 @@ implementation
 uses
   System.DateUtils;
 
-constructor TMicrosoftCognitiveService.Create(AResourceKey: string; AApplicationName:string; AHost: string);
+constructor TMicrosoftCognitiveService.Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
   FOutputFormat := 'audio-24khz-48kbitrate-mono-mp3';

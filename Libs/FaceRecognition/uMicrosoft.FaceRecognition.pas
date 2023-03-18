@@ -19,15 +19,16 @@ type
     function DetectFacesFromURL(imageUrl: string): string; override;
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
-    constructor Create(APIKey : string);
+    constructor Create(const APIKey: string);
   end;
 
 implementation
 
 { TMicrosoftFaceRecognition }
 
-constructor TMicrosoftFaceRecognition.Create(APIKey: string);
+constructor TMicrosoftFaceRecognition.Create(const APIKey: string);
 begin
+  inherited Create;
   FAPIKey := APIKey;
 end;
 
@@ -52,6 +53,7 @@ begin
     restClient := nil;
     restRequest := nil;
     restResponse := nil;
+    request := nil;
   try
     restClient := TRESTClient.Create(nil);
     restRequest := TRESTRequest.Create(nil);

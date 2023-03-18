@@ -28,12 +28,12 @@ type
     FAccessToken : string;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
-    function Base64EncodedFile(filename: string): string;
+    function Base64EncodedFile(const filename:string): string;
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate(ASettings: TIniFile);
-    constructor Create(AResourceKey, AApplicationName, AHost: string);
+    constructor Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
   end;
 
 implementation
@@ -42,7 +42,7 @@ implementation
 
 { TGoogleSpeechToText }
 
-constructor TGoogleSpeechToText.Create(AResourceKey, AApplicationName, AHost: string);
+constructor TGoogleSpeechToText.Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
 begin
  // inherited Create(AResourceKey, AApplicationName, AHost);
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
@@ -84,13 +84,14 @@ begin
 end;
 
 
-function TGoogleSpeechToText.Base64EncodedFile(filename:string):string;
+function TGoogleSpeechToText.Base64EncodedFile(const filename:string):string;
 var
   fs : TFileStream;
   mem : TStringStream;
 begin
   fs := nil;
   mem := nil;
+  Result := '';
   try
     fs := TFileStream.Create(filename, fmOpenRead);
     mem := TStringStream.Create;
@@ -100,6 +101,7 @@ begin
     end;
   finally
     FreeAndNil(fs);
+    FreeAndNil(mem);
   end;
 end;
 

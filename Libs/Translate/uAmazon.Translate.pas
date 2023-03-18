@@ -33,6 +33,7 @@ implementation
 
 constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Endpoint, SourceLang, TargetLang: string);
 begin
+  inherited Create;
   FAccessKey := AccessKey;
   FSecretKey := SecretKey;
   FEndpoint := Endpoint;

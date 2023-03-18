@@ -114,7 +114,6 @@ begin
   begin
     FSpeechToText := TOpenAiWhisperOnline.Create;
   end;
-
 end;
 
 end.

@@ -14,15 +14,15 @@ uses
 type
   TElevenLabsService = class(TBaseSpeech)
   public
-    constructor Create(AResourceKey: string; AApplicationName:string; AHost: string);
-    procedure SendTextToSpeechRequest(const apiKey, voice: string; text: string; out responseStream: TMemoryStream);
+    constructor Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
+    procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
   end;
 
 implementation
 
-constructor TElevenLabsService.Create(AResourceKey, AApplicationName, AHost: string);
+constructor TElevenLabsService.Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
 end;
@@ -32,7 +32,7 @@ begin
   Result := 'ElevenLabs';
 end;
 
-procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey, voice: string; text: string; out responseStream: TMemoryStream);
+procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;

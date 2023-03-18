@@ -73,6 +73,10 @@ begin
   else if cboSize.Text = '1024x1024' then
   begin
     size := DALLE1024;
+  end
+  else
+  begin
+    size := DALLE1024;
   end;
 
   mmoOutput.Text := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);

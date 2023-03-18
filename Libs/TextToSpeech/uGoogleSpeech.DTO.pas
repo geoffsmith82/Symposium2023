@@ -30,7 +30,7 @@ type
     property speakingRate: Extended read FSpeakingRate write FSpeakingRate;
     property volumeGainDb: Extended read FVolumeGainDb write FVolumeGainDb;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TAudioConfigClass;
+    class function FromJsonString(const AJsonString: string): TAudioConfigClass;
   end;
 
   TTimepointsClass = class
@@ -41,7 +41,7 @@ type
     property markName: String read FMarkName write FMarkName;
     property timeSeconds: Extended read FTimeSeconds write FTimeSeconds;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TTimepointsClass;
+    class function FromJsonString(const AJsonString: string): TTimepointsClass;
   end;
 
   TGoogleTextToSpeechResponseClass = class
@@ -56,7 +56,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TGoogleTextToSpeechResponseClass;
+    class function FromJsonString(const AJsonString: string): TGoogleTextToSpeechResponseClass;
   end;
 
   TGoogleVoiceClass = class
@@ -71,7 +71,7 @@ type
     property naturalSampleRateHertz: Extended read FNaturalSampleRateHertz write FNaturalSampleRateHertz;
     property ssmlGender: String read FSsmlGender write FSsmlGender;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TGoogleVoiceClass;
+    class function FromJsonString(const AJsonString: string): TGoogleVoiceClass;
   end;
 
   TGoogleVoicesListClass = class
@@ -81,7 +81,7 @@ type
     property voices: TArray<TGoogleVoiceClass> read FVoices write FVoices;
     destructor Destroy; override;
     function ToJsonString: string;
-    class function FromJsonString(AJsonString: string): TGoogleVoicesListClass;
+    class function FromJsonString(const AJsonString: string): TGoogleVoicesListClass;
   end;
 
 
@@ -96,7 +96,7 @@ begin
   Result := TJson.ObjectToJsonString(self);
 end;
 
-class function TAudioConfigClass.FromJsonString(AJsonString: string): TAudioConfigClass;
+class function TAudioConfigClass.FromJsonString(const AJsonString: string): TAudioConfigClass;
 begin
   Result := TJson.JsonToObject<TAudioConfigClass>(AJsonString)
 end;
@@ -109,7 +109,7 @@ begin
   Result := TJson.ObjectToJsonString(self);
 end;
 
-class function TTimepointsClass.FromJsonString(AJsonString: string): TTimepointsClass;
+class function TTimepointsClass.FromJsonString(const AJsonString: string): TTimepointsClass;
 begin
   Result := TJson.JsonToObject<TTimepointsClass>(AJsonString)
 end;
@@ -139,7 +139,7 @@ begin
   Result := TJson.ObjectToJsonString(self);
 end;
 
-class function TGoogleTextToSpeechResponseClass.FromJsonString(AJsonString: string): TGoogleTextToSpeechResponseClass;
+class function TGoogleTextToSpeechResponseClass.FromJsonString(const AJsonString: string): TGoogleTextToSpeechResponseClass;
 begin
   Result := TJson.JsonToObject<TGoogleTextToSpeechResponseClass>(AJsonString)
 end;
@@ -152,7 +152,7 @@ begin
   Result := TJson.ObjectToJsonString(self);
 end;
 
-class function TGoogleVoiceClass.FromJsonString(AJsonString: string): TGoogleVoiceClass;
+class function TGoogleVoiceClass.FromJsonString(const AJsonString: string): TGoogleVoiceClass;
 begin
   Result := TJson.JsonToObject<TGoogleVoiceClass>(AJsonString)
 end;
@@ -175,7 +175,7 @@ begin
   Result := TJson.ObjectToJsonString(self);
 end;
 
-class function TGoogleVoicesListClass.FromJsonString(AJsonString: string): TGoogleVoicesListClass;
+class function TGoogleVoicesListClass.FromJsonString(const AJsonString: string): TGoogleVoicesListClass;
 begin
   Result := TJson.JsonToObject<TGoogleVoicesListClass>(AJsonString)
 end;

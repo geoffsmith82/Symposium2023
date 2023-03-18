@@ -91,6 +91,7 @@
         <DCCReference Include="..\Libs\SpeechToText\uOpenAI.Whisper.Online.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uGoogle.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uAmazon.SpeechToText.pas"/>
+        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

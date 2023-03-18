@@ -12,7 +12,7 @@ type
     FApplicationName: string;
     FHost: string;
   public
-      constructor Create(AResourceKey: string; AApplicationName:string; AHost: string);
+      constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
       function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
       function SpeechEngineName: string; virtual; abstract;
   end;
@@ -21,7 +21,7 @@ implementation
 
 { TBaseSpeech }
 
-constructor TBaseSpeech.Create(AResourceKey, AApplicationName, AHost: string);
+constructor TBaseSpeech.Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
 begin
   FResourceKey := AResourceKey;
   FApplicationName := AApplicationName;

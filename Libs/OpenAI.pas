@@ -16,15 +16,15 @@ type
 
   TOpenAI = class
   public
-    class function CallDALL_E(prompt: string; n: Integer; size: TDALLESize): string;
-    class function AskChatGPT(AQuestion, AModel: string): string;
+    class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): string;
+    class function AskChatGPT(const AQuestion: string; const AModel: string): string;
   end;
 
 implementation
 
 {$I APIKEY.INC}
 
-class function TOpenAI.CallDALL_E(prompt: string; n: Integer; size: TDALLESize): string;
+class function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): string;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
@@ -67,7 +67,7 @@ begin
   end;
 end;
 
-class function TOpenAI.AskChatGPT(AQuestion: string; AModel: string): string;
+class function TOpenAI.AskChatGPT(const AQuestion: string; const AModel: string): string;
 var
   LClient : TRESTClient;
   LRequest : TRESTRequest;
@@ -120,8 +120,7 @@ begin
         LJSonArray := LJsonValue as TJSonArray;
         LJSonString := LJSonArray.Items[0].GetValue<TJSONString>('text');
         Result := LJSonString.Value;
-      end
-      else
+      end;
     end
     else
       raise Exception.Create('HTTP response code: ' + LResponse.StatusCode.ToString);

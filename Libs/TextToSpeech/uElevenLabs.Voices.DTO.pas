@@ -31,7 +31,7 @@ public
   property samples: TArray<String> read FSamples write FSamples;
   property voice_id: String read FVoice_id write FVoice_id;
   function ToJsonString: string;
-  class function FromJsonString(AJsonString: string): TVoicesClass;
+  class function FromJsonString(const AJsonString: string): TVoicesClass;
 end;
 
 TRootClass = class
@@ -41,7 +41,7 @@ public
   property voices: TArray<TVoicesClass> read FVoices write FVoices;
   destructor Destroy; override;
   function ToJsonString: string;
-  class function FromJsonString(AJsonString: string): TRootClass;
+  class function FromJsonString(const AJsonString: string): TRootClass;
 end;
 
 implementation
@@ -54,7 +54,7 @@ begin
   result := TJson.ObjectToJsonString(self);
 end;
 
-class function TVoicesClass.FromJsonString(AJsonString: string): TVoicesClass;
+class function TVoicesClass.FromJsonString(const AJsonString: string): TVoicesClass;
 begin
   result := TJson.JsonToObject<TVoicesClass>(AJsonString)
 end;
@@ -77,7 +77,7 @@ begin
   result := TJson.ObjectToJsonString(self);
 end;
 
-class function TRootClass.FromJsonString(AJsonString: string): TRootClass;
+class function TRootClass.FromJsonString(const AJsonString: string): TRootClass;
 begin
   result := TJson.JsonToObject<TRootClass>(AJsonString)
 end;

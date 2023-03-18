@@ -38,6 +38,7 @@ uses System.DateUtils;
 
 constructor TMicrosoftTranslate.Create(const SubscriptionKey, Endpoint, SourceLang, TargetLang: string);
 begin
+  inherited Create;
   FSubscriptionKey := SubscriptionKey;
   FEndpoint := Endpoint;
   FSourceLang := SourceLang;

@@ -35,6 +35,7 @@ implementation
 
 constructor TGoogleTranslate.Create(const APIKey: string; const SourceLang, TargetLang: string);
 begin
+  inherited Create;
   FAPIKey := APIKey;
   FSourceLang := SourceLang;
   FTargetLang := TargetLang;

@@ -25,7 +25,7 @@ type
     FAccountName : string;
     FAccountKey: string;
   public
-    constructor Create(AccountName:string; AccountKey: string);
+    constructor Create(const AccountName:string; const AccountKey: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
@@ -33,7 +33,7 @@ type
 
 implementation
 
-constructor TAmazonPollyService.Create(AccountName:string; AccountKey: string);
+constructor TAmazonPollyService.Create(const AccountName:string; const AccountKey: string);
 begin
   FAccountName := AccountName;
   FAccountKey := AccountKey;
