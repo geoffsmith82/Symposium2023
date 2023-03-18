@@ -12,7 +12,12 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  Vcl.Menus;
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Vcl.Samples.Spin,
+  JvExForms,
+  JvCustomItemViewer,
+  JvImagesViewer;
 
 type
   TfrmImageGenerator = class(TForm)
@@ -29,6 +34,13 @@ type
     N2: TMenuItem;
     Generator1: TMenuItem;
     Generator2: TMenuItem;
+    mmoImagePrompt: TMemo;
+    btnExecute: TButton;
+    Label1: TLabel;
+    JvImagesViewer1: TJvImagesViewer;
+    seImageCount: TSpinEdit;
+    mmoOutput: TMemo;
+    procedure btnExecuteClick(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
   private
     { Private declarations }
@@ -42,6 +54,13 @@ var
 implementation
 
 {$R *.dfm}
+
+uses OpenAI;
+
+procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);
+begin
+  mmoOutput.Text := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value);
+end;
 
 procedure TfrmImageGenerator.Exit1Click(Sender: TObject);
 begin

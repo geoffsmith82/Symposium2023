@@ -14,7 +14,7 @@ uses
 type
   TOpenAI = class
   public
-    class function CallDALL_E(prompt, model: string): string;
+    class function CallDALL_E(prompt: string; n: Integer): string;
     class function AskChatGPT(AQuestion, AModel: string): string;
   end;
 
@@ -22,7 +22,7 @@ implementation
 
 {$I APIKEY.INC}
 
-class function TOpenAI.CallDALL_E(prompt: string; model: string): string;
+class function TOpenAI.CallDALL_E(prompt: string; n: Integer): string;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
@@ -43,7 +43,7 @@ begin
 
       json := TJSONObject.Create;
       json.AddPair('prompt', TJSONString.Create(prompt));
-      json.AddPair('model', TJSONString.Create(model));
+      json.AddPair('n', TJSONNumber.Create(n));
       LRequest.AddBody(json.ToString, ctAPPLICATION_JSON);
 
       LResponse := TRESTResponse.Create(nil);
