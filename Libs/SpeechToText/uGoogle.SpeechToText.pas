@@ -6,24 +6,83 @@ uses uBaseSpeechToText,
   System.Classes,
   System.SysUtils,
   System.JSON,
+  System.IniFiles,
+  System.Net.URLClient,
+  Winapi.ShellAPI,
   REST.Client,
   REST.Types,
-  System.NetEncoding;
+  System.NetEncoding,
+  REST.Authenticator.EnhancedOAuth,
+  IdHTTPServer,
+  IdCustomHTTPServer,
+  IdHTTPHeaderInfo,
+  IdContext
+  ;
 
 type
   TGoogleSpeechToText = class(TBaseSpeechToText)
   strict private
+    FOAuth2 : TEnhancedOAuth2Authenticator;
+    FHTTPServer : TIdHttpServer;
+    FSettings : TIniFile;
     FAccessToken : string;
+    procedure IdHTTPServer1CommandGet(AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     function Base64EncodedFile(filename: string): string;
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
-
+    procedure Authenticate(ASettings: TIniFile);
+    constructor Create(AResourceKey, AApplicationName, AHost: string);
   end;
 
 implementation
 
+{$I ..\apikey.inc}
+
 { TGoogleSpeechToText }
+
+constructor TGoogleSpeechToText.Create(AResourceKey, AApplicationName, AHost: string);
+begin
+ // inherited Create(AResourceKey, AApplicationName, AHost);
+  FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
+  FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
+  FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
+  FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
+  FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
+  FOAuth2.ClientID := google_clientid;
+  FOAuth2.ClientSecret := google_clientsecret;
+  FHTTPServer := TIdHttpServer.Create;
+  FHTTPServer.DefaultPort := 7777;
+  FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
+  FHTTPServer.Active := True;
+end;
+
+procedure TGoogleSpeechToText.IdHTTPServer1CommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+var
+  LCode: string;
+  LURL : TURI;
+begin
+  if ARequestInfo.QueryParams = '' then
+    Exit;
+  LURL := TURI.Create('https://localhost/?' + ARequestInfo.QueryParams);
+  try
+    LCode := LURL.ParameterByName['code'];
+  except
+    Exit;
+  end;
+  FOAuth2.AuthCode := LCode;
+  FOAuth2.ChangeAuthCodeToAccesToken;
+
+  FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
+end;
+
+procedure TGoogleSpeechToText.Authenticate(ASettings: TIniFile);
+begin
+  FSettings := ASettings;
+  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
+end;
+
 
 function TGoogleSpeechToText.Base64EncodedFile(filename:string):string;
 var

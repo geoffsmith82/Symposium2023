@@ -104,7 +104,7 @@ begin
   end
   else if engine = 'Google' then
   begin
-    FSpeechToText := TGoogleSpeechToText.Create;
+    FSpeechToText := TGoogleSpeechToText.Create('','ADUG Demo', '');
   end
   else if engine = 'Amazon' then
   begin
