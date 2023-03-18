@@ -86,6 +86,8 @@
             <Form>VoiceRecognitionForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Libs\SpeechToText\uBaseSpeechToText.pas"/>
+        <DCCReference Include="..\Libs\SpeechToText\uMicrosoft.SpeechToText.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

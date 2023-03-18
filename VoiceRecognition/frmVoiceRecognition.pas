@@ -13,7 +13,13 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.Menus,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls,
+  uBaseSpeechToText,
+  uGoogle.SpeechToText,
+  uAmazon.SpeechToText,
+  uMicrosoft.SpeechToText,
+  uOpenAI.Whisper.Online.SpeechToText
+  ;
 
 type
   TVoiceRecognitionForm = class(TForm)
@@ -41,10 +47,14 @@ type
     miAmazon: TMenuItem;
     miOpenAIWhisper: TMenuItem;
     miOpenAIWhisperLocal: TMenuItem;
+    procedure FormDestroy(Sender: TObject);
     procedure btnBrowseClick(Sender: TObject);
+    procedure btnRecognizeSpeechClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
+    procedure miEngineSelectedClick(Sender: TObject);
   private
     { Private declarations }
+    FSpeechToText : TBaseSpeechToText;
   public
     { Public declarations }
   end;
@@ -56,6 +66,11 @@ implementation
 
 {$R *.dfm}
 
+procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FSpeechToText);
+end;
+
 procedure TVoiceRecognitionForm.btnBrowseClick(Sender: TObject);
 begin
   if OpenDialog.Execute then
@@ -64,9 +79,38 @@ begin
   end;
 end;
 
+procedure TVoiceRecognitionForm.btnRecognizeSpeechClick(Sender: TObject);
+begin
+//  FSpeechToText
+end;
+
 procedure TVoiceRecognitionForm.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
+end;
+
+procedure TVoiceRecognitionForm.miEngineSelectedClick(Sender: TObject);
+var
+  engine : string;
+begin
+  engine := (Sender as TMenuItem).Caption.Replace('&', '');
+  if engine = 'Microsoft' then
+  begin
+    FSpeechToText := TMicrosoftSpeechToText.Create;
+  end
+  else if engine = 'Google' then
+  begin
+    FSpeechToText := TGoogleSpeechToText.Create;
+  end
+  else if engine = 'Amazon' then
+  begin
+    FSpeechToText := TAmazonSpeechToText.Create;
+  end
+  else if engine = 'Open AI Whisper' then
+  begin
+    FSpeechToText := TOpenAiWhisperOnline.Create;
+  end;
+
 end;
 
 end.

@@ -2,7 +2,9 @@ program VoiceRecognition;
 
 uses
   Vcl.Forms,
-  frmVoiceRecognition in 'frmVoiceRecognition.pas' {VoiceRecognitionForm};
+  frmVoiceRecognition in 'frmVoiceRecognition.pas' {VoiceRecognitionForm},
+  uBaseSpeechToText in '..\Libs\SpeechToText\uBaseSpeechToText.pas',
+  uMicrosoft.SpeechToText in '..\Libs\SpeechToText\uMicrosoft.SpeechToText.pas';
 
 {$R *.res}
 

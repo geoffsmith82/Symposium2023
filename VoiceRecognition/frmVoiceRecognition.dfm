@@ -12,6 +12,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = True
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
@@ -52,6 +53,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
     Height = 25
     Caption = 'Recognize Speech'
     TabOrder = 3
+    OnClick = btnRecognizeSpeechClick
   end
   object Memo1: TMemo
     Left = 24
@@ -104,18 +106,23 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
       Caption = 'Engine'
       object miMicrosoft: TMenuItem
         Caption = 'Microsoft'
+        OnClick = miEngineSelectedClick
       end
       object miGoogle: TMenuItem
         Caption = 'Google'
+        OnClick = miEngineSelectedClick
       end
       object miAmazon: TMenuItem
         Caption = 'Amazon'
+        OnClick = miEngineSelectedClick
       end
       object miOpenAIWhisper: TMenuItem
         Caption = 'Open AI Whisper'
+        OnClick = miEngineSelectedClick
       end
       object miOpenAIWhisperLocal: TMenuItem
         Caption = 'Open AI Whisper (Local)'
+        OnClick = miEngineSelectedClick
       end
     end
   end
