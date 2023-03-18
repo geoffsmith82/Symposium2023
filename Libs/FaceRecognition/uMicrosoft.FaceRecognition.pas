@@ -3,10 +3,13 @@ unit uMicrosoft.FaceRecognition;
 interface
 
 uses
+  System.Classes,
+  System.SysUtils,
   REST.Client,
   REST.Types,
   System.JSON,
-  uBaseFaceRecognition;
+  uBaseFaceRecognition
+  ;
 
 type
   TMicrosoftFaceRecognition = class(TBaseFaceRecognition)
@@ -14,6 +17,8 @@ type
     FAPIKey : string;
   public
     function DetectFacesFromURL(imageUrl: string): string; override;
+    function DetectFacesFromStream(imageStream: TStream): string; override;
+    function DetectFacesFromFile(imageFilename: string): string; override;
     constructor Create(APIKey : string);
   end;
 
@@ -26,8 +31,17 @@ begin
   FAPIKey := APIKey;
 end;
 
+function TMicrosoftFaceRecognition.DetectFacesFromFile(imageFilename: string): string;
+begin
+
+end;
+
+function TMicrosoftFaceRecognition.DetectFacesFromStream(imageStream: TStream): string;
+begin
+
+end;
+
 function TMicrosoftFaceRecognition.DetectFacesFromURL(imageUrl: string): string;
-//function DetectFaces(imageUrl: string; apiKey: string): TJSONArray;
 var
   restClient: TRESTClient;
   restRequest: TRESTRequest;
@@ -35,10 +49,13 @@ var
   url: string;
   request: TJSONObject;
 begin
-  restClient := TRESTClient.Create(nil);
-  restRequest := TRESTRequest.Create(nil);
-  restResponse := TRESTResponse.Create(nil);
+    restClient := nil;
+    restRequest := nil;
+    restResponse := nil;
   try
+    restClient := TRESTClient.Create(nil);
+    restRequest := TRESTRequest.Create(nil);
+    restResponse := TRESTResponse.Create(nil);
     // Construct the API endpoint URL
     url := 'https://<your region>.api.cognitive.microsoft.com/face/v1.0/detect';
     url := url + '?returnFaceId=true&returnFaceLandmarks=false';
@@ -68,10 +85,10 @@ begin
     // Parse the JSON response and return the array of detected faces
     Result := (TJSONObject.ParseJSONValue(restResponse.Content) as TJSONArray).ToJSON;
   finally
-    request.Free;
-    restResponse.Free;
-    restRequest.Free;
-    restClient.Free;
+    FreeAndNil(request);
+    FreeAndNil(restResponse);
+    FreeAndNil(restRequest);
+    FreeAndNil(restClient);
   end;
 end;
 

@@ -18,6 +18,9 @@
         <Projects Include="ImageGeneration\ImageGeneration.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="FaceRecognition\FaceRecognition.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -71,14 +74,23 @@
     <Target Name="ImageGeneration:Make">
         <MSBuild Projects="ImageGeneration\ImageGeneration.dproj" Targets="Make"/>
     </Target>
+    <Target Name="FaceRecognition">
+        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj"/>
+    </Target>
+    <Target Name="FaceRecognition:Clean">
+        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FaceRecognition:Make">
+        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather;VoiceRecognition;ImageGeneration"/>
+        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather;VoiceRecognition;ImageGeneration;FaceRecognition"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean;VoiceRecognition:Clean;ImageGeneration:Clean"/>
+        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean;VoiceRecognition:Clean;ImageGeneration:Clean;FaceRecognition:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make;VoiceRecognition:Make;ImageGeneration:Make"/>
+        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make;VoiceRecognition:Make;ImageGeneration:Make;FaceRecognition:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

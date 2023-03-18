@@ -104,6 +104,8 @@
         </DCCReference>
         <DCCReference Include="..\Libs\FaceRecognition\uBaseFaceRecognition.pas"/>
         <DCCReference Include="..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.pas"/>
+        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
