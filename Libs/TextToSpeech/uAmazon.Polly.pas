@@ -12,10 +12,11 @@ uses
   System.Net.HttpClient,
   System.NetEncoding,
   System.Hash,
-  uBaseSpeech,
-  AWS.Polly,  // need to install AWS SDK For Delphi Preview
+  uBaseSpeech
+{$IFNDEF NOPOLLY}
+  ,AWS.Polly,  // need to install AWS SDK For Delphi Preview
   AWS.Core    // Need Delphi Enterprise or above and install from
-              // GetIt
+{$ENDIF}              // GetIt
   ;
 
 type
@@ -49,12 +50,15 @@ begin
 end;
 
 function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStream;
+{$IFNDEF NOPOLLY}
 var
   polly : TPollyClient;
   request : TPollySynthesizeSpeechRequest;
   response : IPollySynthesizeSpeechResponse;
   options : IAWSOptions;
+{$ENDIF}
 begin
+{$IFNDEF NOPOLLY}
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccountName;
   options.SecretAccessKey := FAccountKey;
@@ -72,6 +76,10 @@ begin
   finally
     FreeAndNil(polly);
   end;
+{$ENDIF}
+{$IFDEF NOPOLLY}
+  raise Exception.Create('Polly Not Available/Not Compiled in');
+{$ENDIF}
 end;
 
 end.

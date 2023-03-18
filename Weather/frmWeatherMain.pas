@@ -14,8 +14,10 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.MPlayer,
+{$IFNDEF NOPOLLY}
   uAmazon.Polly
   ;
+{$ENDIF}
 
 type
   TfrmWeatherWindow = class(TForm)

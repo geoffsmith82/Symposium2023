@@ -1,7 +1,7 @@
 object dmWeather: TdmWeather
+  OldCreateOrder = True
   Height = 1500
   Width = 2000
-  PixelsPerInch = 120
   object IdFTP1: TIdFTP
     Host = 'ftp.bom.gov.au'
     Passive = True

@@ -117,7 +117,7 @@ begin
 
     ssmlText := '<speak version=''1.0'' xml:lang=''en-US''><voice xml:lang=''en-US'' xml:gender=''Male'' ' +
       'name=''' + VoiceName +  '''>' + text + '</voice></speak>';
-    RESTRequest.AddBody(ssmlText, 'application/ssml+xml');
+    RESTRequest.AddBody(ssmlText);
     RESTRequest.Execute;
     Result := TMemoryStream.Create;
     Result.Write(RESTResponse.RawBytes, Length(RESTResponse.RawBytes));
