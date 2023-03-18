@@ -80,8 +80,12 @@ begin
 end;
 
 procedure TVoiceRecognitionForm.btnRecognizeSpeechClick(Sender: TObject);
+var
+  filename : string;
 begin
-//  FSpeechToText
+  FSpeechToText := TOpenAiWhisperOnline.Create;
+  filename := edtFilename.Text;
+  Memo1.Text := FSpeechToText.TranscribeAudio(filename, 'whisper-1');
 end;
 
 procedure TVoiceRecognitionForm.miExitClick(Sender: TObject);
