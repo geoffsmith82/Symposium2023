@@ -12,9 +12,11 @@ uses
   ;
 
 type
+  TDALLESize = ( DALLE256, DALLE512, DALLE1024);
+
   TOpenAI = class
   public
-    class function CallDALL_E(prompt: string; n: Integer): string;
+    class function CallDALL_E(prompt: string; n: Integer; size: TDALLESize): string;
     class function AskChatGPT(AQuestion, AModel: string): string;
   end;
 
@@ -22,7 +24,7 @@ implementation
 
 {$I APIKEY.INC}
 
-class function TOpenAI.CallDALL_E(prompt: string; n: Integer): string;
+class function TOpenAI.CallDALL_E(prompt: string; n: Integer; size: TDALLESize): string;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
@@ -44,6 +46,11 @@ begin
       json := TJSONObject.Create;
       json.AddPair('prompt', TJSONString.Create(prompt));
       json.AddPair('n', TJSONNumber.Create(n));
+      case size of
+        DALLE256: json.AddPair('size', '256x256');
+        DALLE512: json.AddPair('size', '512x512');
+        DALLE1024: json.AddPair('size', '1024x1024');
+      end;
       LRequest.AddBody(json.ToString, ctAPPLICATION_JSON);
 
       LResponse := TRESTResponse.Create(nil);

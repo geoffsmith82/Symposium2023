@@ -40,6 +40,7 @@ type
     JvImagesViewer1: TJvImagesViewer;
     seImageCount: TSpinEdit;
     mmoOutput: TMemo;
+    cboSize: TComboBox;
     procedure btnExecuteClick(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
   private
@@ -58,8 +59,23 @@ implementation
 uses OpenAI;
 
 procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);
+var
+  size : TDALLESize;
 begin
-  mmoOutput.Text := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value);
+  if cboSize.Text = '256x256' then
+  begin
+    size := DALLE256;
+  end
+  else if cboSize.Text = '512x512' then
+  begin
+    size := DALLE512;
+  end
+  else if cboSize.Text = '1024x1024' then
+  begin
+    size := DALLE1024;
+  end;
+
+  mmoOutput.Text := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
 end;
 
 procedure TfrmImageGenerator.Exit1Click(Sender: TObject);

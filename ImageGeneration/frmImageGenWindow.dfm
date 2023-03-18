@@ -74,6 +74,20 @@ object frmImageGenerator: TfrmImageGenerator
       'mmoOutput')
     TabOrder = 4
   end
+  object cboSize: TComboBox
+    Left = 503
+    Top = 104
+    Width = 92
+    Height = 23
+    Style = csDropDownList
+    ItemIndex = 2
+    TabOrder = 5
+    Text = '1024x1024'
+    Items.Strings = (
+      '256x256'
+      '512x512'
+      '1024x1024')
+  end
   object MainMenu1: TMainMenu
     Left = 184
     Top = 120
