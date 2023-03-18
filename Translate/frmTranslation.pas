@@ -15,6 +15,7 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.Menus,
+  Vcl.StdCtrls,
   uBaseTranslate,
   uAmazon.Translate,
   uGoogle.Translate,
@@ -40,6 +41,10 @@ type
     miAmazonTranslate: TMenuItem;
     miToLanguage: TMenuItem;
     miFromLanguage: TMenuItem;
+    mmoSourceText: TMemo;
+    mmoTranslatedText: TMemo;
+    btnTranslate: TButton;
+    procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
@@ -60,6 +65,13 @@ implementation
 
 {$R *.dfm}
 
+{$i ..\Libs\apikey.inc}
+
+procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
+begin
+  mmoTranslatedText.Text := FTranslate.Translate(mmoSourceText.Text);
+end;
+
 procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
@@ -78,7 +90,7 @@ begin
   if languageEngine.Replace('&','') = 'Microsoft Translate' then
   begin
     miMicrosoft.Checked := True;
-    FTranslate := TMicrosoftTranslate.Create('','https://api.cognitive.microsofttranslator.com/','','');
+    FTranslate := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en');
   end
   else if languageEngine.Replace('&','') = 'Google Translate' then
   begin

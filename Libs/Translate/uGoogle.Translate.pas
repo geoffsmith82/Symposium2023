@@ -25,7 +25,7 @@ type
     FTargetLang: string;
   public
     constructor Create(const APIKey: string; const SourceLang, TargetLang: string);
-    function Translate(const SourceText: string): string;
+    function Translate(const SourceText: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
     function ToLanguages: TArray<string>; override;

@@ -16,6 +16,33 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 15
+  object mmoSourceText: TMemo
+    Left = 24
+    Top = 8
+    Width = 545
+    Height = 177
+    Lines.Strings = (
+      'mmoSourceText')
+    TabOrder = 0
+  end
+  object mmoTranslatedText: TMemo
+    Left = 24
+    Top = 208
+    Width = 545
+    Height = 177
+    Lines.Strings = (
+      'Memo1')
+    TabOrder = 1
+  end
+  object btnTranslate: TButton
+    Left = 600
+    Top = 24
+    Width = 75
+    Height = 25
+    Caption = 'Translate'
+    TabOrder = 2
+    OnClick = btnTranslateClick
+  end
   object MainMenu1: TMainMenu
     Left = 84
     Top = 56
