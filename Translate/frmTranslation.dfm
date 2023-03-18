@@ -2,8 +2,8 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
   Left = 0
   Top = 0
   Caption = 'Translate Language'
-  ClientHeight = 1190
-  ClientWidth = 1978
+  ClientHeight = 471
+  ClientWidth = 787
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,12 +11,14 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu1
+  OldCreateOrder = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  PixelsPerInch = 96
   TextHeight = 15
   object MainMenu1: TMainMenu
-    Left = 1788
-    Top = 8
+    Left = 84
+    Top = 56
     object File1: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
