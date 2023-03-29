@@ -18,6 +18,7 @@ uses
   uGoogle.SpeechToText,
   uAmazon.SpeechToText,
   uMicrosoft.SpeechToText,
+  Inifiles,
   uOpenAI.Whisper.Online.SpeechToText
   ;
 
@@ -47,14 +48,18 @@ type
     miAmazon: TMenuItem;
     miOpenAIWhisper: TMenuItem;
     miOpenAIWhisperLocal: TMenuItem;
+    GoogleAuthenticate1: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure btnBrowseClick(Sender: TObject);
     procedure btnRecognizeSpeechClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miEngineSelectedClick(Sender: TObject);
+    procedure GoogleAuthenticate1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FSpeechToText : TBaseSpeechToText;
+    FSettings : TIniFile;
   public
     { Public declarations }
   end;
@@ -66,9 +71,20 @@ implementation
 
 {$R *.dfm}
 
+procedure TVoiceRecognitionForm.FormCreate(Sender: TObject);
+begin
+  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+end;
+
 procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSpeechToText);
+  FreeAndNil(FSettings);
+end;
+
+procedure TVoiceRecognitionForm.GoogleAuthenticate1Click(Sender: TObject);
+begin
+  (FSpeechToText as TGoogleSpeechToText).Authenticate;
 end;
 
 procedure TVoiceRecognitionForm.btnBrowseClick(Sender: TObject);
@@ -83,7 +99,6 @@ procedure TVoiceRecognitionForm.btnRecognizeSpeechClick(Sender: TObject);
 var
   filename : string;
 begin
-  FSpeechToText := TOpenAiWhisperOnline.Create;
   filename := edtFilename.Text;
   Memo1.Text := FSpeechToText.TranscribeAudio(filename, 'whisper-1');
 end;
@@ -105,7 +120,7 @@ begin
   end
   else if engine = 'Google' then
   begin
-    FSpeechToText := TGoogleSpeechToText.Create('','ADUG Demo', '');
+    FSpeechToText := TGoogleSpeechToText.Create('','ADUG Demo', '', FSettings);
   end
   else if engine = 'Amazon' then
   begin

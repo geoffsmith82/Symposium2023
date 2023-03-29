@@ -16,7 +16,8 @@ uses uBaseSpeechToText,
   IdHTTPServer,
   IdCustomHTTPServer,
   IdHTTPHeaderInfo,
-  IdContext
+  IdContext,
+  uGoogle.SpeechToText.DTO
   ;
 
 type
@@ -32,8 +33,8 @@ type
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
-    procedure Authenticate(ASettings: TIniFile);
-    constructor Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
+    procedure Authenticate;
+    constructor Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
   end;
 
 implementation
@@ -42,7 +43,7 @@ implementation
 
 { TGoogleSpeechToText }
 
-constructor TGoogleSpeechToText.Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
+constructor TGoogleSpeechToText.Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
 begin
  // inherited Create(AResourceKey, AApplicationName, AHost);
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
@@ -52,6 +53,8 @@ begin
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
   FOAuth2.ClientID := google_clientid;
   FOAuth2.ClientSecret := google_clientsecret;
+  FSettings := Settings;
+  FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
@@ -77,25 +80,27 @@ begin
   FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
 end;
 
-procedure TGoogleSpeechToText.Authenticate(ASettings: TIniFile);
+procedure TGoogleSpeechToText.Authenticate;
 begin
-  FSettings := ASettings;
-  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
+  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
 
-function TGoogleSpeechToText.Base64EncodedFile(const filename:string):string;
+function TGoogleSpeechToText.Base64EncodedFile(const filename:string): string;
 var
   fs : TFileStream;
   mem : TStringStream;
+  enc : TNetEncoding;
 begin
   fs := nil;
   mem := nil;
+  enc := nil;
   Result := '';
   try
     fs := TFileStream.Create(filename, fmOpenRead);
     mem := TStringStream.Create;
-    if TNetEncoding.Base64.Encode(fs, mem) > 0 then
+//    enc := ;
+    if TNetEncoding.Base64String.Encode(fs, mem) > 0 then
     begin
       Result := mem.DataString;
     end;
@@ -113,11 +118,11 @@ begin
   // Create the JSON objects and pairs
   ConfigObj := TJSONObject.Create;
   EncodingPair := TJSONPair.Create('encoding', 'FLAC');
-  SampleRatePair := TJSONPair.Create('sampleRateHertz', TJSONNumber.Create(16000));
+ // SampleRatePair := TJSONPair.Create('sampleRateHertz', TJSONNumber.Create(22050));
   LanguageCodePair := TJSONPair.Create('languageCode', 'en-US');
-  ModelPair := TJSONPair.Create('model', ModelName);
+  ModelPair := TJSONPair.Create('model', 'default');// ModelName);
   ConfigObj.AddPair(EncodingPair);
-  ConfigObj.AddPair(SampleRatePair);
+//  ConfigObj.AddPair(SampleRatePair);
   ConfigObj.AddPair(LanguageCodePair);
   ConfigObj.AddPair(ModelPair);
 
@@ -138,25 +143,24 @@ var
   Request: TRESTRequest;
   Response: TRESTResponse;
   jsonBody: TJSONObject;
-//  AccessToken: string;
+  googleResults : TTGoogleSpeechToTextResultsClass;
 begin
   // 1. Get authentication credentials
  // AccessToken := 'YOUR_ACCESS_TOKEN';
-
   // 2. Install a REST client library
   RestClient := TRESTClient.Create('https://speech.googleapis.com');
-
   // 3. Prepare the audio file
   // ...
-
   // 4. Send a POST request to the Speech-to-Text API
   Request := TRESTRequest.Create(RestClient);
   Request.Resource := '/v1/speech:recognize';
+  FOAuth2.RefreshAccessTokenIfRequired;
+  RestClient.Authenticator := FOAuth2;
+
   Request.Method := rmPOST;
  // Request.Params.AddItem('key', 'YOUR_API_KEY');
-  Request.Params.AddItem('access_token', FAccessToken);
-  Request.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER);
-
+ // Request.Params.AddItem('access_token', FAccessToken);
+  Request.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   jsonBody := CreateRequestJSON(FilePath, ModelName);
   try
     Request.AddBody(jsonBody);
@@ -165,15 +169,17 @@ begin
     FreeAndNil(jsonBody);
   end;
   Response := TRESTResponse.Create(Request);
+  Request.Response := Response;
   try
     Request.Execute;
-    Result := Response.Content;
+    googleResults := TTGoogleSpeechToTextResultsClass.FromJsonString(Response.Content);
+    Result := googleResults.results[0].alternatives[0].transcript;
+//    Result := Response.Content;
   finally
     Response.Free;
     Request.Free;
     RestClient.Free;
   end;
-
   // 5. Parse the response
   // ...
 end;

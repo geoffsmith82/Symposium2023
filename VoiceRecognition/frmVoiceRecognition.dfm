@@ -11,6 +11,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu1
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
   object Label1: TLabel
@@ -136,6 +137,10 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
         RadioItem = True
         OnClick = miEngineSelectedClick
       end
+    end
+    object GoogleAuthenticate1: TMenuItem
+      Caption = 'Google Authenticate'
+      OnClick = GoogleAuthenticate1Click
     end
   end
 end

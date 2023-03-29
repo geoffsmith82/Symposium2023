@@ -8,7 +8,8 @@ uses
   uOpenAI.Whisper.Online.SpeechToText in '..\Libs\SpeechToText\uOpenAI.Whisper.Online.SpeechToText.pas',
   uGoogle.SpeechToText in '..\Libs\SpeechToText\uGoogle.SpeechToText.pas',
   uAmazon.SpeechToText in '..\Libs\SpeechToText\uAmazon.SpeechToText.pas',
-  REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas';
+  REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
+  uGoogle.SpeechToText.DTO in '..\Libs\SpeechToText\uGoogle.SpeechToText.DTO.pas';
 
 {$R *.res}
 
