@@ -88,6 +88,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

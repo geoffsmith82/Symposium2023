@@ -8,7 +8,8 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   REST.Client,
-  REST.Types
+  REST.Types,
+  uDALLe2.DTO
   ;
 
 type
@@ -16,7 +17,7 @@ type
 
   TOpenAI = class
   public
-    class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): string;
+    class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
   end;
 
@@ -24,7 +25,7 @@ implementation
 
 {$I APIKEY.INC}
 
-class function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): string;
+class function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
@@ -57,8 +58,7 @@ begin
       LResponse.ContentType := 'application/json';
       LRequest.Response := LResponse;
       LRequest.Execute;
-
-      Result := LResponse.Content;
+      Result := TGeneratedImagesClass.FromJsonString(LResponse.Content);
     finally
       LRequest.Free;
     end;

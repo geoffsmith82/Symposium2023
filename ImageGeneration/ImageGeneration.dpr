@@ -3,7 +3,8 @@ program ImageGeneration;
 uses
   Vcl.Forms,
   frmImageGenWindow in 'frmImageGenWindow.pas' {frmImageGenerator},
-  OpenAI in '..\Libs\OpenAI.pas';
+  OpenAI in '..\Libs\OpenAI.pas',
+  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}
 
