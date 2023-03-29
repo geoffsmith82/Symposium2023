@@ -97,6 +97,7 @@ procedure TVoiceRecognitionForm.miEngineSelectedClick(Sender: TObject);
 var
   engine : string;
 begin
+  FreeAndNil(FSpeechToText);
   engine := (Sender as TMenuItem).Caption.Replace('&', '');
   if engine = 'Microsoft' then
   begin

@@ -82,10 +82,10 @@ begin
       RestRequest.Execute;
       Result := RestResponse.Content;
     finally
-      RestResponse.Free;
+      FreeAndNil(RestResponse);
     end;
   finally
-    RestClient.Free;
+    FreeAndNil(RestClient);
   end;
 end;
 

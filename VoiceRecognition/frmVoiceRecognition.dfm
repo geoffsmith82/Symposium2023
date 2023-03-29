@@ -11,9 +11,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu1
-  OldCreateOrder = True
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
     Left = 40
@@ -45,6 +43,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
     Height = 23
     TabOrder = 2
     Text = 'ComboBox1'
+    Visible = False
   end
   object btnRecognizeSpeech: TButton
     Left = 472
@@ -60,8 +59,6 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
     Top = 96
     Width = 553
     Height = 305
-    Lines.Strings = (
-      'Memo1')
     TabOrder = 4
   end
   object OpenDialog: TOpenDialog
@@ -105,23 +102,38 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
     object miEngine: TMenuItem
       Caption = 'Engine'
       object miMicrosoft: TMenuItem
+        AutoCheck = True
         Caption = 'Microsoft'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miEngineSelectedClick
       end
       object miGoogle: TMenuItem
+        AutoCheck = True
         Caption = 'Google'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miEngineSelectedClick
       end
       object miAmazon: TMenuItem
+        AutoCheck = True
         Caption = 'Amazon'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miEngineSelectedClick
       end
       object miOpenAIWhisper: TMenuItem
+        AutoCheck = True
         Caption = 'Open AI Whisper'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miEngineSelectedClick
       end
       object miOpenAIWhisperLocal: TMenuItem
+        AutoCheck = True
         Caption = 'Open AI Whisper (Local)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miEngineSelectedClick
       end
     end
