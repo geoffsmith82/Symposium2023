@@ -11,14 +11,19 @@ uses
 
 type
   TOpenAiWhisperOnline = class(TBaseSpeechToText)
-
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
+    function SpeechEngineName: string; override;
   end;
 
 implementation
 
 {$i ..\apikey.inc}
+
+function TOpenAiWhisperOnline.SpeechEngineName: string;
+begin
+  Result := 'OpenAiWhisperOnlineSpeech';
+end;
 
 function TOpenAiWhisperOnline.TranscribeAudio(const FilePath, ModelName: string): string;
 var

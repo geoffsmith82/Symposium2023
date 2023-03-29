@@ -31,7 +31,9 @@ type
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     function Base64EncodedFile(const filename:string): string;
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
+
   public
+    function SpeechEngineName: string;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
     constructor Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
@@ -42,6 +44,11 @@ implementation
 {$I ..\apikey.inc}
 
 { TGoogleSpeechToText }
+
+function TGoogleSpeechToText.SpeechEngineName: string;
+begin
+  Result := 'GoogleSpeech';
+end;
 
 constructor TGoogleSpeechToText.Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
 begin

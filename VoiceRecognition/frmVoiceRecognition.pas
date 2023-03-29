@@ -72,8 +72,36 @@ implementation
 {$R *.dfm}
 
 procedure TVoiceRecognitionForm.FormCreate(Sender: TObject);
+var
+  engine : string;
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  engine := FSettings.ReadString('Settings', 'Engine', '');
+  if engine = 'GoogleSpeech' then
+  begin
+    FSpeechToText := TGoogleSpeechToText.Create('','ADUG Demo', '', FSettings);
+    miGoogle.Checked :=  True;
+  end
+  else if engine = 'MicrosoftSpeech' then
+  begin
+    FSpeechToText := TMicrosoftSpeechToText.Create;
+    miMicrosoft.Checked :=  True;
+  end
+  else if engine = 'AmazonSpeech' then
+  begin
+    FSpeechToText := TAmazonSpeechToText.Create;
+    miAmazon.Checked :=  True;
+  end
+  else if engine = 'OpenAiWhisperOnlineSpeech' then
+  begin
+    FSpeechToText := TOpenAiWhisperOnline.Create;
+    miOpenAIWhisper.Checked :=  True;
+  end
+  else
+  begin
+    FSpeechToText := TOpenAiWhisperOnline.Create;
+    miOpenAIWhisper.Checked :=  True;
+  end
 end;
 
 procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
@@ -117,18 +145,22 @@ begin
   if engine = 'Microsoft' then
   begin
     FSpeechToText := TMicrosoftSpeechToText.Create;
+    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
   end
   else if engine = 'Google' then
   begin
     FSpeechToText := TGoogleSpeechToText.Create('','ADUG Demo', '', FSettings);
+    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
   end
   else if engine = 'Amazon' then
   begin
     FSpeechToText := TAmazonSpeechToText.Create;
+    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
   end
   else if engine = 'Open AI Whisper' then
   begin
     FSpeechToText := TOpenAiWhisperOnline.Create;
+    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
   end;
 end;
 
