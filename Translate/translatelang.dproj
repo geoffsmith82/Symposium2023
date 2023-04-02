@@ -91,6 +91,7 @@
         <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
         <DCCReference Include="..\Libs\Translate\uGoogle.Translate.pas"/>
         <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
+        <DCCReference Include="uTranslatedfn.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

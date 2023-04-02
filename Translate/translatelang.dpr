@@ -6,6 +6,7 @@ uses
   uAmazon.Translate in '..\Libs\Translate\uAmazon.Translate.pas',
   uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
   uGoogle.Translate in '..\Libs\Translate\uGoogle.Translate.pas',
+  uTranslatedfn in 'uTranslatedfn.pas',
   uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas';
 
 {$R *.res}
