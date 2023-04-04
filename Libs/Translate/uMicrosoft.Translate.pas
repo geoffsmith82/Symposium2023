@@ -131,17 +131,19 @@ var
   RESTResponse: TRESTResponse;
 begin
   RESTClient := TRESTClient.Create('https://api.cognitive.microsoft.com');
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
+  RESTRequest := TRESTRequest.Create(nil);
+  RESTResponse := TRESTResponse.Create(nil);
   try
     RESTRequest.Method := TRESTRequestMethod.rmPOST;
     RESTRequest.Resource := '/sts/v1.0/issueToken';
+
+    RESTRequest.Client := RESTClient;
     RESTRequest.Response := RESTResponse;
     RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('Content-Length', '0', TRESTRequestParameterKind.pkHTTPHEADER);
+    //RESTRequest.AddParameter('Content-Length', '0', TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.Execute;
-    FAccessToken := RESTResponse.Content;
+    FAccessToken := TEncoding.UTF8.GetString(RESTResponse.RawBytes);
     FExpiryTime := IncMinute(FExpiryTime, 8);
   finally
     RESTResponse.Free;

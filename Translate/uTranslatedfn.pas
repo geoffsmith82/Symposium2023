@@ -125,17 +125,17 @@ type
     { Property Accessors }
     function Get_Id: UnicodeString;
     function Get_Resname: UnicodeString;
-    function Get_Source: Integer;
+    function Get_Source: UnicodeString;
     function Get_Propgroup: IXMLPropgroupType;
     function Get_Target: UnicodeString;
     procedure Set_Id(const Value: UnicodeString);
     procedure Set_Resname(const Value: UnicodeString);
-    procedure Set_Source(const Value: Integer);
+    procedure Set_Source(const Value: UnicodeString);
     procedure Set_Target(const Value: UnicodeString);
     { Methods & Properties }
     property Id: UnicodeString read Get_Id write Set_Id;
     property Resname: UnicodeString read Get_Resname write Set_Resname;
-    property Source: Integer read Get_Source write Set_Source;
+    property Source: UnicodeString read Get_Source write Set_Source;
     property Propgroup: IXMLPropgroupType read Get_Propgroup;
     property Target: UnicodeString read Get_Target write Set_Target;
   end;
@@ -237,12 +237,12 @@ type
     { IXMLTransunitType }
     function Get_Id: UnicodeString;
     function Get_Resname: UnicodeString;
-    function Get_Source: Integer;
+    function Get_Source: UnicodeString;
     function Get_Propgroup: IXMLPropgroupType;
     function Get_Target: UnicodeString;
     procedure Set_Id(const Value: UnicodeString);
     procedure Set_Resname(const Value: UnicodeString);
-    procedure Set_Source(const Value: Integer);
+    procedure Set_Source(const Value: UnicodeString);
     procedure Set_Target(const Value: UnicodeString);
   public
     procedure AfterConstruction; override;
@@ -493,12 +493,12 @@ begin
   SetAttribute('resname', Value);
 end;
 
-function TXMLTransunitType.Get_Source: Integer;
+function TXMLTransunitType.Get_Source: UnicodeString;
 begin
-  Result := XmlStrToInt(ChildNodes['source'].Text);
+  Result := ChildNodes['source'].Text;
 end;
 
-procedure TXMLTransunitType.Set_Source(const Value: Integer);
+procedure TXMLTransunitType.Set_Source(const Value: UnicodeString);
 begin
   ChildNodes['source'].NodeValue := Value;
 end;

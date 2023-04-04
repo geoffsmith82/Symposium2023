@@ -11,10 +11,8 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu1
-  OldCreateOrder = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 15
   object mmoSourceText: TMemo
     Left = 24
@@ -42,6 +40,15 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
     Caption = 'Translate'
     TabOrder = 2
     OnClick = btnTranslateClick
+  end
+  object Button1: TButton
+    Left = 600
+    Top = 88
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 3
+    OnClick = Button1Click
   end
   object MainMenu1: TMainMenu
     Left = 84
@@ -77,7 +84,7 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
         OnClick = Exit1Click
       end
     end
-    object ranslationEngine1: TMenuItem
+    object TranslationEngine1: TMenuItem
       Caption = 'Translation Engine'
       object miMicrosoft: TMenuItem
         Caption = 'Microsoft Translate'
@@ -100,6 +107,10 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
     end
     object miToLanguage: TMenuItem
       Caption = 'To Language'
+    end
+    object GoogleAuthenticate1: TMenuItem
+      Caption = 'Google Authenticate'
+      OnClick = GoogleAuthenticate1Click
     end
   end
 end

@@ -19,7 +19,9 @@ uses
   uBaseTranslate,
   uAmazon.Translate,
   uGoogle.Translate,
-  uMicrosoft.Translate
+  uMicrosoft.Translate,
+  uTranslatedfn,
+  Xml.Win.msxmldom
   ;
 
 type
@@ -35,7 +37,7 @@ type
     Exit1: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
-    ranslationEngine1: TMenuItem;
+    TranslationEngine1: TMenuItem;
     miMicrosoft: TMenuItem;
     miGoogle: TMenuItem;
     miAmazonTranslate: TMenuItem;
@@ -44,11 +46,15 @@ type
     mmoSourceText: TMemo;
     mmoTranslatedText: TMemo;
     btnTranslate: TButton;
+    Button1: TButton;
+    GoogleAuthenticate1: TMenuItem;
     procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure miMicrosoftClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure GoogleAuthenticate1Click(Sender: TObject);
   private
     { Private declarations }
     FTranslate : TBaseTranslate;
@@ -77,6 +83,11 @@ begin
   FreeAndNil(FSettings);
 end;
 
+procedure TfrmMainTranslationWindow.GoogleAuthenticate1Click(Sender: TObject);
+begin
+  (FTranslate as TGoogleTranslate).Authenticate;
+end;
+
 procedure TfrmMainTranslationWindow.FormCreate(Sender: TObject);
 var
   filename : string;
@@ -95,7 +106,7 @@ begin
   else if languageEngine.Replace('&','') = 'Google Translate' then
   begin
     miGoogle.Checked := True;
-    FTranslate := TGoogleTranslate.Create('','','');
+    FTranslate := TGoogleTranslate.Create('', '', '', FSettings);
   end
   else if languageEngine.Replace('&','') = 'Amazon Translate' then
   begin
@@ -127,14 +138,46 @@ begin
   end;
 end;
 
+procedure TfrmMainTranslationWindow.Button1Click(Sender: TObject);
+var
+  xml : IXMLXliffType;
+  i: Integer;
+begin
+  MSXMLDOMDocumentFactory.AddDOMProperty('ProhibitDTD', False);
+  xml := Loadxliff('D:\Programming\ADUG\Symposium2023\Translate\ComponentDinosOffice-OpenOffice-versionOficial\Demo\ENA\Unit1.dfn');
+  for i := 0 to xml.File_.Body.Count - 1 do
+  begin
+    mmoSourceText.Lines.Add('<x>' + i.ToString +'</x><y>' + xml.File_.Body.Transunit[i].Source + '</y>');
+  end;
+end;
+
 procedure TfrmMainTranslationWindow.Exit1Click(Sender: TObject);
 begin
   Application.Terminate;
 end;
 
 procedure TfrmMainTranslationWindow.miMicrosoftClick(Sender: TObject);
+var
+  languageEngine : string;
 begin
   FSettings.WriteString('Settings', 'LanguageEngine', TMenuItem(Sender).Caption);
+  languageEngine := TMenuItem(Sender).Caption;
+  if languageEngine.Replace('&','') = 'Microsoft Translate' then
+  begin
+    miMicrosoft.Checked := True;
+    FTranslate := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en');
+  end
+  else if languageEngine.Replace('&','') = 'Google Translate' then
+  begin
+    miGoogle.Checked := True;
+    FTranslate := TGoogleTranslate.Create('', '', '', FSettings);
+  end
+  else if languageEngine.Replace('&','') = 'Amazon Translate' then
+  begin
+    miAmazonTranslate.Checked := True;
+  end;
+
+
 end;
 
 end.
