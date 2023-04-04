@@ -29,12 +29,12 @@ type
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
-    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
+    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
     function GetVoiceList: TGoogleVoicesListClass;
-    procedure Authenticate(ASettings: TIniFile);
+    procedure Authenticate;
   end;
 
 implementation
@@ -47,13 +47,12 @@ uses
 
 { TGoogleSpeechService }
 
-procedure TGoogleSpeechService.Authenticate(ASettings: TIniFile);
+procedure TGoogleSpeechService.Authenticate;
 begin
-  FSettings := ASettings;
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
 end;
 
-constructor TGoogleSpeechService.Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
+constructor TGoogleSpeechService.Create(const AResourceKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
@@ -67,6 +66,8 @@ begin
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
   FHTTPServer.Active := True;
+  FSettings := Settings;
+  FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
 end;
 
 procedure TGoogleSpeechService.IdHTTPServer1CommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -112,6 +113,7 @@ begin
     RESTRequest1.Method := rmGET;
     RESTRequest1.Resource := '';
     RESTRequest1.Response := RESTResponse1;
+    FOAuth2.RefreshAccessTokenIfRequired;
     RESTClient1.Authenticator := FOAuth2;
     RESTRequest1.AddParameter('Content-Type', 'application/json',
       TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
@@ -161,6 +163,7 @@ begin
     RESTRequest1.Resource := '';
     RESTRequest1.Response := RESTResponse1;
     RESTClient1.Authenticator := FOAuth2;
+    FOAuth2.RefreshAccessTokenIfRequired;
     RESTRequest1.AddParameter('Content-Type', 'application/json',
       TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 

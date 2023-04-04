@@ -7,9 +7,16 @@ uses
   System.SysUtils,
   System.JSON,
   System.NetEncoding,
+  System.Net.URLClient,
+  System.IniFiles,
   REST.Client,
   REST.Types,
-  uBaseFaceRecognition
+  uBaseFaceRecognition,
+  REST.Authenticator.EnhancedOAuth,
+  IdHTTPServer,
+  IdCustomHTTPServer,
+  IdHTTPHeaderInfo,
+  IdContext
   ;
 
 type
@@ -17,16 +24,61 @@ type
   strict private
     function Base64EncodedFile(const filename:string): string;
     function Base64EncodedStream(stream: TStream): string;
-
+  strict private
+    FOAuth2 : TEnhancedOAuth2Authenticator;
+    FHTTPServer : TIdHttpServer;
+    FSettings : TIniFile;
+    FAccessToken : string;
+    procedure IdHTTPServer1CommandGet(AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
     function DetectFacesFromURL(imageUrl: string): string; override;
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
+    constructor Create(const AResourceKey, AApplicationName: string;
+      AHost: string);
   end;
 
 implementation
 
+{$I ..\LIBS\APIKEY.INC}
+
 { TGoogleFaceRecognition }
+
+constructor TGoogleFaceRecognition.Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
+begin
+ // inherited Create(AResourceKey, AApplicationName, AHost);
+  FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
+  FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
+  FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
+  FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
+  FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
+  FOAuth2.ClientID := google_clientid;
+  FOAuth2.ClientSecret := google_clientsecret;
+  FHTTPServer := TIdHttpServer.Create;
+  FHTTPServer.DefaultPort := 7777;
+  FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
+  FHTTPServer.Active := True;
+end;
+
+procedure TGoogleFaceRecognition.IdHTTPServer1CommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+var
+  LCode: string;
+  LURL : TURI;
+begin
+  if ARequestInfo.QueryParams = '' then
+    Exit;
+  LURL := TURI.Create('https://localhost/?' + ARequestInfo.QueryParams);
+  try
+    LCode := LURL.ParameterByName['code'];
+  except
+    Exit;
+  end;
+  FOAuth2.AuthCode := LCode;
+  FOAuth2.ChangeAuthCodeToAccesToken;
+
+  FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
+end;
 
 function TGoogleFaceRecognition.Base64EncodedFile(const filename:string):string;
 var
@@ -49,7 +101,7 @@ begin
   end;
 end;
 
-function TGoogleFaceRecognition.Base64EncodedStream(stream:TStream):string;
+function TGoogleFaceRecognition.Base64EncodedStream(stream: TStream):string;
 var
   mem : TStringStream;
 begin
