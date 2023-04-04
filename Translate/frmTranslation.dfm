@@ -50,6 +50,15 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
     TabOrder = 3
     OnClick = Button1Click
   end
+  object Button2: TButton
+    Left = 600
+    Top = 144
+    Width = 75
+    Height = 25
+    Caption = 'Button2'
+    TabOrder = 4
+    OnClick = Button2Click
+  end
   object MainMenu1: TMainMenu
     Left = 84
     Top = 56

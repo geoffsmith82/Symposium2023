@@ -28,7 +28,6 @@ type
     FOAuth2 : TEnhancedOAuth2Authenticator;
     FHTTPServer : TIdHttpServer;
     FSettings : TIniFile;
-    FAccessToken : string;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   private
@@ -162,17 +161,18 @@ begin
   jsonRequest.AddPair('q', SourceText);
   jsonRequest.AddPair('target', 'en');
 
-  //FRESTRequest.AddParameter('q', SourceText);
   FRESTClient.Authenticator := FOAuth2;
-  FRESTRequest.Resource := '/language/translate/v2';
+  FRESTRequest.Resource := '/language/translate/v2?textType=html';
+
   FOAuth2.RefreshAccessTokenIfRequired;
   FRESTRequest.Method := rmPOST;
   FRESTRequest.AddBody(jsonRequest);
-  FRESTRequest.Execute;
   FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.Execute;
+
 
   // Get the translated text from the REST response
-  Result := FRESTResponse.Content;// FRESTResponse.JSONValue
+  Result := TEncoding.UTF8.GetString(FRESTResponse.RawBytes);
 //    .GetValue<string>(data.translations[0].translatedText);
 end;
 

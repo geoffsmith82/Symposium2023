@@ -90,6 +90,7 @@
         <DCCReference Include="..\Libs\Translate\uAmazon.Translate.pas"/>
         <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
         <DCCReference Include="..\Libs\Translate\uGoogle.Translate.pas"/>
+        <DCCReference Include="uOutputChangedLanguageTokens.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
         <DCCReference Include="uTranslatedfn.pas"/>

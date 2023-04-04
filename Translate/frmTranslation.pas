@@ -21,7 +21,9 @@ uses
   uGoogle.Translate,
   uMicrosoft.Translate,
   uTranslatedfn,
-  Xml.Win.msxmldom
+  uOutputChangedLanguageTokens,
+  Xml.Win.msxmldom,
+  XMLDoc
   ;
 
 type
@@ -48,6 +50,7 @@ type
     btnTranslate: TButton;
     Button1: TButton;
     GoogleAuthenticate1: TMenuItem;
+    Button2: TButton;
     procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -55,6 +58,7 @@ type
     procedure miMicrosoftClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure GoogleAuthenticate1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
     FTranslate : TBaseTranslate;
@@ -142,12 +146,64 @@ procedure TfrmMainTranslationWindow.Button1Click(Sender: TObject);
 var
   xml : IXMLXliffType;
   i: Integer;
+  v : IXMLVType;
+  w : IXMLWType;
 begin
   MSXMLDOMDocumentFactory.AddDOMProperty('ProhibitDTD', False);
   xml := Loadxliff('D:\Programming\ADUG\Symposium2023\Translate\ComponentDinosOffice-OpenOffice-versionOficial\Demo\ENA\Unit1.dfn');
+  v := Newv;
   for i := 0 to xml.File_.Body.Count - 1 do
   begin
-    mmoSourceText.Lines.Add('<x>' + i.ToString +'</x><y>' + xml.File_.Body.Transunit[i].Source + '</y>');
+    w := v.Add;
+    w.X := i;
+    w.Y := xml.File_.Body.Transunit[i].Source;
+  end;
+  mmoSourceText.Text := xmlDoc.FormatXMLData(v.XML);
+end;
+
+procedure TfrmMainTranslationWindow.Button2Click(Sender: TObject);
+var
+  doc : TXMLDocument;
+  xml : IXMLXliffType;
+  v : IXMLVType;
+  w : IXMLWType;
+  k, i : Integer;
+  destInt : Integer;
+  dest : string;
+begin
+  doc := TXMLDocument.Create(nil);
+  try
+    doc.LoadFromXML(mmoTranslatedText.Text);
+    v := Getv(doc);
+    xml := Loadxliff('D:\Programming\ADUG\Symposium2023\Translate\ComponentDinosOffice-OpenOffice-versionOficial\Demo\ENA\Unit1.dfn');
+    for i := 0 to xml.File_.Body.Count - 1 do
+    begin
+      dest := v.W[i].Y.Replace('st', '').Replace('th', '').Replace('nd', '').Replace('rd', '');
+      if not TryStrToInt(dest, destInt) then
+      begin
+        if xml.File_.Body.Transunit[i].Resname.EndsWith('.Caption') then
+        begin
+
+          if v.W[i].Y.DeQuotedString = v.W[i].Y then
+          begin
+            xml.File_.Body.Transunit[i].Target := v.W[i].Y.QuotedString;
+          end
+          else
+            xml.File_.Body.Transunit[i].Target := v.W[i].Y;
+
+          for k := 0 to xml.File_.Body.Transunit[i].Propgroup.Count - 1 do
+          begin
+            if xml.File_.Body.Transunit[i].Propgroup.Prop[k].Proptype = 'Status' then
+            begin
+              xml.File_.Body.Transunit[i].Propgroup.Prop[k].Text := '1';
+            end;
+          end;
+        end;
+      end;
+    end;
+    TFile.WriteAllText('D:\Programming\ADUG\Symposium2023\Translate\ComponentDinosOffice-OpenOffice-versionOficial\Demo\ENA\Unit1.out.dfn', xml.XML);
+  finally
+    v := nil;
   end;
 end;
 
@@ -176,8 +232,6 @@ begin
   begin
     miAmazonTranslate.Checked := True;
   end;
-
-
 end;
 
 end.
