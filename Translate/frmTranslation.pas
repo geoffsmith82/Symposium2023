@@ -110,7 +110,7 @@ begin
   else if languageEngine.Replace('&','') = 'Google Translate' then
   begin
     miGoogle.Checked := True;
-    FTranslate := TGoogleTranslate.Create('', '', '', FSettings);
+    FTranslate := TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings);
   end
   else if languageEngine.Replace('&','') = 'Amazon Translate' then
   begin
@@ -226,7 +226,7 @@ begin
   else if languageEngine.Replace('&','') = 'Google Translate' then
   begin
     miGoogle.Checked := True;
-    FTranslate := TGoogleTranslate.Create('', '', '', FSettings);
+    FTranslate := TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings);
   end
   else if languageEngine.Replace('&','') = 'Amazon Translate' then
   begin

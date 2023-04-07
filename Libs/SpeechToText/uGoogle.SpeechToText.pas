@@ -26,7 +26,7 @@ type
     FOAuth2 : TEnhancedOAuth2Authenticator;
     FHTTPServer : TIdHttpServer;
     FSettings : TIniFile;
-    FAccessToken : string;
+    FSecretKey : string;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     function Base64EncodedFile(const filename:string): string;
@@ -36,12 +36,10 @@ type
     function SpeechEngineName: string;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
-    constructor Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
+    constructor Create(const AResourceKey: string; const ASecretKey: string;const AApplicationName: string; AHost: string; Settings: TIniFile);
   end;
 
 implementation
-
-{$I ..\apikey.inc}
 
 { TGoogleSpeechToText }
 
@@ -50,16 +48,17 @@ begin
   Result := 'GoogleSpeech';
 end;
 
-constructor TGoogleSpeechToText.Create(const AResourceKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
+constructor TGoogleSpeechToText.Create(const AResourceKey: string; const ASecretKey: string;const AApplicationName: string; AHost: string; Settings: TIniFile);
 begin
- // inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(AResourceKey, AApplicationName, AHost);
+  FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
-  FOAuth2.ClientID := google_clientid;
-  FOAuth2.ClientSecret := google_clientsecret;
+  FOAuth2.ClientID := FResourceKey;
+  FOAuth2.ClientSecret := FSecretKey;
   FSettings := Settings;
   FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
   FHTTPServer := TIdHttpServer.Create;

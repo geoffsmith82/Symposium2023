@@ -25,11 +25,12 @@ type
   private
     FOAuth2 : TEnhancedOAuth2Authenticator;
     FHTTPServer : TIdHttpServer;
+    FSecretKey : string;
     FSettings : TIniFile;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
-    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+    constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
@@ -43,8 +44,6 @@ uses
   Winapi.ShellAPI
   ;
 
-{$I ..\apikey.inc}
-
 { TGoogleSpeechService }
 
 procedure TGoogleSpeechService.Authenticate;
@@ -52,16 +51,17 @@ begin
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
 end;
 
-constructor TGoogleSpeechService.Create(const AResourceKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+constructor TGoogleSpeechService.Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
+  FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
-  FOAuth2.ClientID := google_clientid;
-  FOAuth2.ClientSecret := google_clientsecret;
+  FOAuth2.ClientID := FResourceKey;
+  FOAuth2.ClientSecret := FSecretKey;
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;

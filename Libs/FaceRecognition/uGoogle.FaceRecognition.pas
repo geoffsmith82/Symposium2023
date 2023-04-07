@@ -28,33 +28,33 @@ type
     FOAuth2 : TEnhancedOAuth2Authenticator;
     FHTTPServer : TIdHttpServer;
     FSettings : TIniFile;
-    FAccessToken : string;
+    FSecretKey : string;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
     function DetectFacesFromURL(imageUrl: string): string; override;
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
-    constructor Create(const AResourceKey, AApplicationName: string;
-      AHost: string);
+    constructor Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string);
   end;
 
 implementation
 
-{$I ..\LIBS\APIKEY.INC}
+
 
 { TGoogleFaceRecognition }
 
-constructor TGoogleFaceRecognition.Create(const AResourceKey: string; const AApplicationName: string; AHost: string);
+constructor TGoogleFaceRecognition.Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string);
 begin
- // inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(AResourceKey, AApplicationName, AHost);
+  FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
-  FOAuth2.ClientID := google_clientid;
-  FOAuth2.ClientSecret := google_clientsecret;
+  FOAuth2.ClientID := FResourceKey;
+  FOAuth2.ClientSecret := FSecretKey;
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;

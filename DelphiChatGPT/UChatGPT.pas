@@ -107,8 +107,8 @@ begin
   ElevenLabsVoiceService := TElevenLabsService.Create(ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey');
   AmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
   WindowsVoiceService := TWindowsSpeechService.Create('','','');
-  GoogleVoiceService := TGoogleSpeechService.Create('','ADUG Demo', '');
   Settings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  GoogleVoiceService := TGoogleSpeechService.Create(google_clientid, google_clientsecret,'ADUG Demo', '', Settings);
   SpeechEngine := WindowsVoiceService;
   lSpeechEngine := Settings.ReadString('Speech', 'SelectedEngine', 'Windows');
   if lSpeechEngine.Contains(ElevenLabsVoiceService.SpeechEngineName) then
@@ -207,7 +207,7 @@ end;
 
 procedure TForm1.btnGoogleAuthClick(Sender: TObject);
 begin
-  GoogleVoiceService.Authenticate(Settings);
+  GoogleVoiceService.Authenticate;
 end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);

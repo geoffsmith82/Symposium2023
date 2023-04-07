@@ -5,6 +5,7 @@ interface
 uses
   System.Classes,
   System.SysUtils,
+  System.Net.URLClient,
   REST.Client,
   REST.Types,
   System.JSON,
@@ -28,7 +29,7 @@ implementation
 
 constructor TMicrosoftFaceRecognition.Create(const APIKey: string);
 begin
-  inherited Create;
+  inherited Create(APIKey, '', '');
   FAPIKey := APIKey;
 end;
 

@@ -35,10 +35,11 @@ type
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
     FAPIKey: string;
+    FAPISecret: string;
     FSourceLang: string;
     FTargetLang: string;
   public
-    constructor Create(const APIKey: string; const SourceLang, TargetLang: string; Settings: TiniFile);
+    constructor Create(const APIKey: string; const APISecret: string; const SourceLang, TargetLang: string; Settings: TiniFile);
     function Translate(const SourceText: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
@@ -48,18 +49,16 @@ type
 
 implementation
 
-{$I ..\apikey.inc}
-
-
 procedure TGoogleTranslate.Authenticate;
 begin
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
-constructor TGoogleTranslate.Create(const APIKey: string; const SourceLang, TargetLang: string; Settings: TiniFile);
+constructor TGoogleTranslate.Create(const APIKey: string; const APISecret: string; const SourceLang, TargetLang: string; Settings: TiniFile);
 begin
   inherited Create;
   FAPIKey := APIKey;
+  FAPISecret := APISecret;
   FSourceLang := SourceLang;
   FTargetLang := TargetLang;
 
@@ -73,7 +72,6 @@ begin
   FRESTRequest.Client := FRESTClient;
   FRESTRequest.AddParameter('source', FSourceLang);
   FRESTRequest.AddParameter('target', FTargetLang);
-  FRESTRequest.AddParameter('key', FAPIKey);
 
   // Create a new REST response adapter
   FRESTResponse := TRESTResponse.Create(nil);
@@ -84,8 +82,8 @@ begin
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
-  FOAuth2.ClientID := google_clientid;
-  FOAuth2.ClientSecret := google_clientsecret;
+  FOAuth2.ClientID := FAPIKey;
+  FOAuth2.ClientSecret := FAPISecret;
   FSettings := Settings;
   FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
   FHTTPServer := TIdHttpServer.Create;
