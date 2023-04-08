@@ -3,7 +3,7 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
 
 
 ## Example projects
-  - [TranslateLang ](./TranslateLang)
+  - [Translate](./Translate)
 	- translates between languages using the various cloud API's.  
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
   - [DelphiChatGPT](./DelphiChatGPT) 
@@ -35,8 +35,9 @@ Final note: never, ever comment out any code for the sake of brevity. Each revis
 
 
 ### Artificial Intelligence Related links
-https://github.com/Pigrecos/TensorFlow.Delphi
-https://www.bing.com/images/create/
+- [TensorFlow.Delphi](https://github.com/Pigrecos/TensorFlow.Delphi)
+- [Bing Image Creator](https://www.bing.com/images/create/)
+- [Bing](https://www.bing.com/)
 
 
 ### Tools used to create example projects
