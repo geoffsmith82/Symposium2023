@@ -12,9 +12,9 @@ type
     FApplicationName: string;
     FHost: string;
   public
-      constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
-      function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
-      function SpeechEngineName: string; virtual; abstract;
+    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
+    function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
+    function SpeechEngineName: string; virtual; abstract;
   end;
 
 implementation

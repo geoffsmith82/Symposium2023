@@ -11,12 +11,10 @@ object frmImageGenerator: TfrmImageGenerator
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu1
-  OldCreateOrder = True
   OnCreate = FormCreate
   DesignSize = (
     628
     442)
-  PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
     Left = 24
@@ -33,7 +31,7 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 0
   end
   object btnExecute: TButton
-    Left = 520
+    Left = 516
     Top = 23
     Width = 75
     Height = 25
@@ -41,9 +39,10 @@ object frmImageGenerator: TfrmImageGenerator
     Caption = 'Execute'
     TabOrder = 1
     OnClick = btnExecuteClick
+    ExplicitLeft = 512
   end
   object seImageCount: TSpinEdit
-    Left = 536
+    Left = 532
     Top = 54
     Width = 59
     Height = 24
@@ -53,9 +52,10 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 2
     Value = 1
     OnChange = seImageCountChange
+    ExplicitLeft = 528
   end
   object cboSize: TComboBox
-    Left = 503
+    Left = 499
     Top = 84
     Width = 92
     Height = 23
@@ -68,20 +68,23 @@ object frmImageGenerator: TfrmImageGenerator
       '256x256'
       '512x512'
       '1024x1024')
+    ExplicitLeft = 495
   end
   object ScrollBox1: TScrollBox
     Left = 16
     Top = 128
-    Width = 593
+    Width = 589
     Height = 289
     VertScrollBar.Range = 2000
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoScroll = False
     TabOrder = 4
+    ExplicitWidth = 585
+    ExplicitHeight = 288
     object GridPanel1: TGridPanel
       Left = 0
       Top = 0
-      Width = 572
+      Width = 568
       Height = 2000
       Align = alClient
       Caption = 'GridPanel1'
@@ -107,8 +110,7 @@ object frmImageGenerator: TfrmImageGenerator
           Value = 50.000000000000000000
         end>
       TabOrder = 0
-      ExplicitLeft = -3
-      ExplicitTop = 3
+      ExplicitWidth = 564
     end
   end
   object MainMenu1: TMainMenu

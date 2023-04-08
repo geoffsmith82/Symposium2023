@@ -36,7 +36,7 @@ type
     function SpeechEngineName: string;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
-    constructor Create(const AResourceKey: string; const ASecretKey: string;const AApplicationName: string; AHost: string; Settings: TIniFile);
+    constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
   end;
 
 implementation
@@ -96,16 +96,13 @@ function TGoogleSpeechToText.Base64EncodedFile(const filename:string): string;
 var
   fs : TFileStream;
   mem : TStringStream;
-  enc : TNetEncoding;
 begin
   fs := nil;
   mem := nil;
-  enc := nil;
   Result := '';
   try
     fs := TFileStream.Create(filename, fmOpenRead);
     mem := TStringStream.Create;
-//    enc := ;
     if TNetEncoding.Base64String.Encode(fs, mem) > 0 then
     begin
       Result := mem.DataString;
@@ -164,8 +161,6 @@ begin
   RestClient.Authenticator := FOAuth2;
 
   Request.Method := rmPOST;
- // Request.Params.AddItem('key', 'YOUR_API_KEY');
- // Request.Params.AddItem('access_token', FAccessToken);
   Request.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   jsonBody := CreateRequestJSON(FilePath, ModelName);
   try
@@ -180,7 +175,6 @@ begin
     Request.Execute;
     googleResults := TTGoogleSpeechToTextResultsClass.FromJsonString(Response.Content);
     Result := googleResults.results[0].alternatives[0].transcript;
-//    Result := Response.Content;
   finally
     Response.Free;
     Request.Free;

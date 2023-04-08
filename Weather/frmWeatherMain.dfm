@@ -2,18 +2,16 @@ object frmWeatherWindow: TfrmWeatherWindow
   Left = 0
   Top = 0
   Caption = 'Bendigo Weather'
-  ClientHeight = 442
-  ClientWidth = 525
+  ClientHeight = 441
+  ClientWidth = 521
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 15
   object btnLatestForcast: TButton
     Left = 16

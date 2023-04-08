@@ -2,31 +2,26 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Delphi ChatGPT interface'
-  ClientHeight = 876
-  ClientWidth = 1270
+  ClientHeight = 401
+  ClientWidth = 512
   Color = clBtnHighlight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -28
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 240
   DesignSize = (
-    1270
-    876)
-  TextHeight = 34
+    512
+    401)
+  TextHeight = 13
   object Image1: TImage
     Left = 0
-    Top = 2
-    Width = 162
-    Height = 142
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Top = 1
+    Width = 65
+    Height = 57
     Picture.Data = {
       0954506E67496D61676589504E470D0A1A0A0000000D49484452000001BC0000
       01A40403000000B81B8D1A000000017352474200AECE1CE90000000467414D41
@@ -328,50 +323,36 @@ object Form1: TForm1
     Proportional = True
   end
   object btnAskTheMachine: TButton
-    Left = 920
-    Top = 218
-    Width = 324
-    Height = 62
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 368
+    Top = 87
+    Width = 130
+    Height = 25
     Caption = 'Ask the machine '
     TabOrder = 0
     OnClick = btnAskTheMachineClick
   end
   object mmoOutput: TMemo
-    Left = 60
-    Top = 320
-    Width = 1156
-    Height = 558
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 24
+    Top = 119
+    Width = 466
+    Height = 257
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
+    ExplicitWidth = 474
+    ExplicitHeight = 258
   end
   object mmoPrompt: TMemo
-    Left = 178
-    Top = 38
-    Width = 1066
-    Height = 164
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 71
+    Top = 15
+    Width = 427
+    Height = 66
     TabOrder = 2
   end
   object MediaPlayer1: TMediaPlayer
-    Left = 468
-    Top = 70
-    Width = 58
-    Height = 74
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 187
+    Top = 28
+    Width = 0
+    Height = 30
     VisibleButtons = [btPlay]
     DoubleBuffered = True
     Visible = False
@@ -379,26 +360,18 @@ object Form1: TForm1
     TabOrder = 3
   end
   object chkSpeak: TCheckBox
-    Left = 580
-    Top = 220
-    Width = 244
-    Height = 44
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 232
+    Top = 87
+    Width = 98
+    Height = 18
     Caption = 'Speak Answer'
     TabOrder = 4
   end
   object btnSpeakQuestion: TButton
-    Left = 240
-    Top = 218
-    Width = 258
-    Height = 64
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
+    Left = 96
+    Top = 87
+    Width = 103
+    Height = 26
     Caption = 'Speak Question'
     TabOrder = 5
     OnClick = btnSpeakQuestionClick

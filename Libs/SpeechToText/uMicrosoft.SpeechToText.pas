@@ -74,7 +74,6 @@ begin
     RestRequest.Method := rmPOST;
     RestRequest.Params.AddItem('Authorization', 'Bearer ' + AccessToken, TRESTRequestParameterKind.pkHTTPHEADER);
     RestRequest.Params.AddItem('Content-Type', 'audio/wav', TRESTRequestParameterKind.pkHTTPHEADER);
-    // , TRESTContentType.ctAPPLICATION_OCTET_STREAM
     fileStream := TFileStream.Create(filepath, fmOpenRead);
     try
       RestRequest.AddBody(fileStream);

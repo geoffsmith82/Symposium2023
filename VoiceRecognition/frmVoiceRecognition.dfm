@@ -2,8 +2,8 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
   Left = 0
   Top = 0
   Caption = 'Voice Recognition'
-  ClientHeight = 475
-  ClientWidth = 628
+  ClientHeight = 474
+  ClientWidth = 624
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

@@ -132,7 +132,6 @@ begin
     FreeAndNil(RESTResponse1);
     FreeAndNil(RESTClient1);
   end;
-
 end;
 
 function TGoogleSpeechService.SpeechEngineName: string;

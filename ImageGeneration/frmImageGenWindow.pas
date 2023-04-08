@@ -51,8 +51,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnExecuteClick(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
-    procedure Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled:
-        Boolean);
+    procedure Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure SaveImage1Click(Sender: TObject);
     procedure seImageCountChange(Sender: TObject);
   private
@@ -152,8 +151,7 @@ begin
   Application.Terminate;
 end;
 
-procedure TfrmImageGenerator.Image1ContextPopup(Sender: TObject; MousePos:
-    TPoint; var Handled: Boolean);
+procedure TfrmImageGenerator.Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 begin
   CurrentImage := Sender as TImage;
 end;
@@ -225,8 +223,6 @@ begin
       GridPanel1.RowCollection[i].Value := 100 / rowCount; //have cells evenly distributed
     end;
   end;
-
-
 end;
 
 end.

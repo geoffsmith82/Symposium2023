@@ -1,5 +1,4 @@
 object dmWeather: TdmWeather
-  OldCreateOrder = True
   Height = 1500
   Width = 2000
   object IdFTP1: TIdFTP

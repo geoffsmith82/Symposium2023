@@ -48,7 +48,8 @@ var
   restClient: TRESTClient;
   restRequest: TRESTRequest;
   restResponse: TRESTResponse;
-  url: string;
+  serviceUrl: string;
+  uri : TURI;
   request: TJSONObject;
 begin
     restClient := nil;
@@ -60,15 +61,18 @@ begin
     restRequest := TRESTRequest.Create(nil);
     restResponse := TRESTResponse.Create(nil);
     // Construct the API endpoint URL
-    url := 'https://<your region>.api.cognitive.microsoft.com/face/v1.0/detect';
-    url := url + '?returnFaceId=true&returnFaceLandmarks=false';
+  //  url := 'https://<your region>.api.cognitive.microsoft.com/face/v1.0/detect';
+    serviceUrl := 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect';
+    uri := TURI.Create(serviceUrl);
+    uri.AddParameter('returnFaceId', 'false');
+    uri.AddParameter('returnFaceLandmarks', 'false');
 
     // Create a JSON request with the image URL
     request := TJSONObject.Create;
     request.AddPair('url', imageUrl);
 
     // Set the necessary REST client properties
-    restClient.BaseURL := url;
+    restClient.BaseURL := uri.ToString;
     restClient.ContentType := 'application/json';
     restClient.HandleRedirects := True;
     restClient.Authenticator := nil; // no authentication required for the Face API
