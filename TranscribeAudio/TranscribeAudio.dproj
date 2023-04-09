@@ -4,7 +4,7 @@
         <AppType>Application</AppType>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>VoiceRecognition.dpr</MainSource>
+        <MainSource>TranscribeAudio.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{37A0250C-C31B-4179-B85A-92783373B9DB}</ProjectGuid>
         <ProjectVersion>19.5</ProjectVersion>
@@ -41,7 +41,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <SanitizedProjectName>VoiceRecognition</SanitizedProjectName>
+        <SanitizedProjectName>TranscribeAudio</SanitizedProjectName>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
@@ -82,7 +82,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frmVoiceRecognition.pas">
+        <DCCReference Include="frmTranscribeAudio.pas">
             <Form>VoiceRecognitionForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
@@ -111,7 +111,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">VoiceRecognition.dpr</Source>
+                    <Source Name="MainSource">TranscribeAudio.dpr</Source>
                 </Source>
             </Delphi.Personality>
             <Platforms>

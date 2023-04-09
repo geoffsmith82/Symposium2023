@@ -1,8 +1,8 @@
-program VoiceRecognition;
+program TranscribeAudio;
 
 uses
   Vcl.Forms,
-  frmVoiceRecognition in 'frmVoiceRecognition.pas' {VoiceRecognitionForm},
+  frmTranscribeAudio in 'frmTranscribeAudio.pas' {VoiceRecognitionForm},
   uBaseSpeechToText in '..\Libs\SpeechToText\uBaseSpeechToText.pas',
   uMicrosoft.SpeechToText in '..\Libs\SpeechToText\uMicrosoft.SpeechToText.pas',
   uOpenAI.Whisper.Online.SpeechToText in '..\Libs\SpeechToText\uOpenAI.Whisper.Online.SpeechToText.pas',

@@ -1,7 +1,7 @@
 object VoiceRecognitionForm: TVoiceRecognitionForm
   Left = 0
   Top = 0
-  Caption = 'Voice Recognition'
+  Caption = 'Transcribe Audio'
   ClientHeight = 474
   ClientWidth = 624
   Color = clBtnFace
