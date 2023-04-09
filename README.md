@@ -10,8 +10,10 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
 	- write questions to ChatGPT and have it speak the answer.
   - [Weather](./Weather)  
 	- Query the weather forcast for Bendigo from the bureau of meteorology generate a paragraph or two and read it out
-  - [VoiceRecognition](./VoiceRecognition)
+  - [TranscribeAudio](./TranscribeAudio)
     - Upload a audio file and have it translated via a cloud speech to text api.
+  - [VoiceRecognition](./VoiceRecognition)
+    - convert speech to text in real-time straight from your microphone.
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide
 ### Providers Used/Available
@@ -36,6 +38,7 @@ Final note: never, ever comment out any code for the sake of brevity. Each revis
 
 ### Artificial Intelligence Related links
 - [TensorFlow.Delphi](https://github.com/Pigrecos/TensorFlow.Delphi)
+- [llama-pas](https://github.com/Kagamma/llama-pas)
 - [Bing Image Creator](https://www.bing.com/images/create/)
 - [Bing](https://www.bing.com/)
 
