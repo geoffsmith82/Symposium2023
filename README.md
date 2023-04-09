@@ -22,6 +22,7 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
   - Amazon  
   - [ElevenLabs](https://beta.elevenlabs.io/)
   - [OpenAI](https://platform.openai.com)
+  - [AssemblyAI](https://www.assemblyai.com/app)
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.
@@ -41,7 +42,7 @@ Final note: never, ever comment out any code for the sake of brevity. Each revis
 - [llama-pas](https://github.com/Kagamma/llama-pas)
 - [Bing Image Creator](https://www.bing.com/images/create/)
 - [Bing](https://www.bing.com/)
-
+- [ChatGPT](https://chat.openai.com/chat)
 
 ### Tools used to create example projects
  - https://github.com/PKGeorgiev/Delphi-JsonToDelphiClass
