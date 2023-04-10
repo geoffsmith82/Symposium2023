@@ -2,20 +2,21 @@ object Form3: TForm3
   Left = 0
   Top = 0
   Caption = 'Voice Recognition'
-  ClientHeight = 319
-  ClientWidth = 505
+  ClientHeight = 424
+  ClientWidth = 658
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 13
   object Button1: TButton
-    Left = 400
-    Top = 33
+    Left = 568
+    Top = 8
     Width = 75
     Height = 25
     Caption = 'Start'
@@ -23,15 +24,15 @@ object Form3: TForm3
     OnClick = Button1Click
   end
   object Memo1: TMemo
-    Left = 16
+    Left = 8
     Top = 122
-    Width = 353
-    Height = 175
+    Width = 537
+    Height = 151
     TabOrder = 1
   end
   object Button2: TButton
-    Left = 400
-    Top = 72
+    Left = 568
+    Top = 48
     Width = 75
     Height = 25
     Caption = 'Stop'
@@ -41,11 +42,29 @@ object Form3: TForm3
   object ListBox1: TListBox
     Left = 16
     Top = 8
-    Width = 353
+    Width = 537
     Height = 97
     ItemHeight = 13
     TabOrder = 3
     OnClick = ListBox1Click
+  end
+  object Memo2: TMemo
+    Left = 8
+    Top = 279
+    Width = 537
+    Height = 137
+    TabOrder = 4
+  end
+  object MediaPlayer1: TMediaPlayer
+    Left = 587
+    Top = 196
+    Width = 29
+    Height = 30
+    VisibleButtons = [btPlay]
+    DoubleBuffered = True
+    Visible = False
+    ParentDoubleBuffered = False
+    TabOrder = 5
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -136,15 +155,78 @@ object Form3: TForm3
     Left = 157
     Top = 115
   end
-  object WaveOut1: TWaveOut
-    Input = AudioProcessor1
-    FileName = 'D:\Programming\ADUG\Symposium2023\DeepGram\example.wav'
-    ShareMode = 0
-    WavType = wtPCM
-    BlockSize = 512
-    CreateNonMsHeaders = True
-    FileMode = foRewrite
-    Left = 280
-    Top = 144
+  object MainMenu1: TMainMenu
+    Left = 576
+    Top = 128
+    object File1: TMenuItem
+      Caption = '&File'
+      object New1: TMenuItem
+        Caption = '&New'
+      end
+      object Open1: TMenuItem
+        Caption = '&Open...'
+      end
+      object Save1: TMenuItem
+        Caption = '&Save'
+      end
+      object SaveAs1: TMenuItem
+        Caption = 'Save &As...'
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Print1: TMenuItem
+        Caption = '&Print...'
+      end
+      object PrintSetup1: TMenuItem
+        Caption = 'P&rint Setup...'
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Exit1: TMenuItem
+        Caption = 'E&xit'
+        OnClick = Exit1Click
+      end
+    end
+    object SpeechEngine1: TMenuItem
+      Caption = 'Speech Engine'
+      object miMicrosoftSpeechEngine: TMenuItem
+        AutoCheck = True
+        Caption = 'Microsoft'
+        RadioItem = True
+        OnClick = miMicrosoftSpeechEngineClick
+      end
+      object miAmazonSpeechEngine: TMenuItem
+        AutoCheck = True
+        Caption = 'Amazon'
+        RadioItem = True
+        OnClick = miAmazonSpeechEngineClick
+      end
+      object miGoogleSpeechEngine: TMenuItem
+        AutoCheck = True
+        Caption = 'Google'
+        RadioItem = True
+        OnClick = miGoogleSpeechEngineClick
+      end
+      object miElevenLabsSpeechEngine: TMenuItem
+        AutoCheck = True
+        Caption = 'Eleven Labs'
+        RadioItem = True
+        OnClick = miElevenLabsSpeechEngineClick
+      end
+      object miWindowsSpeechEngine: TMenuItem
+        AutoCheck = True
+        Caption = 'Windows'
+        RadioItem = True
+        OnClick = miWindowsSpeechEngineClick
+      end
+    end
+  end
+  object Timer1: TTimer
+    Interval = 50
+    OnTimer = Timer1Timer
+    Left = 568
+    Top = 88
   end
 end

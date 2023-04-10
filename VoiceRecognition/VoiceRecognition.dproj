@@ -123,10 +123,23 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit3.pas">
+        <DCCReference Include="ufrmVoiceRecognition.pas">
             <Form>Form3</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uWindows.Engine.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
+        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
