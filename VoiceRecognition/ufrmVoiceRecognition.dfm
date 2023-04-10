@@ -87,10 +87,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   end
   object AudioProcessor1: TAudioProcessor
     Input = DXAudioIn1
-    OnGetBitsPerSample = AudioProcessor1GetBitsPerSample
-    OnGetChannels = AudioProcessor1GetChannels
     OnGetData = AudioProcessor1GetData
-    OnGetSampleRate = AudioProcessor1GetSampleRate
     Left = 272
     Top = 64
   end

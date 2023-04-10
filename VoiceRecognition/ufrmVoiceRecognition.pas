@@ -87,9 +87,6 @@ type
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
-    procedure AudioProcessor1GetChannels(Sender: TComponent; var Param: Cardinal);
-    procedure AudioProcessor1GetBitsPerSample(Sender: TComponent; var Param: Cardinal);
-    procedure AudioProcessor1GetSampleRate(Sender: TComponent; var Param: Cardinal);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure miAmazonSpeechEngineClick(Sender: TObject);
@@ -309,16 +306,6 @@ begin
   end;
 end;
 
-procedure TfrmVoiceRecognition.AudioProcessor1GetBitsPerSample(Sender: TComponent; var Param: Cardinal);
-begin
-  Param := TAudioProcessor(Sender).Input.BitsPerSample;
-end;
-
-procedure TfrmVoiceRecognition.AudioProcessor1GetChannels(Sender: TComponent; var Param: Cardinal);
-begin
-  Param := TAudioProcessor(Sender).Input.Channels;
-end;
-
 procedure TfrmVoiceRecognition.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
 var
   mem : TMemoryStream;
@@ -334,17 +321,12 @@ begin
   OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
 
-procedure TfrmVoiceRecognition.AudioProcessor1GetSampleRate(Sender: TComponent; var Param: Cardinal);
-begin
-  Param := TAudioProcessor(Sender).Input.SampleRate;
-end;
-
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
-  FSendThread.Resume;
-  Sleep(1000);
   StreamOut1.Stream := FmemStream;
+  FSendThread.Resume;
   Listen;
+  Sleep(100);
   StreamOut1.Run;
 end;
 
