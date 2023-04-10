@@ -1,4 +1,4 @@
-object Form3: TForm3
+object frmVoiceRecognition: TfrmVoiceRecognition
   Left = 0
   Top = 0
   Caption = 'Voice Recognition'
@@ -14,46 +14,37 @@ object Form3: TForm3
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 13
-  object Button1: TButton
+  object btnStart: TButton
     Left = 568
     Top = 8
     Width = 75
     Height = 25
     Caption = 'Start'
     TabOrder = 0
-    OnClick = Button1Click
+    OnClick = btnStartClick
   end
   object Memo1: TMemo
     Left = 8
-    Top = 122
+    Top = 8
     Width = 537
     Height = 151
     TabOrder = 1
   end
-  object Button2: TButton
+  object btnStop: TButton
     Left = 568
     Top = 48
     Width = 75
     Height = 25
     Caption = 'Stop'
     TabOrder = 2
-    OnClick = Button2Click
-  end
-  object ListBox1: TListBox
-    Left = 16
-    Top = 8
-    Width = 537
-    Height = 97
-    ItemHeight = 13
-    TabOrder = 3
-    OnClick = ListBox1Click
+    OnClick = btnStopClick
   end
   object Memo2: TMemo
     Left = 8
-    Top = 279
+    Top = 165
     Width = 537
     Height = 137
-    TabOrder = 4
+    TabOrder = 3
   end
   object MediaPlayer1: TMediaPlayer
     Left = 587
@@ -64,7 +55,7 @@ object Form3: TForm3
     DoubleBuffered = True
     Visible = False
     ParentDoubleBuffered = False
-    TabOrder = 5
+    TabOrder = 4
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -108,8 +99,6 @@ object Form3: TForm3
     HeartBeat.Interval = 300
     HeartBeat.Timeout = 0
     IPVersion = Id_IPv4
-    OnMessage = sgcWebSocketClient1Message
-    OnHandshake = sgcWebSocketClient1Handshake
     Authentication.Enabled = False
     Authentication.URL.Enabled = True
     Authentication.Session.Enabled = False
@@ -221,6 +210,9 @@ object Form3: TForm3
         RadioItem = True
         OnClick = miWindowsSpeechEngineClick
       end
+    end
+    object miAudioInput: TMenuItem
+      Caption = 'Audio Input'
     end
   end
   object Timer1: TTimer

@@ -62,15 +62,14 @@ type
     constructor Create(CreateSuspended: Boolean);
   end;
 
-  TForm3 = class(TForm)
+  TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
-    Button1: TButton;
+    btnStart: TButton;
     StreamOut1: TStreamOut;
     sgcWebSocketClient1: TsgcWebSocketClient;
     Memo1: TMemo;
-    Button2: TButton;
-    ListBox1: TListBox;
+    btnStop: TButton;
     Memo2: TMemo;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
@@ -90,16 +89,14 @@ type
     miWindowsSpeechEngine: TMenuItem;
     MediaPlayer1: TMediaPlayer;
     Timer1: TTimer;
+    miAudioInput: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
-    procedure Button1Click(Sender: TObject);
-    procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-    procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-    procedure Button2Click(Sender: TObject);
+    procedure btnStartClick(Sender: TObject);
+    procedure btnStopClick(Sender: TObject);
     procedure AudioProcessor1GetChannels(Sender: TComponent; var Param: Cardinal);
     procedure AudioProcessor1GetBitsPerSample(Sender: TComponent; var Param: Cardinal);
     procedure AudioProcessor1GetSampleRate(Sender: TComponent; var Param: Cardinal);
-    procedure ListBox1Click(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure miAmazonSpeechEngineClick(Sender: TObject);
@@ -118,7 +115,7 @@ type
     GoogleVoiceService : TGoogleSpeechService;
     WindowsVoiceService : TWindowsSpeechService;
     FmemStream : TMemoryStream;
-    sendThread : TTSendThread;
+    FSendThread : TTSendThread;
 
     procedure PlayTextWithSelectedEngine(text: string);
     procedure NotifyProc(Sender: TObject);
@@ -128,7 +125,7 @@ type
   end;
 
 var
-  Form3: TForm3;
+  frmVoiceRecognition: TfrmVoiceRecognition;
 
 implementation
 
@@ -136,7 +133,7 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm3.PlayTextWithSelectedEngine(text:string);
+procedure TfrmVoiceRecognition.PlayTextWithSelectedEngine(text:string);
 var
   Stream: TMemoryStream;
   FileName: string;
@@ -160,10 +157,12 @@ begin
   MediaPlayer1.Play;
 end;
 
-procedure TForm3.FormCreate(Sender: TObject);
+procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
 var
   i : Integer;
   lSpeechEngine : string;
+  lAudioInput : Integer;
+  mi : TMenuItem;
 begin
   Settings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   lSpeechEngine := Settings.ReadString('Speech', 'SelectedEngine', 'Windows');
@@ -210,38 +209,36 @@ begin
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
 
-  sendThread := TTSendThread.Create(True);
+  FSendThread := TTSendThread.Create(True);
 
+  miAudioInput.Clear;
+  lAudioInput := Settings.ReadInteger('Audio', 'Input', 0);
 
-  ListBox1.Items.Clear;
   for i := 0 to DXAudioIn1.DeviceCount - 1 do
   begin
-    ListBox1.Items.Add(DXAudioIn1.DeviceName[i]);
+    mi := TMenuItem.Create(nil);
+    mi.Caption := DXAudioIn1.DeviceName[i];
+    mi.Tag := i;
+    if lAudioInput = i then
+    begin
+      mi.Checked := True;
+      DXAudioIn1.DeviceNumber := i;
+    end;
+
+    mi.GroupIndex := 10;
+    mi.RadioItem := True;
+    mi.AutoCheck := True;
+    miAudioInput.Add(mi);
   end;
-  ListBox1.ItemIndex := 0;
 end;
 
-procedure TForm3.FormDestroy(Sender: TObject);
+procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(sendThread);
+  FSendThread.Terminate;
+  FreeAndNil(FSendThread);
 end;
 
-procedure TForm3.ListBox1Click(Sender: TObject);
-begin
-  DXAudioIn1.DeviceNumber := ListBox1.ItemIndex;
-end;
-
-procedure TForm3.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-begin
-  Headers.Add('Authorization: Token 9c04fed810f9e03bab6bd48b5ef9681995699f4d');
-end;
-
-procedure TForm3.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-begin
-  Memo1.Lines.Add(Text);
-end;
-
-procedure TForm3.Timer1Timer(Sender: TObject);
+procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
 begin
   OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
   if Mediaplayer1.Mode = mpStopped then
@@ -251,7 +248,7 @@ begin
   end;
 end;
 
-procedure TForm3.NotifyProc(Sender: TObject);
+procedure TfrmVoiceRecognition.NotifyProc(Sender: TObject);
 begin
   OutputDebugString(PChar('Mediaplayer NotifyProc'));
   with Sender as TMediaPlayer do
@@ -260,7 +257,6 @@ begin
       mpStopped:
       begin{do something here}
         OutputDebugString(PChar('Mediaplayer Stopped'));
-    //    StreamOut1.Run;
       end;
     end;
     //must set to true to enable next-time notification
@@ -268,17 +264,17 @@ begin
   end;
 end;
 
-procedure TForm3.AudioProcessor1GetBitsPerSample(Sender: TComponent; var Param: Cardinal);
+procedure TfrmVoiceRecognition.AudioProcessor1GetBitsPerSample(Sender: TComponent; var Param: Cardinal);
 begin
   Param := TAudioProcessor(Sender).Input.BitsPerSample;
 end;
 
-procedure TForm3.AudioProcessor1GetChannels(Sender: TComponent; var Param: Cardinal);
+procedure TfrmVoiceRecognition.AudioProcessor1GetChannels(Sender: TComponent; var Param: Cardinal);
 begin
   Param := TAudioProcessor(Sender).Input.Channels;
 end;
 
-procedure TForm3.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
+procedure TfrmVoiceRecognition.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
 var
   mem : TMemoryStream;
 begin
@@ -287,62 +283,62 @@ begin
   mem := TMemoryStream.Create;
   mem.WriteData(Buffer, Bytes);
   mem.Position := 0;
-  sendThread.Add(mem);
+  if Assigned(FSendThread) then
+    FSendThread.Add(mem);
 
   OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
 
-procedure TForm3.AudioProcessor1GetSampleRate(Sender: TComponent; var Param: Cardinal);
+procedure TfrmVoiceRecognition.AudioProcessor1GetSampleRate(Sender: TComponent; var Param: Cardinal);
 begin
   Param := TAudioProcessor(Sender).Input.SampleRate;
 end;
 
-procedure TForm3.Button1Click(Sender: TObject);
+procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
-  sendThread.Resume;
+  FSendThread.Resume;
   Sleep(1000);
   StreamOut1.Stream := FmemStream;
   StreamOut1.Run;
-//  AudioProcessor1._Resume;
 end;
 
-procedure TForm3.Button2Click(Sender: TObject);
+procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   sgcWebSocketClient1.WriteData('{ "type": "CloseStream" }');
   StreamOut1.Stop;
 end;
 
-procedure TForm3.Exit1Click(Sender: TObject);
+procedure TfrmVoiceRecognition.Exit1Click(Sender: TObject);
 begin
-  sendThread.Terminate;
+  FSendThread.Terminate;
   Application.Terminate;
 end;
 
-procedure TForm3.miAmazonSpeechEngineClick(Sender: TObject);
+procedure TfrmVoiceRecognition.miAmazonSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := AmazonPolyVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
 end;
 
-procedure TForm3.miElevenLabsSpeechEngineClick(Sender: TObject);
+procedure TfrmVoiceRecognition.miElevenLabsSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := ElevenLabsVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
 end;
 
-procedure TForm3.miGoogleSpeechEngineClick(Sender: TObject);
+procedure TfrmVoiceRecognition.miGoogleSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := GoogleVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
 end;
 
-procedure TForm3.miMicrosoftSpeechEngineClick(Sender: TObject);
+procedure TfrmVoiceRecognition.miMicrosoftSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := MsVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
 end;
 
-procedure TForm3.miWindowsSpeechEngineClick(Sender: TObject);
+procedure TfrmVoiceRecognition.miWindowsSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := WindowsVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
@@ -352,7 +348,7 @@ end;
 
 procedure TTSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
 begin
-  Headers.Add('Authorization: e1c1c21347b54ddb86c426b8ae4a1096');
+  Headers.Add('Authorization: Token ' + assemblyai_key);
 end;
 
 procedure TTSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
@@ -377,11 +373,9 @@ begin
          Form3.Memo2.Lines.Text := response;
          Form3.Memo2.Update;
          Form3.StreamOut1.Stop(False);
-         //Form3.AudioProcessor1._Pause;
          Form3.FmemStream.Clear;
          Sleep(100);
          Form3.PlayTextWithSelectedEngine(response);
-        // Form3.StreamOut1.Resume;
       end;
     end;
   end);
@@ -394,7 +388,6 @@ begin
     Form3.Memo1.Lines.Add('Connected');
   end);
 end;
-
 
 procedure TTSendThread.Add(ms: TMemoryStream);
 begin
