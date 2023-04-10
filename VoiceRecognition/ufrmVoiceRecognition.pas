@@ -46,7 +46,7 @@ uses
   uGoogleSpeech,
   uAmazon.Polly,
   uWindows.Engine,
-  uAssemblyAI.SpeechToText
+  uAssemblyAI.SpeechToText, System.ImageList, Vcl.ImgList
   ;
 
 type
@@ -78,6 +78,8 @@ type
     MediaPlayer1: TMediaPlayer;
     Timer1: TTimer;
     miAudioInput: TMenuItem;
+    ImageList1: TImageList;
+    Image1: TImage;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -110,7 +112,8 @@ type
     procedure OnHandleConnect(Connection: TsgcWSConnection);
   public
     { Public declarations }
-
+    procedure Listen;
+    procedure Speak;
   end;
 
 var
@@ -144,6 +147,15 @@ begin
   MediaPlayer1.Open;
   MediaPlayer1.Notify := true;
   MediaPlayer1.Play;
+end;
+
+procedure TfrmVoiceRecognition.Speak;
+begin
+  Image1.Stretch := true;  // to make it as large as Image1
+  Image1.Proportional := true;  // to keep width/height ratio
+  Image1.Picture.Bitmap:= nil; // clear previous image
+  ImageList1.GetBitmap(1, Image1.Picture.Bitmap);
+  Image1.Update;
 end;
 
 procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
@@ -229,13 +241,25 @@ begin
   FreeAndNil(FSendThread);
 end;
 
+procedure TfrmVoiceRecognition.Listen;
+begin
+  Image1.Stretch := true;  // to make it as large as Image1
+  Image1.Proportional := true;  // to keep width/height ratio
+  Image1.Picture.Bitmap:= nil; // clear previous image
+  ImageList1.GetBitmap(0, Image1.Picture.Bitmap);
+  Image1.Update;
+end;
+
 procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
 begin
   OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
   if Mediaplayer1.Mode = mpStopped then
   begin
     if StreamOut1.Status <> tosPlaying then
+    begin
       StreamOut1.Run;
+      Listen;
+    end;
   end;
 end;
 
@@ -282,6 +306,7 @@ begin
        StreamOut1.Stop(False);
        FmemStream.Clear;
        Sleep(100);
+       Speak;
        PlayTextWithSelectedEngine(response);
     end;
   end;
@@ -322,6 +347,7 @@ begin
   FSendThread.Resume;
   Sleep(1000);
   StreamOut1.Stream := FmemStream;
+  Listen;
   StreamOut1.Run;
 end;
 
