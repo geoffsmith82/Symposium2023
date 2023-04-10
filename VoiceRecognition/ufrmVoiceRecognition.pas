@@ -14,6 +14,7 @@ uses
   System.IOUtils,
   System.JSON,
   System.SyncObjs,
+  Vcl.ExtCtrls,
   Vcl.Menus,
   Vcl.MPlayer,
   Vcl.Graphics,
@@ -44,18 +45,21 @@ uses
   uElevenLabs.REST,
   uGoogleSpeech,
   uAmazon.Polly,
-  uWindows.Engine, Vcl.ExtCtrls
+  uWindows.Engine
   ;
 
 type
   TTSendThread = class(TThread)
   private
+    queueItems : TThreadedQueue<TMemoryStream>;
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
     function Base64EncodedStream(fs: TStream): string;
   public
     procedure Execute; override;
+    procedure Add(ms: TMemoryStream);
+    constructor Create(CreateSuspended: Boolean);
   end;
 
   TForm3 = class(TForm)
@@ -114,15 +118,13 @@ type
     GoogleVoiceService : TGoogleSpeechService;
     WindowsVoiceService : TWindowsSpeechService;
     FmemStream : TMemoryStream;
-    FLastSend : Int64;
     sendThread : TTSendThread;
 
     procedure PlayTextWithSelectedEngine(text: string);
     procedure NotifyProc(Sender: TObject);
   public
     { Public declarations }
-    bAnswering : Boolean;
-    queueItems : TThreadedQueue<TMemoryStream>;
+
   end;
 
 var
@@ -207,10 +209,9 @@ begin
 
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
-  FLastSend := 0;
 
   sendThread := TTSendThread.Create(True);
-  queueItems := TThreadedQueue<TMemoryStream>.Create;
+
 
   ListBox1.Items.Clear;
   for i := 0 to DXAudioIn1.DeviceCount - 1 do
@@ -279,18 +280,14 @@ end;
 
 procedure TForm3.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
 var
-  oldPos : Int64;
   mem : TMemoryStream;
 begin
   TAudioProcessor(Sender).Input.GetData(Buffer, Bytes);
 
-//  if not bAnswering then
-  begin
-    mem := TMemoryStream.Create;
-    mem.WriteData(Buffer, Bytes);
-    mem.Position := 0;
-    queueItems.PushItem(mem);
-  end;
+  mem := TMemoryStream.Create;
+  mem.WriteData(Buffer, Bytes);
+  mem.Position := 0;
+  sendThread.Add(mem);
 
   OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
@@ -380,7 +377,6 @@ begin
          Form3.Memo2.Lines.Text := response;
          Form3.Memo2.Update;
          Form3.StreamOut1.Stop(False);
-         Form3.bAnswering := true;
          //Form3.AudioProcessor1._Pause;
          Form3.FmemStream.Clear;
          Sleep(100);
@@ -400,6 +396,11 @@ begin
 end;
 
 
+procedure TTSendThread.Add(ms: TMemoryStream);
+begin
+  queueItems.PushItem(ms);
+end;
+
 function TTSendThread.Base64EncodedStream(fs: TStream): string;
 var
   mem : TStringStream;
@@ -415,6 +416,12 @@ begin
   finally
     FreeAndNil(mem);
   end;
+end;
+
+constructor TTSendThread.Create(CreateSuspended: Boolean);
+begin
+  inherited Create(CreateSuspended);
+  queueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
 procedure TTSendThread.Execute;
@@ -441,7 +448,7 @@ begin
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
-      m := Form3.queueItems.PopItem;
+      m := queueItems.PopItem;
       if mm.Size < 17000 then
       begin
         m.Position := 0;
