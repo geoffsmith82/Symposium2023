@@ -49,6 +49,8 @@ uses
   ;
 
 type
+  TOnHandleMessage = procedure(msg: string) of object;
+
   TTSendThread = class(TThread)
   private
     queueItems : TThreadedQueue<TMemoryStream>;
@@ -60,6 +62,8 @@ type
     procedure Execute; override;
     procedure Add(ms: TMemoryStream);
     constructor Create(CreateSuspended: Boolean);
+  public
+    OnHandleMessage : TOnHandleMessage;
   end;
 
   TfrmVoiceRecognition = class(TForm)
@@ -116,7 +120,7 @@ type
     WindowsVoiceService : TWindowsSpeechService;
     FmemStream : TMemoryStream;
     FSendThread : TTSendThread;
-
+    procedure OnHandleMessage(Text: string);
     procedure PlayTextWithSelectedEngine(text: string);
     procedure NotifyProc(Sender: TObject);
   public
@@ -210,6 +214,7 @@ begin
   FmemStream.SetSize(100*1024*1024);
 
   FSendThread := TTSendThread.Create(True);
+  FSendThread.OnHandleMessage := OnHandleMessage;
 
   miAudioInput.Clear;
   lAudioInput := Settings.ReadInteger('Audio', 'Input', 0);
@@ -261,6 +266,33 @@ begin
     end;
     //must set to true to enable next-time notification
     Notify := True;
+  end;
+end;
+
+procedure TfrmVoiceRecognition.OnHandleMessage(Text: string);
+var
+  msg : TJSONObject;
+  value : string;
+  response : string;
+  question : string;
+begin
+  msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
+  if msg.TryGetValue('message_type', Value) then
+  begin
+    if (value = 'FinalTranscript') and (msg.Values['text'].Value<>'') and
+      (Mediaplayer1.Mode <> mpPlaying) then
+    begin
+       question := msg.Values['text'].Value;
+       Memo1.Lines.Add(question);
+
+       response := TOpenAI.AskChatGPT(question, 'text-davinci-003');
+       Memo2.Lines.Text := response;
+       Memo2.Update;
+       StreamOut1.Stop(False);
+       FmemStream.Clear;
+       Sleep(100);
+       PlayTextWithSelectedEngine(response);
+    end;
   end;
 end;
 
@@ -363,19 +395,9 @@ begin
     msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
     if msg.TryGetValue('message_type', Value) then
     begin
-      if (value = 'FinalTranscript') and (msg.Values['text'].Value<>'') and
-        (Form3.Mediaplayer1.Mode <> mpPlaying) then
+      if Assigned(OnHandleMessage) then
       begin
-         question := msg.Values['text'].Value;
-         Form3.Memo1.Lines.Add(question);
-
-         response := TOpenAI.AskChatGPT(question, 'text-davinci-003');
-         Form3.Memo2.Lines.Text := response;
-         Form3.Memo2.Update;
-         Form3.StreamOut1.Stop(False);
-         Form3.FmemStream.Clear;
-         Sleep(100);
-         Form3.PlayTextWithSelectedEngine(response);
+        OnHandleMessage(Text);
       end;
     end;
   end);
@@ -385,7 +407,7 @@ procedure TTSendThread.sgOnConnect(Connection: TsgcWSConnection);
 begin
   TThread.Queue(nil, procedure()
   begin
-    Form3.Memo1.Lines.Add('Connected');
+    frmVoiceRecognition.Memo1.Lines.Add('Connected');
   end);
 end;
 
@@ -433,7 +455,7 @@ begin
   sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
   sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
   sgcWebSocketClient1.OnConnect := sgOnConnect;
-  sgcWebSocketClient1.NotifyEvents := Form3.sgcWebSocketClient1.NotifyEvents;
+  sgcWebSocketClient1.NotifyEvents := frmVoiceRecognition.sgcWebSocketClient1.NotifyEvents;
   sgcWebSocketClient1.Connect;
   Application.ProcessMessages;
 

@@ -124,7 +124,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="ufrmVoiceRecognition.pas">
-            <Form>Form3</Form>
+            <Form>frmVoiceRecognition</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\OpenAI.pas"/>

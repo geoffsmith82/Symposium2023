@@ -2,7 +2,7 @@ program VoiceRecognition;
 
 uses
   Vcl.Forms,
-  ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {Form3},
+  ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {frmVoiceRecognition},
   OpenAI in '..\Libs\OpenAI.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
@@ -22,6 +22,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm3, Form3);
+  Application.CreateForm(TfrmVoiceRecognition, frmVoiceRecognition);
   Application.Run;
 end.
