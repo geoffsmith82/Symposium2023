@@ -9,19 +9,22 @@
         <Projects Include="DelphiChatGPT\DelphiChatGPT.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="Weather\Weather.dproj">
+        <Projects Include="FaceDetection\FaceDetection.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="VoiceRecognition\VoiceRecognition.dproj">
+        <Projects Include="Weather\Weather.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ImageGeneration\ImageGeneration.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="FaceRecognition\FaceRecognition.dproj">
+        <Projects Include="..\..\DelphiConversionTool\Libs\GitForDelphi\Demo\gitdemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="TranscribeAudio\TranscribeAudio.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="VoiceRecognition\VoiceRecognition.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -50,6 +53,15 @@
     <Target Name="DelphiChatGPT:Make">
         <MSBuild Projects="DelphiChatGPT\DelphiChatGPT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="FaceDetection">
+        <MSBuild Projects="FaceDetection\FaceDetection.dproj"/>
+    </Target>
+    <Target Name="FaceDetection:Clean">
+        <MSBuild Projects="FaceDetection\FaceDetection.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FaceDetection:Make">
+        <MSBuild Projects="FaceDetection\FaceDetection.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Weather">
         <MSBuild Projects="Weather\Weather.dproj"/>
     </Target>
@@ -67,15 +79,6 @@
     </Target>
     <Target Name="ImageGeneration:Make">
         <MSBuild Projects="ImageGeneration\ImageGeneration.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="FaceRecognition">
-        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj"/>
-    </Target>
-    <Target Name="FaceRecognition:Clean">
-        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="FaceRecognition:Make">
-        <MSBuild Projects="FaceRecognition\FaceRecognition.dproj" Targets="Make"/>
     </Target>
     <Target Name="gitdemo">
         <MSBuild Projects="..\..\DelphiConversionTool\Libs\GitForDelphi\Demo\gitdemo.dproj"/>
@@ -105,13 +108,13 @@
         <MSBuild Projects="VoiceRecognition\VoiceRecognition.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="TranslateLang;DelphiChatGPT;Weather;ImageGeneration;FaceRecognition;gitdemo;TranscribeAudio;VoiceRecognition"/>
+        <CallTarget Targets="TranslateLang;DelphiChatGPT;FaceDetection;Weather;ImageGeneration;gitdemo;TranscribeAudio;VoiceRecognition"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;Weather:Clean;ImageGeneration:Clean;FaceRecognition:Clean;gitdemo:Clean;TranscribeAudio:Clean;VoiceRecognition:Clean"/>
+        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;FaceDetection:Clean;Weather:Clean;ImageGeneration:Clean;gitdemo:Clean;TranscribeAudio:Clean;VoiceRecognition:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;Weather:Make;ImageGeneration:Make;FaceRecognition:Make;gitdemo:Make;TranscribeAudio:Make;VoiceRecognition:Make"/>
+        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;FaceDetection:Make;Weather:Make;ImageGeneration:Make;gitdemo:Make;TranscribeAudio:Make;VoiceRecognition:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

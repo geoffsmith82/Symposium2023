@@ -1,4 +1,4 @@
-program FaceRecognition;
+program FaceDetection;
 
 uses
   Vcl.Forms,

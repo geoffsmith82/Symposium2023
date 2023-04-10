@@ -8,6 +8,8 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
   - [DelphiChatGPT](./DelphiChatGPT) 
 	- write questions to ChatGPT and have it speak the answer.
+  - [FaceDetection](./FaceDetection)  
+	- Detect faces in a photo.
   - [Weather](./Weather)  
 	- Query the weather forcast for Bendigo from the bureau of meteorology generate a paragraph or two and read it out
   - [TranscribeAudio](./TranscribeAudio)
