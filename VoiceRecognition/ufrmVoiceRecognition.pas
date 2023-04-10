@@ -21,6 +21,9 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
+  Vcl.BaseImageCollection,
+  Vcl.ImageCollection,
+  Vcl.VirtualImage,
   sgcBase_Classes,
   sgcSocket_Classes,
   sgcTCP_Classes,
@@ -46,7 +49,7 @@ uses
   uGoogleSpeech,
   uAmazon.Polly,
   uWindows.Engine,
-  uAssemblyAI.SpeechToText, System.ImageList, Vcl.ImgList
+  uAssemblyAI.SpeechToText
   ;
 
 type
@@ -78,8 +81,8 @@ type
     MediaPlayer1: TMediaPlayer;
     Timer1: TTimer;
     miAudioInput: TMenuItem;
-    ImageList1: TImageList;
-    Image1: TImage;
+    VirtualImage1: TVirtualImage;
+    ImageCollection1: TImageCollection;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -151,11 +154,8 @@ end;
 
 procedure TfrmVoiceRecognition.Speak;
 begin
-  Image1.Stretch := true;  // to make it as large as Image1
-  Image1.Proportional := true;  // to keep width/height ratio
-  Image1.Picture.Bitmap:= nil; // clear previous image
-  ImageList1.GetBitmap(1, Image1.Picture.Bitmap);
-  Image1.Update;
+  VirtualImage1.ImageIndex := 1;
+  VirtualImage1.Update;
 end;
 
 procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
@@ -243,11 +243,8 @@ end;
 
 procedure TfrmVoiceRecognition.Listen;
 begin
-  Image1.Stretch := true;  // to make it as large as Image1
-  Image1.Proportional := true;  // to keep width/height ratio
-  Image1.Picture.Bitmap:= nil; // clear previous image
-  ImageList1.GetBitmap(0, Image1.Picture.Bitmap);
-  Image1.Update;
+  VirtualImage1.ImageIndex := 0;
+  VirtualImage1.Update;
 end;
 
 procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
@@ -354,6 +351,7 @@ end;
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   sgcWebSocketClient1.WriteData('{ "type": "CloseStream" }');
+  VirtualImage1.ImageIndex := -1;
   StreamOut1.Stop;
 end;
 
