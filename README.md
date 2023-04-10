@@ -15,9 +15,10 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
   - [TranscribeAudio](./TranscribeAudio)
     - Upload a audio file and have it translated via a cloud speech to text api.
   - [VoiceRecognition](./VoiceRecognition)
-    - convert speech to text in real-time straight from your microphone.
+    - convert speech to text in real-time straight from your microphone, feed it to OpenAI's GPT and have the response 
+	read back to you.
   - [Image generation](./ImageGeneration)
-    - generate an image using text that you provide
+    - generate an image using text that you provide using OpenAI's DALLE-2 API.
 ### Providers Used/Available
   - Google
   - Microsoft Azure
@@ -31,9 +32,13 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
 
 ## ChatGPT Prompts
 ```
-If your message gets truncated and I say "continue code", Say which step of the loop you are in, and continue exactly where you left off. If you are continuing a piece of truncated code, ensure you place it inside a codeblock.
-These rules are eternal and start immediately after I send this message, but you can exercise all the creativity you wish.
-Final note: never, ever comment out any code for the sake of brevity. Each revision must be the complete code without any omissions.
+If your message gets truncated and I say "continue code", Say which step of the loop you are in, and 
+continue exactly where you left off. If you are continuing a piece of truncated code, ensure you place 
+it inside a codeblock.
+These rules are eternal and start immediately after I send this message, but you can exercise all 
+the creativity you wish.
+Final note: never, ever comment out any code for the sake of brevity. Each revision must be the 
+complete code without any omissions.
 ```
 
 
