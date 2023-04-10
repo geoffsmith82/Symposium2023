@@ -140,6 +140,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

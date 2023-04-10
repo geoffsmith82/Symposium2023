@@ -45,27 +45,11 @@ uses
   uElevenLabs.REST,
   uGoogleSpeech,
   uAmazon.Polly,
-  uWindows.Engine
+  uWindows.Engine,
+  uAssemblyAI.SpeechToText
   ;
 
 type
-  TOnHandleMessage = procedure(msg: string) of object;
-
-  TTSendThread = class(TThread)
-  private
-    queueItems : TThreadedQueue<TMemoryStream>;
-    procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-    procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-    procedure sgOnConnect(Connection: TsgcWSConnection);
-    function Base64EncodedStream(fs: TStream): string;
-  public
-    procedure Execute; override;
-    procedure Add(ms: TMemoryStream);
-    constructor Create(CreateSuspended: Boolean);
-  public
-    OnHandleMessage : TOnHandleMessage;
-  end;
-
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
@@ -123,6 +107,7 @@ type
     procedure OnHandleMessage(Text: string);
     procedure PlayTextWithSelectedEngine(text: string);
     procedure NotifyProc(Sender: TObject);
+    procedure OnHandleConnect(Connection: TsgcWSConnection);
   public
     { Public declarations }
 
@@ -213,8 +198,9 @@ begin
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
 
-  FSendThread := TTSendThread.Create(True);
+  FSendThread := TTSendThread.Create(True, assemblyai_key);
   FSendThread.OnHandleMessage := OnHandleMessage;
+  FSendThread.OnConnect := OnHandleConnect;
 
   miAudioInput.Clear;
   lAudioInput := Settings.ReadInteger('Audio', 'Input', 0);
@@ -267,6 +253,11 @@ begin
     //must set to true to enable next-time notification
     Notify := True;
   end;
+end;
+
+procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TsgcWSConnection);
+begin
+  Memo1.Lines.Add('Connected');
 end;
 
 procedure TfrmVoiceRecognition.OnHandleMessage(Text: string);
@@ -374,124 +365,6 @@ procedure TfrmVoiceRecognition.miWindowsSpeechEngineClick(Sender: TObject);
 begin
   SpeechEngine := WindowsVoiceService;
   Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
-end;
-
-{ TTSendThread }
-
-procedure TTSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-begin
-  Headers.Add('Authorization: Token ' + assemblyai_key);
-end;
-
-procedure TTSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-begin
-  TThread.Queue(nil, procedure()
-  var
-    msg : TJSONObject;
-    value : string;
-    response : string;
-    question : string;
-  begin
-    msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
-    if msg.TryGetValue('message_type', Value) then
-    begin
-      if Assigned(OnHandleMessage) then
-      begin
-        OnHandleMessage(Text);
-      end;
-    end;
-  end);
-end;
-
-procedure TTSendThread.sgOnConnect(Connection: TsgcWSConnection);
-begin
-  TThread.Queue(nil, procedure()
-  begin
-    frmVoiceRecognition.Memo1.Lines.Add('Connected');
-  end);
-end;
-
-procedure TTSendThread.Add(ms: TMemoryStream);
-begin
-  queueItems.PushItem(ms);
-end;
-
-function TTSendThread.Base64EncodedStream(fs: TStream): string;
-var
-  mem : TStringStream;
-begin
-  mem := nil;
-  Result := '';
-  try
-    mem := TStringStream.Create;
-    if TNetEncoding.Base64String.Encode(fs, mem) > 0 then
-    begin
-      Result := mem.DataString;
-    end;
-  finally
-    FreeAndNil(mem);
-  end;
-end;
-
-constructor TTSendThread.Create(CreateSuspended: Boolean);
-begin
-  inherited Create(CreateSuspended);
-  queueItems := TThreadedQueue<TMemoryStream>.Create;
-end;
-
-procedure TTSendThread.Execute;
-var
-  m : TMemoryStream;
-  mm : TMemoryStream;
-  sgcWebSocketClient1 : TsgcWebSocketClient;
-  msg : TJSONObject;
-begin
-  inherited;
-  sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
-  sgcWebSocketClient1.URL := 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
-  sgcWebSocketClient1.Proxy.Host := 'localhost';
-  sgcWebSocketClient1.Proxy.Port := 8888;
-  sgcWebSocketClient1.Proxy.Enabled := True;
-  sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
-  sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
-  sgcWebSocketClient1.OnConnect := sgOnConnect;
-  sgcWebSocketClient1.NotifyEvents := frmVoiceRecognition.sgcWebSocketClient1.NotifyEvents;
-  sgcWebSocketClient1.Connect;
-  Application.ProcessMessages;
-
-  try
-    mm := TMemoryStream.Create;
-    while not Terminated do
-    begin
-      m := queueItems.PopItem;
-      if mm.Size < 17000 then
-      begin
-        m.Position := 0;
-        mm.CopyFrom(m, m.Size);
-        FreeAndNil(m);
-        continue;
-      end;
-      mm.Position := 0;
-      OutputDebugString(PChar('Size:' + mm.Size.ToString));
-      try
-        if not sgcWebSocketClient1.Connected then
-          sgcWebSocketClient1.Connect;
-        msg := TJSONObject.Create;
-        try
-          msg.AddPair('audio_data', Base64EncodedStream(mm));
-          sgcWebSocketClient1.WriteData(msg.ToJson);
-        finally
-          FreeAndNil(msg);
-        end;
-
-      finally
-        FreeandNil(m);
-        mm.Clear;
-      end;
-    end;
-  finally
-    FreeAndNil(sgcWebSocketClient1);
-  end;
 end;
 
 end.
