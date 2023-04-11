@@ -1,4 +1,4 @@
-unit uAssemblyAI.SpeechToText;
+unit uDeepGram.SpeechToText;
 
 interface
 
@@ -25,7 +25,7 @@ type
   TOnHandleMessage = procedure(msg: string) of object;
   TOnConnect = procedure(Connection: TsgcWSConnection) of object;
 
-  TTSendThread = class(TThread)
+  TDeepGramSendThread = class(TThread)
   private
     FAssemblyai_key : string;
     queueItems : TThreadedQueue<TMemoryStream>;
@@ -47,12 +47,12 @@ implementation
 
 { TTSendThread }
 
-procedure TTSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
+procedure TDeepGramSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
 begin
-  Headers.Add('Authorization: ' + FAssemblyai_key);
+  Headers.Add('Authorization: Token ' + FAssemblyai_key);
 end;
 
-procedure TTSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
+procedure TDeepGramSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
 begin
   TThread.Queue(nil, procedure()
   var
@@ -72,7 +72,7 @@ begin
   end);
 end;
 
-procedure TTSendThread.sgOnConnect(Connection: TsgcWSConnection);
+procedure TDeepGramSendThread.sgOnConnect(Connection: TsgcWSConnection);
 begin
   TThread.Queue(nil, procedure()
   begin
@@ -83,12 +83,12 @@ begin
   end);
 end;
 
-procedure TTSendThread.Add(ms: TMemoryStream);
+procedure TDeepGramSendThread.Add(ms: TMemoryStream);
 begin
   queueItems.PushItem(ms);
 end;
 
-function TTSendThread.Base64EncodedStream(fs: TStream): string;
+function TDeepGramSendThread.Base64EncodedStream(fs: TStream): string;
 var
   mem : TStringStream;
 begin
@@ -105,39 +105,36 @@ begin
   end;
 end;
 
-constructor TTSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
+constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
 begin
   inherited Create(CreateSuspended);
   FAssemblyai_key := assemblyai_key;
   queueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
-procedure TTSendThread.Execute;
+procedure TDeepGramSendThread.Execute;
 var
   m : TMemoryStream;
   mm : TMemoryStream;
   sgcWebSocketClient1 : TsgcWebSocketClient;
-  msg : TJSONObject;
 begin
   inherited;
   sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
-  sgcWebSocketClient1.URL := 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
+  sgcWebSocketClient1.URL := 'wss://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
   sgcWebSocketClient1.Proxy.Host := 'localhost';
   sgcWebSocketClient1.Proxy.Port := 8888;
   sgcWebSocketClient1.Proxy.Enabled := True;
   sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
   sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
   sgcWebSocketClient1.OnConnect := sgOnConnect;
-//  sgcWebSocketClient1.NotifyEvents := frmVoiceRecognition.sgcWebSocketClient1.NotifyEvents;
   sgcWebSocketClient1.Connect;
- // Application.ProcessMessages;
 
   try
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
       m := queueItems.PopItem;
-      if mm.Size < 17000 then // Assembly AI needs chunks of audio of 1 second in size minimum
+      if mm.Size < 3000 then
       begin
         m.Position := 0;
         mm.CopyFrom(m, m.Size);
@@ -149,13 +146,8 @@ begin
       try
         if not sgcWebSocketClient1.Connected then
           sgcWebSocketClient1.Connect;
-        msg := TJSONObject.Create;
-        try
-          msg.AddPair('audio_data', Base64EncodedStream(mm));
-          sgcWebSocketClient1.WriteData(msg.ToJson);
-        finally
-          FreeAndNil(msg);
-        end;
+
+        sgcWebSocketClient1.WriteData(mm);
 
       finally
         FreeandNil(m);

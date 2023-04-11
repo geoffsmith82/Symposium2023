@@ -26,6 +26,7 @@ Source code and Documentation for my ADUG Symposium Talk presented on the 28th o
   - [ElevenLabs](https://beta.elevenlabs.io/)
   - [OpenAI](https://platform.openai.com)
   - [AssemblyAI](https://www.assemblyai.com/app)
+  - [DeepGram](https://deepgram.com/)
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.
