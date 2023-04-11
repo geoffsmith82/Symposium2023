@@ -16,6 +16,7 @@ uses
   uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
   uAssemblyAI.SpeechToText in '..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas',
+  uDeepGram.SpeechToText in '..\Libs\SpeechToText\uDeepGram.SpeechToText.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas';
 
 {$R *.res}

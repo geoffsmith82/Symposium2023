@@ -48,6 +48,8 @@ complete code without any omissions.
 ### Artificial Intelligence Related links
 - [TensorFlow.Delphi](https://github.com/Pigrecos/TensorFlow.Delphi)
 - [llama-pas](https://github.com/Kagamma/llama-pas)
+- [whisper.cpp](https://github.com/ggerganov/whisper.cpp)
+- [llama.cpp](https://github.com/ggerganov/llama.cpp)
 - [Bing Image Creator](https://www.bing.com/images/create/)
 - [Bing](https://www.bing.com/)
 - [ChatGPT](https://chat.openai.com/chat)
