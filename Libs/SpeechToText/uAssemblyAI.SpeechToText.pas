@@ -22,7 +22,7 @@ uses
   ;
 
 type
-  TOnHandleMessage = procedure(msg: string) of object;
+  TOnHandleMessage = procedure(const msg: string) of object;
   TOnConnect = procedure(Connection: TsgcWSConnection) of object;
 
   TAssemblyAiSendThread = class(TThread)
@@ -32,6 +32,7 @@ type
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
+    procedure sgOnDisconnect(Connection: TsgcWSConnection; Code: Integer);
     function Base64EncodedStream(fs: TStream): string;
   public
     procedure Execute; override;
@@ -40,6 +41,7 @@ type
   public
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
+    OnDisconnect: TOnConnect;
   end;
 
 implementation
@@ -81,6 +83,17 @@ begin
   end);
 end;
 
+procedure TAssemblyAiSendThread.sgOnDisconnect(Connection: TsgcWSConnection; Code: Integer);
+begin
+  TThread.Queue(nil, procedure
+  begin
+    if Assigned(OnDisconnect) then
+    begin
+      OnDisconnect(Connection);
+    end;
+  end);
+end;
+
 procedure TAssemblyAiSendThread.Add(ms: TMemoryStream);
 begin
   FQueueItems.PushItem(ms);
@@ -119,18 +132,19 @@ var
 begin
   inherited;
   sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
-  sgcWebSocketClient1.URL := 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
-  sgcWebSocketClient1.Proxy.Host := 'localhost';
-  sgcWebSocketClient1.Proxy.Port := 8888;
-  sgcWebSocketClient1.Proxy.Enabled := True;
-  sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
-  sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
-  sgcWebSocketClient1.OnConnect := sgOnConnect;
-//  sgcWebSocketClient1.NotifyEvents := frmVoiceRecognition.sgcWebSocketClient1.NotifyEvents;
-  sgcWebSocketClient1.Connect;
- // Application.ProcessMessages;
-
   try
+    sgcWebSocketClient1.URL := 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
+    sgcWebSocketClient1.Proxy.Host := 'localhost';
+    sgcWebSocketClient1.Proxy.Port := 8888;
+    sgcWebSocketClient1.Proxy.Enabled := True;
+    sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
+    sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
+    sgcWebSocketClient1.OnConnect := sgOnConnect;
+    sgcWebSocketClient1.OnDisconnect := sgOnDisconnect;
+    sgcWebSocketClient1.Connect;
+
+
+
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
@@ -161,6 +175,7 @@ begin
       end;
     end;
   finally
+    FreeAndNil(mm);
     FreeAndNil(sgcWebSocketClient1);
   end;
 end;

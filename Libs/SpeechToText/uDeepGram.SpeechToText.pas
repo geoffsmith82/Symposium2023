@@ -57,8 +57,6 @@ begin
   var
     msg : TJSONObject;
     value : string;
-    response : string;
-    question : string;
   begin
     msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
     if msg.TryGetValue('speech_final', Value) then
@@ -137,6 +135,7 @@ begin
       end;
     end;
   finally
+    FreeAndNil(mm);
     FreeAndNil(sgcWebSocketClient1);
   end;
 end;

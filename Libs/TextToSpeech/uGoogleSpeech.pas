@@ -5,6 +5,7 @@ interface
 uses
   REST.Client,
   REST.Types,
+  Vcl.Controls,
   REST.Authenticator.EnhancedOAuth,
   IdHTTPServer,
   IdContext,
@@ -30,7 +31,7 @@ type
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
   public
-    constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+    constructor Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
@@ -51,9 +52,9 @@ begin
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
 end;
 
-constructor TGoogleSpeechService.Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+constructor TGoogleSpeechService.Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
 begin
-  inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
   FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';

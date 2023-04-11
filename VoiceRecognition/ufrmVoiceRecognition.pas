@@ -54,6 +54,9 @@ uses
   ;
 
 type
+  TBaseSpeechClass = class of TBaseSpeech;
+
+type
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
@@ -79,7 +82,6 @@ type
     miAmazonSpeechEngine: TMenuItem;
     miGoogleSpeechEngine: TMenuItem;
     miWindowsSpeechEngine: TMenuItem;
-    MediaPlayer1: TMediaPlayer;
     Timer1: TTimer;
     miAudioInput: TMenuItem;
     VirtualImage1: TVirtualImage;
@@ -90,27 +92,24 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
-    procedure miAmazonSpeechEngineClick(Sender: TObject);
-    procedure miElevenLabsSpeechEngineClick(Sender: TObject);
-    procedure miGoogleSpeechEngineClick(Sender: TObject);
-    procedure miMicrosoftSpeechEngineClick(Sender: TObject);
-    procedure miWindowsSpeechEngineClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure SelectSpeechEngine(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
     FSpeechEngine : TBaseSpeech;
-    FMsVoiceService : TMicrosoftCognitiveService;
-    FElevenLabsVoiceService : TElevenLabsService;
-    FAmazonPolyVoiceService : TAmazonPollyService;
-    FGoogleVoiceService : TGoogleSpeechService;
-    FWindowsVoiceService : TWindowsSpeechService;
     FmemStream : TMemoryStream;
+    FConnected : Boolean;
     FSendThread : TAssemblyAiSendThread;
+    SpeechEngines : TObjectDictionary<string, TBaseSpeech>;
+    SpeechEngineMenuItems : TDictionary<string, TMenuItem>;
+    SpeechEngineNames: TDictionary<TMenuItem, string>;
+    procedure LoadAudioInputsMenu;
+    procedure RegisterSpeechToTextEngine(engineClass : TBaseSpeech; menuItem: TMenuItem);
+    function LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
     procedure OnHandleMessage(const Text: string);
-    procedure PlayTextWithSelectedEngine(const text:string);
-    procedure NotifyProc(Sender: TObject);
     procedure OnHandleConnect(Connection: TsgcWSConnection);
+    procedure OnHandleDisconnect(Connection: TsgcWSConnection);
   public
     { Public declarations }
     procedure Listen;
@@ -126,28 +125,29 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TfrmVoiceRecognition.PlayTextWithSelectedEngine(const text:string);
+
+procedure TfrmVoiceRecognition.RegisterSpeechToTextEngine(engineClass : TBaseSpeech; menuItem: TMenuItem);
 var
-  Stream: TMemoryStream;
-  FileName: string;
+  engineName: string;
 begin
-  MediaPlayer1.Notify := true;
-  MediaPlayer1.OnNotify := NotifyProc;
-  Stream := TMemoryStream.Create;
-  try
-    Stream := FSpeechEngine.TextToSpeech(text);
-    if not Assigned(Stream) then
-      Exit;
-    FileName := TPath.GetTempFileName + '.mp3';
-    Stream.Position := 0;
-    Stream.SaveToFile(FileName);
-  finally
-    Stream.Free;
-  end;
-  MediaPlayer1.FileName := FileName;
-  MediaPlayer1.Open;
-  MediaPlayer1.Notify := true;
-  MediaPlayer1.Play;
+  engineName := engineClass.SpeechEngineName;
+  SpeechEngines.AddOrSetValue(engineName, engineClass);
+  SpeechEngineMenuItems.Add(engineName, menuItem);
+  SpeechEngineNames.Add(menuItem, engineName);
+end;
+
+function TfrmVoiceRecognition.LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
+begin
+  Result := SpeechEngines[engineName];
+end;
+
+procedure TfrmVoiceRecognition.SelectSpeechEngine(Sender: TObject);
+var
+  lSpeechEngine: String;
+begin
+  lSpeechEngine := SpeechEngineNames[Sender as TMenuItem];
+  FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
+  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
 end;
 
 procedure TfrmVoiceRecognition.Speak;
@@ -156,64 +156,27 @@ begin
   VirtualImage1.Update;
 end;
 
-procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
-var
-  i : Integer;
-  lSpeechEngine : string;
-  lAudioInput : Integer;
-  mi : TMenuItem;
+procedure TfrmVoiceRecognition.Listen;
 begin
-  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'Windows');
-  FMsVoiceService := TMicrosoftCognitiveService.Create(ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
-  FElevenLabsVoiceService := TElevenLabsService.Create(ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey');
-  FAmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
-  FWindowsVoiceService := TWindowsSpeechService.Create('','','');
-  FGoogleVoiceService := TGoogleSpeechService.Create(google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
-  FSpeechEngine := FAmazonPolyVoiceService;
-
-
-  if lSpeechEngine.Contains(FElevenLabsVoiceService.SpeechEngineName) then
-  begin
-    FSpeechEngine := FElevenLabsVoiceService;
-    miElevenLabsSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(FMsVoiceService.SpeechEngineName) then
-  begin
-    FSpeechEngine := FMsVoiceService;
-    miMicrosoftSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(FAmazonPolyVoiceService.SpeechEngineName) then
-  begin
-    FSpeechEngine := FAmazonPolyVoiceService;
-    miAmazonSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(FGoogleVoiceService.SpeechEngineName) then
-  begin
-    FSpeechEngine := FGoogleVoiceService;
-    miGoogleSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(FWindowsVoiceService.SpeechEngineName) then
-  begin
-    FSpeechEngine := FWindowsVoiceService;
-    miWindowsSpeechEngine.Checked := True;
+  if FConnected then
+  begin  
+    VirtualImage1.ImageIndex := 0;
   end
   else
   begin
-    FSpeechEngine := FWindowsVoiceService;  // default engine
-    miWindowsSpeechEngine.Checked := True;
+    VirtualImage1.ImageIndex := -1;
   end;
+  VirtualImage1.Update;  
+end;
 
-  FmemStream := TMemoryStream.Create;
-  FmemStream.SetSize(100*1024*1024);
-
-  FSendThread := TAssemblyAiSendThread.Create(True, assemblyai_key);
-  FSendThread.OnHandleMessage := OnHandleMessage;
-  FSendThread.OnConnect := OnHandleConnect;
-
+procedure TfrmVoiceRecognition.LoadAudioInputsMenu;
+var
+  lAudioInput: Integer;
+  i: Integer;
+  mi: TMenuItem;
+begin
   miAudioInput.Clear;
   lAudioInput := FSettings.ReadInteger('Audio', 'Input', 0);
-
   for i := 0 to DXAudioIn1.DeviceCount - 1 do
   begin
     mi := TMenuItem.Create(nil);
@@ -224,7 +187,6 @@ begin
       mi.Checked := True;
       DXAudioIn1.DeviceNumber := i;
     end;
-
     mi.GroupIndex := 10;
     mi.RadioItem := True;
     mi.AutoCheck := True;
@@ -232,50 +194,90 @@ begin
   end;
 end;
 
+procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
+var
+  lSpeechEngine : string;
+begin
+  FConnected := False;
+  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create;
+  SpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
+  SpeechEngineNames := TDictionary<TMenuItem, string>.Create;
+
+
+  RegisterSpeechToTextEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'),
+                  miMicrosoftSpeechEngine);
+
+  RegisterSpeechToTextEngine(TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'),
+                  miElevenLabsSpeechEngine);
+
+  RegisterSpeechToTextEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey),
+                  miAmazonSpeechEngine);//'ADUG Demo', ''););
+
+  RegisterSpeechToTextEngine(TWindowsSpeechService.Create(Self, '','',''),
+                  miWindowsSpeechEngine);
+
+  RegisterSpeechToTextEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings),
+                  miGoogleSpeechEngine);
+
+  lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'Windows');
+
+  FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
+  SpeechEngineMenuItems[FSpeechEngine.SpeechEngineName].Checked := True;
+
+  FmemStream := TMemoryStream.Create;
+  FmemStream.SetSize(100*1024*1024);
+
+  FSendThread := TAssemblyAiSendThread.Create(True, assemblyai_key);
+  FSendThread.OnHandleMessage := OnHandleMessage;
+  FSendThread.OnConnect := OnHandleConnect;
+  FSendThread.OnDisconnect := OnHandleDisconnect;
+  LoadAudioInputsMenu;
+end;
+
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
   FSendThread.Terminate;
   FreeAndNil(FSendThread);
+  FreeAndNil(SpeechEngines);
+  FreeAndNil(SpeechEngineMenuItems);
+  FreeAndNil(SpeechEngineNames);
+  FreeAndNil(FSettings);
 end;
 
-procedure TfrmVoiceRecognition.Listen;
-begin
-  VirtualImage1.ImageIndex := 0;
-  VirtualImage1.Update;
-end;
 
 procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
 begin
-  OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
-  if Mediaplayer1.Mode = mpStopped then
+ // OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
+  if FSpeechEngine.Mode = mpStopped then
   begin
     if StreamOut1.Status <> tosPlaying then
     begin
       StreamOut1.Run;
-      Listen;
     end;
+    Listen;
   end;
-end;
-
-procedure TfrmVoiceRecognition.NotifyProc(Sender: TObject);
-begin
-  OutputDebugString(PChar('Mediaplayer NotifyProc'));
-  with Sender as TMediaPlayer do
+  if FSpeechEngine.Mode = mpPlaying then
   begin
-    case Mode of
-      mpStopped:
-      begin{do something here}
-        OutputDebugString(PChar('Mediaplayer Stopped'));
-      end;
-    end;
-    //must set to true to enable next-time notification
-    Notify := True;
+  
+  end
+  else
+  begin
+    Listen;  
   end;
+  
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TsgcWSConnection);
 begin
   Memo1.Lines.Add('Connected');
+  FConnected := True;
+end;
+
+procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TsgcWSConnection);
+begin
+  Memo1.Lines.Add('Disconnected');
+  FConnected := False;
 end;
 
 procedure TfrmVoiceRecognition.OnHandleMessage(const Text: string);
@@ -289,7 +291,7 @@ begin
   if msg.TryGetValue('message_type', Value) then
   begin
     if (value = 'FinalTranscript') and (msg.Values['text'].Value<>'') and
-      (Mediaplayer1.Mode <> mpPlaying) then
+      (FSpeechEngine.Mode <> mpPlaying) then
     begin
        question := msg.Values['text'].Value;
        Memo1.Lines.Add(question);
@@ -301,7 +303,7 @@ begin
        FmemStream.Clear;
        Sleep(100);
        Speak;
-       PlayTextWithSelectedEngine(response);
+       FSpeechEngine.PlayText(response);
     end;
   end;
 end;
@@ -325,52 +327,24 @@ procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
   StreamOut1.Stream := FmemStream;
   FSendThread.Resume;
-  Listen;
   Sleep(100);
   StreamOut1.Run;
+  Listen;
+  Timer1.Enabled := True;
 end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
   VirtualImage1.ImageIndex := -1;
-  StreamOut1.Stop;
+  StreamOut1.Stop(False);
+  Timer1.Enabled := False;
 end;
 
 procedure TfrmVoiceRecognition.Exit1Click(Sender: TObject);
 begin
   FSendThread.Terminate;
   Application.Terminate;
-end;
-
-procedure TfrmVoiceRecognition.miAmazonSpeechEngineClick(Sender: TObject);
-begin
-  FSpeechEngine := FAmazonPolyVoiceService;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
-end;
-
-procedure TfrmVoiceRecognition.miElevenLabsSpeechEngineClick(Sender: TObject);
-begin
-  FSpeechEngine := FElevenLabsVoiceService;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
-end;
-
-procedure TfrmVoiceRecognition.miGoogleSpeechEngineClick(Sender: TObject);
-begin
-  FSpeechEngine := FGoogleVoiceService;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
-end;
-
-procedure TfrmVoiceRecognition.miMicrosoftSpeechEngineClick(Sender: TObject);
-begin
-  FSpeechEngine := FMsVoiceService;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
-end;
-
-procedure TfrmVoiceRecognition.miWindowsSpeechEngineClick(Sender: TObject);
-begin
-  FSpeechEngine := FWindowsVoiceService;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
 end;
 
 end.

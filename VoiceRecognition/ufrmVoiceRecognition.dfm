@@ -46,7 +46,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   end
   object btnStop: TButton
     Left = 568
-    Top = 150
+    Top = 142
     Width = 75
     Height = 25
     Caption = 'Stop'
@@ -59,17 +59,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Width = 537
     Height = 137
     TabOrder = 3
-  end
-  object MediaPlayer1: TMediaPlayer
-    Left = 587
-    Top = 196
-    Width = 29
-    Height = 30
-    VisibleButtons = [btPlay]
-    DoubleBuffered = True
-    Visible = False
-    ParentDoubleBuffered = False
-    TabOrder = 4
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -195,31 +184,31 @@ object frmVoiceRecognition: TfrmVoiceRecognition
         AutoCheck = True
         Caption = 'Microsoft'
         RadioItem = True
-        OnClick = miMicrosoftSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miAmazonSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Amazon'
         RadioItem = True
-        OnClick = miAmazonSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miGoogleSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Google'
         RadioItem = True
-        OnClick = miGoogleSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miElevenLabsSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Eleven Labs'
         RadioItem = True
-        OnClick = miElevenLabsSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miWindowsSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Windows'
         RadioItem = True
-        OnClick = miWindowsSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
     end
     object miAudioInput: TMenuItem

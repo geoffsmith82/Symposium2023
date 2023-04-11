@@ -6,6 +6,7 @@ uses
   System.Classes,
   System.SysUtils,
   System.JSON,
+  Vcl.Controls,
   Data.Cloud.AmazonAPI,
   Data.Cloud.CloudAPI,
   System.Net.URLClient,
@@ -25,7 +26,7 @@ type
     FAccountName : string;
     FAccountKey: string;
   public
-    constructor Create(const AccountName:string; const AccountKey: string);
+    constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
@@ -33,8 +34,9 @@ type
 
 implementation
 
-constructor TAmazonPollyService.Create(const AccountName:string; const AccountKey: string);
+constructor TAmazonPollyService.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
 begin
+  inherited Create(Sender, '', '', '');
   FAccountName := AccountName;
   FAccountKey := AccountKey;
 end;

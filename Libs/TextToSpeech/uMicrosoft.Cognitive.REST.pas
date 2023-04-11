@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  Vcl.Controls,
   REST.Client,
   REST.Types,
   uBaseSpeech,
@@ -18,7 +19,7 @@ type
     FOutputFormat: string;
   public
     procedure GetAccessToken;
-    constructor Create(const AResourceKey: string; const AApplicationName:string; const AHost: string = 'australiaeast.tts.speech.microsoft.com');
+    constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function GetVoiceList: TMicrosoftCognitiveVoicesClass;
     function SpeechEngineName: string; override;
@@ -29,10 +30,11 @@ implementation
 uses
   System.DateUtils;
 
-constructor TMicrosoftCognitiveService.Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
+constructor TMicrosoftCognitiveService.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
 begin
-  inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
   FOutputFormat := 'audio-24khz-48kbitrate-mono-mp3';
+  FExpiryTime := 0;
 end;
 
 procedure TMicrosoftCognitiveService.GetAccessToken;
@@ -50,7 +52,6 @@ begin
     RESTRequest.Response := RESTResponse;
     RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('Content-Length', '0', TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.Execute;
     FAccessToken := RESTResponse.Content;
     FExpiryTime := IncMinute(FExpiryTime, 8);

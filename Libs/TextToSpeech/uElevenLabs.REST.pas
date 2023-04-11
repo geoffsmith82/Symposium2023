@@ -5,6 +5,7 @@ interface
 uses
   REST.Client,
   REST.Types,
+  Vcl.Controls,
   System.SysUtils,
   System.Classes,
   System.JSON,
@@ -14,7 +15,7 @@ uses
 type
   TElevenLabsService = class(TBaseSpeech)
   public
-    constructor Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
+    constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;
@@ -22,9 +23,9 @@ type
 
 implementation
 
-constructor TElevenLabsService.Create(const AResourceKey: string; const AApplicationName:string; const AHost: string);
+constructor TElevenLabsService.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
 begin
-  inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
 end;
 
 function TElevenLabsService.SpeechEngineName: string;
