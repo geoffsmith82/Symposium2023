@@ -49,7 +49,8 @@ uses
   uGoogleSpeech,
   uAmazon.Polly,
   uWindows.Engine,
-  uAssemblyAI.SpeechToText
+  uAssemblyAI.SpeechToText,
+  uDeepGram.SpeechToText
   ;
 
 type
@@ -105,7 +106,7 @@ type
     GoogleVoiceService : TGoogleSpeechService;
     WindowsVoiceService : TWindowsSpeechService;
     FmemStream : TMemoryStream;
-    FSendThread : TTSendThread;
+    FSendThread : TAssemblyAiSendThread;
     procedure OnHandleMessage(Text: string);
     procedure PlayTextWithSelectedEngine(text: string);
     procedure NotifyProc(Sender: TObject);
@@ -165,7 +166,6 @@ begin
   Settings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   lSpeechEngine := Settings.ReadString('Speech', 'SelectedEngine', 'Windows');
   MsVoiceService := TMicrosoftCognitiveService.Create(ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
-  MsVoiceService.GetAccessToken;
   ElevenLabsVoiceService := TElevenLabsService.Create(ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey');
   AmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
   WindowsVoiceService := TWindowsSpeechService.Create('','','');
@@ -207,7 +207,7 @@ begin
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
 
-  FSendThread := TTSendThread.Create(True, assemblyai_key);
+  FSendThread := TAssemblyAiSendThread.Create(True, assemblyai_key);
   FSendThread.OnHandleMessage := OnHandleMessage;
   FSendThread.OnConnect := OnHandleConnect;
 
@@ -332,7 +332,7 @@ end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
-  sgcWebSocketClient1.WriteData('{ "type": "CloseStream" }');
+  sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
   VirtualImage1.ImageIndex := -1;
   StreamOut1.Stop;
 end;

@@ -25,7 +25,7 @@ type
   TOnHandleMessage = procedure(msg: string) of object;
   TOnConnect = procedure(Connection: TsgcWSConnection) of object;
 
-  TTSendThread = class(TThread)
+  TAssemblyAiSendThread = class(TThread)
   private
     FAssemblyai_key : string;
     queueItems : TThreadedQueue<TMemoryStream>;
@@ -47,19 +47,17 @@ implementation
 
 { TTSendThread }
 
-procedure TTSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
+procedure TAssemblyAiSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
 begin
   Headers.Add('Authorization: ' + FAssemblyai_key);
 end;
 
-procedure TTSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
+procedure TAssemblyAiSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
 begin
   TThread.Queue(nil, procedure()
   var
     msg : TJSONObject;
     value : string;
-    response : string;
-    question : string;
   begin
     msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
     if msg.TryGetValue('message_type', Value) then
@@ -72,7 +70,7 @@ begin
   end);
 end;
 
-procedure TTSendThread.sgOnConnect(Connection: TsgcWSConnection);
+procedure TAssemblyAiSendThread.sgOnConnect(Connection: TsgcWSConnection);
 begin
   TThread.Queue(nil, procedure()
   begin
@@ -83,12 +81,12 @@ begin
   end);
 end;
 
-procedure TTSendThread.Add(ms: TMemoryStream);
+procedure TAssemblyAiSendThread.Add(ms: TMemoryStream);
 begin
   queueItems.PushItem(ms);
 end;
 
-function TTSendThread.Base64EncodedStream(fs: TStream): string;
+function TAssemblyAiSendThread.Base64EncodedStream(fs: TStream): string;
 var
   mem : TStringStream;
 begin
@@ -105,14 +103,14 @@ begin
   end;
 end;
 
-constructor TTSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
+constructor TAssemblyAiSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
 begin
   inherited Create(CreateSuspended);
   FAssemblyai_key := assemblyai_key;
   queueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
-procedure TTSendThread.Execute;
+procedure TAssemblyAiSendThread.Execute;
 var
   m : TMemoryStream;
   mm : TMemoryStream;

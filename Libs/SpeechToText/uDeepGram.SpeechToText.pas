@@ -27,16 +27,15 @@ type
 
   TDeepGramSendThread = class(TThread)
   private
-    FAssemblyai_key : string;
+    FDeepGram_Key : string;
     queueItems : TThreadedQueue<TMemoryStream>;
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
-    function Base64EncodedStream(fs: TStream): string;
   public
     procedure Execute; override;
     procedure Add(ms: TMemoryStream);
-    constructor Create(CreateSuspended: Boolean; assemblyai_key: string);
+    constructor Create(CreateSuspended: Boolean; deepgram_key: string);
   public
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
@@ -49,7 +48,7 @@ implementation
 
 procedure TDeepGramSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
 begin
-  Headers.Add('Authorization: Token ' + FAssemblyai_key);
+  Headers.Add('Authorization: Token ' + FDeepGram_Key);
 end;
 
 procedure TDeepGramSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
@@ -62,9 +61,9 @@ begin
     question : string;
   begin
     msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
-    if msg.TryGetValue('message_type', Value) then
+    if msg.TryGetValue('speech_final', Value) then
     begin
-      if Assigned(OnHandleMessage) then
+      if Assigned(OnHandleMessage) and (Value='True') then
       begin
         OnHandleMessage(Text);
       end;
@@ -88,27 +87,10 @@ begin
   queueItems.PushItem(ms);
 end;
 
-function TDeepGramSendThread.Base64EncodedStream(fs: TStream): string;
-var
-  mem : TStringStream;
-begin
-  mem := nil;
-  Result := '';
-  try
-    mem := TStringStream.Create;
-    if TNetEncoding.Base64String.Encode(fs, mem) > 0 then
-    begin
-      Result := mem.DataString;
-    end;
-  finally
-    FreeAndNil(mem);
-  end;
-end;
-
-constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
+constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; deepgram_key: string);
 begin
   inherited Create(CreateSuspended);
-  FAssemblyai_key := assemblyai_key;
+  FDeepGram_Key := deepgram_key;
   queueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
