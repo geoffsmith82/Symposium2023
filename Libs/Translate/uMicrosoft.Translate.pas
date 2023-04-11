@@ -39,6 +39,7 @@ uses System.DateUtils;
 constructor TMicrosoftTranslate.Create(const SubscriptionKey, Endpoint, SourceLang, TargetLang: string);
 begin
   inherited Create;
+  FExpiryTime := 0;
   FSubscriptionKey := SubscriptionKey;
   FEndpoint := Endpoint;
   FSourceLang := SourceLang;
@@ -59,6 +60,7 @@ begin
   FRESTResponse := TRESTResponse.Create(nil);
   FRESTResponse.ContentType := 'application/json';
 end;
+
 function TMicrosoftTranslate.EngineName: string;
 begin
   Result := 'Microsoft Translate';
@@ -141,7 +143,6 @@ begin
     RESTRequest.Response := RESTResponse;
     RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    //RESTRequest.AddParameter('Content-Length', '0', TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.Execute;
     FAccessToken := TEncoding.UTF8.GetString(RESTResponse.RawBytes);
     FExpiryTime := IncMinute(FExpiryTime, 8);
@@ -163,7 +164,9 @@ begin
   if SourceText.Trim.IsEmpty or FTargetLang.Trim.IsEmpty then
     Exit('');
 
-  GetAccessToken;
+  if (Now > FExpiryTime) then
+    GetAccessToken;
+
 
   ApiVersion := '3.0';
   FRESTRequest.ResetToDefaults;
