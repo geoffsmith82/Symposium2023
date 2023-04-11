@@ -22,20 +22,20 @@ uses
   ;
 
 type
-  TOnHandleMessage = procedure(msg: string) of object;
+  TOnHandleMessage = procedure(const msg: string) of object;
   TOnConnect = procedure(Connection: TsgcWSConnection) of object;
 
   TDeepGramSendThread = class(TThread)
   private
     FDeepGram_Key : string;
-    queueItems : TThreadedQueue<TMemoryStream>;
+    FQueueItems : TThreadedQueue<TMemoryStream>;
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
   public
     procedure Execute; override;
     procedure Add(ms: TMemoryStream);
-    constructor Create(CreateSuspended: Boolean; deepgram_key: string);
+    constructor Create(CreateSuspended: Boolean; const deepgram_key: string);
   public
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
@@ -84,14 +84,14 @@ end;
 
 procedure TDeepGramSendThread.Add(ms: TMemoryStream);
 begin
-  queueItems.PushItem(ms);
+  FQueueItems.PushItem(ms);
 end;
 
-constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; deepgram_key: string);
+constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; const deepgram_key: string);
 begin
   inherited Create(CreateSuspended);
   FDeepGram_Key := deepgram_key;
-  queueItems := TThreadedQueue<TMemoryStream>.Create;
+  FQueueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
 procedure TDeepGramSendThread.Execute;
@@ -115,7 +115,7 @@ begin
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
-      m := queueItems.PopItem;
+      m := FQueueItems.PopItem;
       if mm.Size < 3000 then
       begin
         m.Position := 0;

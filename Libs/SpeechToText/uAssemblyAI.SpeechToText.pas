@@ -28,7 +28,7 @@ type
   TAssemblyAiSendThread = class(TThread)
   private
     FAssemblyai_key : string;
-    queueItems : TThreadedQueue<TMemoryStream>;
+    FQueueItems : TThreadedQueue<TMemoryStream>;
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
@@ -36,7 +36,7 @@ type
   public
     procedure Execute; override;
     procedure Add(ms: TMemoryStream);
-    constructor Create(CreateSuspended: Boolean; assemblyai_key: string);
+    constructor Create(CreateSuspended: Boolean; const assemblyai_key: string);
   public
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
@@ -83,7 +83,7 @@ end;
 
 procedure TAssemblyAiSendThread.Add(ms: TMemoryStream);
 begin
-  queueItems.PushItem(ms);
+  FQueueItems.PushItem(ms);
 end;
 
 function TAssemblyAiSendThread.Base64EncodedStream(fs: TStream): string;
@@ -103,11 +103,11 @@ begin
   end;
 end;
 
-constructor TAssemblyAiSendThread.Create(CreateSuspended: Boolean; assemblyai_key: string);
+constructor TAssemblyAiSendThread.Create(CreateSuspended: Boolean; const assemblyai_key: string);
 begin
   inherited Create(CreateSuspended);
   FAssemblyai_key := assemblyai_key;
-  queueItems := TThreadedQueue<TMemoryStream>.Create;
+  FQueueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
 procedure TAssemblyAiSendThread.Execute;
@@ -134,7 +134,7 @@ begin
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
-      m := queueItems.PopItem;
+      m := FQueueItems.PopItem;
       if mm.Size < 17000 then // Assembly AI needs chunks of audio of 1 second in size minimum
       begin
         m.Position := 0;
