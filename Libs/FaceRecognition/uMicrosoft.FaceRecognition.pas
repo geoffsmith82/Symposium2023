@@ -65,7 +65,7 @@ begin
     serviceUrl := 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect';
     uri := TURI.Create(serviceUrl);
     uri.AddParameter('returnFaceId', 'false');
-    uri.AddParameter('returnFaceLandmarks', 'false');
+    uri.AddParameter('returnFaceLandmarks', 'true');
 
     // Create a JSON request with the image URL
     request := TJSONObject.Create;

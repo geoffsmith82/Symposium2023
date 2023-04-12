@@ -1,6 +1,19 @@
 program VoiceRecognition;
 
 uses
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  EDebugExports,
+  EDebugJCL,
+  EFixSafeCallException,
+  EMapWin32,
+  EAppVCL,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   Vcl.Forms,
   ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {frmVoiceRecognition},
   OpenAI in '..\Libs\OpenAI.pas',

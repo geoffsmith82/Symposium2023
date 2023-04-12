@@ -1,6 +1,19 @@
 program DelphiChatGPT;
 
 uses
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  EDebugExports,
+  EDebugJCL,
+  EFixSafeCallException,
+  EMapWin32,
+  EAppVCL,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   Vcl.Forms,
   UChatGPT in 'UChatGPT.pas' {Form1},
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
@@ -25,4 +38,3 @@ begin
   Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
-

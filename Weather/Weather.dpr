@@ -1,6 +1,19 @@
 program Weather;
 
 uses
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  EDebugExports,
+  EDebugJCL,
+  EFixSafeCallException,
+  EMapWin32,
+  EAppVCL,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmWeatherMain in 'frmWeatherMain.pas' {frmWeatherWindow},
   udmWeather in 'udmWeather.pas' {dmWeather: TDataModule},

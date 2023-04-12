@@ -1,6 +1,19 @@
 program FaceDetection;
 
 uses
+  {$IFDEF EurekaLog}
+  EMemLeaks,
+  EResLeaks,
+  EDebugExports,
+  EDebugJCL,
+  EFixSafeCallException,
+  EMapWin32,
+  EAppVCL,
+  EDialogWinAPIMSClassic,
+  EDialogWinAPIEurekaLogDetailed,
+  EDialogWinAPIStepsToReproduce,
+  ExceptionLog7,
+  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmFaceWindow in 'frmFaceWindow.pas' {frmFaceDetection},
   uBaseFaceRecognition in '..\Libs\FaceRecognition\uBaseFaceRecognition.pas',
