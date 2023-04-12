@@ -101,9 +101,9 @@ type
     FmemStream : TMemoryStream;
     FConnected : Boolean;
     FSendThread : TAssemblyAiSendThread;
-    SpeechEngines : TObjectDictionary<string, TBaseSpeech>;
-    SpeechEngineMenuItems : TDictionary<string, TMenuItem>;
-    SpeechEngineNames: TDictionary<TMenuItem, string>;
+    FSpeechEngines : TObjectDictionary<string, TBaseSpeech>;
+    FSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
+    FSpeechEngineNames: TDictionary<TMenuItem, string>;
     procedure LoadAudioInputsMenu;
     procedure RegisterSpeechToTextEngine(engineClass : TBaseSpeech; menuItem: TMenuItem);
     function LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
@@ -131,21 +131,21 @@ var
   engineName: string;
 begin
   engineName := engineClass.SpeechEngineName;
-  SpeechEngines.AddOrSetValue(engineName, engineClass);
-  SpeechEngineMenuItems.Add(engineName, menuItem);
-  SpeechEngineNames.Add(menuItem, engineName);
+  FSpeechEngines.AddOrSetValue(engineName, engineClass);
+  FSpeechEngineMenuItems.Add(engineName, menuItem);
+  FSpeechEngineNames.Add(menuItem, engineName);
 end;
 
 function TfrmVoiceRecognition.LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
 begin
-  Result := SpeechEngines[engineName];
+  Result := FSpeechEngines[engineName];
 end;
 
 procedure TfrmVoiceRecognition.SelectSpeechEngine(Sender: TObject);
 var
   lSpeechEngine: String;
 begin
-  lSpeechEngine := SpeechEngineNames[Sender as TMenuItem];
+  lSpeechEngine := FSpeechEngineNames[Sender as TMenuItem];
   FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
   FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
 end;
@@ -200,9 +200,9 @@ var
 begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
-  SpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
-  SpeechEngineNames := TDictionary<TMenuItem, string>.Create;
+  FSpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
+  FSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
+  FSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
 
 
   RegisterSpeechToTextEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'),
@@ -223,7 +223,7 @@ begin
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'Windows');
 
   FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
-  SpeechEngineMenuItems[FSpeechEngine.SpeechEngineName].Checked := True;
+  FSpeechEngineMenuItems[FSpeechEngine.SpeechEngineName].Checked := True;
 
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
@@ -239,9 +239,9 @@ procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
   FSendThread.Terminate;
   FreeAndNil(FSendThread);
-  FreeAndNil(SpeechEngines);
-  FreeAndNil(SpeechEngineMenuItems);
-  FreeAndNil(SpeechEngineNames);
+  FreeAndNil(FSpeechEngines);
+  FreeAndNil(FSpeechEngineMenuItems);
+  FreeAndNil(FSpeechEngineNames);
   FreeAndNil(FSettings);
   FreeAndNil(FmemStream);
 end;
