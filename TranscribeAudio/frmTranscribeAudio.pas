@@ -8,6 +8,8 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.Inifiles,
+  System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -18,7 +20,6 @@ uses
   uGoogle.SpeechToText,
   uAmazon.SpeechToText,
   uMicrosoft.SpeechToText,
-  Inifiles,
   uOpenAI.Whisper.Online.SpeechToText
   ;
 
@@ -58,8 +59,13 @@ type
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
+    FEngines : TObjectDictionary<string, TBaseSpeechToText>;
+    FMenuEngine : TDictionary<string, TMenuItem>;
+    FNameFromMenu: TDictionary<TMenuItem, string>;
     FSpeechToText : TBaseSpeechToText;
     FSettings : TIniFile;
+    procedure RegisterEngine(engine: string; menuItem: TMenuItem;
+      Speechengine: TBaseSpeechToText);
   public
     { Public declarations }
   end;
@@ -73,43 +79,43 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
+procedure TVoiceRecognitionForm.RegisterEngine(engine: string; menuItem: TMenuItem; Speechengine: TBaseSpeechToText);
+begin
+  FEngines.AddOrSetValue(engine, Speechengine);
+  FMenuEngine.AddOrSetValue(engine, menuItem);
+  FNameFromMenu.AddOrSetValue(menuItem, engine);
+end;
+
 procedure TVoiceRecognitionForm.FormCreate(Sender: TObject);
 var
   engine : string;
 begin
+  FEngines := TObjectDictionary<string,TBaseSpeechToText>.Create;
+  FMenuEngine := TDictionary<string, TMenuItem>.Create;
+  FNameFromMenu := TDictionary<TMenuItem, string>.Create;
+
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  engine := FSettings.ReadString('Settings', 'Engine', '');
-  if engine = 'GoogleSpeech' then
-  begin
-    FSpeechToText := TGoogleSpeechToText.Create(google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings);
-    miGoogle.Checked :=  True;
-  end
-  else if engine = 'MicrosoftSpeech' then
-  begin
-    FSpeechToText := TMicrosoftSpeechToText.Create('', '', '');
-    miMicrosoft.Checked :=  True;
-  end
-  else if engine = 'AmazonSpeech' then
-  begin
-    FSpeechToText := TAmazonSpeechToText.Create('', '', '');
-    miAmazon.Checked :=  True;
-  end
-  else if engine = 'OpenAiWhisperOnlineSpeech' then
-  begin
-    FSpeechToText := TOpenAiWhisperOnline.Create('', '', '');
-    miOpenAIWhisper.Checked :=  True;
-  end
-  else
-  begin
-    FSpeechToText := TOpenAiWhisperOnline.Create('', '', '');
-    miOpenAIWhisper.Checked :=  True;
-  end
+  RegisterEngine('GoogleSpeech', miGoogle,
+    TGoogleSpeechToText.Create(google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings));
+  RegisterEngine('MicrosoftSpeech', miMicrosoft,
+    TMicrosoftSpeechToText.Create('', '', ''));
+  RegisterEngine('AmazonSpeech', miAmazon,
+    TAmazonSpeechToText.Create('', '', ''));
+  RegisterEngine('OpenAiWhisperOnlineSpeech', miOpenAIWhisper,
+    TOpenAiWhisperOnline.Create('', '', ''));
+
+  engine := FSettings.ReadString('Settings', 'Engine', 'MicrosoftSpeech');
+
+  FSpeechToText := FEngines[engine];
+  FMenuEngine[engine].Checked := True;
 end;
 
 procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FSpeechToText);
   FreeAndNil(FSettings);
+  FreeAndNil(FEngines);
+  FreeAndNil(FMenuEngine);
+  FreeAndNil(FNameFromMenu);
 end;
 
 procedure TVoiceRecognitionForm.GoogleAuthenticate1Click(Sender: TObject);
@@ -142,28 +148,8 @@ procedure TVoiceRecognitionForm.miEngineSelectedClick(Sender: TObject);
 var
   engine : string;
 begin
-  FreeAndNil(FSpeechToText);
-  engine := (Sender as TMenuItem).Caption.Replace('&', '');
-  if engine = 'Microsoft' then
-  begin
-    FSpeechToText := TMicrosoftSpeechToText.Create('', '', '');
-    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
-  end
-  else if engine = 'Google' then
-  begin
-    FSpeechToText := TGoogleSpeechToText.Create(google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
-    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
-  end
-  else if engine = 'Amazon' then
-  begin
-    FSpeechToText := TAmazonSpeechToText.Create('', '', '');
-    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
-  end
-  else if engine = 'Open AI Whisper' then
-  begin
-    FSpeechToText := TOpenAiWhisperOnline.Create('', '', '');
-    FSettings.WriteString('Settings', 'Engine', FSpeechToText.SpeechEngineName);
-  end;
+  engine := FNameFromMenu[(Sender as TMenuItem)];
+  FSettings.WriteString('Settings', 'Engine', engine);
 end;
 
 end.

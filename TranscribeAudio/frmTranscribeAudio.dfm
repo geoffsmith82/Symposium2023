@@ -101,7 +101,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
       end
     end
     object miEngine: TMenuItem
-      Caption = 'Engine'
+      Caption = 'Recognition Engine'
       object miMicrosoft: TMenuItem
         AutoCheck = True
         Caption = 'Microsoft'
