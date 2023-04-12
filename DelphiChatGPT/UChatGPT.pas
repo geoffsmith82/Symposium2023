@@ -9,6 +9,7 @@ uses
   System.Variants,
   System.Classes,
   System.IniFiles,
+  System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -51,28 +52,23 @@ type
     miTextCurie0011: TMenuItem;
     miTextBabbage001: TMenuItem;
     miTextAda0011: TMenuItem;
-    procedure miAmazonSpeechEngineClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAskTheMachineClick(Sender: TObject);
     procedure btnGoogleAuthClick(Sender: TObject);
     procedure btnSpeakQuestionClick(Sender: TObject);
-    procedure miElevenLabsSpeechEngineClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
-    procedure miGoogleSpeechEngineClick(Sender: TObject);
-    procedure miMicrosoftSpeechEngineClick(Sender: TObject);
-    procedure miWindowsSpeechEngineClick(Sender: TObject);
     procedure miTextDavinci003Click(Sender: TObject);
+    procedure SelectSpeechEngine(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     SpeechEngine : TBaseSpeech;
-    MsVoiceService : TMicrosoftCognitiveService;
-    ElevenLabsVoiceService : TElevenLabsService;
-    AmazonPolyVoiceService : TAmazonPollyService;
-    GoogleVoiceService : TGoogleSpeechService;
-    WindowsVoiceService : TWindowsSpeechService;
+    SpeechEngines : TObjectDictionary<string, TBaseSpeech>;
+    SpeechEngineMenuItems : TDictionary<string, TMenuItem>;
+    SpeechEngineNames: TDictionary<TMenuItem, string>;
     Settings : TIniFile;
     procedure PlayTextWithSelectedEngine(text: string);
     function SelectedModel: string;
+    procedure RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass: TBaseSpeech);
     { Private declarations }
   public
     { Public declarations }
@@ -87,13 +83,14 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm1.FormDestroy(Sender: TObject);
+procedure TForm1.RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass : TBaseSpeech);
+var
+  engineName: string;
 begin
-  FreeAndNil(MsVoiceService);
-  FreeAndNil(ElevenLabsVoiceService);
-  FreeAndNil(AmazonPolyVoiceService);
-  FreeAndNil(GoogleVoiceService);
-  FreeAndNil(WindowsVoiceService);
+  engineName := engineClass.SpeechEngineName;
+  SpeechEngines.AddOrSetValue(engineName, engineClass);
+  SpeechEngineMenuItems.Add(engineName, menuItem);
+  SpeechEngineNames.Add(menuItem, engineName);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -101,45 +98,29 @@ var
   lSpeechEngine: string;
   i: Integer;
   currentModel : string;
+  menu: TMenuItem;
 begin
-  MsVoiceService := TMicrosoftCognitiveService.Create(ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
-  MsVoiceService.GetAccessToken;
-  ElevenLabsVoiceService := TElevenLabsService.Create(ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey');
-  AmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
-  WindowsVoiceService := TWindowsSpeechService.Create('','','');
+  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create;
+  SpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
+  SpeechEngineNames := TDictionary<TMenuItem, string>.Create;
   Settings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  GoogleVoiceService := TGoogleSpeechService.Create(google_clientid, google_clientsecret,'ADUG Demo', '', Settings);
-  SpeechEngine := WindowsVoiceService;
+
+  RegisterSpeechToTextEngine(miMicrosoftSpeechEngine,
+     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'));
+  RegisterSpeechToTextEngine(miElevenLabsSpeechEngine,
+     TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'));
+  RegisterSpeechToTextEngine(miAmazonSpeechEngine,
+     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey));//'ADUG Demo', '');
+  RegisterSpeechToTextEngine(miWindowsSpeechEngine,
+     TWindowsSpeechService.Create(Self, '','',''));
+  RegisterSpeechToTextEngine(miGoogleSpeechEngine,
+     TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', Settings));
+
   lSpeechEngine := Settings.ReadString('Speech', 'SelectedEngine', 'Windows');
-  if lSpeechEngine.Contains(ElevenLabsVoiceService.SpeechEngineName) then
+  SpeechEngines.TryGetValue(lSpeechEngine, SpeechEngine);
+  if SpeechEngineMenuItems.TryGetValue(lSpeechEngine, menu) then
   begin
-    SpeechEngine := ElevenLabsVoiceService;
-    miElevenLabsSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(MsVoiceService.SpeechEngineName) then
-  begin
-    SpeechEngine := MsVoiceService;
-    miMicrosoftSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(AmazonPolyVoiceService.SpeechEngineName) then
-  begin
-    SpeechEngine := AmazonPolyVoiceService;
-    miAmazonSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(GoogleVoiceService.SpeechEngineName) then
-  begin
-    SpeechEngine := GoogleVoiceService;
-    miGoogleSpeechEngine.Checked := True;
-  end
-  else if lSpeechEngine.Contains(WindowsVoiceService.SpeechEngineName) then
-  begin
-    SpeechEngine := WindowsVoiceService;
-    miWindowsSpeechEngine.Checked := True;
-  end
-  else
-  begin
-    SpeechEngine := WindowsVoiceService;  // default engine
-    miWindowsSpeechEngine.Checked := True;
+    menu.Checked := True;
   end;
   currentModel := Settings.ReadString('ChatGPT', 'Model', 'text-davinci-003').Replace('&', '');
   for i := 0 to ModelMenu.Count - 1 do
@@ -150,6 +131,14 @@ begin
       break;
     end;
   end;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(SpeechEngines);
+  FreeAndNil(SpeechEngineMenuItems);
+  FreeAndNil(SpeechEngineNames);
+  FreeAndNil(Settings);
 end;
 
 function TForm1.SelectedModel: string;
@@ -165,6 +154,16 @@ begin
   end;
 end;
 
+
+procedure TForm1.SelectSpeechEngine(Sender: TObject);
+var
+  engine : string;
+begin
+  engine := SpeechEngineNames[Sender as TMenuItem];
+  SpeechEngine := SpeechEngines[engine];
+  (Sender as TMenuItem).Checked := True;
+  Settings.WriteString('Speech', 'SelectedEngine', engine);
+end;
 
 procedure TForm1.btnAskTheMachineClick(Sender: TObject);
 var
@@ -207,7 +206,7 @@ end;
 
 procedure TForm1.btnGoogleAuthClick(Sender: TObject);
 begin
-  GoogleVoiceService.Authenticate;
+  (SpeechEngine as TGoogleSpeechService).Authenticate;
 end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);
@@ -218,36 +217,6 @@ end;
 procedure TForm1.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
-end;
-
-procedure TForm1.miAmazonSpeechEngineClick(Sender: TObject);
-begin
-  SpeechEngine := AmazonPolyVoiceService;
-  Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
-end;
-
-procedure TForm1.miElevenLabsSpeechEngineClick(Sender: TObject);
-begin
-  SpeechEngine := ElevenLabsVoiceService;
-  Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
-end;
-
-procedure TForm1.miGoogleSpeechEngineClick(Sender: TObject);
-begin
-  SpeechEngine := GoogleVoiceService;
-  Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
-end;
-
-procedure TForm1.miMicrosoftSpeechEngineClick(Sender: TObject);
-begin
-  SpeechEngine := MsVoiceService;
-  Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
-end;
-
-procedure TForm1.miWindowsSpeechEngineClick(Sender: TObject);
-begin
-  SpeechEngine := WindowsVoiceService;
-  Settings.WriteString('Speech', 'SelectedEngine', SpeechEngine.SpeechEngineName);
 end;
 
 procedure TForm1.miTextDavinci003Click(Sender: TObject);

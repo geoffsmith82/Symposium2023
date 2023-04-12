@@ -49,6 +49,7 @@ uses
 
 procedure TGoogleSpeechService.Authenticate;
 begin
+  FHTTPServer.Active := True;
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
 end;
 
@@ -66,7 +67,6 @@ begin
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
-  FHTTPServer.Active := True;
   FSettings := Settings;
   FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
 end;

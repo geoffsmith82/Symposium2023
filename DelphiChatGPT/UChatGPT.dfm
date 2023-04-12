@@ -334,12 +334,12 @@ object Form1: TForm1
   object mmoOutput: TMemo
     Left = 24
     Top = 119
-    Width = 466
+    Width = 462
     Height = 257
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
-    ExplicitWidth = 474
-    ExplicitHeight = 258
+    ExplicitWidth = 458
+    ExplicitHeight = 256
   end
   object mmoPrompt: TMemo
     Left = 71
@@ -351,7 +351,7 @@ object Form1: TForm1
   object MediaPlayer1: TMediaPlayer
     Left = 187
     Top = 28
-    Width = 0
+    Width = 29
     Height = 30
     VisibleButtons = [btPlay]
     DoubleBuffered = True
@@ -392,31 +392,31 @@ object Form1: TForm1
         AutoCheck = True
         Caption = 'Microsoft'
         RadioItem = True
-        OnClick = miMicrosoftSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miAmazonSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Amazon'
         RadioItem = True
-        OnClick = miAmazonSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miGoogleSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Google'
         RadioItem = True
-        OnClick = miGoogleSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miElevenLabsSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Eleven Labs'
         RadioItem = True
-        OnClick = miElevenLabsSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
       object miWindowsSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Windows'
         RadioItem = True
-        OnClick = miWindowsSpeechEngineClick
+        OnClick = SelectSpeechEngine
       end
     end
     object ModelMenu: TMenuItem
