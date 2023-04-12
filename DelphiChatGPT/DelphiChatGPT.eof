@@ -1,0 +1,23 @@
+﻿
+[Exception Log]
+EurekaLog Version=8000
+934A8C7448044071A3F7A237F4461A0E="5AE9714BB5ED8BF2524B89817A3BDC705ABBC993430396AD550752D73110465FA49FBB639AD5C642305FAC71F8335FAB"
+Activate=1
+atFixSafeCallException=1
+atVCL=1
+atWin32=1
+dpJCL=1
+Encrypt Password=""
+GUID="{CC9F9FEF-9AA4-499A-B818-E6715EB662C9}"
+idEurekaLog=1
+idEurekaLogDetailed=1
+idMSClassic=1
+idStepsToReproduce=1
+InjectCode=1
+InjectInfo=1
+InjectOptions=1
+loEnableMMDebugMode=1
+ProjectID="{A5B5B87C-BD89-4630-9C64-995DDAE62852}"
+_CustomProfile=""
+
+
