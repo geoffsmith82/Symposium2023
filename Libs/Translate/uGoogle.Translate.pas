@@ -40,6 +40,7 @@ type
     FTargetLang: string;
   public
     constructor Create(const APIKey: string; const APISecret: string; const SourceLang, TargetLang: string; Settings: TiniFile);
+    destructor Destroy; override;
     function Translate(const SourceText: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
@@ -91,6 +92,16 @@ begin
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
   FHTTPServer.Active := True;
 
+end;
+
+destructor TGoogleTranslate.Destroy;
+begin
+  FreeAndNil(FOAuth2);
+  FreeAndNil(FHTTPServer);
+  FreeAndNil(FRESTResponse);
+  FreeAndNil(FRESTRequest);
+  FreeAndNil(FRESTClient);
+  inherited;
 end;
 
 function TGoogleTranslate.EngineName: string;

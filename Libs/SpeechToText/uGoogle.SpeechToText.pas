@@ -146,7 +146,6 @@ begin
   FreeAndNil(FOAuth2);
   FHTTPServer.Active := False;
   FreeAndNil(FHTTPServer);
-  FreeAndNil(FSettings);
   inherited;
 end;
 

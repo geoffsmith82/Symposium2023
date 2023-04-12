@@ -54,6 +54,7 @@ type
     procedure Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure SaveImage1Click(Sender: TObject);
     procedure seImageCountChange(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     ImageList : TObjectList<TImage>;
@@ -76,6 +77,11 @@ procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
   ImageList := TObjectList<TImage>.Create;
   CurrentImage := nil;
+end;
+
+procedure TfrmImageGenerator.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(ImageList);
 end;
 
 procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);

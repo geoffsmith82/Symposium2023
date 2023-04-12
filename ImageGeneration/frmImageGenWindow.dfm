@@ -12,6 +12,7 @@ object frmImageGenerator: TfrmImageGenerator
   Font.Style = []
   Menu = MainMenu1
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   DesignSize = (
     628
     442)
@@ -31,7 +32,7 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 0
   end
   object btnExecute: TButton
-    Left = 516
+    Left = 512
     Top = 23
     Width = 75
     Height = 25
@@ -39,10 +40,10 @@ object frmImageGenerator: TfrmImageGenerator
     Caption = 'Execute'
     TabOrder = 1
     OnClick = btnExecuteClick
-    ExplicitLeft = 512
+    ExplicitLeft = 508
   end
   object seImageCount: TSpinEdit
-    Left = 532
+    Left = 528
     Top = 54
     Width = 59
     Height = 24
@@ -52,10 +53,10 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 2
     Value = 1
     OnChange = seImageCountChange
-    ExplicitLeft = 528
+    ExplicitLeft = 524
   end
   object cboSize: TComboBox
-    Left = 499
+    Left = 495
     Top = 84
     Width = 92
     Height = 23
@@ -68,23 +69,23 @@ object frmImageGenerator: TfrmImageGenerator
       '256x256'
       '512x512'
       '1024x1024')
-    ExplicitLeft = 495
+    ExplicitLeft = 491
   end
   object ScrollBox1: TScrollBox
     Left = 16
     Top = 128
-    Width = 589
+    Width = 585
     Height = 289
     VertScrollBar.Range = 2000
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoScroll = False
     TabOrder = 4
-    ExplicitWidth = 585
+    ExplicitWidth = 581
     ExplicitHeight = 288
     object GridPanel1: TGridPanel
       Left = 0
       Top = 0
-      Width = 568
+      Width = 564
       Height = 2000
       Align = alClient
       Caption = 'GridPanel1'
@@ -110,7 +111,7 @@ object frmImageGenerator: TfrmImageGenerator
           Value = 50.000000000000000000
         end>
       TabOrder = 0
-      ExplicitWidth = 564
+      ExplicitWidth = 560
     end
   end
   object MainMenu1: TMainMenu

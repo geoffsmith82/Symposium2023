@@ -26,6 +26,7 @@ type
     procedure GetAccessToken;
   public
     constructor Create(const SubscriptionKey, Endpoint, SourceLang, TargetLang: string);
+    destructor Destroy; override;
     function Translate(const SourceText: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
@@ -59,6 +60,15 @@ begin
   // Create a new REST response adapter
   FRESTResponse := TRESTResponse.Create(nil);
   FRESTResponse.ContentType := 'application/json';
+end;
+
+destructor TMicrosoftTranslate.Destroy;
+begin
+  FreeAndNil(FRESTClient);
+  FreeAndNil(FRESTResponse);
+  FreeAndNil(FRESTRequest);
+
+  inherited;
 end;
 
 function TMicrosoftTranslate.EngineName: string;

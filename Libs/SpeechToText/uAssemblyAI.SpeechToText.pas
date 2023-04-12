@@ -38,6 +38,7 @@ type
     procedure Execute; override;
     procedure Add(ms: TMemoryStream);
     constructor Create(CreateSuspended: Boolean; const assemblyai_key: string);
+    destructor Destroy; override;
   public
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
@@ -121,6 +122,12 @@ begin
   inherited Create(CreateSuspended);
   FAssemblyai_key := assemblyai_key;
   FQueueItems := TThreadedQueue<TMemoryStream>.Create;
+end;
+
+destructor TAssemblyAiSendThread.Destroy;
+begin
+  FreeAndNil(FQueueItems);
+  inherited;
 end;
 
 procedure TAssemblyAiSendThread.Execute;

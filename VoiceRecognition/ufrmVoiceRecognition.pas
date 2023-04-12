@@ -200,7 +200,7 @@ var
 begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create;
+  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
   SpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
   SpeechEngineNames := TDictionary<TMenuItem, string>.Create;
 
@@ -243,6 +243,7 @@ begin
   FreeAndNil(SpeechEngineMenuItems);
   FreeAndNil(SpeechEngineNames);
   FreeAndNil(FSettings);
+  FreeAndNil(FmemStream);
 end;
 
 

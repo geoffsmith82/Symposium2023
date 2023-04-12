@@ -58,7 +58,7 @@ end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
-  FAmazonPolyVoiceService := TAmazonPollyService.Create(AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
+  FAmazonPolyVoiceService := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
 end;
 
 procedure TfrmWeatherWindow.PlayTextAmazon(const text:string);

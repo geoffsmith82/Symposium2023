@@ -116,7 +116,7 @@ var
   menuItem : TMenuItem;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
-  FEngines := TObjectDictionary<string, TBaseTranslate>.Create;
+  FEngines := TObjectDictionary<string, TBaseTranslate>.Create([doOwnsValues]);
   FMenuEngine :=TDictionary<string, TMenuItem>.Create;
   FNameFromMenu := TDictionary<TMenuItem, string>.Create;
   FSettings := TIniFile.Create(filename);

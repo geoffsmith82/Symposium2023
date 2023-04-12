@@ -100,7 +100,7 @@ var
   currentModel : string;
   menu: TMenuItem;
 begin
-  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create;
+  SpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
   SpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
   SpeechEngineNames := TDictionary<TMenuItem, string>.Create;
   Settings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));

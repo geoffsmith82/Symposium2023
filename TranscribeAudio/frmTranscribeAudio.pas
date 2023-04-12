@@ -90,7 +90,7 @@ procedure TVoiceRecognitionForm.FormCreate(Sender: TObject);
 var
   engine : string;
 begin
-  FEngines := TObjectDictionary<string,TBaseSpeechToText>.Create;
+  FEngines := TObjectDictionary<string,TBaseSpeechToText>.Create([doOwnsValues]);
   FMenuEngine := TDictionary<string, TMenuItem>.Create;
   FNameFromMenu := TDictionary<TMenuItem, string>.Create;
 
