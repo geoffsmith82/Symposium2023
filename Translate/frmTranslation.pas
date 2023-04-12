@@ -10,6 +10,7 @@ uses
   System.Classes,
   System.IniFiles,
   System.IOUtils,
+  System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -61,9 +62,14 @@ type
     procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
+    FEngines : TObjectDictionary<string, TBaseTranslate>;
+    FMenuEngine : TDictionary<string, TMenuItem>;
+    FNameFromMenu: TDictionary<TMenuItem, string>;
     FTranslate : TBaseTranslate;
     FSettings : TIniFile;
     procedure LoadLanguageMenus;
+    procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem;
+      translateEngine: TBaseTranslate);
   public
     { Public declarations }
   end;
@@ -77,6 +83,13 @@ implementation
 
 {$i ..\Libs\apikey.inc}
 
+procedure TfrmMainTranslationWindow.RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
+begin
+  FEngines.AddOrSetValue(engine, translateEngine);
+  FMenuEngine.AddOrSetValue(engine, menuItem);
+  FNameFromMenu.AddOrSetValue(menuItem, engine);
+end;
+
 procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
 begin
   mmoTranslatedText.Text := FTranslate.Translate(mmoSourceText.Text);
@@ -85,6 +98,9 @@ end;
 procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
+  FreeAndNil(FEngines);
+  FreeAndNil(FMenuEngine);
+  FreeAndNil(FNameFromMenu);
 end;
 
 procedure TfrmMainTranslationWindow.GoogleAuthenticate1Click(Sender: TObject);
@@ -97,25 +113,25 @@ var
   filename : string;
   toLanguage : string;
   languageEngine : string;
+  menuItem : TMenuItem;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
+  FEngines := TObjectDictionary<string, TBaseTranslate>.Create;
+  FMenuEngine :=TDictionary<string, TMenuItem>.Create;
+  FNameFromMenu := TDictionary<TMenuItem, string>.Create;
   FSettings := TIniFile.Create(filename);
   toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
-  if languageEngine.Replace('&','') = 'Microsoft Translate' then
-  begin
-    miMicrosoft.Checked := True;
-    FTranslate := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en');
-  end
-  else if languageEngine.Replace('&','') = 'Google Translate' then
-  begin
-    miGoogle.Checked := True;
-    FTranslate := TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings);
-  end
-  else if languageEngine.Replace('&','') = 'Amazon Translate' then
-  begin
-    miAmazonTranslate.Checked := True;
-  end;
+
+  RegisterTranslationEngine('Microsoft Translate', miMicrosoft,
+    TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en'));
+  RegisterTranslationEngine('Google Translate', miGoogle,
+    TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings));
+
+  if FMenuEngine.TryGetValue(languageEngine, menuItem) then
+    menuItem.Checked := True;
+
+  FEngines.TryGetValue(languageEngine, FTranslate);
   LoadLanguageMenus;
 end;
 
@@ -125,6 +141,8 @@ var
   lang: string;
   menu : TMenuItem;
 begin
+  if not Assigned(FTranslate) then
+    Exit;
   languages := FTranslate.FromLanguages;
   for lang in languages do
   begin
@@ -217,21 +235,9 @@ var
   languageEngine : string;
 begin
   FSettings.WriteString('Settings', 'LanguageEngine', TMenuItem(Sender).Caption);
-  languageEngine := TMenuItem(Sender).Caption;
-  if languageEngine.Replace('&','') = 'Microsoft Translate' then
-  begin
-    miMicrosoft.Checked := True;
-    FTranslate := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en');
-  end
-  else if languageEngine.Replace('&','') = 'Google Translate' then
-  begin
-    miGoogle.Checked := True;
-    FTranslate := TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings);
-  end
-  else if languageEngine.Replace('&','') = 'Amazon Translate' then
-  begin
-    miAmazonTranslate.Checked := True;
-  end;
+  languageEngine := FNameFromMenu[TMenuItem(Sender)];
+  FTranslate := FEngines[languageEngine];
+  TMenuItem(Sender).Checked := True;
 end;
 
 end.
