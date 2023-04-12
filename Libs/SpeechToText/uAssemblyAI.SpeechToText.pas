@@ -177,6 +177,7 @@ begin
   finally
     FreeAndNil(mm);
     FreeAndNil(sgcWebSocketClient1);
+    FreeAndNil(FQueueItems);
   end;
 end;
 

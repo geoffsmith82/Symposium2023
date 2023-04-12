@@ -37,6 +37,7 @@ type
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
     constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
+    destructor Destroy; override;
   end;
 
 implementation
@@ -64,7 +65,6 @@ begin
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
-  FHTTPServer.Active := True;
 end;
 
 procedure TGoogleSpeechToText.IdHTTPServer1CommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -88,6 +88,7 @@ end;
 
 procedure TGoogleSpeechToText.Authenticate;
 begin
+  FHTTPServer.Active := True;
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
@@ -138,6 +139,15 @@ begin
   AudioPair := TJSONPair.Create('audio', AudioObj);
   Result.AddPair(ConfigPair);
   Result.AddPair(AudioPair);
+end;
+
+destructor TGoogleSpeechToText.Destroy;
+begin
+  FreeAndNil(FOAuth2);
+  FHTTPServer.Active := False;
+  FreeAndNil(FHTTPServer);
+  FreeAndNil(FSettings);
+  inherited;
 end;
 
 function TGoogleSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;

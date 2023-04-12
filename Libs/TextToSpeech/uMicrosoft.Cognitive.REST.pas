@@ -97,6 +97,7 @@ var
   RESTRequest: TRESTRequest;
   RESTResponse: TRESTResponse;
   ssmlText : string;
+  param : TRESTRequestParameter;
 begin
   if (Now > FExpiryTime) then
     GetAccessToken;
@@ -118,8 +119,13 @@ begin
 
     ssmlText := '<speak version=''1.0'' xml:lang=''en-US''><voice xml:lang=''en-US'' xml:gender=''Male'' ' +
       'name=''' + VoiceName +  '''>' + text + '</voice></speak>';
-    RESTRequest.AddBody(ssmlText);
+//    RESTRequest.AddBody(ssmlText);
+    param := RESTRequest.Params.AddItem;
+    param.Kind := pkREQUESTBODY;
+    param.Options := [poDoNotEncode];
+    param.Value := ssmlText;
     RESTRequest.Execute;
+
     Result := TMemoryStream.Create;
     Result.Write(RESTResponse.RawBytes, Length(RESTResponse.RawBytes));
   finally
