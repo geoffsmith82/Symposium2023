@@ -40,7 +40,7 @@ type
     Exit1: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
-    TranslationEngine1: TMenuItem;
+    miTranslationEngine: TMenuItem;
     miMicrosoft: TMenuItem;
     miGoogle: TMenuItem;
     miAmazonTranslate: TMenuItem;
@@ -50,7 +50,7 @@ type
     mmoTranslatedText: TMemo;
     btnTranslate: TButton;
     Button1: TButton;
-    GoogleAuthenticate1: TMenuItem;
+    miGoogleAuthenticate: TMenuItem;
     Button2: TButton;
     procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -58,8 +58,10 @@ type
     procedure Exit1Click(Sender: TObject);
     procedure miMicrosoftClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure GoogleAuthenticate1Click(Sender: TObject);
+    procedure miGoogleAuthenticateClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure miSelectSourceLanguageClick(Sender: TObject);
+    procedure miSelectDestinationLanguageClick(Sender: TObject);
   private
     { Private declarations }
     FEngines : TObjectDictionary<string, TBaseTranslate>;
@@ -67,9 +69,9 @@ type
     FNameFromMenu: TDictionary<TMenuItem, string>;
     FTranslate : TBaseTranslate;
     FSettings : TIniFile;
+    toLanguage : string;
     procedure LoadLanguageMenus;
-    procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem;
-      translateEngine: TBaseTranslate);
+    procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
   public
     { Public declarations }
   end;
@@ -80,6 +82,9 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  LanguageCodes;
 
 {$i ..\Libs\apikey.inc}
 
@@ -92,7 +97,7 @@ end;
 
 procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
 begin
-  mmoTranslatedText.Text := FTranslate.Translate(mmoSourceText.Text);
+  mmoTranslatedText.Text := FTranslate.Translate(mmoSourceText.Text, toLanguage, '');
 end;
 
 procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
@@ -103,7 +108,7 @@ begin
   FreeAndNil(FNameFromMenu);
 end;
 
-procedure TfrmMainTranslationWindow.GoogleAuthenticate1Click(Sender: TObject);
+procedure TfrmMainTranslationWindow.miGoogleAuthenticateClick(Sender: TObject);
 begin
   (FTranslate as TGoogleTranslate).Authenticate;
 end;
@@ -111,22 +116,21 @@ end;
 procedure TfrmMainTranslationWindow.FormCreate(Sender: TObject);
 var
   filename : string;
-  toLanguage : string;
   languageEngine : string;
   menuItem : TMenuItem;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
   FEngines := TObjectDictionary<string, TBaseTranslate>.Create([doOwnsValues]);
-  FMenuEngine :=TDictionary<string, TMenuItem>.Create;
+  FMenuEngine := TDictionary<string, TMenuItem>.Create;
   FNameFromMenu := TDictionary<TMenuItem, string>.Create;
   FSettings := TIniFile.Create(filename);
   toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
 
   RegisterTranslationEngine('Microsoft Translate', miMicrosoft,
-    TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/','fr','en'));
+    TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/'));
   RegisterTranslationEngine('Google Translate', miGoogle,
-    TGoogleTranslate.Create(google_clientid, google_clientsecret, '', '', FSettings));
+    TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings));
 
   if FMenuEngine.TryGetValue(languageEngine, menuItem) then
     menuItem.Checked := True;
@@ -147,7 +151,13 @@ begin
   for lang in languages do
   begin
     menu := TMenuItem.Create(miFromLanguage);
-    menu.Caption := lang;
+    if lang.Length = 2 then
+      menu.Caption := GetLanguageNameFromCode(lang)
+    else
+      menu.Caption := lang;
+    menu.OnClick := miSelectSourceLanguageClick;
+    menu.GroupIndex := 120;
+    menu.RadioItem := True;
     miFromLanguage.Add(menu)
   end;
 
@@ -156,8 +166,21 @@ begin
   begin
     menu := TMenuItem.Create(miToLanguage);
     menu.Caption := lang;
+    menu.OnClick := miSelectDestinationLanguageClick;
+    menu.GroupIndex := 140;
+    menu.RadioItem := True;
     miToLanguage.Add(menu)
   end;
+end;
+
+procedure TfrmMainTranslationWindow.miSelectSourceLanguageClick(Sender: TObject);
+begin
+  TMenuItem(Sender).Checked := True;
+end;
+
+procedure TfrmMainTranslationWindow.miSelectDestinationLanguageClick(Sender: TObject);
+begin
+  TMenuItem(Sender).Checked := True;
 end;
 
 procedure TfrmMainTranslationWindow.Button1Click(Sender: TObject);
@@ -234,10 +257,10 @@ procedure TfrmMainTranslationWindow.miMicrosoftClick(Sender: TObject);
 var
   languageEngine : string;
 begin
-  FSettings.WriteString('Settings', 'LanguageEngine', TMenuItem(Sender).Caption);
   languageEngine := FNameFromMenu[TMenuItem(Sender)];
   FTranslate := FEngines[languageEngine];
   TMenuItem(Sender).Checked := True;
+  FSettings.WriteString('Settings', 'LanguageEngine', languageEngine);
 end;
 
 end.
