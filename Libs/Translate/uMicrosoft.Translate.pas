@@ -19,15 +19,13 @@ type
     FRESTResponse: TRESTResponse;
     FSubscriptionKey: string;
     FEndpoint: string;
-    FSourceLang: string;
-    FTargetLang: string;
     FAccessToken: string;
     FExpiryTime: TDateTime;
     procedure GetAccessToken;
   public
-    constructor Create(const SubscriptionKey, Endpoint, SourceLang, TargetLang: string);
+    constructor Create(const SubscriptionKey, Endpoint: string);
     destructor Destroy; override;
-    function Translate(const SourceText: string): string; override;
+    function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
     function ToLanguages: TArray<string>; override;
@@ -37,14 +35,12 @@ implementation
 uses System.DateUtils;
 
 
-constructor TMicrosoftTranslate.Create(const SubscriptionKey, Endpoint, SourceLang, TargetLang: string);
+constructor TMicrosoftTranslate.Create(const SubscriptionKey, Endpoint: string);
 begin
   inherited Create;
   FExpiryTime := 0;
   FSubscriptionKey := SubscriptionKey;
   FEndpoint := Endpoint;
-  FSourceLang := SourceLang;
-  FTargetLang := TargetLang;
   // Create a new REST client and set the base URL to the Microsoft Translate API endpoint
   FRESTClient := TRESTClient.Create(nil);
   FRESTClient.BaseURL := FEndpoint;
@@ -53,8 +49,6 @@ begin
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Client := FRESTClient;
   FRESTRequest.AddParameter('api-version', '3.0');
-  FRESTRequest.AddParameter('from', FSourceLang);
-  FRESTRequest.AddParameter('to', FTargetLang);
   // Set the authorization header using the subscription key
   FRESTRequest.Params.AddItem('Ocp-Apim-Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
   // Create a new REST response adapter
@@ -163,7 +157,7 @@ begin
   end;
 end;
 
-function TMicrosoftTranslate.Translate(const SourceText: string): string;
+function TMicrosoftTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
   RequestBody: TJSONObject;
   jsonArray : TJSONArray;
@@ -171,7 +165,7 @@ var
   TranslationsArray: TJSONArray;
   ApiVersion : string;
 begin
-  if SourceText.Trim.IsEmpty or FTargetLang.Trim.IsEmpty then
+  if SourceText.Trim.IsEmpty or toLang.Trim.IsEmpty then
     Exit('');
 
   if (Now > FExpiryTime) then
@@ -191,7 +185,7 @@ begin
    jsonArray := TJSONArray.Create(RequestBody);
     FRESTRequest.AddBody(jsonArray.ToJSON, ctAPPLICATION_JSON);
     // Set the target language and URL for the Microsoft Translate API
-    FRESTRequest.AddParameter('to', FTargetLang, TRESTRequestParameterKind.pkQUERY);
+    FRESTRequest.AddParameter('to', toLang, TRESTRequestParameterKind.pkQUERY);
     FRESTRequest.AddParameter('api-version', ApiVersion, TRESTRequestParameterKind.pkQUERY);
     FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     FRESTRequest.Method := rmPOST;

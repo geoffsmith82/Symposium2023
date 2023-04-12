@@ -24,22 +24,19 @@ type
     FSourceLang: string;
     FTargetLang: string;
   public
-    constructor Create(const AccessKey, SecretKey, Endpoint, SourceLang, TargetLang: string);
-    function Translate(const SourceText: string): string;
+    constructor Create(const AccessKey, SecretKey, Endpoint: string);
+    function Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
     function EngineName: string; override;
   end;
 
 implementation
 
-constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Endpoint, SourceLang, TargetLang: string);
+constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Endpoint: string);
 begin
   inherited Create;
   FAccessKey := AccessKey;
   FSecretKey := SecretKey;
   FEndpoint := Endpoint;
-  FSourceLang := SourceLang;
-  FTargetLang := TargetLang;
-
   // Create a new REST client and set the base URL to the Amazon Translate API endpoint
   FRESTClient := TRESTClient.Create(nil);
   FRESTClient.BaseURL := FEndpoint;
@@ -113,7 +110,7 @@ begin
   Result := 'Amazon Translate';
 end;
 
-function TAmazonTranslate.Translate(const SourceText: string): string;
+function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
   RequestBody: string;
   Timestamp: string;

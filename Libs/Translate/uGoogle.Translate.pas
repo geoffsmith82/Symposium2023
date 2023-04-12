@@ -36,12 +36,10 @@ type
     FRESTResponse: TRESTResponse;
     FAPIKey: string;
     FAPISecret: string;
-    FSourceLang: string;
-    FTargetLang: string;
   public
-    constructor Create(const APIKey: string; const APISecret: string; const SourceLang, TargetLang: string; Settings: TiniFile);
+    constructor Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
     destructor Destroy; override;
-    function Translate(const SourceText: string): string; override;
+    function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
     function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
     function ToLanguages: TArray<string>; override;
@@ -55,13 +53,11 @@ begin
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
-constructor TGoogleTranslate.Create(const APIKey: string; const APISecret: string; const SourceLang, TargetLang: string; Settings: TiniFile);
+constructor TGoogleTranslate.Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
 begin
   inherited Create;
   FAPIKey := APIKey;
   FAPISecret := APISecret;
-  FSourceLang := SourceLang;
-  FTargetLang := TargetLang;
 
   // Create a new REST client and set the base URL to the Google Translate API endpoint
   FRESTClient := TRESTClient.Create(nil);
@@ -71,8 +67,6 @@ begin
   FRESTRequest := TRESTRequest.Create(nil);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Client := FRESTClient;
-  FRESTRequest.AddParameter('source', FSourceLang);
-  FRESTRequest.AddParameter('target', FTargetLang);
 
   // Create a new REST response adapter
   FRESTResponse := TRESTResponse.Create(nil);
@@ -113,6 +107,7 @@ function TGoogleTranslate.FromLanguages: TArray<string>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONArray;
+  dataJson : TJSONObject;
   I: Integer;
 begin
 //  RequestUrl := Format('%s/languages?target=%s&key=%s', [Endpoint, DefaultLanguage, ApiKey]);
@@ -124,11 +119,12 @@ begin
   FOAuth2.RefreshAccessTokenIfRequired;
 
   FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
   FRESTRequest.Execute;
 
   ResponseJson := FRESTResponse.JSONValue  as TJSONObject;
-
-  LanguagesArray := (ResponseJson.GetValue('data') as TJSONObject).GetValue('languages') as TJSONArray;
+  dataJson := (ResponseJson.GetValue('data') as TJSONObject);
+  LanguagesArray := datajson.GetValue('languages') as TJSONArray;
   SetLength(Result, LanguagesArray.Count);
 
   for I := 0 to LanguagesArray.Count - 1 do
@@ -158,17 +154,17 @@ end;
 
 function TGoogleTranslate.ToLanguages: TArray<string>;
 begin
-
+  Result := FromLanguages;
 end;
 
-function TGoogleTranslate.Translate(const SourceText: string): string;
+function TGoogleTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
   jsonRequest : TJSONObject;
 begin
   // Set the source text parameter and execute the REST request
   jsonRequest := TJSONObject.Create;
   jsonRequest.AddPair('q', SourceText);
-  jsonRequest.AddPair('target', 'en');
+  jsonRequest.AddPair('target', toLang);
 
   FRESTClient.Authenticator := FOAuth2;
   FRESTRequest.Resource := '/language/translate/v2?textType=html';
