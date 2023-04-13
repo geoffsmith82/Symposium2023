@@ -68,3 +68,7 @@ __recovery/
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
 New folder
+TranscribeAudio/Win64
+Translate/Win32
+VoiceRecognition/Win32
+Libs/TextToSpeech/Unused
