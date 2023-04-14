@@ -52,11 +52,13 @@ type
     Button1: TButton;
     miGoogleAuthenticate: TMenuItem;
     Button2: TButton;
+    miGoogleMenu: TMenuItem;
+    Logout1: TMenuItem;
     procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
-    procedure miMicrosoftClick(Sender: TObject);
+    procedure miSelectEngineClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure miGoogleAuthenticateClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -72,6 +74,8 @@ type
     toLanguage : string;
     procedure LoadLanguageMenus;
     procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
+    procedure HangleGoogleEngineSelected(Sender: TObject);
+    procedure HangleMicrosoftEngineSelected(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -113,11 +117,33 @@ begin
   (FTranslate as TGoogleTranslate).Authenticate;
 end;
 
+procedure TfrmMainTranslationWindow.HangleMicrosoftEngineSelected(Sender: TObject);
+begin
+  miGoogleMenu.Visible := False;
+  LoadLanguageMenus;
+end;
+
+procedure TfrmMainTranslationWindow.HangleGoogleEngineSelected(Sender: TObject);
+begin
+  miGoogleMenu.Visible := True;
+  LoadLanguageMenus;
+  if FSettings.ReadString('Authentication', 'RefreshToken', '').IsEmpty then
+  begin
+    miGoogle.Enabled := True;
+  end
+  else
+  begin
+    miGoogle.Enabled := False;
+  end;
+end;
+
 procedure TfrmMainTranslationWindow.FormCreate(Sender: TObject);
 var
   filename : string;
   languageEngine : string;
   menuItem : TMenuItem;
+  googleEngine : TGoogleTranslate;
+  microsoftEngine : TMicrosoftTranslate;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
   FEngines := TObjectDictionary<string, TBaseTranslate>.Create([doOwnsValues]);
@@ -127,16 +153,21 @@ begin
   toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
 
-  RegisterTranslationEngine('Microsoft Translate', miMicrosoft,
-    TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/'));
-  RegisterTranslationEngine('Google Translate', miGoogle,
-    TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings));
+  microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
+  microsoftEngine.OnSelectEngine := HangleMicrosoftEngineSelected;
+  RegisterTranslationEngine('Microsoft Translate', miMicrosoft, microsoftEngine);
+    googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
+    googleEngine.OnSelectEngine := HangleGoogleEngineSelected;
+  RegisterTranslationEngine('Google Translate', miGoogle, googleEngine);
+
 
   if FMenuEngine.TryGetValue(languageEngine, menuItem) then
     menuItem.Checked := True;
 
-  FEngines.TryGetValue(languageEngine, FTranslate);
-  LoadLanguageMenus;
+  if FEngines.TryGetValue(languageEngine, FTranslate) then
+  begin
+    FTranslate.DoSelectEngine;
+  end;
 end;
 
 procedure TfrmMainTranslationWindow.LoadLanguageMenus;
@@ -145,6 +176,8 @@ var
   lang: string;
   menu : TMenuItem;
 begin
+  miFromLanguage.Clear;
+  miToLanguage.Clear;
   if not Assigned(FTranslate) then
     Exit;
   languages := FTranslate.FromLanguages;
@@ -253,14 +286,19 @@ begin
   Application.Terminate;
 end;
 
-procedure TfrmMainTranslationWindow.miMicrosoftClick(Sender: TObject);
+procedure TfrmMainTranslationWindow.miSelectEngineClick(Sender: TObject);
 var
   languageEngine : string;
+  engine : TBaseTranslate;
 begin
-  languageEngine := FNameFromMenu[TMenuItem(Sender)];
-  FTranslate := FEngines[languageEngine];
-  TMenuItem(Sender).Checked := True;
-  FSettings.WriteString('Settings', 'LanguageEngine', languageEngine);
+  FNameFromMenu.TryGetValue(TMenuItem(Sender), languageEngine);
+
+  if FEngines.TryGetValue(languageEngine, FTranslate) then
+  begin
+    FTranslate.DoSelectEngine;
+    TMenuItem(Sender).Checked := True;
+    FSettings.WriteString('Settings', 'LanguageEngine', languageEngine);
+  end;
 end;
 
 end.

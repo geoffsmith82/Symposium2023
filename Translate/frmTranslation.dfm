@@ -99,19 +99,19 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
         Caption = 'Microsoft Translate'
         GroupIndex = 10
         RadioItem = True
-        OnClick = miMicrosoftClick
+        OnClick = miSelectEngineClick
       end
       object miGoogle: TMenuItem
         Caption = 'Google Translate'
         GroupIndex = 10
         RadioItem = True
-        OnClick = miMicrosoftClick
+        OnClick = miSelectEngineClick
       end
       object miAmazonTranslate: TMenuItem
         Caption = 'Amazon Translate'
         GroupIndex = 10
         RadioItem = True
-        OnClick = miMicrosoftClick
+        OnClick = miSelectEngineClick
       end
     end
     object miFromLanguage: TMenuItem
@@ -120,9 +120,15 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
     object miToLanguage: TMenuItem
       Caption = 'To Language'
     end
-    object miGoogleAuthenticate: TMenuItem
-      Caption = 'Google Authenticate'
-      OnClick = miGoogleAuthenticateClick
+    object miGoogleMenu: TMenuItem
+      Caption = 'Google'
+      object miGoogleAuthenticate: TMenuItem
+        Caption = 'Google Authenticate'
+        OnClick = miGoogleAuthenticateClick
+      end
+      object Logout1: TMenuItem
+        Caption = 'Logout'
+      end
     end
   end
 end
