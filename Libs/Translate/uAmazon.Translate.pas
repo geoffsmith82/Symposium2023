@@ -25,7 +25,7 @@ type
     FTargetLang: string;
   public
     constructor Create(const AccessKey, SecretKey, Endpoint: string);
-    function Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
+    function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
     function EngineName: string; override;
   end;
 

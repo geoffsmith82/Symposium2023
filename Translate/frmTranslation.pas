@@ -17,14 +17,15 @@ uses
   Vcl.Dialogs,
   Vcl.Menus,
   Vcl.StdCtrls,
+  Xml.Win.msxmldom,
+  XMLDoc,
   uBaseTranslate,
+  uEngineManager,
   uAmazon.Translate,
   uGoogle.Translate,
   uMicrosoft.Translate,
   uTranslatedfn,
-  uOutputChangedLanguageTokens,
-  Xml.Win.msxmldom,
-  XMLDoc
+  uOutputChangedLanguageTokens
   ;
 
 type
@@ -66,14 +67,10 @@ type
     procedure miSelectDestinationLanguageClick(Sender: TObject);
   private
     { Private declarations }
-    FEngines : TObjectDictionary<string, TBaseTranslate>;
-    FMenuEngine : TDictionary<string, TMenuItem>;
-    FNameFromMenu: TDictionary<TMenuItem, string>;
-    FTranslate : TBaseTranslate;
+    FTranslateEngines: TEngineManager<TBaseTranslate>;
     FSettings : TIniFile;
     toLanguage : string;
     procedure LoadLanguageMenus;
-    procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
     procedure HandleGoogleEngineSelected(Sender: TObject);
     procedure HandleMicrosoftEngineSelected(Sender: TObject);
   public
@@ -92,29 +89,20 @@ uses
 
 {$i ..\Libs\apikey.inc}
 
-procedure TfrmMainTranslationWindow.RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
-begin
-  FEngines.AddOrSetValue(engine, translateEngine);
-  FMenuEngine.AddOrSetValue(engine, menuItem);
-  FNameFromMenu.AddOrSetValue(menuItem, engine);
-end;
-
 procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
 begin
-  mmoTranslatedText.Text := FTranslate.Translate(mmoSourceText.Text, toLanguage, '');
+  mmoTranslatedText.Text := FTranslateEngines.ActiveEngine.Translate(mmoSourceText.Text, toLanguage, '');
 end;
 
 procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
-  FreeAndNil(FEngines);
-  FreeAndNil(FMenuEngine);
-  FreeAndNil(FNameFromMenu);
+  FreeAndNil(FTranslateEngines);
 end;
 
 procedure TfrmMainTranslationWindow.miGoogleAuthenticateClick(Sender: TObject);
 begin
-  (FTranslate as TGoogleTranslate).Authenticate;
+  (FTranslateEngines.ActiveEngine as TGoogleTranslate).Authenticate;
 end;
 
 procedure TfrmMainTranslationWindow.HandleMicrosoftEngineSelected(Sender: TObject);
@@ -146,28 +134,21 @@ var
   microsoftEngine : TMicrosoftTranslate;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
-  FEngines := TObjectDictionary<string, TBaseTranslate>.Create([doOwnsValues]);
-  FMenuEngine := TDictionary<string, TMenuItem>.Create;
-  FNameFromMenu := TDictionary<TMenuItem, string>.Create;
+  FTranslateEngines := TEngineManager<TBaseTranslate>.Create;
   FSettings := TIniFile.Create(filename);
   toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
-  languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
 
   microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
   microsoftEngine.OnSelectEngine := HandleMicrosoftEngineSelected;
-  RegisterTranslationEngine('Microsoft Translate', miMicrosoft, microsoftEngine);
+  FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft);
     googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
     googleEngine.OnSelectEngine := HandleGoogleEngineSelected;
-  RegisterTranslationEngine('Google Translate', miGoogle, googleEngine);
+  FTranslateEngines.RegisterEngine(googleEngine, miGoogle);
 
-
-  if FMenuEngine.TryGetValue(languageEngine, menuItem) then
-    menuItem.Checked := True;
-
-  if FEngines.TryGetValue(languageEngine, FTranslate) then
-  begin
-    FTranslate.DoSelectEngine;
-  end;
+  languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
+  FTranslateEngines.SelectEngine(languageEngine);
+  FTranslateEngines.ActiveMenuItem.Checked := True;
+  FTranslateEngines.ActiveEngine.DoSelectEngine;
 end;
 
 procedure TfrmMainTranslationWindow.LoadLanguageMenus;
@@ -178,9 +159,7 @@ var
 begin
   miFromLanguage.Clear;
   miToLanguage.Clear;
-  if not Assigned(FTranslate) then
-    Exit;
-  languages := FTranslate.FromLanguages;
+  languages := FTranslateEngines.ActiveEngine.FromLanguages;
   for lang in languages do
   begin
     menu := TMenuItem.Create(miFromLanguage);
@@ -194,7 +173,7 @@ begin
     miFromLanguage.Add(menu)
   end;
 
-  languages := FTranslate.ToLanguages;
+  languages := FTranslateEngines.ActiveEngine.ToLanguages;
   for lang in languages do
   begin
     menu := TMenuItem.Create(miToLanguage);
@@ -287,18 +266,11 @@ begin
 end;
 
 procedure TfrmMainTranslationWindow.miSelectEngineClick(Sender: TObject);
-var
-  languageEngine : string;
-  engine : TBaseTranslate;
 begin
-  FNameFromMenu.TryGetValue(TMenuItem(Sender), languageEngine);
-
-  if FEngines.TryGetValue(languageEngine, FTranslate) then
-  begin
-    FTranslate.DoSelectEngine;
-    TMenuItem(Sender).Checked := True;
-    FSettings.WriteString('Settings', 'LanguageEngine', languageEngine);
-  end;
+  FTranslateEngines.SelectEngine(Sender as TMenuItem);
+  FTranslateEngines.ActiveEngine.DoSelectEngine;
+  TMenuItem(Sender).Checked := True;
+  FSettings.WriteString('Settings', 'LanguageEngine', FTranslateEngines.ActiveEngine.ClassName);
 end;
 
 end.
