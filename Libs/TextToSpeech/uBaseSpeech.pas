@@ -10,7 +10,7 @@ uses
   Vcl.MPlayer;
 
 type
-  TBaseSpeech = class
+  TBaseTextToSpeech = class
   strict private
     MediaPlayer1 : TMediaPlayer;
   protected
@@ -30,17 +30,17 @@ implementation
 
 { TBaseSpeech }
 
-destructor TBaseSpeech.Destroy;
+destructor TBaseTextToSpeech.Destroy;
 begin
   FreeAndNil(MediaPlayer1);
 end;
 
-function TBaseSpeech.Mode: TMPModes;
+function TBaseTextToSpeech.Mode: TMPModes;
 begin
   Result := MediaPlayer1.Mode;
 end;
 
-procedure TBaseSpeech.PlayText(const text:string);
+procedure TBaseTextToSpeech.PlayText(const text:string);
 var
   Stream: TMemoryStream;
   FileName: string;
@@ -64,7 +64,7 @@ begin
   MediaPlayer1.Play;
 end;
 
-constructor TBaseSpeech.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName: string; const AHost: string);
+constructor TBaseTextToSpeech.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName: string; const AHost: string);
 begin
   FResourceKey := AResourceKey;
   FApplicationName := AApplicationName;

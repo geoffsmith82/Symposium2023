@@ -22,7 +22,7 @@ uses
   ;
 
 type
-  TGoogleSpeechService = class(TBaseSpeech)
+  TGoogleSpeechService = class(TBaseTextToSpeech)
   private
     FOAuth2 : TEnhancedOAuth2Authenticator;
     FHTTPServer : TIdHttpServer;

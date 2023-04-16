@@ -13,7 +13,7 @@ uses
   ;
 
 type
-  TElevenLabsService = class(TBaseSpeech)
+  TElevenLabsService = class(TBaseTextToSpeech)
   public
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);

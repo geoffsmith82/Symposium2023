@@ -54,7 +54,7 @@ uses
   ;
 
 type
-  TBaseSpeechClass = class of TBaseSpeech;
+  TBaseSpeechClass = class of TBaseTextToSpeech;
 
 type
   TfrmVoiceRecognition = class(TForm)
@@ -97,16 +97,16 @@ type
   private
     { Private declarations }
     FSettings : TIniFile;
-    FSpeechEngine : TBaseSpeech;
+    FSpeechEngine : TBaseTextToSpeech;
     FmemStream : TMemoryStream;
     FConnected : Boolean;
     FSendThread : TAssemblyAiSendThread;
-    FSpeechEngines : TObjectDictionary<string, TBaseSpeech>;
+    FSpeechEngines : TObjectDictionary<string, TBaseTextToSpeech>;
     FSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
     FSpeechEngineNames: TDictionary<TMenuItem, string>;
     procedure LoadAudioInputsMenu;
-    procedure RegisterSpeechToTextEngine(engineClass : TBaseSpeech; menuItem: TMenuItem);
-    function LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
+    procedure RegisterSpeechToTextEngine(engineClass : TBaseTextToSpeech; menuItem: TMenuItem);
+    function LookupSpeechEngineClassByName(engineName: string): TBaseTextToSpeech;
     procedure OnHandleMessage(const Text: string);
     procedure OnHandleConnect(Connection: TsgcWSConnection);
     procedure OnHandleDisconnect(Connection: TsgcWSConnection);
@@ -126,7 +126,7 @@ implementation
 {$I ..\Libs\apikey.inc}
 
 
-procedure TfrmVoiceRecognition.RegisterSpeechToTextEngine(engineClass : TBaseSpeech; menuItem: TMenuItem);
+procedure TfrmVoiceRecognition.RegisterSpeechToTextEngine(engineClass : TBaseTextToSpeech; menuItem: TMenuItem);
 var
   engineName: string;
 begin
@@ -136,7 +136,7 @@ begin
   FSpeechEngineNames.Add(menuItem, engineName);
 end;
 
-function TfrmVoiceRecognition.LookupSpeechEngineClassByName(engineName: string): TBaseSpeech;
+function TfrmVoiceRecognition.LookupSpeechEngineClassByName(engineName: string): TBaseTextToSpeech;
 begin
   Result := FSpeechEngines[engineName];
 end;
@@ -200,7 +200,7 @@ var
 begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  FSpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
+  FSpeechEngines := TObjectDictionary<string, TBaseTextToSpeech>.Create([doOwnsValues]);
   FSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
   FSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
 

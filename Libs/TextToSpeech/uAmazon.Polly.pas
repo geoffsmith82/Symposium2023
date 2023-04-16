@@ -16,12 +16,12 @@ uses
   uBaseSpeech
 {$IFNDEF NOPOLLY}
   ,AWS.Polly,  // need to install AWS SDK For Delphi Preview
-  AWS.Core    // Need Delphi Enterprise or above and install from
+  AWS.Core    // Need Delphi Enterprise 11 or above and install from
 {$ENDIF}              // GetIt
   ;
 
 type
-  TAmazonPollyService = class(TBaseSpeech)
+  TAmazonPollyService = class(TBaseTextToSpeech)
   private
     FAccountName : string;
     FAccountKey: string;

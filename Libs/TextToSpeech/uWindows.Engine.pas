@@ -12,7 +12,7 @@ uses
   ;
 
 type
-  TWindowsSpeechService = class(TBaseSpeech)
+  TWindowsSpeechService = class(TBaseTextToSpeech)
   public
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function SpeechEngineName: string; override;

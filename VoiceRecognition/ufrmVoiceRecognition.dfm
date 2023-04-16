@@ -18,7 +18,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 568
+    Left = 564
     Top = 8
     Width = 82
     Height = 73
@@ -27,6 +27,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ImageWidth = 0
     ImageHeight = 0
     ImageIndex = -1
+    ExplicitLeft = 568
   end
   object Memo1: TMemo
     Left = 8
@@ -179,7 +180,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       end
     end
     object SpeechEngine1: TMenuItem
-      Caption = 'Speech Engine'
+      Caption = 'Text to Speech Engine'
       object miMicrosoftSpeechEngine: TMenuItem
         AutoCheck = True
         Caption = 'Microsoft'

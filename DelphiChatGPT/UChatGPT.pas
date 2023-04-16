@@ -61,14 +61,14 @@ type
     procedure SelectSpeechEngine(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FSpeechEngine : TBaseSpeech;
-    FSpeechEngines : TObjectDictionary<string, TBaseSpeech>;
+    FSpeechEngine : TBaseTextToSpeech;
+    FSpeechEngines : TObjectDictionary<string, TBaseTextToSpeech>;
     FSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
     FSpeechEngineNames: TDictionary<TMenuItem, string>;
     FSettings : TIniFile;
     procedure PlayTextWithSelectedEngine(text: string);
     function SelectedModel: string;
-    procedure RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass: TBaseSpeech);
+    procedure RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass: TBaseTextToSpeech);
     { Private declarations }
   public
     { Public declarations }
@@ -83,7 +83,7 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm1.RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass : TBaseSpeech);
+procedure TForm1.RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass : TBaseTextToSpeech);
 var
   engineName: string;
 begin
@@ -100,7 +100,7 @@ var
   currentModel : string;
   menu: TMenuItem;
 begin
-  FSpeechEngines := TObjectDictionary<string, TBaseSpeech>.Create([doOwnsValues]);
+  FSpeechEngines := TObjectDictionary<string, TBaseTextToSpeech>.Create([doOwnsValues]);
   FSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
   FSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));

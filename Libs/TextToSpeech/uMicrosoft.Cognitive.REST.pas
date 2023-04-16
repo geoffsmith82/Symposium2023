@@ -12,7 +12,7 @@ uses
   uMicrosoft.Cognitive.Voices.DTO;
 
 type
-  TMicrosoftCognitiveService = class(TBaseSpeech)
+  TMicrosoftCognitiveService = class(TBaseTextToSpeech)
   private
     FAccessToken: string;
     FExpiryTime: TDateTime;
