@@ -25,6 +25,7 @@ uses
   Vcl.ImageCollection,
   Vcl.VirtualImage,
   Vcl.DBCGrids,
+  Vcl.DBCtrls,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
@@ -115,6 +116,7 @@ type
     btnNewChatSession: TButton;
     btnStart: TButton;
     btnStop: TButton;
+    DBText1: TDBText;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -124,6 +126,7 @@ type
     procedure UserInterfaceUpdateTimerTimer(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
+    procedure btnNewChatSessionClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -256,6 +259,9 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
 
+  tblSessions.Active := True;
+  tblConversion.Active := True;
+
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
 
@@ -353,6 +359,13 @@ begin
   OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
 
+procedure TfrmVoiceRecognition.btnNewChatSessionClick(Sender: TObject);
+begin
+  DBCtrlGrid1.DataSource.DataSet.Append;
+  DBCtrlGrid1.DataSource.DataSet.FieldByName('CreationTime').AsDateTime := now;
+  DBCtrlGrid1.DataSource.DataSet.Post;
+end;
+
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
   StreamOut1.Stream := FmemStream;
@@ -366,7 +379,6 @@ end;
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   FSpeechRecognitionEngines.ActiveEngine.Finish;
-  sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
   VirtualImage1.ImageIndex := -1;
   StreamOut1.Stop(False);
   UserInterfaceUpdateTimer.Enabled := False;

@@ -48,12 +48,26 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Width = 225
     Height = 383
     Align = alLeft
+    DataSource = dsSessions
     PanelHeight = 54
     PanelWidth = 208
     TabOrder = 2
     RowCount = 7
     ExplicitTop = 48
     ExplicitHeight = 371
+    object DBText1: TDBText
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 202
+      Height = 25
+      Align = alTop
+      DataField = 'CreationTime'
+      DataSource = dsSessions
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 208
+    end
   end
   object PnlButtons: TPanel
     Left = 0
@@ -73,6 +87,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Align = alLeft
       Caption = 'New Chat'
       TabOrder = 0
+      OnClick = btnNewChatSessionClick
       ExplicitLeft = 96
       ExplicitTop = -8
       ExplicitHeight = 49
