@@ -281,7 +281,6 @@ begin
   tblConversation.Active := True;
   tblSessions.Active := True;
 
-
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
 

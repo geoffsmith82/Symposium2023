@@ -97,6 +97,7 @@
         <DCCReference Include="uOutputChangedLanguageTokens.pas"/>
         <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
         <DCCReference Include="..\Libs\Translate\LanguageCodes.pas"/>
+        <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
