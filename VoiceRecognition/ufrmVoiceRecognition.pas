@@ -50,7 +50,8 @@ uses
   uAmazon.Polly,
   uWindows.Engine,
   uAssemblyAI.SpeechToText,
-  uDeepGram.SpeechToText
+  uDeepGram.SpeechToText,
+  uBaseSpeechRecognition
   ;
 
 type
@@ -63,18 +64,18 @@ type
     btnStart: TButton;
     StreamOut1: TStreamOut;
     sgcWebSocketClient1: TsgcWebSocketClient;
-    Memo1: TMemo;
+    mmoQuestions: TMemo;
     btnStop: TButton;
-    Memo2: TMemo;
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
+    mmoAnswers: TMemo;
+    mmMainMenu: TMainMenu;
+    miFile: TMenuItem;
     New1: TMenuItem;
     Open1: TMenuItem;
     Save1: TMenuItem;
     SaveAs1: TMenuItem;
     Print1: TMenuItem;
     PrintSetup1: TMenuItem;
-    Exit1: TMenuItem;
+    miExit: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
     miElevenLabsSpeechEngine: TMenuItem;
@@ -86,27 +87,40 @@ type
     miAudioInput: TMenuItem;
     VirtualImage1: TVirtualImage;
     ImageCollection1: TImageCollection;
+    miSpeechRecognitionEngine: TMenuItem;
+    miDeepGram: TMenuItem;
+    miAssemblyAI: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
+    procedure SelectSpeechRecognitionClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
-    FSpeechEngine : TBaseTextToSpeech;
+    FTextToSpeechEngine : TBaseTextToSpeech;
+    FSpeechRecognitionEngine : TBaseSpeechRecognition;
     FmemStream : TMemoryStream;
     FConnected : Boolean;
     FSendThread : TAssemblyAiSendThread;
-    FSpeechEngines : TObjectDictionary<string, TBaseTextToSpeech>;
-    FSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
-    FSpeechEngineNames: TDictionary<TMenuItem, string>;
+
+    FTextToSpeechEngines : TObjectDictionary<string, TBaseTextToSpeech>;
+    FTextSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
+    FTextSpeechEngineNames: TDictionary<TMenuItem, string>;
+
+    FSpeechRecognitionEngines : TObjectDictionary<string, TBaseSpeechRecognition>;
+    FSpeechRecognitionEngineMenuItems : TDictionary<string, TMenuItem>;
+    FSpeechRecognitionEngineNames : TDictionary<TMenuItem, string>;
+
     procedure LoadAudioInputsMenu;
     procedure RegisterSpeechToTextEngine(engineClass : TBaseTextToSpeech; menuItem: TMenuItem);
     function LookupSpeechEngineClassByName(engineName: string): TBaseTextToSpeech;
+    procedure RegisterSpeechRecognitionEngine(engineClass : TBaseSpeechRecognition; menuItem: TMenuItem);
+
     procedure OnHandleMessage(const Text: string);
     procedure OnHandleConnect(Connection: TsgcWSConnection);
     procedure OnHandleDisconnect(Connection: TsgcWSConnection);
@@ -131,23 +145,42 @@ var
   engineName: string;
 begin
   engineName := engineClass.SpeechEngineName;
-  FSpeechEngines.AddOrSetValue(engineName, engineClass);
-  FSpeechEngineMenuItems.Add(engineName, menuItem);
-  FSpeechEngineNames.Add(menuItem, engineName);
+  FTextToSpeechEngines.AddOrSetValue(engineName, engineClass);
+  FTextSpeechEngineMenuItems.Add(engineName, menuItem);
+  FTextSpeechEngineNames.Add(menuItem, engineName);
+end;
+
+procedure TfrmVoiceRecognition.RegisterSpeechRecognitionEngine(engineClass : TBaseSpeechRecognition; menuItem: TMenuItem);
+var
+  engineName: string;
+begin
+  engineName := engineClass.ClassName;
+  FSpeechRecognitionEngines.AddOrSetValue(engineName, engineClass);
+  FSpeechRecognitionEngineMenuItems.Add(engineName, menuItem);
+  FTextSpeechEngineNames.Add(menuItem, engineName);
 end;
 
 function TfrmVoiceRecognition.LookupSpeechEngineClassByName(engineName: string): TBaseTextToSpeech;
 begin
-  Result := FSpeechEngines[engineName];
+  Result := FTextToSpeechEngines[engineName];
 end;
 
 procedure TfrmVoiceRecognition.SelectSpeechEngine(Sender: TObject);
 var
   lSpeechEngine: String;
 begin
-  lSpeechEngine := FSpeechEngineNames[Sender as TMenuItem];
-  FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeechEngine.SpeechEngineName);
+  lSpeechEngine := FTextSpeechEngineNames[Sender as TMenuItem];
+  FTextToSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
+  FSettings.WriteString('Speech', 'SelectedEngine', FTextToSpeechEngine.SpeechEngineName);
+end;
+
+procedure TfrmVoiceRecognition.SelectSpeechRecognitionClick(Sender: TObject);
+var
+  lSpeechEngine: String;
+begin
+  lSpeechEngine := FSpeechRecognitionEngineNames[Sender as TMenuItem];
+  FSpeechRecognitionEngine :=  FSpeechRecognitionEngines[lSpeechEngine];
+  FSettings.WriteString('Speech', 'SelectedRecognitionEngine', FSpeechRecognitionEngine.ClassName);
 end;
 
 procedure TfrmVoiceRecognition.Speak;
@@ -200,9 +233,9 @@ var
 begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  FSpeechEngines := TObjectDictionary<string, TBaseTextToSpeech>.Create([doOwnsValues]);
-  FSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
-  FSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
+  FTextToSpeechEngines := TObjectDictionary<string, TBaseTextToSpeech>.Create([doOwnsValues]);
+  FTextSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
+  FTextSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
 
 
   RegisterSpeechToTextEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'),
@@ -222,8 +255,8 @@ begin
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'Windows');
 
-  FSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
-  FSpeechEngineMenuItems[FSpeechEngine.SpeechEngineName].Checked := True;
+  FTextToSpeechEngine := LookupSpeechEngineClassByName(lSpeechEngine);
+  FTextSpeechEngineMenuItems[FTextToSpeechEngine.SpeechEngineName].Checked := True;
 
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(100*1024*1024);
@@ -239,9 +272,9 @@ procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
   FSendThread.Terminate;
   FreeAndNil(FSendThread);
-  FreeAndNil(FSpeechEngines);
-  FreeAndNil(FSpeechEngineMenuItems);
-  FreeAndNil(FSpeechEngineNames);
+  FreeAndNil(FTextToSpeechEngines);
+  FreeAndNil(FTextSpeechEngineMenuItems);
+  FreeAndNil(FTextSpeechEngineNames);
   FreeAndNil(FSettings);
   FreeAndNil(FmemStream);
 end;
@@ -250,7 +283,7 @@ end;
 procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
 begin
  // OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
-  if FSpeechEngine.Mode = mpStopped then
+  if FTextToSpeechEngine.Mode = mpStopped then
   begin
     if StreamOut1.Status <> tosPlaying then
     begin
@@ -258,7 +291,7 @@ begin
     end;
     Listen;
   end;
-  if FSpeechEngine.Mode = mpPlaying then
+  if FTextToSpeechEngine.Mode = mpPlaying then
   begin
   
   end
@@ -266,18 +299,17 @@ begin
   begin
     Listen;  
   end;
-  
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TsgcWSConnection);
 begin
-  Memo1.Lines.Add('Connected');
+  mmoQuestions.Lines.Add('Connected');
   FConnected := True;
 end;
 
 procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TsgcWSConnection);
 begin
-  Memo1.Lines.Add('Disconnected');
+  mmoQuestions.Lines.Add('Disconnected');
   FConnected := False;
 end;
 
@@ -292,22 +324,23 @@ begin
   if msg.TryGetValue('message_type', Value) then
   begin
     if (value = 'FinalTranscript') and (msg.Values['text'].Value<>'') and
-      (FSpeechEngine.Mode <> mpPlaying) then
+      (FTextToSpeechEngine.Mode <> mpPlaying) then
     begin
        question := msg.Values['text'].Value;
-       Memo1.Lines.Add(question);
+       mmoQuestions.Lines.Add(question);
 
        response := TOpenAI.AskChatGPT(question, 'text-davinci-003');
-       Memo2.Lines.Text := response;
-       Memo2.Update;
+       mmoAnswers.Lines.Text := response;
+       mmoAnswers.Update;
        StreamOut1.Stop(False);
        FmemStream.Clear;
        Sleep(100);
        Speak;
-       FSpeechEngine.PlayText(response);
+       FTextToSpeechEngine.PlayText(response);
     end;
   end;
 end;
+
 
 procedure TfrmVoiceRecognition.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
 var
@@ -342,7 +375,7 @@ begin
   Timer1.Enabled := False;
 end;
 
-procedure TfrmVoiceRecognition.Exit1Click(Sender: TObject);
+procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);
 begin
   FSendThread.Terminate;
   Application.Terminate;

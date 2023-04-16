@@ -10,7 +10,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
@@ -29,7 +29,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ImageIndex = -1
     ExplicitLeft = 568
   end
-  object Memo1: TMemo
+  object mmoQuestions: TMemo
     Left = 8
     Top = 8
     Width = 537
@@ -54,7 +54,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     TabOrder = 2
     OnClick = btnStopClick
   end
-  object Memo2: TMemo
+  object mmoAnswers: TMemo
     Left = 8
     Top = 165
     Width = 537
@@ -145,10 +145,10 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Left = 157
     Top = 115
   end
-  object MainMenu1: TMainMenu
+  object mmMainMenu: TMainMenu
     Left = 488
     Top = 336
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
         Caption = '&New'
@@ -174,12 +174,12 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       object N1: TMenuItem
         Caption = '-'
       end
-      object Exit1: TMenuItem
+      object miExit: TMenuItem
         Caption = 'E&xit'
-        OnClick = Exit1Click
+        OnClick = miExitClick
       end
     end
-    object SpeechEngine1: TMenuItem
+    object miTextToSpeechEngine: TMenuItem
       Caption = 'Text to Speech Engine'
       object miMicrosoftSpeechEngine: TMenuItem
         AutoCheck = True
@@ -210,6 +210,21 @@ object frmVoiceRecognition: TfrmVoiceRecognition
         Caption = 'Windows'
         RadioItem = True
         OnClick = SelectSpeechEngine
+      end
+    end
+    object miSpeechRecognitionEngine: TMenuItem
+      Caption = 'Speech Recognition Engine'
+      object miDeepGram: TMenuItem
+        Caption = 'DeepGram'
+        GroupIndex = 5
+        RadioItem = True
+        OnClick = SelectSpeechRecognitionClick
+      end
+      object miAssemblyAI: TMenuItem
+        Caption = 'AssemblyAI'
+        GroupIndex = 5
+        RadioItem = True
+        OnClick = SelectSpeechRecognitionClick
       end
     end
     object miAudioInput: TMenuItem

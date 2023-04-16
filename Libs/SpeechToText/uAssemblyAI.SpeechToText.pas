@@ -18,7 +18,8 @@ uses
   sgcWebSocket_Classes,
   sgcWebSocket_Classes_Indy,
   sgcWebSocket_Client,
-  sgcWebSocket
+  sgcWebSocket,
+  uBaseSpeechRecognition
   ;
 
 type
@@ -44,6 +45,11 @@ type
     OnConnect: TOnConnect;
     OnDisconnect: TOnConnect;
   end;
+
+  TAssemblyAiRecognition = class(TBaseSpeechRecognition)
+
+  end;
+
 
 implementation
 

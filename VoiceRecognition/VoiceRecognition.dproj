@@ -145,6 +145,7 @@
         <DCCReference Include="..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uDeepGram.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="..\Libs\SpeechToText\uBaseSpeechRecognition.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

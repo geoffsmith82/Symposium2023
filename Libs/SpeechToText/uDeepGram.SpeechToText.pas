@@ -18,7 +18,8 @@ uses
   sgcWebSocket_Classes,
   sgcWebSocket_Classes_Indy,
   sgcWebSocket_Client,
-  sgcWebSocket
+  sgcWebSocket,
+  uBaseSpeechRecognition
   ;
 
 type
@@ -40,6 +41,11 @@ type
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
   end;
+
+  TDeepGramRecognition = class(TBaseSpeechRecognition)
+
+  end;
+
 
 implementation
 
