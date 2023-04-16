@@ -15,6 +15,8 @@ type
     procedure DoSelectEngine;
     constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
     procedure Finish; virtual; abstract;
+    procedure Add(ms: TMemoryStream); virtual; abstract;
+    procedure Resume; virtual; abstract;
   end;
 
 implementation

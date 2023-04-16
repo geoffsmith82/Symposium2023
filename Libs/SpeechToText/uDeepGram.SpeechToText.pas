@@ -38,12 +38,30 @@ type
     procedure Add(ms: TMemoryStream);
     constructor Create(CreateSuspended: Boolean; const deepgram_key: string);
   public
+    sgcWebSocketClient1 : TsgcWebSocketClient;
     OnHandleMessage: TOnHandleMessage;
     OnConnect: TOnConnect;
+    OnDisconnect: TOnConnect;
   end;
 
   TDeepGramRecognition = class(TBaseSpeechRecognition)
-
+  private
+    FSendThread : TDeepGramSendThread;
+    function GetOnConnect: TOnConnect;
+    function GetOnDisconnect: TOnConnect;
+    function GetOnHandleMessage: TOnHandleMessage;
+    procedure SetOnConnect(const Value: TOnConnect);
+    procedure SetOnDisconnect(const Value: TOnConnect);
+    procedure SetOnHandleMessage(const Value: TOnHandleMessage);
+  public
+    procedure Resume; override;
+    procedure Add(ms: TMemoryStream); override;
+    procedure Finish; override;
+    constructor Create(const AResourceKey, AApplicationName, AHost: string);
+  published
+    property OnHandleMessage: TOnHandleMessage read GetOnHandleMessage write SetOnHandleMessage;
+    property OnConnect: TOnConnect read GetOnConnect write SetOnConnect;
+    property OnDisconnect: TOnConnect read GetOnDisconnect write SetOnDisconnect;
   end;
 
 
@@ -102,7 +120,6 @@ procedure TDeepGramSendThread.Execute;
 var
   m : TMemoryStream;
   mm : TMemoryStream;
-  sgcWebSocketClient1 : TsgcWebSocketClient;
 begin
   inherited;
   sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
@@ -144,6 +161,62 @@ begin
     FreeAndNil(mm);
     FreeAndNil(sgcWebSocketClient1);
   end;
+end;
+
+{ TDeepGramRecognition }
+
+procedure TDeepGramRecognition.Add(ms: TMemoryStream);
+begin
+  inherited;
+  FSendThread.Add(ms);
+end;
+
+constructor TDeepGramRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
+begin
+  inherited Create(AResourceKey, AApplicationName, AHost);
+  FSendThread := TDeepGramSendThread.Create(True, AResourceKey);
+end;
+
+procedure TDeepGramRecognition.Finish;
+begin
+  inherited;
+
+end;
+
+function TDeepGramRecognition.GetOnConnect: TOnConnect;
+begin
+  Result := FSendThread.OnConnect;
+end;
+
+function TDeepGramRecognition.GetOnDisconnect: TOnConnect;
+begin
+  Result := FSendThread.OnDisconnect;
+end;
+
+function TDeepGramRecognition.GetOnHandleMessage: TOnHandleMessage;
+begin
+  Result := FSendThread.OnHandleMessage;
+end;
+
+procedure TDeepGramRecognition.Resume;
+begin
+  inherited;
+  FSendThread.Resume;
+end;
+
+procedure TDeepGramRecognition.SetOnConnect(const Value: TOnConnect);
+begin
+  FSendThread.OnConnect := Value;
+end;
+
+procedure TDeepGramRecognition.SetOnDisconnect(const Value: TOnConnect);
+begin
+  FSendThread.OnDisconnect := Value;
+end;
+
+procedure TDeepGramRecognition.SetOnHandleMessage(const Value: TOnHandleMessage);
+begin
+  FSendThread.OnHandleMessage := Value;
 end;
 
 end.

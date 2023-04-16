@@ -18,7 +18,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 564
+    Left = 552
     Top = 8
     Width = 82
     Height = 73

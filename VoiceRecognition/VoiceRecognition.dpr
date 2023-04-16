@@ -31,7 +31,8 @@ uses
   uAssemblyAI.SpeechToText in '..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas',
   uDeepGram.SpeechToText in '..\Libs\SpeechToText\uDeepGram.SpeechToText.pas',
   uBaseSpeechRecognition in '..\Libs\SpeechToText\uBaseSpeechRecognition.pas',
-  REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas';
+  REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
+  uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}
 

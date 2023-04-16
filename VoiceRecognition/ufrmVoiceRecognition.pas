@@ -100,10 +100,8 @@ type
   private
     { Private declarations }
     FSettings : TIniFile;
-    FSpeechRecognitionEngine : TBaseSpeechRecognition;
     FmemStream : TMemoryStream;
     FConnected : Boolean;
-    FSendThread : TAssemblyAiSendThread;
     FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
 
@@ -194,6 +192,7 @@ begin
   FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self, '', '', ''), miWindowsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedTextToSpeechEngine', 'TWindowsSpeechService');
   FTextToSpeechEngines.SelectEngine(lSpeechEngine);
   FTextToSpeechEngines.ActiveMenuItem.Checked := True;
@@ -202,8 +201,25 @@ end;
 procedure TfrmVoiceRecognition.SetupSpeechRecognitionEngines;
 var
   lSpeechEngine: string;
+  lAssemblyAi : TAssemblyAiRecognition;
+  lDeepGram : TDeepGramRecognition;
 begin
+  lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key,'','');
+  lAssemblyAi.OnHandleMessage := OnHandleMessage;
+  lAssemblyAi.OnConnect := OnHandleConnect;
+  lAssemblyAi.OnDisconnect := OnHandleDisconnect;
+  FSpeechRecognitionEngines.RegisterEngine(lAssemblyAi, miAssemblyAI);
 
+  lDeepGram := TDeepGramRecognition.Create(deepgram_key,'','');
+  lDeepGram.OnHandleMessage := OnHandleMessage;
+  lDeepGram.OnConnect := OnHandleConnect;
+  lDeepGram.OnDisconnect := OnHandleDisconnect;
+  FSpeechRecognitionEngines.RegisterEngine(lDeepGram, miDeepGram);
+
+  lSpeechEngine := FSettings.ReadString('Speech', 'SelectedRecognitionEngine', 'TAssemblyAiRecognition');
+  FSpeechRecognitionEngines.SelectEngine(lSpeechEngine);
+  FSpeechRecognitionEngines.ActiveEngine.DoSelectEngine;
+  FSpeechRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 
 procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
@@ -219,17 +235,13 @@ begin
   FmemStream := TMemoryStream.Create;
   FmemStream.SetSize(50*1024*1024); // not used but needed for the stream out
 
-  FSendThread := TAssemblyAiSendThread.Create(True, assemblyai_key);
-  FSendThread.OnHandleMessage := OnHandleMessage;
-  FSendThread.OnConnect := OnHandleConnect;
-  FSendThread.OnDisconnect := OnHandleDisconnect;
   LoadAudioInputsMenu;
 end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
-  FSendThread.Terminate;
-  FreeAndNil(FSendThread);
+  Timer1.Enabled := False;
+
   FreeAndNil(FSettings);
   FreeAndNil(FmemStream);
   FreeAndNil(FTextToSpeechEngines);
@@ -308,8 +320,8 @@ begin
   mem := TMemoryStream.Create;
   mem.WriteData(Buffer, Bytes);
   mem.Position := 0;
-  if Assigned(FSendThread) then
-    FSendThread.Add(mem);
+
+  FSpeechRecognitionEngines.ActiveEngine.Add(mem);
 
   OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
@@ -317,7 +329,7 @@ end;
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
   StreamOut1.Stream := FmemStream;
-  FSendThread.Resume;
+  FSpeechRecognitionEngines.ActiveEngine.Resume;
   Sleep(100);
   StreamOut1.Run;
   Listen;
@@ -326,6 +338,7 @@ end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
+  FSpeechRecognitionEngines.ActiveEngine.Finish;
   sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
   VirtualImage1.ImageIndex := -1;
   StreamOut1.Stop(False);
@@ -334,10 +347,7 @@ end;
 
 procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);
 begin
-  FSendThread.Terminate;
   Application.Terminate;
 end;
-
-
 
 end.
