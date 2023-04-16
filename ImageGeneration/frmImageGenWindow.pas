@@ -37,7 +37,7 @@ type
     N1: TMenuItem;
     N2: TMenuItem;
     Generator1: TMenuItem;
-    Generator2: TMenuItem;
+    miDALLE2: TMenuItem;
     mmoImagePrompt: TMemo;
     btnExecute: TButton;
     Label1: TLabel;
@@ -108,47 +108,49 @@ begin
   end;
 
   images := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
-
-  for i := 0 to length(images.data) - 1 do
-  begin
-    var imageURL : string := images.data[i].url;
-    TTask.Run(procedure ()
-    var
-      NetRequest : TNetHTTPRequest;
-      NetClient : TNetHTTPClient;
-      memStream : TMemoryStream;
-      png : TImage;
-
+  try
+    for i := 0 to length(images.data) - 1 do
     begin
-      NetRequest := nil;
-      NetClient := nil;
-      memStream := nil;
-      png := nil;
-      try
-        memStream := TMemoryStream.Create;
-        NetClient := TNetHTTPClient.Create(nil);
-        NetRequest := TNetHTTPRequest.Create(nil);
-        NetRequest.Client := NetClient;
-        NetRequest.Get(imageURL, memStream);
-        png := TImage.Create(nil);
-        png.Proportional := True;
-        png.Stretch := True;
-        png.Align := alClient;
-        png.PopupMenu := PopupMenu1;
-        png.OnContextPopup := Image1ContextPopup;
-        png.Picture.LoadFromStream(memStream);
-        TThread.Synchronize(nil, procedure ()
-        begin
-          FImageList.Add(png);
-          png.Parent := GridPanel1;
-        end
-        );
-      finally
-        FreeAndNil(memStream);
-        FreeAndNil(NetRequest);
-        FreeAndNil(NetClient);
-      end;
-    end);
+      var imageURL : string := images.data[i].url;
+      TTask.Run(procedure ()
+      var
+        NetRequest : TNetHTTPRequest;
+        NetClient : TNetHTTPClient;
+        memStream : TMemoryStream;
+        png : TImage;
+      begin
+        NetRequest := nil;
+        NetClient := nil;
+        memStream := nil;
+        png := nil;
+        try
+          memStream := TMemoryStream.Create;
+          NetClient := TNetHTTPClient.Create(nil);
+          NetRequest := TNetHTTPRequest.Create(nil);
+          NetRequest.Client := NetClient;
+          NetRequest.Get(imageURL, memStream);
+          png := TImage.Create(nil);
+          png.Proportional := True;
+          png.Stretch := True;
+          png.Align := alClient;
+          png.PopupMenu := PopupMenu1;
+          png.OnContextPopup := Image1ContextPopup;
+          png.Picture.LoadFromStream(memStream);
+          TThread.Synchronize(nil, procedure ()
+          begin
+            FImageList.Add(png);
+            png.Parent := GridPanel1;
+          end
+          );
+        finally
+          FreeAndNil(memStream);
+          FreeAndNil(NetRequest);
+          FreeAndNil(NetClient);
+        end;
+      end);
+    end;
+  finally
+    FreeAndNil(images);
   end;
 end;
 

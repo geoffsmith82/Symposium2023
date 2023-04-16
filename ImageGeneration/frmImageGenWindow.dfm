@@ -150,7 +150,7 @@ object frmImageGenerator: TfrmImageGenerator
     end
     object Generator1: TMenuItem
       Caption = 'Generator'
-      object Generator2: TMenuItem
+      object miDALLE2: TMenuItem
         Caption = 'OpenAI DALL-E 2'
         Checked = True
       end
