@@ -13,6 +13,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   DesignSize = (
     802
     424)
@@ -112,6 +113,16 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       TabOrder = 2
       OnClick = btnStopClick
     end
+  end
+  object sgConversationGrid: TStringGrid
+    Left = 248
+    Top = 56
+    Width = 448
+    Height = 254
+    Anchors = [akLeft, akTop, akRight]
+    ColCount = 2
+    FixedCols = 0
+    TabOrder = 4
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -441,6 +452,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Top = 232
   end
   object tblSessions: TFDTable
+    AfterScroll = tblSessionsAfterScroll
     IndexFieldNames = 'SessionID'
     Connection = FDConnection
     ResourceOptions.AssignedValues = [rvEscapeExpand]

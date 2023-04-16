@@ -26,6 +26,7 @@ uses
   Vcl.VirtualImage,
   Vcl.DBCGrids,
   Vcl.DBCtrls,
+  Vcl.Grids,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
@@ -117,6 +118,7 @@ type
     btnStart: TButton;
     btnStop: TButton;
     DBText1: TDBText;
+    sgConversationGrid: TStringGrid;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -127,6 +129,8 @@ type
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
     procedure btnNewChatSessionClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure tblSessionsAfterScroll(DataSet: TDataSet);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -173,6 +177,21 @@ procedure TfrmVoiceRecognition.Speak;
 begin
   VirtualImage1.ImageIndex := 1;
   VirtualImage1.Update;
+end;
+
+procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
+var
+  i : Integer;
+begin
+  i := 0;
+  tblConversion.First;
+  sgConversationGrid.RowCount := tblConversion.RecordCount;
+  repeat
+    sgConversationGrid.Cells[0, i] := tblConversion.FieldByName('User').AsString;
+    sgConversationGrid.Cells[1, i] := tblConversion.FieldByName('Message').AsString;
+    sgConversationGrid.RowHeights[i] := 300;
+    tblConversion.Next;
+  until tblConversion.Eof;
 end;
 
 procedure TfrmVoiceRecognition.Listen;
@@ -259,8 +278,9 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
 
-  tblSessions.Active := True;
   tblConversion.Active := True;
+  tblSessions.Active := True;
+
 
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
@@ -281,6 +301,12 @@ begin
   FreeAndNil(FSpeechRecognitionEngines);
 end;
 
+
+procedure TfrmVoiceRecognition.FormResize(Sender: TObject);
+begin
+  sgConversationGrid.ColWidths[0] := 150;
+  sgConversationGrid.ColWidths[1] := sgConversationGrid.ClientWidth - 200;
+end;
 
 procedure TfrmVoiceRecognition.UserInterfaceUpdateTimerTimer(Sender: TObject);
 begin
