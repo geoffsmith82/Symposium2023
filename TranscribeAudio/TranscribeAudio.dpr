@@ -22,6 +22,7 @@ uses
   uGoogle.SpeechToText in '..\Libs\SpeechToText\uGoogle.SpeechToText.pas',
   uAmazon.SpeechToText in '..\Libs\SpeechToText\uAmazon.SpeechToText.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
+  uEngineManager in '..\Libs\uEngineManager.pas',
   uGoogle.SpeechToText.DTO in '..\Libs\SpeechToText\uGoogle.SpeechToText.DTO.pas';
 
 {$R *.res}

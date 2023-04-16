@@ -96,6 +96,7 @@
         <DCCReference Include="..\Libs\SpeechToText\uAmazon.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uGoogle.SpeechToText.DTO.pas"/>
+        <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
