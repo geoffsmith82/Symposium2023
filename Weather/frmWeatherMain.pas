@@ -72,8 +72,6 @@ var
   aTask: ITask;
 begin
   aTask := TTask.Create (procedure ()
-      var
-        answer : string;
       begin
         Stream := TMemoryStream.Create;
         try

@@ -85,7 +85,6 @@ var
   lSpeechEngine: string;
   i: Integer;
   currentModel : string;
-  menu: TMenuItem;
 begin
   FSpeedToTextEngine := TEngineManager<TBaseTextToSpeech>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
@@ -136,8 +135,6 @@ end;
 
 
 procedure TForm1.SelectSpeechEngine(Sender: TObject);
-var
-  engine : string;
 begin
   FSpeedToTextEngine.SelectEngine(Sender as TMenuItem);
   (Sender as TMenuItem).Checked := True;

@@ -139,7 +139,7 @@ begin
         png.Picture.LoadFromStream(memStream);
         TThread.Synchronize(nil, procedure ()
         begin
-          ImageList.Add(png);
+          FImageList.Add(png);
           png.Parent := GridPanel1;
         end
         );
@@ -159,7 +159,7 @@ end;
 
 procedure TfrmImageGenerator.Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
 begin
-  CurrentImage := Sender as TImage;
+  FCurrentImage := Sender as TImage;
 end;
 
 procedure TfrmImageGenerator.SaveImage1Click(Sender: TObject);
@@ -167,7 +167,7 @@ begin
   if SaveDialog.Execute then
   begin
     OutputDebugString(PChar(Sender.ClassName));
-    CurrentImage.Picture.SaveToFile(SaveDialog.FileName);
+    FCurrentImage.Picture.SaveToFile(SaveDialog.FileName);
   end;
 end;
 

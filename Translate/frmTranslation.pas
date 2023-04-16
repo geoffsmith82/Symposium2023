@@ -129,7 +129,6 @@ procedure TfrmMainTranslationWindow.FormCreate(Sender: TObject);
 var
   filename : string;
   languageEngine : string;
-  menuItem : TMenuItem;
   googleEngine : TGoogleTranslate;
   microsoftEngine : TMicrosoftTranslate;
 begin
