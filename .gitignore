@@ -72,3 +72,4 @@ TranscribeAudio/Win64
 Translate/Win32
 VoiceRecognition/Win32
 Libs/TextToSpeech/Unused
+TranscribeAudio/models
