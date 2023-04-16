@@ -26,7 +26,8 @@ uses
   uAmazon.Polly,
   uGoogleSpeech,
   uWindows.Engine,
-  uBaseSpeech
+  uBaseSpeech,
+  uEngineManager
   ;
 
 type
@@ -61,14 +62,10 @@ type
     procedure SelectSpeechEngine(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FSpeechEngine : TBaseTextToSpeech;
-    FSpeechEngines : TObjectDictionary<string, TBaseTextToSpeech>;
-    FSpeechEngineMenuItems : TDictionary<string, TMenuItem>;
-    FSpeechEngineNames: TDictionary<TMenuItem, string>;
+    FSpeedToTextEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
     procedure PlayTextWithSelectedEngine(text: string);
     function SelectedModel: string;
-    procedure RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass: TBaseTextToSpeech);
     { Private declarations }
   public
     { Public declarations }
@@ -83,16 +80,6 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm1.RegisterSpeechToTextEngine(menuItem: TMenuItem; engineClass : TBaseTextToSpeech);
-var
-  engineName: string;
-begin
-  engineName := engineClass.SpeechEngineName;
-  FSpeechEngines.AddOrSetValue(engineName, engineClass);
-  FSpeechEngineMenuItems.Add(engineName, menuItem);
-  FSpeechEngineNames.Add(menuItem, engineName);
-end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 var
   lSpeechEngine: string;
@@ -100,28 +87,23 @@ var
   currentModel : string;
   menu: TMenuItem;
 begin
-  FSpeechEngines := TObjectDictionary<string, TBaseTextToSpeech>.Create([doOwnsValues]);
-  FSpeechEngineMenuItems := TDictionary<string, TMenuItem>.Create;
-  FSpeechEngineNames := TDictionary<TMenuItem, string>.Create;
+  FSpeedToTextEngine := TEngineManager<TBaseTextToSpeech>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
 
-  RegisterSpeechToTextEngine(miMicrosoftSpeechEngine,
-     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'));
-  RegisterSpeechToTextEngine(miElevenLabsSpeechEngine,
-     TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'));
-  RegisterSpeechToTextEngine(miAmazonSpeechEngine,
-     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey));//'ADUG Demo', '');
-  RegisterSpeechToTextEngine(miWindowsSpeechEngine,
-     TWindowsSpeechService.Create(Self, '','',''));
-  RegisterSpeechToTextEngine(miGoogleSpeechEngine,
-     TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings));
+  FSpeedToTextEngine.RegisterEngine(
+     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+  FSpeedToTextEngine.RegisterEngine(
+     TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'), miElevenLabsSpeechEngine);
+  FSpeedToTextEngine.RegisterEngine(
+     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);//'ADUG Demo', '');
+  FSpeedToTextEngine.RegisterEngine(
+     TWindowsSpeechService.Create(Self, '','',''), miWindowsSpeechEngine);
+  FSpeedToTextEngine.RegisterEngine(
+     TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 
-  lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'Windows');
-  FSpeechEngines.TryGetValue(lSpeechEngine, FSpeechEngine);
-  if FSpeechEngineMenuItems.TryGetValue(lSpeechEngine, menu) then
-  begin
-    menu.Checked := True;
-  end;
+  lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'TWindowsSpeechService');
+  FSpeedToTextEngine.SelectEngine(lSpeechEngine);
+  FSpeedToTextEngine.ActiveMenuItem.Checked := True;
   currentModel := FSettings.ReadString('ChatGPT', 'Model', 'text-davinci-003').Replace('&', '');
   for i := 0 to ModelMenu.Count - 1 do
   begin
@@ -135,9 +117,7 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FSpeechEngines);
-  FreeAndNil(FSpeechEngineMenuItems);
-  FreeAndNil(FSpeechEngineNames);
+  FreeAndNil(FSpeedToTextEngine);
   FreeAndNil(FSettings);
 end;
 
@@ -159,10 +139,9 @@ procedure TForm1.SelectSpeechEngine(Sender: TObject);
 var
   engine : string;
 begin
-  engine := FSpeechEngineNames[Sender as TMenuItem];
-  FSpeechEngine := FSpeechEngines[engine];
+  FSpeedToTextEngine.SelectEngine(Sender as TMenuItem);
   (Sender as TMenuItem).Checked := True;
-  FSettings.WriteString('Speech', 'SelectedEngine', engine);
+  FSettings.WriteString('Speech', 'SelectedEngine', FSpeedToTextEngine.ActiveEngine.ClassName);
 end;
 
 procedure TForm1.btnAskTheMachineClick(Sender: TObject);
@@ -188,9 +167,9 @@ var
   Stream: TMemoryStream;
   FileName: string;
 begin
-  Stream := TMemoryStream.Create;
+  Stream := nil;
   try
-    Stream := FSpeechEngine.TextToSpeech(text);
+    Stream := FSpeedToTextEngine.ActiveEngine.TextToSpeech(text);
     if not Assigned(Stream) then
       Exit;
     FileName := TPath.GetTempFileName + '.mp3';
@@ -206,7 +185,7 @@ end;
 
 procedure TForm1.btnGoogleAuthClick(Sender: TObject);
 begin
-  (FSpeechEngine as TGoogleSpeechService).Authenticate;
+  (FSpeedToTextEngine.ActiveEngine as TGoogleSpeechService).Authenticate;
 end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);
