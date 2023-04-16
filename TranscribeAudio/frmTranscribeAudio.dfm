@@ -138,9 +138,12 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
         OnClick = miEngineSelectedClick
       end
     end
-    object GoogleAuthenticate1: TMenuItem
-      Caption = 'Google Authenticate'
-      OnClick = GoogleAuthenticate1Click
+    object miGoogleMenu: TMenuItem
+      Caption = 'Google'
+      object GoogleAuthenticate1: TMenuItem
+        Caption = 'Google Authenticate'
+        OnClick = GoogleAuthenticate1Click
+      end
     end
   end
 end

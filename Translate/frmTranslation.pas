@@ -74,8 +74,8 @@ type
     toLanguage : string;
     procedure LoadLanguageMenus;
     procedure RegisterTranslationEngine(engine: string; menuItem: TMenuItem; translateEngine: TBaseTranslate);
-    procedure HangleGoogleEngineSelected(Sender: TObject);
-    procedure HangleMicrosoftEngineSelected(Sender: TObject);
+    procedure HandleGoogleEngineSelected(Sender: TObject);
+    procedure HandleMicrosoftEngineSelected(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -117,13 +117,13 @@ begin
   (FTranslate as TGoogleTranslate).Authenticate;
 end;
 
-procedure TfrmMainTranslationWindow.HangleMicrosoftEngineSelected(Sender: TObject);
+procedure TfrmMainTranslationWindow.HandleMicrosoftEngineSelected(Sender: TObject);
 begin
   miGoogleMenu.Visible := False;
   LoadLanguageMenus;
 end;
 
-procedure TfrmMainTranslationWindow.HangleGoogleEngineSelected(Sender: TObject);
+procedure TfrmMainTranslationWindow.HandleGoogleEngineSelected(Sender: TObject);
 begin
   miGoogleMenu.Visible := True;
   LoadLanguageMenus;
@@ -154,10 +154,10 @@ begin
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
 
   microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
-  microsoftEngine.OnSelectEngine := HangleMicrosoftEngineSelected;
+  microsoftEngine.OnSelectEngine := HandleMicrosoftEngineSelected;
   RegisterTranslationEngine('Microsoft Translate', miMicrosoft, microsoftEngine);
     googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
-    googleEngine.OnSelectEngine := HangleGoogleEngineSelected;
+    googleEngine.OnSelectEngine := HandleGoogleEngineSelected;
   RegisterTranslationEngine('Google Translate', miGoogle, googleEngine);
 
 

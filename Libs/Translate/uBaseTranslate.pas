@@ -2,9 +2,14 @@ unit uBaseTranslate;
 
 interface
 
+uses
+  Classes;
+
 type
   TBaseTranslate = class
   public
+    OnSelectEngine : TNotifyEvent;
+    procedure DoSelectEngine;
     function EngineName: string; virtual; abstract;
     function FromLanguages: TArray<string>; virtual; abstract;
     function ToLanguages: TArray<string>; virtual; abstract;
@@ -12,5 +17,13 @@ type
   end;
 
 implementation
+
+{ TBaseTranslate }
+
+procedure TBaseTranslate.DoSelectEngine;
+begin
+  if Assigned(OnSelectEngine) then
+    OnSelectEngine(Self);
+end;
 
 end.
