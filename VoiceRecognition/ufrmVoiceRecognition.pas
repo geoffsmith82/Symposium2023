@@ -78,11 +78,9 @@ type
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
-    btnStart: TButton;
     StreamOut1: TStreamOut;
     sgcWebSocketClient1: TsgcWebSocketClient;
     mmoQuestions: TMemo;
-    btnStop: TButton;
     mmoAnswers: TMemo;
     mmMainMenu: TMainMenu;
     miFile: TMenuItem;
@@ -113,7 +111,10 @@ type
     tblConversion: TFDTable;
     dsSessions: TDataSource;
     dsConversation: TDataSource;
+    PnlButtons: TPanel;
     btnNewChatSession: TButton;
+    btnStart: TButton;
+    btnStop: TButton;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);

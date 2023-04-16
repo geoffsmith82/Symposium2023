@@ -18,8 +18,8 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 696
-    Top = 8
+    Left = 712
+    Top = 47
     Width = 82
     Height = 73
     Anchors = [akTop, akRight]
@@ -27,59 +27,76 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ImageWidth = 0
     ImageHeight = 0
     ImageIndex = -1
-    ExplicitLeft = 568
   end
   object mmoQuestions: TMemo
     Left = 248
     Top = 8
     Width = 433
     Height = 151
-    TabOrder = 1
-  end
-  object btnStart: TButton
-    Left = 703
-    Top = 119
-    Width = 75
-    Height = 25
-    Anchors = [akTop, akRight]
-    Caption = 'Start'
     TabOrder = 0
-    OnClick = btnStartClick
-  end
-  object btnStop: TButton
-    Left = 703
-    Top = 163
-    Width = 75
-    Height = 25
-    Anchors = [akTop, akRight]
-    Caption = 'Stop'
-    TabOrder = 2
-    OnClick = btnStopClick
   end
   object mmoAnswers: TMemo
     Left = 248
     Top = 173
     Width = 433
     Height = 137
-    TabOrder = 3
+    TabOrder = 1
   end
   object DBCtrlGrid1: TDBCtrlGrid
     Left = 0
-    Top = 48
+    Top = 41
     Width = 225
-    Height = 376
-    PanelHeight = 53
+    Height = 383
+    Align = alLeft
+    PanelHeight = 54
     PanelWidth = 208
-    TabOrder = 4
+    TabOrder = 2
     RowCount = 7
+    ExplicitTop = 48
+    ExplicitHeight = 371
   end
-  object btnNewChatSession: TButton
+  object PnlButtons: TPanel
     Left = 0
     Top = 0
-    Width = 225
-    Height = 49
-    Caption = 'New Chat'
-    TabOrder = 5
+    Width = 802
+    Height = 41
+    Align = alTop
+    TabOrder = 3
+    ExplicitLeft = 448
+    ExplicitTop = 112
+    ExplicitWidth = 185
+    object btnNewChatSession: TButton
+      Left = 1
+      Top = 1
+      Width = 225
+      Height = 39
+      Align = alLeft
+      Caption = 'New Chat'
+      TabOrder = 0
+      ExplicitLeft = 96
+      ExplicitTop = -8
+      ExplicitHeight = 49
+    end
+    object btnStart: TButton
+      Left = 696
+      Top = 1
+      Width = 105
+      Height = 39
+      Align = alRight
+      Caption = 'Start'
+      TabOrder = 1
+      OnClick = btnStartClick
+    end
+    object btnStop: TButton
+      Left = 600
+      Top = 1
+      Width = 96
+      Height = 39
+      Align = alRight
+      Caption = 'Stop'
+      TabOrder = 2
+      OnClick = btnStopClick
+    end
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
