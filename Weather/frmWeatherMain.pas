@@ -8,22 +8,26 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.Threading,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
-  Vcl.MPlayer,
+  Vcl.ExtCtrls,
 {$IFNDEF NOPOLLY}
-  uAmazon.Polly
-  ;
+  uAmazon.Polly,
 {$ENDIF}
+  Vcl.MPlayer
+  ;
 
 type
   TfrmWeatherWindow = class(TForm)
     btnLatestForcast: TButton;
-    Memo1: TMemo;
+    mmoWeatherQuestion: TMemo;
     MediaPlayer1: TMediaPlayer;
+    GridPanel1: TGridPanel;
+    mmWeatherAnswer: TMemo;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnLatestForcastClick(Sender: TObject);
@@ -65,19 +69,29 @@ procedure TfrmWeatherWindow.PlayTextAmazon(const text:string);
 var
   Stream: TMemoryStream;
   FileName: string;
+  aTask: ITask;
 begin
-  Stream := TMemoryStream.Create;
-  try
-    Stream := FAmazonPolyVoiceService.TextToSpeech(text);
-    FileName := TPath.GetTempFileName + '.mp3';
-    Stream.Position := 0;
-    Stream.SaveToFile(FileName);
-  finally
-    Stream.Free;
-  end;
-  MediaPlayer1.FileName := FileName;
-  MediaPlayer1.Open;
-  MediaPlayer1.Play;
+  aTask := TTask.Create (procedure ()
+      var
+        answer : string;
+      begin
+        Stream := TMemoryStream.Create;
+        try
+          Stream := FAmazonPolyVoiceService.TextToSpeech(text);
+          FileName := TPath.GetTempFileName + '.mp3';
+          Stream.Position := 0;
+          Stream.SaveToFile(FileName);
+        finally
+          Stream.Free;
+        end;
+        TThread.Synchronize(nil, procedure
+        begin
+          MediaPlayer1.FileName := FileName;
+          MediaPlayer1.Open;
+          MediaPlayer1.Play;
+        end);
+      end);
+  aTask.Start;
 end;
 
 procedure TfrmWeatherWindow.btnLatestForcastClick(Sender: TObject);
@@ -105,10 +119,22 @@ begin
     begin
       if product.Forecast[i].Description = 'Bendigo' then
       begin
-        forcastInfo := product.Forecast[i].XML;
-        Memo1.Lines.Add(forcastInfo);
-        Memo1.Lines.Text := TOpenAI.AskChatGPT(question + forcastInfo, 'text-davinci-003');
-     //   PlayTextAmazon(Memo1.Lines.Text);
+        var aTask: ITask :=  TTask.Create (procedure ()
+            var
+              answer : string;
+            begin
+                forcastInfo := product.Forecast[i].XML;
+                mmoWeatherQuestion.Lines.Add(question);
+                mmoWeatherQuestion.Lines.Add('');
+                mmoWeatherQuestion.Lines.Add(forcastInfo);
+                answer := TOpenAI.AskChatGPT(question + forcastInfo, 'text-davinci-003');
+                TThread.Synchronize(nil, procedure
+                  begin
+                    mmWeatherAnswer.Text := answer;
+                    PlayTextAmazon(mmWeatherAnswer.Text);
+                  end);
+            end);
+         aTask.Start;
       end;
     end;
   finally
