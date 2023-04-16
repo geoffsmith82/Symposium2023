@@ -19,7 +19,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 712
+    Left = 708
     Top = 47
     Width = 82
     Height = 73
@@ -28,6 +28,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ImageWidth = 0
     ImageHeight = 0
     ImageIndex = -1
+    ExplicitLeft = 712
   end
   object mmoQuestions: TMemo
     Left = 248
@@ -54,8 +55,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     PanelWidth = 208
     TabOrder = 2
     RowCount = 7
-    ExplicitTop = 48
-    ExplicitHeight = 371
+    ExplicitHeight = 382
     object DBText1: TDBText
       AlignWithMargins = True
       Left = 3
@@ -77,9 +77,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Height = 41
     Align = alTop
     TabOrder = 3
-    ExplicitLeft = 448
-    ExplicitTop = 112
-    ExplicitWidth = 185
+    ExplicitWidth = 798
     object btnNewChatSession: TButton
       Left = 1
       Top = 1
@@ -89,9 +87,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = 'New Chat'
       TabOrder = 0
       OnClick = btnNewChatSessionClick
-      ExplicitLeft = 96
-      ExplicitTop = -8
-      ExplicitHeight = 49
     end
     object btnStart: TButton
       Left = 696
@@ -102,6 +97,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = 'Start'
       TabOrder = 1
       OnClick = btnStartClick
+      ExplicitLeft = 692
     end
     object btnStop: TButton
       Left = 600
@@ -112,17 +108,19 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = 'Stop'
       TabOrder = 2
       OnClick = btnStopClick
+      ExplicitLeft = 596
     end
   end
   object sgConversationGrid: TStringGrid
     Left = 248
     Top = 56
-    Width = 448
+    Width = 444
     Height = 254
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
     TabOrder = 4
+    ExplicitWidth = 440
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -460,7 +458,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Left = 248
     Top = 312
   end
-  object tblConversion: TFDTable
+  object tblConversation: TFDTable
     MasterSource = dsSessions
     MasterFields = 'SessionID'
     Connection = FDConnection
@@ -474,7 +472,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Top = 296
   end
   object dsConversation: TDataSource
-    DataSet = tblConversion
+    DataSet = tblConversation
     Left = 144
     Top = 368
   end

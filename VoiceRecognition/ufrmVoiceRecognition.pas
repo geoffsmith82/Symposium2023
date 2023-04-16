@@ -110,7 +110,7 @@ type
     DBCtrlGrid1: TDBCtrlGrid;
     FDConnection: TFDConnection;
     tblSessions: TFDTable;
-    tblConversion: TFDTable;
+    tblConversation: TFDTable;
     dsSessions: TDataSource;
     dsConversation: TDataSource;
     PnlButtons: TPanel;
@@ -184,14 +184,14 @@ var
   i : Integer;
 begin
   i := 0;
-  tblConversion.First;
-  sgConversationGrid.RowCount := tblConversion.RecordCount;
+  tblConversation.First;
+  sgConversationGrid.RowCount := tblConversation.RecordCount;
   repeat
-    sgConversationGrid.Cells[0, i] := tblConversion.FieldByName('User').AsString;
-    sgConversationGrid.Cells[1, i] := tblConversion.FieldByName('Message').AsString;
+    sgConversationGrid.Cells[0, i] := tblConversation.FieldByName('User').AsString;
+    sgConversationGrid.Cells[1, i] := tblConversation.FieldByName('Message').AsString;
     sgConversationGrid.RowHeights[i] := 300;
-    tblConversion.Next;
-  until tblConversion.Eof;
+    tblConversation.Next;
+  until tblConversation.Eof;
 end;
 
 procedure TfrmVoiceRecognition.Listen;
@@ -278,7 +278,7 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
 
-  tblConversion.Active := True;
+  tblConversation.Active := True;
   tblSessions.Active := True;
 
 
