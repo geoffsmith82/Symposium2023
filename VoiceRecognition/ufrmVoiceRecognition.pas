@@ -41,6 +41,8 @@ uses
   FireDAC.DApt, Data.DB,
   FireDAC.Comp.DataSet,
   FireDAC.Comp.Client,
+  FireDAC.Phys.MSAcc,
+  FireDAC.Phys.MSAccDef,
   sgcBase_Classes,
   sgcSocket_Classes,
   sgcTCP_Classes,
@@ -264,7 +266,7 @@ end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
-  Timer1.Enabled := False;
+  UserInterfaceUpdateTimer.Enabled := False;
 
   FreeAndNil(FSettings);
   FreeAndNil(FmemStream);
@@ -357,7 +359,7 @@ begin
   Sleep(100);
   StreamOut1.Run;
   Listen;
-  Timer1.Enabled := True;
+  UserInterfaceUpdateTimer.Enabled := True;
 end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
@@ -366,7 +368,7 @@ begin
   sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
   VirtualImage1.ImageIndex := -1;
   StreamOut1.Stop(False);
-  Timer1.Enabled := False;
+  UserInterfaceUpdateTimer.Enabled := False;
 end;
 
 procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);

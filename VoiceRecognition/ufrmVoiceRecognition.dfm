@@ -92,8 +92,8 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     EchoRecording = False
     FramesInBuffer = 16000
     PollingInterval = 100
-    Left = 96
-    Top = 80
+    Left = 56
+    Top = 168
   end
   object AudioProcessor1: TAudioProcessor
     Input = DXAudioIn1
@@ -162,8 +162,8 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     TLSOptions.OpenSSL_Options.UnixSymLinks = oslsSymLinksDefault
     TLSOptions.SChannel_Options.CertStoreName = scsnMY
     TLSOptions.SChannel_Options.CertStorePath = scspStoreCurrentUser
-    Left = 157
-    Top = 115
+    Left = 133
+    Top = 203
   end
   object mmMainMenu: TMainMenu
     Left = 488
@@ -398,16 +398,29 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Top = 320
   end
   object FDConnection: TFDConnection
+    Params.Strings = (
+      
+        'Database=D:\Programming\ADUG\Symposium2023\VoiceRecognition\chat' +
+        's.mdb'
+      'DriverID=MSAcc')
+    Connected = True
+    LoginPrompt = False
     Left = 720
     Top = 232
   end
   object tblSessions: TFDTable
+    IndexFieldNames = 'SessionID'
     Connection = FDConnection
+    ResourceOptions.AssignedValues = [rvEscapeExpand]
+    TableName = 'Sessions'
     Left = 248
     Top = 312
   end
   object tblConversion: TFDTable
+    MasterSource = dsSessions
+    MasterFields = 'SessionID'
     Connection = FDConnection
+    TableName = 'Conversation'
     Left = 248
     Top = 368
   end
