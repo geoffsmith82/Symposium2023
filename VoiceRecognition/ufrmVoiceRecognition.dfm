@@ -3,7 +3,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   Top = 0
   Caption = 'Voice Recognition'
   ClientHeight = 424
-  ClientWidth = 658
+  ClientWidth = 802
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,11 +14,11 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    658
+    802
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 552
+    Left = 696
     Top = 8
     Width = 82
     Height = 73
@@ -30,36 +30,56 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ExplicitLeft = 568
   end
   object mmoQuestions: TMemo
-    Left = 8
+    Left = 248
     Top = 8
-    Width = 537
+    Width = 433
     Height = 151
     TabOrder = 1
   end
   object btnStart: TButton
-    Left = 568
-    Top = 111
+    Left = 703
+    Top = 119
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Start'
     TabOrder = 0
     OnClick = btnStartClick
   end
   object btnStop: TButton
-    Left = 568
-    Top = 142
+    Left = 703
+    Top = 163
     Width = 75
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Stop'
     TabOrder = 2
     OnClick = btnStopClick
   end
   object mmoAnswers: TMemo
-    Left = 8
-    Top = 165
-    Width = 537
+    Left = 248
+    Top = 173
+    Width = 433
     Height = 137
     TabOrder = 3
+  end
+  object DBCtrlGrid1: TDBCtrlGrid
+    Left = 0
+    Top = 48
+    Width = 225
+    Height = 376
+    PanelHeight = 53
+    PanelWidth = 208
+    TabOrder = 4
+    RowCount = 7
+  end
+  object btnNewChatSession: TButton
+    Left = 0
+    Top = 0
+    Width = 225
+    Height = 49
+    Caption = 'New Chat'
+    TabOrder = 5
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -231,9 +251,9 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = 'Audio Input'
     end
   end
-  object Timer1: TTimer
+  object UserInterfaceUpdateTimer: TTimer
     Interval = 50
-    OnTimer = Timer1Timer
+    OnTimer = UserInterfaceUpdateTimerTimer
     Left = 320
     Top = 344
   end
@@ -376,5 +396,29 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       end>
     Left = 592
     Top = 320
+  end
+  object FDConnection: TFDConnection
+    Left = 720
+    Top = 232
+  end
+  object tblSessions: TFDTable
+    Connection = FDConnection
+    Left = 248
+    Top = 312
+  end
+  object tblConversion: TFDTable
+    Connection = FDConnection
+    Left = 248
+    Top = 368
+  end
+  object dsSessions: TDataSource
+    DataSet = tblSessions
+    Left = 152
+    Top = 296
+  end
+  object dsConversation: TDataSource
+    DataSet = tblConversion
+    Left = 144
+    Top = 368
   end
 end

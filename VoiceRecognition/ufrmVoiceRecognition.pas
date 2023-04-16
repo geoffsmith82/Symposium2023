@@ -24,6 +24,23 @@ uses
   Vcl.BaseImageCollection,
   Vcl.ImageCollection,
   Vcl.VirtualImage,
+  Vcl.DBCGrids,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.VCLUI.Wait,
+  FireDAC.Stan.Param,
+  FireDAC.DatS,
+  FireDAC.DApt.Intf,
+  FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
   sgcBase_Classes,
   sgcSocket_Classes,
   sgcTCP_Classes,
@@ -81,20 +98,27 @@ type
     miAmazonSpeechEngine: TMenuItem;
     miGoogleSpeechEngine: TMenuItem;
     miWindowsSpeechEngine: TMenuItem;
-    Timer1: TTimer;
+    UserInterfaceUpdateTimer: TTimer;
     miAudioInput: TMenuItem;
     VirtualImage1: TVirtualImage;
     ImageCollection1: TImageCollection;
     miSpeechRecognitionEngine: TMenuItem;
     miDeepGram: TMenuItem;
     miAssemblyAI: TMenuItem;
+    DBCtrlGrid1: TDBCtrlGrid;
+    FDConnection: TFDConnection;
+    tblSessions: TFDTable;
+    tblConversion: TFDTable;
+    dsSessions: TDataSource;
+    dsConversation: TDataSource;
+    btnNewChatSession: TButton;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miExitClick(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
+    procedure UserInterfaceUpdateTimerTimer(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
   private
@@ -249,7 +273,7 @@ begin
 end;
 
 
-procedure TfrmVoiceRecognition.Timer1Timer(Sender: TObject);
+procedure TfrmVoiceRecognition.UserInterfaceUpdateTimerTimer(Sender: TObject);
 begin
  // OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
   if FTextToSpeechEngines.ActiveEngine.Mode = mpStopped then
