@@ -80,7 +80,6 @@ type
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
-    StreamOut1: TStreamOut;
     sgcWebSocketClient1: TsgcWebSocketClient;
     mmoQuestions: TMemo;
     mmoAnswers: TMemo;
@@ -119,6 +118,7 @@ type
     btnStop: TButton;
     DBText1: TDBText;
     sgConversationGrid: TStringGrid;
+    NULLOut: TNULLOut;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -134,7 +134,6 @@ type
   private
     { Private declarations }
     FSettings : TIniFile;
-    FmemStream : TMemoryStream;
     FConnected : Boolean;
     FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
@@ -284,9 +283,6 @@ begin
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
 
-  FmemStream := TMemoryStream.Create;
-  FmemStream.SetSize(50*1024*1024); // not used but needed for the stream out
-
   LoadAudioInputsMenu;
 end;
 
@@ -295,7 +291,6 @@ begin
   UserInterfaceUpdateTimer.Enabled := False;
 
   FreeAndNil(FSettings);
-  FreeAndNil(FmemStream);
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
 end;
@@ -312,10 +307,11 @@ begin
  // OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
   if FTextToSpeechEngines.ActiveEngine.Mode = mpStopped then
   begin
-    if StreamOut1.Status <> tosPlaying then
+    if NULLOut.Status <> tosPlaying then
     begin
-      StreamOut1.Run;
+      NULLOut.Run;
     end;
+
     Listen;
   end;
   if FTextToSpeechEngines.ActiveEngine.Mode = mpPlaying then
@@ -350,7 +346,7 @@ begin
   msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
   if msg.TryGetValue('message_type', Value) then
   begin
-    if (value = 'FinalTranscript') and (msg.Values['text'].Value<>'') and
+    if (value = 'FinalTranscript') and (msg.Values['text'].Value <> '') and
       (FTextToSpeechEngines.ActiveEngine.Mode <> mpPlaying) then
     begin
        question := msg.Values['text'].Value;
@@ -359,8 +355,7 @@ begin
        response := TOpenAI.AskChatGPT(question, 'text-davinci-003');
        mmoAnswers.Lines.Text := response;
        mmoAnswers.Update;
-       StreamOut1.Stop(False);
-       FmemStream.Clear;
+       NULLOut.Stop(False);
        Sleep(100);
        Speak;
        FTextToSpeechEngines.ActiveEngine.PlayText(response);
@@ -393,10 +388,9 @@ end;
 
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
-  StreamOut1.Stream := FmemStream;
   FSpeechRecognitionEngines.ActiveEngine.Resume;
   Sleep(100);
-  StreamOut1.Run;
+  NULLOut.Run;
   Listen;
   UserInterfaceUpdateTimer.Enabled := True;
 end;
@@ -405,7 +399,7 @@ procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   FSpeechRecognitionEngines.ActiveEngine.Finish;
   VirtualImage1.ImageIndex := -1;
-  StreamOut1.Stop(False);
+  NULLOut.Stop(False);
   UserInterfaceUpdateTimer.Enabled := False;
 end;
 

@@ -142,11 +142,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Left = 272
     Top = 64
   end
-  object StreamOut1: TStreamOut
-    Input = AudioProcessor1
-    Left = 280
-    Top = 224
-  end
   object sgcWebSocketClient1: TsgcWebSocketClient
     Host = 'api.deepgram.com'
     Port = 443
@@ -475,5 +470,10 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     DataSet = tblConversation
     Left = 144
     Top = 368
+  end
+  object NULLOut: TNULLOut
+    Input = AudioProcessor1
+    Left = 400
+    Top = 336
   end
 end
