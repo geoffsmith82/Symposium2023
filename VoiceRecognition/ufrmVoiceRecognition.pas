@@ -26,6 +26,7 @@ uses
   Vcl.VirtualImage,
   Vcl.DBCGrids,
   Vcl.DBCtrls,
+  Vcl.DBGrids,
   Vcl.Grids,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
@@ -343,7 +344,6 @@ end;
 procedure TfrmVoiceRecognition.OnHandleSpeechRecognitionCompletion(const Text: string);
 var
   question : string;
-  response : string;
   ChatMessages: TObjectList<TChatMessage>;
   ChatResponse: TChatResponse;
   chat : TChatMessage;
@@ -359,7 +359,7 @@ begin
        SessionID := tblConversation.FieldByName('SessionID').AsLargeInt;
 
        tblConversation.Append;
-       tblConversation.FieldByName('User').AsString := 'user';
+       tblConversation.FieldByName('User').AsString := 'User';
        tblConversation.FieldByName('Message').AsString := question;
        tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
        tblConversation.Post;
@@ -390,14 +390,13 @@ begin
        tblConversation.EnableControls;
      end;
    finally
-//     FreeAndNil(ChatMessages);
+     FreeAndNil(ChatMessages);
    end;
-   mmoAnswers.Lines.Text := response;
+   mmoAnswers.Lines.Text := ChatResponse.Content;
    mmoAnswers.Update;
    NULLOut.Stop(False);
-//   Sleep(100);
    Speak;
-   FTextToSpeechEngines.ActiveEngine.PlayText(response);
+   FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content);
 end;
 
 
