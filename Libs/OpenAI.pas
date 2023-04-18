@@ -122,41 +122,43 @@ var
   url: string;
   json: TJSONObject;
 begin
+  LClient := nil;
+  LRequest := nil;
+  LResponse := nil;
+  json := nil;
   LClient := TRESTClient.Create(nil);
   LClient.ReadTimeout := 60000;
   try
     LRequest := TRESTRequest.Create(nil);
+    url := 'https://api.openai.com/v1/images/generations';
+    LClient.BaseURL := url;
+    LRequest.Client := LClient;
+    LRequest.Method := rmPOST;
+    LRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+
+    json := TJSONObject.Create;
     try
-      url := 'https://api.openai.com/v1/images/generations';
-      LClient.BaseURL := url;
-      LRequest.Client := LClient;
-      LRequest.Method := rmPOST;
-      LRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-
-      json := TJSONObject.Create;
-      try
-        json.AddPair('prompt', TJSONString.Create(prompt));
-        json.AddPair('n', TJSONNumber.Create(n));
-        case size of
-          DALLE256: json.AddPair('size', '256x256');
-          DALLE512: json.AddPair('size', '512x512');
-          DALLE1024: json.AddPair('size', '1024x1024');
-        end;
-        LRequest.AddBody(json.ToString, ctAPPLICATION_JSON);
-      finally
-        FreeAndNil(json);
+      json.AddPair('prompt', TJSONString.Create(prompt));
+      json.AddPair('n', TJSONNumber.Create(n));
+      case size of
+        DALLE256: json.AddPair('size', '256x256');
+        DALLE512: json.AddPair('size', '512x512');
+        DALLE1024: json.AddPair('size', '1024x1024');
       end;
-
-      LResponse := TRESTResponse.Create(nil);
-      LResponse.ContentType := 'application/json';
-      LRequest.Response := LResponse;
-      LRequest.Execute;
-      Result := TGeneratedImagesClass.FromJsonString(LResponse.Content);
+      LRequest.AddBody(json.ToString, ctAPPLICATION_JSON);
     finally
-      LRequest.Free;
+      FreeAndNil(json);
     end;
+
+    LResponse := TRESTResponse.Create(nil);
+    LResponse.ContentType := 'application/json';
+    LRequest.Response := LResponse;
+    LRequest.Execute;
+    Result := TGeneratedImagesClass.FromJsonString(LResponse.Content);
   finally
-    LClient.Free;
+    FreeAndNil(LRequest);
+    FreeAndNil(LResponse);
+    FreeAndNil(LClient);
   end;
 end;
 
