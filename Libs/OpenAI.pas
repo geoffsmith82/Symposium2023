@@ -63,7 +63,7 @@ begin
     RESTRequest.Client := RESTClient;
     RESTRequest.Response := RESTResponse;
     RESTRequest.Method := TRESTRequestMethod.rmPOST;
-    RESTRequest.Timeout := 10000; // Set the timeout as needed
+    RESTRequest.Timeout := 60000; // Set the timeout as needed
     RESTRequest.Resource := '';
     RESTRequest.Params.AddItem('Authorization', 'Bearer ' + APIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     RESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
