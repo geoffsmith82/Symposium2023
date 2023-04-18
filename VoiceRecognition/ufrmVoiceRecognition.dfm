@@ -19,7 +19,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 704
+    Left = 700
     Top = 47
     Width = 82
     Height = 73
@@ -55,6 +55,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     PanelWidth = 136
     TabOrder = 2
     RowCount = 7
+    ExplicitHeight = 382
     object DBText1: TDBText
       AlignWithMargins = True
       Left = 3
@@ -113,14 +114,13 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   object sgConversationGrid: TStringGrid
     Left = 248
     Top = 56
-    Width = 440
+    Width = 436
     Height = 254
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
     TabOrder = 4
-    Visible = False
-    ExplicitWidth = 436
+    ExplicitWidth = 432
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100
@@ -446,7 +446,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   end
   object tblSessions: TFDTable
     AfterScroll = tblSessionsAfterScroll
-    IndexFieldNames = 'SessionID'
+    IndexName = 'SessionID'
     Connection = FDConnection
     ResourceOptions.AssignedValues = [rvEscapeExpand]
     TableName = 'Sessions'
@@ -454,9 +454,11 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Top = 312
   end
   object tblConversation: TFDTable
+    IndexName = 'SessionID'
     MasterSource = dsSessions
     MasterFields = 'SessionID'
     Connection = FDConnection
+    ResourceOptions.AssignedValues = [rvEscapeExpand]
     TableName = 'Conversation'
     Left = 248
     Top = 368

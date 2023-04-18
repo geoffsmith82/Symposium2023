@@ -183,12 +183,16 @@ var
   i : Integer;
 begin
   i := 0;
+  if not tblConversation.Active then Exit;
+  OutputDebugString(PChar('SessionID: ' + tblSessions.FieldByName('SessionID').AsString));
   tblConversation.First;
   sgConversationGrid.RowCount := tblConversation.RecordCount;
   repeat
+  OutputDebugString(PChar('++SessionID: ' + tblConversation.FieldByName('SessionID').AsString));
     sgConversationGrid.Cells[0, i] := tblConversation.FieldByName('User').AsString;
     sgConversationGrid.Cells[1, i] := tblConversation.FieldByName('Message').AsString;
     sgConversationGrid.RowHeights[i] := 300;
+    Inc(i);
     tblConversation.Next;
   until tblConversation.Eof;
 end;
@@ -277,8 +281,8 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
 
-  tblConversation.Active := True;
   tblSessions.Active := True;
+  tblConversation.Active := True;
 
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
@@ -340,14 +344,58 @@ procedure TfrmVoiceRecognition.OnHandleSpeechRecognitionCompletion(const Text: s
 var
   question : string;
   response : string;
+  ChatMessages: TObjectList<TChatMessage>;
+  ChatResponse: TChatResponse;
+  chat : TChatMessage;
+  SessionID : Int64;
 begin
    question := Text;
    mmoQuestions.Lines.Add(question);
-   response := TOpenAI.AskChatGPT(Text, 'text-davinci-003');
+//   response := TOpenAI.AskChatGPT(Text, 'text-davinci-003');
+   ChatMessages := TObjectList<TChatMessage>.Create(True);
+   try
+     tblConversation.DisableControls;
+     try
+       SessionID := tblConversation.FieldByName('SessionID').AsLargeInt;
+
+       tblConversation.Append;
+       tblConversation.FieldByName('User').AsString := 'user';
+       tblConversation.FieldByName('Message').AsString := question;
+       tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
+       tblConversation.Post;
+
+       tblConversation.First;
+       repeat
+         chat := TChatMessage.Create;
+         chat.Role := tblConversation.FieldByName('User').AsString;
+         chat.Content := tblConversation.FieldByName('Message').AsString;
+         ChatMessages.Add(chat);
+         tblConversation.Next;
+       until tblConversation.Eof;
+
+       ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, ChatMessages);
+       tblConversation.Append;
+       try
+         tblConversation.FieldByName('User').AsString := 'Assistant';
+         tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
+         tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
+         tblConversation.Post;
+       except
+         on e : Exception do
+         begin
+
+         end;
+       end;
+     finally
+       tblConversation.EnableControls;
+     end;
+   finally
+//     FreeAndNil(ChatMessages);
+   end;
    mmoAnswers.Lines.Text := response;
    mmoAnswers.Update;
    NULLOut.Stop(False);
-   Sleep(100);
+//   Sleep(100);
    Speak;
    FTextToSpeechEngines.ActiveEngine.PlayText(response);
 end;

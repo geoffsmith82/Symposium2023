@@ -14,8 +14,23 @@ uses
 type
   TDALLESize = (DALLE256, DALLE512, DALLE1024);
 
+  TChatMessage = class
+    Role: string;
+    Content: string;
+  end;
+
+  TChatResponse = record
+    Content : string;
+    Completion_Tokens : Cardinal;
+    Prompt_Tokens : Cardinal;
+    Total_Tokens : Cardinal;
+  end;
+
+  PChatMessage = ^TChatMessage;
+
   TOpenAI = class
   public
+    class function SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
   end;
@@ -23,6 +38,81 @@ type
 implementation
 
 {$I APIKEY.INC}
+
+class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse;
+var
+  RESTClient: TRESTClient;
+  RESTRequest: TRESTRequest;
+  RESTResponse: TRESTResponse;
+  JSONBody: TJSONObject;
+  JSONMessages: TJSONArray;
+  JSONMsg : TJSONObject;
+  Message: TChatMessage;
+begin
+  Result.Content := '';
+  Result.Completion_Tokens := 0;
+  Result.Prompt_Tokens := 0;
+  Result.Total_Tokens := 0;
+  RESTClient := TRESTClient.Create(nil);
+  RESTRequest := TRESTRequest.Create(nil);
+  RESTResponse := TRESTResponse.Create(nil);
+  try
+    RESTClient.BaseURL := 'https://api.openai.com/v1/chat/completions';
+    RESTClient.Accept := 'application/json';
+    RESTClient.AcceptCharset := 'UTF-8';
+    RESTRequest.Client := RESTClient;
+    RESTRequest.Response := RESTResponse;
+    RESTRequest.Method := TRESTRequestMethod.rmPOST;
+    RESTRequest.Timeout := 10000; // Set the timeout as needed
+    RESTRequest.Resource := '';
+    RESTRequest.Params.AddItem('Authorization', 'Bearer ' + APIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    RESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    JSONBody := TJSONObject.Create;
+    JSONMessages := TJSONArray.Create;
+    try
+      for Message in Messages do
+      begin
+        JSONMsg := TJSONObject.Create;
+        JSONMsg.AddPair('role', Message.Role.ToLower);
+        JSONMsg.AddPair('content', Message.Content);
+        JSONMessages.AddElement(JSONMsg);
+      end;
+
+
+      JSONBody.AddPair('model', 'gpt-3.5-turbo');
+      JSONBody.AddPair('messages', JSONMessages);
+//      JSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
+//      JSONBody.AddPair('n', TJSONNumber.Create(1));
+      RESTRequest.AddBody(JSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
+      RESTRequest.Execute;
+      if RESTResponse.StatusCode = 200 then
+      begin
+        var jsonResponse := TJSONObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
+        try
+          var choices := jsonResponse.GetValue<TJSONArray>('choices');
+          var usage := jsonResponse.GetValue<TJSONObject>('usage');
+          usage.TryGetValue('completion_tokens', Result.Completion_Tokens);
+          usage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
+          usage.TryGetValue('total_tokens', Result.Total_Tokens);
+          var choice := choices.Items[0] as TJSONObject;
+          Result.Content := choice.GetValue('message').GetValue<string>('content');
+        finally
+          FreeAndNil(jsonResponse);
+        end;
+      end
+      else
+      begin
+        raise Exception.CreateFmt('Error: %d - %s', [RESTResponse.StatusCode, RESTResponse.StatusText]);
+      end;
+    finally
+      FreeAndNil(JSONBody);
+    end;
+  finally
+    FreeAndNil(RESTClient);
+    FreeAndNil(RESTRequest);
+    FreeAndNil(RESTResponse);
+  end;
+end;
 
 class function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
 var
