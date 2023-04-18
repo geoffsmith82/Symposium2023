@@ -140,7 +140,7 @@ type
 
     procedure LoadAudioInputsMenu;
 
-    procedure OnHandleMessage(const Text: string);
+    procedure OnHandleSpeechRecognitionCompletion(const Text: string);
     procedure OnHandleConnect(Connection: TsgcWSConnection);
     procedure OnHandleDisconnect(Connection: TsgcWSConnection);
     procedure SetupTextToSpeechEngines;
@@ -253,13 +253,13 @@ var
   lDeepGram : TDeepGramRecognition;
 begin
   lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key,'','');
-  lAssemblyAi.OnHandleMessage := OnHandleMessage;
+  lAssemblyAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lAssemblyAi.OnConnect := OnHandleConnect;
   lAssemblyAi.OnDisconnect := OnHandleDisconnect;
   FSpeechRecognitionEngines.RegisterEngine(lAssemblyAi, miAssemblyAI);
 
   lDeepGram := TDeepGramRecognition.Create(deepgram_key,'','');
-  lDeepGram.OnHandleMessage := OnHandleMessage;
+  lDeepGram.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lDeepGram.OnConnect := OnHandleConnect;
   lDeepGram.OnDisconnect := OnHandleDisconnect;
   FSpeechRecognitionEngines.RegisterEngine(lDeepGram, miDeepGram);
@@ -336,31 +336,20 @@ begin
   FConnected := False;
 end;
 
-procedure TfrmVoiceRecognition.OnHandleMessage(const Text: string);
+procedure TfrmVoiceRecognition.OnHandleSpeechRecognitionCompletion(const Text: string);
 var
-  msg : TJSONObject;
-  value : string;
-  response : string;
   question : string;
+  response : string;
 begin
-  msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
-  if msg.TryGetValue('message_type', Value) then
-  begin
-    if (value = 'FinalTranscript') and (msg.Values['text'].Value <> '') and
-      (FTextToSpeechEngines.ActiveEngine.Mode <> mpPlaying) then
-    begin
-       question := msg.Values['text'].Value;
-       mmoQuestions.Lines.Add(question);
-
-       response := TOpenAI.AskChatGPT(question, 'text-davinci-003');
-       mmoAnswers.Lines.Text := response;
-       mmoAnswers.Update;
-       NULLOut.Stop(False);
-       Sleep(100);
-       Speak;
-       FTextToSpeechEngines.ActiveEngine.PlayText(response);
-    end;
-  end;
+   question := Text;
+   mmoQuestions.Lines.Add(question);
+   response := TOpenAI.AskChatGPT(Text, 'text-davinci-003');
+   mmoAnswers.Lines.Text := response;
+   mmoAnswers.Update;
+   NULLOut.Stop(False);
+   Sleep(100);
+   Speak;
+   FTextToSpeechEngines.ActiveEngine.PlayText(response);
 end;
 
 

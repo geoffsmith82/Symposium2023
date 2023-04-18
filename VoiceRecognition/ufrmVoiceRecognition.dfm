@@ -19,7 +19,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     424)
   TextHeight = 13
   object VirtualImage1: TVirtualImage
-    Left = 708
+    Left = 704
     Top = 47
     Width = 82
     Height = 73
@@ -47,20 +47,19 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   object DBCtrlGrid1: TDBCtrlGrid
     Left = 0
     Top = 41
-    Width = 225
+    Width = 153
     Height = 383
     Align = alLeft
     DataSource = dsSessions
     PanelHeight = 54
-    PanelWidth = 208
+    PanelWidth = 136
     TabOrder = 2
     RowCount = 7
-    ExplicitHeight = 382
     object DBText1: TDBText
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 202
+      Width = 130
       Height = 25
       Align = alTop
       DataField = 'CreationTime'
@@ -114,13 +113,14 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   object sgConversationGrid: TStringGrid
     Left = 248
     Top = 56
-    Width = 444
+    Width = 440
     Height = 254
     Anchors = [akLeft, akTop, akRight]
     ColCount = 2
     FixedCols = 0
     TabOrder = 4
-    ExplicitWidth = 440
+    Visible = False
+    ExplicitWidth = 436
   end
   object DXAudioIn1: TDXAudioIn
     Latency = 100

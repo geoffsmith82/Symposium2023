@@ -23,13 +23,10 @@ uses
   ;
 
 type
-  TOnHandleMessage = procedure(const msg: string) of object;
-  TOnConnect = procedure(Connection: TsgcWSConnection) of object;
-
-  TAssemblyAiSendThread = class(TThread)
+  TAssemblyAiSendThread = class(TBaseSendThread)
   private
     FAssemblyai_key : string;
-    FQueueItems : TThreadedQueue<TMemoryStream>;
+    sgcWebSocketClient1 : TsgcWebSocketClient;
 
     procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
@@ -37,37 +34,18 @@ type
     procedure sgOnDisconnect(Connection: TsgcWSConnection; Code: Integer);
     function Base64EncodedStream(fs: TStream): string;
   public
+    procedure WriteData(data: string); override;
     procedure Execute; override;
-    procedure Add(ms: TMemoryStream);
     constructor Create(CreateSuspended: Boolean; const assemblyai_key: string);
     destructor Destroy; override;
-  public
-    sgcWebSocketClient1 : TsgcWebSocketClient;
-    OnHandleMessage: TOnHandleMessage;
-    OnConnect: TOnConnect;
-    OnDisconnect: TOnConnect;
   end;
 
   TAssemblyAiRecognition = class(TBaseSpeechRecognition)
-  strict private
-    FSendThread : TAssemblyAiSendThread;
-  private
-    function GetOnHandleMessage: TOnHandleMessage;
-    procedure SetOnConnect(const Value: TOnConnect);
-    procedure SetOnDisconnect(const Value: TOnConnect);
-    procedure SetOnHandleMessage(const Value: TOnHandleMessage);
-    function GetOnConnect: TOnConnect;
-    function GetOnDisconnect: TOnConnect;
   public
     constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
     destructor Destroy; override;
-    procedure Add(ms: TMemoryStream); override;
     procedure Resume; override;
     procedure Finish; override;
-  published
-    property OnHandleMessage: TOnHandleMessage read GetOnHandleMessage write SetOnHandleMessage;
-    property OnConnect: TOnConnect read GetOnConnect write SetOnConnect;
-    property OnDisconnect: TOnConnect read GetOnDisconnect write SetOnDisconnect;
   end;
 
 
@@ -75,6 +53,11 @@ implementation
 
 
 { TTSendThread }
+
+procedure TAssemblyAiSendThread.WriteData(data: string);
+begin
+  sgcWebSocketClient1.WriteData(data);
+end;
 
 procedure TAssemblyAiSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
 begin
@@ -87,13 +70,16 @@ begin
   var
     msg : TJSONObject;
     value : string;
+    finalText : string;
   begin
     msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
     if msg.TryGetValue('message_type', Value) then
     begin
-      if Assigned(OnHandleMessage) then
+      if (value = 'FinalTranscript') and (msg.Values['text'].Value <> '') and
+        Assigned(OnHandleSpeechRecognitionCompletion) then
       begin
-        OnHandleMessage(Text);
+        finalText := msg.Values['text'].Value;
+        OnHandleSpeechRecognitionCompletion(finalText);
       end;
     end;
   end);
@@ -121,11 +107,6 @@ begin
   end);
 end;
 
-procedure TAssemblyAiSendThread.Add(ms: TMemoryStream);
-begin
-  FQueueItems.PushItem(ms);
-end;
-
 function TAssemblyAiSendThread.Base64EncodedStream(fs: TStream): string;
 var
   mem : TStringStream;
@@ -147,12 +128,10 @@ constructor TAssemblyAiSendThread.Create(CreateSuspended: Boolean; const assembl
 begin
   inherited Create(CreateSuspended);
   FAssemblyai_key := assemblyai_key;
-  FQueueItems := TThreadedQueue<TMemoryStream>.Create;
 end;
 
 destructor TAssemblyAiSendThread.Destroy;
 begin
-  FreeAndNil(FQueueItems);
   inherited;
 end;
 
@@ -215,12 +194,6 @@ end;
 
 { TAssemblyAiRecognition }
 
-procedure TAssemblyAiRecognition.Add(ms: TMemoryStream);
-begin
-  inherited;
-  FSendThread.Add(ms);
-end;
-
 constructor TAssemblyAiRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
@@ -240,24 +213,10 @@ begin
   inherited;
   TThread.Synchronize(FSendThread, procedure
   begin
-    FSendThread.sgcWebSocketClient1.WriteData('{ "terminate_session": True }');
+    FSendThread.WriteData('{ "terminate_session": True }');
   end);
 end;
 
-function TAssemblyAiRecognition.GetOnConnect: TOnConnect;
-begin
-  Result := FSendThread.OnConnect;
-end;
-
-function TAssemblyAiRecognition.GetOnDisconnect: TOnConnect;
-begin
-  Result := FSendThread.OnDisconnect;
-end;
-
-function TAssemblyAiRecognition.GetOnHandleMessage: TOnHandleMessage;
-begin
-  Result := FSendThread.OnHandleMessage;
-end;
 
 procedure TAssemblyAiRecognition.Resume;
 begin
@@ -265,19 +224,5 @@ begin
   FSendThread.Resume;
 end;
 
-procedure TAssemblyAiRecognition.SetOnConnect(const Value: TOnConnect);
-begin
-  FSendThread.OnConnect := Value;;
-end;
-
-procedure TAssemblyAiRecognition.SetOnDisconnect(const Value: TOnConnect);
-begin
-  FSendThread.OnDisconnect := Value;
-end;
-
-procedure TAssemblyAiRecognition.SetOnHandleMessage(const Value: TOnHandleMessage);
-begin
-  FSendThread.OnHandleMessage := Value;
-end;
 
 end.
