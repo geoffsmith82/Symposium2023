@@ -34,8 +34,9 @@ type
     procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
     procedure sgOnConnect(Connection: TsgcWSConnection);
   public
+    procedure WriteData(data: string); override;
     procedure Execute; override;
-    constructor Create(CreateSuspended: Boolean; const deepgram_key: string);
+    constructor Create(CreateSuspended: Boolean; const deepgram_key: string); reintroduce;
   end;
 
   TDeepGramRecognition = class(TBaseSpeechRecognition)
@@ -112,6 +113,11 @@ constructor TDeepGramSendThread.Create(CreateSuspended: Boolean; const deepgram_
 begin
   inherited Create(CreateSuspended);
   FDeepGram_Key := deepgram_key;
+end;
+
+procedure TDeepGramSendThread.WriteData(data: string);
+begin
+  sgcWebSocketClient1.WriteData(data);
 end;
 
 procedure TDeepGramSendThread.Execute;

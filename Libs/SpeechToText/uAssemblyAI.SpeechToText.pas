@@ -36,7 +36,7 @@ type
   public
     procedure WriteData(data: string); override;
     procedure Execute; override;
-    constructor Create(CreateSuspended: Boolean; const assemblyai_key: string);
+    constructor Create(CreateSuspended: Boolean; const assemblyai_key: string); reintroduce;
     destructor Destroy; override;
   end;
 
