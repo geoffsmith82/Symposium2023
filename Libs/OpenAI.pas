@@ -33,11 +33,15 @@ type
     class function SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
+    class function Embeddings(const Texts: TArray<string>): TArray<TArray<Double>>; static;
   end;
 
 implementation
 
 {$I APIKEY.INC}
+
+const
+  API_URL = 'https://api.openai.com/v1/embeddings';
 
 class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse;
 var
@@ -224,6 +228,66 @@ begin
     FreeAndNil(LRequest);
     FreeAndNil(LClient);
     FreeAndNil(LJsonPostData);
+  end;
+end;
+
+class function TOpenAI.Embeddings(const Texts: TArray<string>): TArray<TArray<Double>>;
+var
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJsonRequest: TJSONArray;
+  LDataArray, LEmbeddingArray: TJSONArray;
+  LJsonResponse : TJSONObject;
+  LJson: TJSONObject;
+  I, J: Integer;
+begin
+  LRestClient := TRESTClient.Create(API_URL);
+  LRestRequest := TRESTRequest.Create(nil);
+  LRestResponse := TRESTResponse.Create(nil);
+
+  try
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Response := LRestResponse;
+    LRestRequest.Method := TRESTRequestMethod.rmPOST;
+
+    LJsonRequest := TJSONArray.Create;
+    for I := 0 to High(Texts) do
+      LJsonRequest.AddElement(TJSONString.Create(Texts[I]));
+
+    LJson := TJSONObject.Create;
+    LJson.AddPair('input', LJsonRequest);
+
+    LJson.AddPair('model', 'text-embedding-ada-002');
+
+    LRestRequest.AddBody(LJson.ToString, TRESTContentType.ctAPPLICATION_JSON);
+    LRestRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRestRequest.Execute;
+
+    if LRestResponse.StatusCode = 200 then
+    begin
+      LJsonResponse := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
+      LDataArray := LJsonResponse.GetValue<TJSONArray>('data');
+      SetLength(Result, LDataArray.Count);
+
+      for I := 0 to LDataArray.Count - 1 do
+      begin
+        LEmbeddingArray := LDataArray.Items[I].GetValue<TJSONArray>('embedding');
+        SetLength(Result[I], LEmbeddingArray.Count);
+        for J := 0 to LEmbeddingArray.Count - 1 do
+          Result[I][J] := (LEmbeddingArray.Items[J] as TJSONNumber).AsDouble;
+      end;
+
+      FreeAndNil(LJsonResponse);
+    end
+    else
+      raise Exception.CreateFmt('Error: %d - %s', [LRestResponse.StatusCode, LRestResponse.StatusText]);
+
+
+  finally
+    FreeAndNil(LJson);
+    FreeAndNil(LRestRequest);
+    FreeAndNil(LRestClient);
   end;
 end;
 
