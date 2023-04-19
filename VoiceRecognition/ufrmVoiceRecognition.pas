@@ -19,6 +19,7 @@ uses
   Vcl.MPlayer,
   Vcl.Graphics,
   Vcl.Controls,
+  Vcl.ComCtrls,
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.BaseImageCollection,
@@ -74,7 +75,12 @@ uses
   uAssemblyAI.SpeechToText,
   uDeepGram.SpeechToText,
   uBaseSpeechRecognition,
-  uEngineManager
+  uEngineManager,
+  AdvUtil,
+  AdvObj,
+  BaseGrid,
+  AdvGrid,
+  DBAdvGrid
   ;
 
 type
@@ -102,7 +108,6 @@ type
     miWindowsSpeechEngine: TMenuItem;
     UserInterfaceUpdateTimer: TTimer;
     miAudioInput: TMenuItem;
-    VirtualImage1: TVirtualImage;
     ImageCollection1: TImageCollection;
     miSpeechRecognitionEngine: TMenuItem;
     miDeepGram: TMenuItem;
@@ -118,8 +123,11 @@ type
     btnStart: TButton;
     btnStop: TButton;
     DBText1: TDBText;
-    sgConversationGrid: TStringGrid;
     NULLOut: TNULLOut;
+    StatusBar: TStatusBar;
+    DBAdvGrid1: TDBAdvGrid;
+    Panel1: TPanel;
+    VirtualImage1: TVirtualImage;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -132,6 +140,7 @@ type
     procedure btnNewChatSessionClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure tblSessionsAfterScroll(DataSet: TDataSet);
+    procedure DBCtrlGrid1Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -180,28 +189,14 @@ begin
 end;
 
 procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
-var
-  i : Integer;
 begin
-  i := 0;
-  if not tblConversation.Active then Exit;
-  OutputDebugString(PChar('SessionID: ' + tblSessions.FieldByName('SessionID').AsString));
-  tblConversation.First;
-  sgConversationGrid.RowCount := tblConversation.RecordCount;
-  repeat
-  OutputDebugString(PChar('++SessionID: ' + tblConversation.FieldByName('SessionID').AsString));
-    sgConversationGrid.Cells[0, i] := tblConversation.FieldByName('User').AsString;
-    sgConversationGrid.Cells[1, i] := tblConversation.FieldByName('Message').AsString;
-    sgConversationGrid.RowHeights[i] := 300;
-    Inc(i);
-    tblConversation.Next;
-  until tblConversation.Eof;
+  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.Listen;
 begin
   if FConnected then
-  begin  
+  begin
     VirtualImage1.ImageIndex := 0;
   end
   else
@@ -287,8 +282,8 @@ begin
 
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
-
   LoadAudioInputsMenu;
+  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
@@ -303,8 +298,8 @@ end;
 
 procedure TfrmVoiceRecognition.FormResize(Sender: TObject);
 begin
-  sgConversationGrid.ColWidths[0] := 150;
-  sgConversationGrid.ColWidths[1] := sgConversationGrid.ClientWidth - 200;
+  DBAdvGrid1.ColWidths[0] := 150;
+  DBAdvGrid1.ColWidths[1] := DBAdvGrid1.ClientWidth - 150;
 end;
 
 procedure TfrmVoiceRecognition.UserInterfaceUpdateTimerTimer(Sender: TObject);
@@ -321,11 +316,11 @@ begin
   end;
   if FTextToSpeechEngines.ActiveEngine.Mode = mpPlaying then
   begin
-  
+
   end
   else
   begin
-    Listen;  
+    Listen;
   end;
 end;
 
@@ -348,6 +343,7 @@ var
   ChatResponse: TChatResponse;
   chat : TChatMessage;
   SessionID : Int64;
+  embedding: TArray<string>;
 begin
    question := Text;
    mmoQuestions.Lines.Add(question);
@@ -356,7 +352,7 @@ begin
    try
      tblConversation.DisableControls;
      try
-       SessionID := tblConversation.FieldByName('SessionID').AsLargeInt;
+       SessionID := tblSessions.FieldByName('SessionID').AsLargeInt;
 
        tblConversation.Append;
        tblConversation.FieldByName('User').AsString := 'User';
@@ -376,8 +372,14 @@ begin
        ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, ChatMessages);
        tblConversation.Append;
        try
+         tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
          tblConversation.FieldByName('User').AsString := 'Assistant';
          tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
+         setlength(embedding, 2);
+         embedding[0] := question;
+         embedding[1] := ChatResponse.Content;
+         TOpenAI.Embeddings(embedding);
+
          tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
          tblConversation.Post;
        except
@@ -437,6 +439,12 @@ begin
   VirtualImage1.ImageIndex := -1;
   NULLOut.Stop(False);
   UserInterfaceUpdateTimer.Enabled := False;
+end;
+
+
+procedure TfrmVoiceRecognition.DBCtrlGrid1Click(Sender: TObject);
+begin
+  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);
