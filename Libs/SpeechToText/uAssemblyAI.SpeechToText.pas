@@ -12,27 +12,20 @@ uses
   System.IniFiles,
   System.JSON,
   System.SyncObjs,
-  sgcBase_Classes,
-  sgcSocket_Classes,
-  sgcTCP_Classes,
-  sgcWebSocket_Classes,
-  sgcWebSocket_Classes_Indy,
-  sgcWebSocket_Client,
-  sgcWebSocket,
+  OverbyteIcsWebSocketCli,
   uBaseSpeechRecognition
   ;
 
 type
   TAssemblyAiSendThread = class(TBaseSendThread)
-  private
+  strict private
     FAssemblyai_key : string;
-    sgcWebSocketClient1 : TsgcWebSocketClient;
-
-    procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-    procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-    procedure sgOnConnect(Connection: TsgcWSConnection);
-    procedure sgOnDisconnect(Connection: TsgcWSConnection; Code: Integer);
+    FWebSocket : TSslWebSocketCli;
     function Base64EncodedStream(fs: TStream): string;
+    procedure WSOnRecv(Sender: TSslWebSocketCli; const APacket: String; var AFrame: TWebSocketReceivedFrame);
+    procedure WSOnConnected(Sender: TObject);
+    procedure WSOnDisconnected(Sender: TObject);
+    procedure WSOnSent(Sender: TSslWebSocketCli; var AFrame: TWebSocketOutgoingFrame);
   public
     procedure WriteData(data: string); override;
     procedure Execute; override;
@@ -56,53 +49,27 @@ implementation
 
 procedure TAssemblyAiSendThread.WriteData(data: string);
 begin
-  sgcWebSocketClient1.WriteData(data);
+   FWebSocket.WSSendText(nil, data);
 end;
 
-procedure TAssemblyAiSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-begin
-  Headers.Add('Authorization: ' + FAssemblyai_key);
-end;
-
-procedure TAssemblyAiSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-begin
-  TThread.Queue(nil, procedure()
-  var
-    msg : TJSONObject;
-    value : string;
-    finalText : string;
-  begin
-    msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
-    if msg.TryGetValue('message_type', Value) then
-    begin
-      if (value = 'FinalTranscript') and (msg.Values['text'].Value <> '') and
-        Assigned(OnHandleSpeechRecognitionCompletion) then
-      begin
-        finalText := msg.Values['text'].Value;
-        OnHandleSpeechRecognitionCompletion(finalText);
-      end;
-    end;
-  end);
-end;
-
-procedure TAssemblyAiSendThread.sgOnConnect(Connection: TsgcWSConnection);
+procedure TAssemblyAiSendThread.WSOnConnected(Sender: TObject);
 begin
   TThread.Queue(nil, procedure()
   begin
     if Assigned(OnConnect) then
     begin
-      OnConnect(Connection);
+      OnConnect(Sender);
     end;    
   end);
 end;
 
-procedure TAssemblyAiSendThread.sgOnDisconnect(Connection: TsgcWSConnection; Code: Integer);
+procedure TAssemblyAiSendThread.WSOnDisconnected(Sender: TObject);
 begin
   TThread.Queue(nil, procedure
   begin
     if Assigned(OnDisconnect) then
     begin
-      OnDisconnect(Connection);
+      OnDisconnect(Sender);
     end;
   end);
 end;
@@ -135,6 +102,32 @@ begin
   inherited;
 end;
 
+procedure TAssemblyAiSendThread.WSOnSent(Sender: TSslWebSocketCli; var AFrame: TWebSocketOutgoingFrame);
+begin
+  OutputDebugString(PChar('Sent'));
+end;
+
+procedure TAssemblyAiSendThread.WSOnRecv(Sender: TSslWebSocketCli; const APacket: String; var AFrame: TWebSocketReceivedFrame);
+begin
+  TThread.Queue(nil, procedure()
+  var
+    msg : TJSONObject;
+    value : string;
+    finalText : string;
+  begin
+    msg := TJSONObject.ParseJSONValue(APacket) as TJSONObject;
+    if msg.TryGetValue('message_type', Value) then
+    begin
+      if (value = 'FinalTranscript') and (msg.Values['text'].Value <> '') and
+        Assigned(OnHandleSpeechRecognitionCompletion) then
+      begin
+        finalText := msg.Values['text'].Value;
+        OnHandleSpeechRecognitionCompletion(finalText);
+      end;
+    end;
+  end);
+end;
+
 procedure TAssemblyAiSendThread.Execute;
 var
   m : TMemoryStream;
@@ -142,19 +135,20 @@ var
   msg : TJSONObject;
 begin
   inherited;
-  sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
+  NameThreadForDebugging('Assembly.Ai');
+  FWebSocket := TSslWebSocketCli.Create(nil);
   try
-    sgcWebSocketClient1.URL := 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
-    sgcWebSocketClient1.Proxy.Host := 'localhost';
-    sgcWebSocketClient1.Proxy.Port := 8888;
-    sgcWebSocketClient1.Proxy.Enabled := True;
-    sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
-    sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
-    sgcWebSocketClient1.OnConnect := sgOnConnect;
-    sgcWebSocketClient1.OnDisconnect := sgOnDisconnect;
-    sgcWebSocketClient1.Connect;
-
-
+    FWebSocket.URL := 'https://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
+    FWebSocket.Proxy := 'localhost';
+    FWebSocket.ProxyPort := '8888';
+    FWebSocket.ExtraHeaders.Add('Authorization: ' + FAssemblyai_key);
+    FWebSocket.ExtraHeaders.Add('Origin: api.assemblyai.com');
+    FWebSocket.Connection := 'Upgrade';
+    FWebSocket.OnWSFrameRcvd := WSOnRecv;
+    FWebSocket.OnWSFrameSent := WSOnSent;
+    FWebSocket.OnWSConnected := WSOnConnected;
+    FWebSocket.OnWSDisconnected := WSOnDisconnected;
+    FWebSocket.WSConnect;
 
     mm := TMemoryStream.Create;
     while not Terminated do
@@ -170,12 +164,14 @@ begin
       mm.Position := 0;
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
-        if not sgcWebSocketClient1.Connected then
-          sgcWebSocketClient1.Connect;
+        if not FWebSocket.Connected then
+          FWebSocket.WSConnect;
+
         msg := TJSONObject.Create;
         try
           msg.AddPair('audio_data', Base64EncodedStream(mm));
-          sgcWebSocketClient1.WriteData(msg.ToJson);
+          WriteData(msg.ToJSON);
+          FWebSocket.ProcessMessages;
         finally
           FreeAndNil(msg);
         end;
@@ -187,7 +183,7 @@ begin
     end;
   finally
     FreeAndNil(mm);
-    FreeAndNil(sgcWebSocketClient1);
+    FreeAndNil(FWebSocket);
     FreeAndNil(FQueueItems);
   end;
 end;

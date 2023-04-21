@@ -5,19 +5,12 @@ interface
 uses
   Classes,
   System.SysUtils,
-  System.Generics.Collections,
-  sgcBase_Classes,
-  sgcSocket_Classes,
-  sgcTCP_Classes,
-  sgcWebSocket_Classes,
-  sgcWebSocket_Classes_Indy,
-  sgcWebSocket_Client,
-  sgcWebSocket
+  System.Generics.Collections
   ;
 
 type
   TOnHandleMessage = procedure(const msg: string) of object;
-  TOnConnect = procedure(Connection: TsgcWSConnection) of object;
+  TOnConnect = procedure(Sender: TObject) of object;
 
 type
   TBaseSendThread = class(TThread)
@@ -29,6 +22,7 @@ type
     OnDisconnect: TOnConnect;
     procedure Add(ms: TMemoryStream);
     procedure WriteData(data: string); virtual; abstract;
+    procedure WriteDataStream(m: TStream); virtual; abstract;
     constructor Create(CreateSuspended: Boolean); virtual;
     destructor Destroy; override;
   end;
@@ -83,7 +77,6 @@ begin
   if Assigned(OnSelectEngine) then
     OnSelectEngine(Self);
 end;
-
 
 function TBaseSpeechRecognition.GetOnConnect: TOnConnect;
 begin

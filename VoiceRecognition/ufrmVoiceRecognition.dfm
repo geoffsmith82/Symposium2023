@@ -42,8 +42,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     RowCount = 7
     OnClick = DBCtrlGrid1Click
     OnDblClick = DBCtrlGrid1Click
-    ExplicitLeft = -104
-    ExplicitTop = -55
+    ExplicitHeight = 350
     object DBText1: TDBText
       AlignWithMargins = True
       Left = 3
@@ -123,8 +122,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     RowCount = 2
     FixedRows = 1
     TabOrder = 5
-    GridLineColor = 13948116
-    GridFixedLineColor = 11250603
     ActiveCellFont.Charset = DEFAULT_CHARSET
     ActiveCellFont.Color = 4474440
     ActiveCellFont.Height = -12
@@ -135,6 +132,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     BorderColor = 11250603
     ControlLook.FixedGradientFrom = clWhite
     ControlLook.FixedGradientTo = clWhite
+    ControlLook.FixedGradientHoverFrom = clGray
     ControlLook.FixedGradientHoverTo = clWhite
     ControlLook.FixedGradientHoverMirrorFrom = clWhite
     ControlLook.FixedGradientHoverMirrorTo = clWhite
@@ -180,7 +178,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     FixedColWidth = 100
     FixedRowHeight = 22
     FixedFont.Charset = DEFAULT_CHARSET
-    FixedFont.Color = 3881787
+    FixedFont.Color = clWindowText
     FixedFont.Height = -11
     FixedFont.Name = 'Segoe UI'
     FixedFont.Style = [fsBold]
@@ -227,6 +225,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     SearchFooter.MatchCaseCaption = 'Match case'
     SearchFooter.ResultFormat = '(%d of %d)'
     SelectionColor = 13744549
+    SelectionTextColor = clWindowText
     SortSettings.HeaderColor = clWhite
     SortSettings.HeaderColorTo = clWhite
     SortSettings.HeaderMirrorColor = clWhite
@@ -504,10 +503,8 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       FF000000}
     ShowMemoFields = True
     ShowUnicode = False
-    ExplicitLeft = 224
-    ExplicitTop = 60
-    ExplicitWidth = 456
-    ExplicitHeight = 317
+    ExplicitWidth = 545
+    ExplicitHeight = 350
     ColWidths = (
       100
       64)
@@ -522,6 +519,8 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Height = 351
     Align = alRight
     TabOrder = 6
+    ExplicitLeft = 698
+    ExplicitHeight = 350
     DesignSize = (
       100
       351)
@@ -557,65 +556,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     OnGetData = AudioProcessor1GetData
     Left = 272
     Top = 64
-  end
-  object sgcWebSocketClient1: TsgcWebSocketClient
-    Host = 'api.deepgram.com'
-    Port = 443
-    ConnectTimeout = 0
-    ReadTimeout = -1
-    WriteTimeout = 0
-    TLS = False
-    Proxy.Enabled = True
-    Proxy.Port = 8080
-    Proxy.ProxyType = pxyHTTP
-    HeartBeat.Enabled = False
-    HeartBeat.Interval = 300
-    HeartBeat.Timeout = 0
-    IPVersion = Id_IPv4
-    Authentication.Enabled = False
-    Authentication.URL.Enabled = True
-    Authentication.Session.Enabled = False
-    Authentication.Basic.Enabled = False
-    Authentication.Token.Enabled = False
-    Authentication.Token.AuthName = 'Bearer'
-    Extensions.DeflateFrame.Enabled = True
-    Extensions.DeflateFrame.WindowBits = 15
-    Extensions.PerMessage_Deflate.Enabled = False
-    Extensions.PerMessage_Deflate.ClientMaxWindowBits = 15
-    Extensions.PerMessage_Deflate.ClientNoContextTakeOver = False
-    Extensions.PerMessage_Deflate.MemLevel = 9
-    Extensions.PerMessage_Deflate.ServerMaxWindowBits = 15
-    Extensions.PerMessage_Deflate.ServerNoContextTakeOver = False
-    Options.CleanDisconnect = False
-    Options.FragmentedMessages = frgOnlyBuffer
-    Options.Parameters = '/'
-    Options.RaiseDisconnectExceptions = True
-    Options.ValidateUTF8 = False
-    Specifications.Drafts.Hixie76 = False
-    Specifications.RFC6455 = True
-    NotifyEvents = neNoSync
-    LogFile.Enabled = False
-    QueueOptions.Binary.Level = qmNone
-    QueueOptions.Ping.Level = qmNone
-    QueueOptions.Text.Level = qmNone
-    WatchDog.Attempts = 0
-    WatchDog.Enabled = False
-    WatchDog.Interval = 10
-    Throttle.BitsPerSec = 0
-    Throttle.Enabled = False
-    LoadBalancer.Enabled = False
-    LoadBalancer.Port = 0
-    TLSOptions.VerifyCertificate = False
-    TLSOptions.VerifyDepth = 0
-    TLSOptions.Version = tlsUndefined
-    TLSOptions.IOHandler = iohOpenSSL
-    TLSOptions.OpenSSL_Options.APIVersion = oslAPI_1_0
-    TLSOptions.OpenSSL_Options.LibPath = oslpNone
-    TLSOptions.OpenSSL_Options.UnixSymLinks = oslsSymLinksDefault
-    TLSOptions.SChannel_Options.CertStoreName = scsnMY
-    TLSOptions.SChannel_Options.CertStorePath = scspStoreCurrentUser
-    Left = 133
-    Top = 203
   end
   object mmMainMenu: TMainMenu
     Left = 488

@@ -47,13 +47,6 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Phys.MSAcc,
   FireDAC.Phys.MSAccDef,
-  sgcBase_Classes,
-  sgcSocket_Classes,
-  sgcTCP_Classes,
-  sgcWebSocket_Classes,
-  sgcWebSocket_Classes_Indy,
-  sgcWebSocket_Client,
-  sgcWebSocket,
   ACS_Classes,
   ACS_DXAudio,
   ACS_Misc,
@@ -87,7 +80,6 @@ type
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
-    sgcWebSocketClient1: TsgcWebSocketClient;
     mmoQuestions: TMemo;
     mmoAnswers: TMemo;
     mmMainMenu: TMainMenu;
@@ -151,14 +143,16 @@ type
     procedure LoadAudioInputsMenu;
 
     procedure OnHandleSpeechRecognitionCompletion(const Text: string);
-    procedure OnHandleConnect(Connection: TsgcWSConnection);
-    procedure OnHandleDisconnect(Connection: TsgcWSConnection);
+    procedure OnHandleConnect(Connection: TObject);
+    procedure OnHandleDisconnect(Connection: TObject);
     procedure SetupTextToSpeechEngines;
     procedure SetupSpeechRecognitionEngines;
   public
     { Public declarations }
-    procedure Listen;
-    procedure Speak;
+    procedure ShowListening;
+    procedure ShowSpeaking;
+    procedure StopListening;
+    procedure StartListening;
   end;
 
 var
@@ -182,18 +176,29 @@ begin
   FSettings.WriteString('Speech', 'SelectedRecognitionEngine', FSpeechRecognitionEngines.ActiveEngine.ClassName);
 end;
 
-procedure TfrmVoiceRecognition.Speak;
+procedure TfrmVoiceRecognition.ShowSpeaking;
 begin
   VirtualImage1.ImageIndex := 1;
   VirtualImage1.Update;
 end;
 
-procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
+procedure TfrmVoiceRecognition.StartListening;
 begin
-  DBAdvGrid1.AutoSizeRows(True, 4);
+  FSpeechRecognitionEngines.ActiveEngine.Resume;
+  NULLOut.Run;
+  ShowListening;
+  UserInterfaceUpdateTimer.Enabled := True;
 end;
 
-procedure TfrmVoiceRecognition.Listen;
+procedure TfrmVoiceRecognition.StopListening;
+begin
+  FSpeechRecognitionEngines.ActiveEngine.Finish;
+  VirtualImage1.ImageIndex := -1;
+  NULLOut.Stop(False);
+  UserInterfaceUpdateTimer.Enabled := False;
+end;
+
+procedure TfrmVoiceRecognition.ShowListening;
 begin
   if FConnected then
   begin
@@ -203,7 +208,12 @@ begin
   begin
     VirtualImage1.ImageIndex := -1;
   end;
-  VirtualImage1.Update;  
+  VirtualImage1.Update;
+end;
+
+procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
+begin
+  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.LoadAudioInputsMenu;
@@ -288,13 +298,11 @@ end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
-  UserInterfaceUpdateTimer.Enabled := False;
-
+  StopListening;
   FreeAndNil(FSettings);
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
 end;
-
 
 procedure TfrmVoiceRecognition.FormResize(Sender: TObject);
 begin
@@ -308,11 +316,7 @@ begin
   if FTextToSpeechEngines.ActiveEngine.Mode = mpStopped then
   begin
     if NULLOut.Status <> tosPlaying then
-    begin
-      NULLOut.Run;
-    end;
-
-    Listen;
+      StartListening;
   end;
   if FTextToSpeechEngines.ActiveEngine.Mode = mpPlaying then
   begin
@@ -320,17 +324,17 @@ begin
   end
   else
   begin
-    Listen;
+    ShowListening;
   end;
 end;
 
-procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TsgcWSConnection);
+procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);
 begin
   mmoQuestions.Lines.Add('Connected');
   FConnected := True;
 end;
 
-procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TsgcWSConnection);
+procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TObject);
 begin
   mmoQuestions.Lines.Add('Disconnected');
   FConnected := False;
@@ -359,7 +363,12 @@ begin
        tblConversation.FieldByName('Message').AsString := question;
        tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
        tblConversation.Post;
-
+     finally
+       tblConversation.EnableControls;
+     end;
+     DBAdvGrid1.AutoSizeRows(True, 4);
+     tblConversation.DisableControls;
+     try
        tblConversation.First;
        repeat
          chat := TChatMessage.Create;
@@ -397,7 +406,7 @@ begin
    mmoAnswers.Lines.Text := ChatResponse.Content;
    mmoAnswers.Update;
    NULLOut.Stop(False);
-   Speak;
+   ShowSpeaking;
    FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content);
 end;
 
@@ -426,21 +435,13 @@ end;
 
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
 begin
-  FSpeechRecognitionEngines.ActiveEngine.Resume;
-  Sleep(100);
-  NULLOut.Run;
-  Listen;
-  UserInterfaceUpdateTimer.Enabled := True;
+  StartListening;
 end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
-  FSpeechRecognitionEngines.ActiveEngine.Finish;
-  VirtualImage1.ImageIndex := -1;
-  NULLOut.Stop(False);
-  UserInterfaceUpdateTimer.Enabled := False;
+  StopListening;
 end;
-
 
 procedure TfrmVoiceRecognition.DBCtrlGrid1Click(Sender: TObject);
 begin

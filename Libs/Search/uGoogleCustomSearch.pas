@@ -29,7 +29,7 @@ type
   end;
 
   TGoogleCustomSearch = class
-  private
+  strict private
     FApiKey: string;
     FCx: string;
     FRestClient: TRESTClient;
@@ -95,11 +95,11 @@ begin
 
       for i := 0 to LJsonItems.Count - 1 do
       begin
-          LJsonItem := LJsonItems[i] as TJSONObject;
-          LSearchItem.Title := LJsonItem.GetValue<string>('title');
-          LSearchItem.Link := LJsonItem.GetValue<string>('link');
-          LSearchItem.Snippet := LJsonItem.GetValue<string>('snippet');
-          Result.Items[i] := LSearchItem;
+        LJsonItem := LJsonItems[i] as TJSONObject;
+        LSearchItem.Title := LJsonItem.GetValue<string>('title');
+        LSearchItem.Link := LJsonItem.GetValue<string>('link');
+        LSearchItem.Snippet := LJsonItem.GetValue<string>('snippet');
+        Result.Items[i] := LSearchItem;
       end;
 
       LJsonSearchInformation.GetValue('searchTime', Result.SearchInformation.searchTime);

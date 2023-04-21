@@ -70,6 +70,11 @@ complete code without any omissions.
 - [CommonVoice](https://commonvoice.mozilla.org/en/languages) Public dataset of recordings for Voice Recognition
 - [Huggingface](https://huggingface.co/)
 
+### External Libraries required to build projects
+ - [TMS Grid](https://www.tmssoftware.com/site/dbadvgrd.asp) TMS Software TDBAdvGrid... You can use the trail version to get the demo to work.
+ - [ICS Daily Snapshot 8.71](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) ICS WebSockets are a new feature coming in v8.71
+ - [newac](https://github.com/geoffsmith82/newac) New Audio Components
+
 ### Tools used to create example projects
  - https://github.com/PKGeorgiev/Delphi-JsonToDelphiClass
  - [Fiddler](https://www.fiddler.com)

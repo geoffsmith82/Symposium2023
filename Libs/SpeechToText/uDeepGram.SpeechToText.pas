@@ -12,29 +12,21 @@ uses
   System.IniFiles,
   System.JSON,
   System.SyncObjs,
-  sgcBase_Classes,
-  sgcSocket_Classes,
-  sgcTCP_Classes,
-  sgcWebSocket_Classes,
-  sgcWebSocket_Classes_Indy,
-  sgcWebSocket_Client,
-  sgcWebSocket,
+  OverbyteIcsWebSocketCli,
   uBaseSpeechRecognition
   ;
 
 type
-  TOnHandleMessage = procedure(const msg: string) of object;
-  TOnConnect = procedure(Connection: TsgcWSConnection) of object;
-
   TDeepGramSendThread = class(TBaseSendThread)
-  private
+  strict private
     FDeepGram_Key : string;
-    sgcWebSocketClient1 : TsgcWebSocketClient;
-    procedure sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-    procedure sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
-    procedure sgOnConnect(Connection: TsgcWSConnection);
+    FWebSocket : TSslWebSocketCli;
+    procedure WSOnRecv(Sender: TSslWebSocketCli; const APacket: String; var AFrame: TWebSocketReceivedFrame);
+    procedure WSOnConnected(Sender: TObject);
+    procedure WSOnDisconnected(Sender: TObject);
   public
     procedure WriteData(data: string); override;
+    procedure WriteDataStream(m: TStream); override;
     procedure Execute; override;
     constructor Create(CreateSuspended: Boolean; const deepgram_key: string); reintroduce;
   end;
@@ -46,18 +38,12 @@ type
     constructor Create(const AResourceKey, AApplicationName, AHost: string);
   end;
 
-
 implementation
-
 
 { TTSendThread }
 
-procedure TDeepGramSendThread.sgcWebSocketClient1Handshake(Connection: TsgcWSConnection; var Headers: TStringList);
-begin
-  Headers.Add('Authorization: Token ' + FDeepGram_Key);
-end;
-
-procedure TDeepGramSendThread.sgcWebSocketClient1Message(Connection: TsgcWSConnection; const Text: string);
+procedure TDeepGramSendThread.WSOnRecv(Sender: TSslWebSocketCli;
+  const APacket: String; var AFrame: TWebSocketReceivedFrame);
 begin
   TThread.Queue(nil, procedure()
   var
@@ -68,7 +54,7 @@ begin
     value : string;
     finalValue : string;
   begin
-    msg := TJSONObject.ParseJSONValue(Text) as TJSONObject;
+    msg := TJSONObject.ParseJSONValue(APacket) as TJSONObject;
     if msg.TryGetValue('speech_final', Value) then
     begin
       if Assigned(OnHandleSpeechRecognitionCompletion) and (Value='true') then
@@ -77,7 +63,6 @@ begin
         begin
           if channel.TryGetValue('alternatives', alternativesArray) then
           begin
-     //       if alternativesObj.TryGetValue( then
             OutputDebugString(PChar(alternativesArray.ToJSON));
             if alternativesArray.Count > 0 then
             begin
@@ -87,24 +72,31 @@ begin
                 Exit;
               OnHandleSpeechRecognitionCompletion(finalValue);
             end;
-
           end;
-          
         end;
-
-
       end;
     end;
   end);
 end;
 
-procedure TDeepGramSendThread.sgOnConnect(Connection: TsgcWSConnection);
+procedure TDeepGramSendThread.WSOnConnected(Sender: TObject);
 begin
   TThread.Queue(nil, procedure()
   begin
     if Assigned(OnConnect) then
     begin
-      OnConnect(Connection);
+      OnConnect(Sender);
+    end;
+  end);
+end;
+
+procedure TDeepGramSendThread.WSOnDisconnected(Sender: TObject);
+begin
+  TThread.Queue(nil, procedure()
+  begin
+    if Assigned(OnDisconnect) then
+    begin
+      OnDisconnect(Sender);
     end;
   end);
 end;
@@ -117,7 +109,12 @@ end;
 
 procedure TDeepGramSendThread.WriteData(data: string);
 begin
-  sgcWebSocketClient1.WriteData(data);
+  FWebSocket.WSSendText(nil, data);
+end;
+
+procedure TDeepGramSendThread.WriteDataStream(m: TStream);
+begin
+  FWebSocket.WSSendBinaryStream(nil, m);
 end;
 
 procedure TDeepGramSendThread.Execute;
@@ -126,17 +123,20 @@ var
   mm : TMemoryStream;
 begin
   inherited;
-  sgcWebSocketClient1 := TsgcWebSocketClient.Create(nil);
-  sgcWebSocketClient1.URL := 'wss://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
-  sgcWebSocketClient1.Proxy.Host := 'localhost';
-  sgcWebSocketClient1.Proxy.Port := 8888;
-  sgcWebSocketClient1.Proxy.Enabled := True;
-  sgcWebSocketClient1.OnHandshake := sgcWebSocketClient1Handshake;
-  sgcWebSocketClient1.OnMessage := sgcWebSocketClient1Message;
-  sgcWebSocketClient1.OnConnect := sgOnConnect;
-  sgcWebSocketClient1.Connect;
-
+  NameThreadForDebugging('DeepGram.Ai');
+  FWebSocket := TSslWebSocketCli.Create(nil);
   try
+    FWebSocket.URL := 'https://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
+    FWebSocket.Proxy := 'localhost';
+    FWebSocket.ProxyPort := '8888';
+    FWebSocket.ExtraHeaders.Add('Authorization: Token ' + FDeepGram_Key);
+    FWebSocket.ExtraHeaders.Add('Origin: api.deepgram.com');
+    FWebSocket.Connection := 'Upgrade';
+    FWebSocket.OnWSFrameRcvd := WSOnRecv;
+    FWebSocket.OnWSConnected := WSOnConnected;
+    FWebSocket.OnWSDisconnected := WSOnDisconnected;
+    FWebSocket.WSConnect;
+
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
@@ -151,11 +151,9 @@ begin
       mm.Position := 0;
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
-        if not sgcWebSocketClient1.Connected then
-          sgcWebSocketClient1.Connect;
 
-        sgcWebSocketClient1.WriteData(mm);
-
+        WriteDataStream(mm);
+        FWebSocket.ProcessMessages;
       finally
         FreeandNil(m);
         mm.Clear;
@@ -163,7 +161,7 @@ begin
     end;
   finally
     FreeAndNil(mm);
-    FreeAndNil(sgcWebSocketClient1);
+    FreeAndNil(FWebSocket);
   end;
 end;
 
@@ -178,7 +176,6 @@ end;
 procedure TDeepGramRecognition.Finish;
 begin
   inherited;
-
 end;
 
 procedure TDeepGramRecognition.Resume;
