@@ -65,7 +65,10 @@ complete code without any omissions.
 - [Bing](https://www.bing.com/)
 - [ChatGPT](https://chat.openai.com/chat) OpenAI ChatGPT
 - [DelphiOpenAI](https://github.com/HemulGM/DelphiOpenAI) a Delphi Library for OpenAI 
+- [ChatGPT](https://github.com/HemulGM/ChatGPT) a Firemonkey ChatGPT interface written in Delphi.
+- [AI-Playground-DesktopClient](https://github.com/FMXExpress/AI-Playground-DesktopClient) A Firemonkey Language model playground to access languages models like StableLM, ChatGPT, and more.
 - [TOpenALPR](https://github.com/r1me/TOpenALPR) Open Source Number Plate recognition
+
 
 - [CommonVoice](https://commonvoice.mozilla.org/en/languages) Public dataset of recordings for Voice Recognition
 - [Huggingface](https://huggingface.co/)
