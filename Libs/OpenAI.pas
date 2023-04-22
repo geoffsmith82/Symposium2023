@@ -3,6 +3,7 @@ unit OpenAI;
 interface
 
 uses
+  System.Classes,
   System.JSON,
   System.SysUtils,
   System.Generics.Collections,
@@ -26,10 +27,9 @@ type
     Total_Tokens : Cardinal;
   end;
 
-  PChatMessage = ^TChatMessage;
-
   TOpenAI = class
   public
+    class procedure ListOpenAIModels(out AModelList: TStringList); static;
     class function SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
@@ -288,6 +288,60 @@ begin
     FreeAndNil(LJson);
     FreeAndNil(LRestRequest);
     FreeAndNil(LRestClient);
+  end;
+end;
+
+class procedure TOpenAI.ListOpenAIModels(out AModelList: TStringList);
+var
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJSONValue: TJSONValue;
+  LJSONArray: TJSONArray;
+  LJSONModel: TJSONObject;
+  LBaseJSONObject: TJSONObject;
+  i: Integer;
+begin
+  LRESTClient := TRESTClient.Create('https://api.openai.com');
+  try
+    LRESTRequest := TRESTRequest.Create(nil);
+    try
+      LRESTResponse := TRESTResponse.Create(nil);
+      try
+        LRESTRequest.Client := LRESTClient;
+        LRESTRequest.Resource := '/v1/models';
+        LRESTRequest.Method := rmGET;
+        LRESTRequest.Response := LRESTResponse;
+
+        // Add your API key to the request header
+        LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + CHATGPT_APIKEY, pkHTTPHEADER, [poDoNotEncode]);
+
+        LRESTRequest.Execute;
+
+        if LRESTResponse.StatusCode = 200 then
+        begin
+          LBaseJSONObject := TJSONObject.ParseJSONValue(LRESTResponse.JSONText) as TJSONObject;
+          try
+            if LBaseJSONObject.TryGetValue<TJSONArray>('data', LJSONArray) then
+            begin
+              for i := 0 to LJSONArray.Count - 1 do
+              begin
+                LJSONModel := LJSONArray.Items[i] as TJSONObject;
+                AModelList.Add(LJSONModel.GetValue<string>('id'));
+              end;
+            end;
+          finally
+            FreeAndNil(LBaseJSONObject);
+          end;
+        end;
+      finally
+        FreeAndNil(LRESTResponse);
+      end;
+    finally
+      FreeAndNil(LRESTRequest);
+    end;
+  finally
+    FreeAndNil(LRESTClient);
   end;
 end;
 
