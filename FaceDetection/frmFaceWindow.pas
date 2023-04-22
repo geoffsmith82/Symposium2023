@@ -57,6 +57,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miExitClick(Sender: TObject);
+    procedure miSelectEngineClick(Sender: TObject);
   private
     { Private declarations }
     FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition>;
@@ -137,6 +138,12 @@ end;
 procedure TfrmFaceDetection.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
+end;
+
+procedure TfrmFaceDetection.miSelectEngineClick(Sender: TObject);
+begin
+  FFaceRecognitionEngines.SelectEngine(Sender as TMenuItem);
+  FFaceRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 
 procedure TfrmFaceDetection.FormCreate(Sender: TObject);

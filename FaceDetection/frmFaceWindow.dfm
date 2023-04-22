@@ -136,9 +136,15 @@ object frmFaceDetection: TfrmFaceDetection
       Caption = 'Face Recognition Engine'
       object miGoogle: TMenuItem
         Caption = 'Google'
+        GroupIndex = 10
+        RadioItem = True
+        OnClick = miSelectEngineClick
       end
       object miMicrosoft: TMenuItem
         Caption = 'Microsoft'
+        GroupIndex = 10
+        RadioItem = True
+        OnClick = miSelectEngineClick
       end
     end
   end
