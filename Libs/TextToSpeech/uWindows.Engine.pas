@@ -15,18 +15,12 @@ type
   TWindowsSpeechService = class(TBaseTextToSpeech)
   public
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    function SpeechEngineName: string; override;
   end;
 
 implementation
 
 { TWindowsSpeechService }
 
-
-function TWindowsSpeechService.SpeechEngineName: string;
-begin
-  Result := 'WindowsVoice';
-end;
 
 function TWindowsSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;
 var

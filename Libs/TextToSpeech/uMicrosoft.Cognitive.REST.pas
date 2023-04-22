@@ -22,7 +22,6 @@ type
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function GetVoiceList: TMicrosoftCognitiveVoicesClass;
-    function SpeechEngineName: string; override;
   end;
 
 implementation
@@ -84,11 +83,6 @@ begin
     RESTRequest.Free;
     RESTClient.Free;
   end;
-end;
-
-function TMicrosoftCognitiveService.SpeechEngineName: string;
-begin
-  Result := 'MicrosoftCognitive';
 end;
 
 function TMicrosoftCognitiveService.TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream;

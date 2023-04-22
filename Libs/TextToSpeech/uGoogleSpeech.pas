@@ -34,7 +34,6 @@ type
     constructor Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    function SpeechEngineName: string; override;
     function GetVoiceList: TGoogleVoicesListClass;
     procedure Authenticate;
   end;
@@ -133,11 +132,6 @@ begin
     FreeAndNil(RESTResponse1);
     FreeAndNil(RESTClient1);
   end;
-end;
-
-function TGoogleSpeechService.SpeechEngineName: string;
-begin
-  Result := 'GoogleVoice';
 end;
 
 function TGoogleSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;

@@ -29,7 +29,6 @@ type
     constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    function SpeechEngineName: string; override;
   end;
 
 implementation
@@ -44,11 +43,6 @@ end;
 destructor TAmazonPollyService.Destroy;
 begin
   inherited;
-end;
-
-function TAmazonPollyService.SpeechEngineName: string;
-begin
-  Result := 'Amazon.Polly';
 end;
 
 function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStream;
