@@ -14,18 +14,16 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
-  Vcl.ExtCtrls,
 {$IFNDEF NOPOLLY}
   uAmazon.Polly,
 {$ENDIF}
-  Vcl.MPlayer
+  Vcl.ExtCtrls
   ;
 
 type
   TfrmWeatherWindow = class(TForm)
     btnLatestForcast: TButton;
     mmoWeatherQuestion: TMemo;
-    MediaPlayer1: TMediaPlayer;
     GridPanel1: TGridPanel;
     mmWeatherAnswer: TMemo;
     procedure FormDestroy(Sender: TObject);
@@ -34,7 +32,6 @@ type
   private
     { Private declarations }
     FAmazonPolyVoiceService : TAmazonPollyService;
-    procedure PlayTextAmazon(const text:string);
   public
     { Public declarations }
   end;
@@ -63,33 +60,6 @@ end;
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
   FAmazonPolyVoiceService := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey);//'ADUG Demo', '');
-end;
-
-procedure TfrmWeatherWindow.PlayTextAmazon(const text:string);
-var
-  Stream: TMemoryStream;
-  FileName: string;
-  aTask: ITask;
-begin
-  aTask := TTask.Create (procedure ()
-      begin
-        Stream := TMemoryStream.Create;
-        try
-          Stream := FAmazonPolyVoiceService.TextToSpeech(text);
-          FileName := TPath.GetTempFileName + '.mp3';
-          Stream.Position := 0;
-          Stream.SaveToFile(FileName);
-        finally
-          Stream.Free;
-        end;
-        TThread.Synchronize(nil, procedure
-        begin
-          MediaPlayer1.FileName := FileName;
-          MediaPlayer1.Open;
-          MediaPlayer1.Play;
-        end);
-      end);
-  aTask.Start;
 end;
 
 procedure TfrmWeatherWindow.btnLatestForcastClick(Sender: TObject);
@@ -129,7 +99,7 @@ begin
                 TThread.Synchronize(nil, procedure
                   begin
                     mmWeatherAnswer.Text := answer;
-                    PlayTextAmazon(mmWeatherAnswer.Text);
+                    FAmazonPolyVoiceService.PlayText(mmWeatherAnswer.Text);
                   end);
             end);
          aTask.Start;

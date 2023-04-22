@@ -13,16 +13,6 @@ object frmWeatherWindow: TfrmWeatherWindow
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
-  object MediaPlayer1: TMediaPlayer
-    Left = 40
-    Top = 336
-    Width = 253
-    Height = 30
-    DoubleBuffered = True
-    Visible = False
-    ParentDoubleBuffered = False
-    TabOrder = 0
-  end
   object GridPanel1: TGridPanel
     Left = 0
     Top = 0
@@ -60,11 +50,9 @@ object frmWeatherWindow: TfrmWeatherWindow
       item
         Value = 38.461538461538460000
       end>
-    TabOrder = 1
-    ExplicitLeft = 235
-    ExplicitTop = 40
-    ExplicitWidth = 185
-    ExplicitHeight = 377
+    TabOrder = 0
+    ExplicitWidth = 517
+    ExplicitHeight = 440
     DesignSize = (
       521
       441)
@@ -77,7 +65,7 @@ object frmWeatherWindow: TfrmWeatherWindow
       Caption = 'Latest Forcast'
       TabOrder = 0
       OnClick = btnLatestForcastClick
-      ExplicitTop = 0
+      ExplicitLeft = 134
     end
     object mmoWeatherQuestion: TMemo
       Left = 1
@@ -87,6 +75,7 @@ object frmWeatherWindow: TfrmWeatherWindow
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 1
+      ExplicitWidth = 515
     end
     object mmWeatherAnswer: TMemo
       Left = 1
@@ -96,6 +85,8 @@ object frmWeatherWindow: TfrmWeatherWindow
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 2
+      ExplicitWidth = 515
+      ExplicitHeight = 168
     end
   end
 end
