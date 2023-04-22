@@ -27,6 +27,20 @@ type
     Total_Tokens : Cardinal;
   end;
 
+  TParameterDictionary = TDictionary<string, string>;
+
+  TPrompt = class
+  private
+    FPromptText: string;
+    FParameters: TParameterDictionary;
+    function ReplaceParameters: string;
+  public
+    constructor Create(const APromptText: string);
+    destructor Destroy; override;
+    function AsString: string;
+    property Parameters: TParameterDictionary read FParameters;
+  end;
+
   TOpenAI = class
   public
     class procedure ListOpenAIModels(out AModelList: TStringList); static;
@@ -298,7 +312,6 @@ var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
   LRESTResponse: TRESTResponse;
-  LJSONValue: TJSONValue;
   LJSONArray: TJSONArray;
   LJSONModel: TJSONObject;
   LBaseJSONObject: TJSONObject;
@@ -344,6 +357,36 @@ begin
     end;
   finally
     FreeAndNil(LRESTClient);
+  end;
+end;
+
+{ TPrompt }
+
+constructor TPrompt.Create(const APromptText: string);
+begin
+  FPromptText := APromptText;
+  FParameters := TParameterDictionary.Create;
+end;
+
+destructor TPrompt.Destroy;
+begin
+  FParameters.Free;
+  inherited;
+end;
+
+function TPrompt.AsString: string;
+begin
+  Result := ReplaceParameters;
+end;
+
+function TPrompt.ReplaceParameters: string;
+var
+  Param: TPair<string, string>;
+begin
+  Result := FPromptText;
+  for Param in FParameters do
+  begin
+    Result := StringReplace(Result, '{' + Param.Key + '}', Param.Value, [rfReplaceAll, rfIgnoreCase]);
   end;
 end;
 
