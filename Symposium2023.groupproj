@@ -27,6 +27,9 @@
         <Projects Include="VoiceRecognition\VoiceRecognition.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Embeddings\EmbeddingsDemo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -107,14 +110,23 @@
     <Target Name="VoiceRecognition:Make">
         <MSBuild Projects="VoiceRecognition\VoiceRecognition.dproj" Targets="Make"/>
     </Target>
+    <Target Name="EmbeddingsDemo">
+        <MSBuild Projects="Embeddings\EmbeddingsDemo.dproj"/>
+    </Target>
+    <Target Name="EmbeddingsDemo:Clean">
+        <MSBuild Projects="Embeddings\EmbeddingsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EmbeddingsDemo:Make">
+        <MSBuild Projects="Embeddings\EmbeddingsDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="TranslateLang;DelphiChatGPT;FaceDetection;Weather;ImageGeneration;gitdemo;TranscribeAudio;VoiceRecognition"/>
+        <CallTarget Targets="TranslateLang;DelphiChatGPT;FaceDetection;Weather;ImageGeneration;gitdemo;TranscribeAudio;VoiceRecognition;EmbeddingsDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;FaceDetection:Clean;Weather:Clean;ImageGeneration:Clean;gitdemo:Clean;TranscribeAudio:Clean;VoiceRecognition:Clean"/>
+        <CallTarget Targets="TranslateLang:Clean;DelphiChatGPT:Clean;FaceDetection:Clean;Weather:Clean;ImageGeneration:Clean;gitdemo:Clean;TranscribeAudio:Clean;VoiceRecognition:Clean;EmbeddingsDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;FaceDetection:Make;Weather:Make;ImageGeneration:Make;gitdemo:Make;TranscribeAudio:Make;VoiceRecognition:Make"/>
+        <CallTarget Targets="TranslateLang:Make;DelphiChatGPT:Make;FaceDetection:Make;Weather:Make;ImageGeneration:Make;gitdemo:Make;TranscribeAudio:Make;VoiceRecognition:Make;EmbeddingsDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
