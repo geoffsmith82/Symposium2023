@@ -138,11 +138,9 @@ begin
   toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
 
   microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
-  microsoftEngine.OnSelectEngine := HandleMicrosoftEngineSelected;
-  FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft);
+  FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
     googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
-    googleEngine.OnSelectEngine := HandleGoogleEngineSelected;
-  FTranslateEngines.RegisterEngine(googleEngine, miGoogle);
+  FTranslateEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
   FTranslateEngines.SelectEngine(languageEngine);
