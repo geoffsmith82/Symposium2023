@@ -20,7 +20,8 @@ uses
   uMicrosoft.FaceRecognition in '..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uGoogle.FaceRecognition in '..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas',
-  uEngineManager in '..\Libs\uEngineManager.pas';
+  uEngineManager in '..\Libs\uEngineManager.pas',
+  uMicrosoft.FaceRecognition.DTO in '..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.DTO.pas';
 
 {$R *.res}
 

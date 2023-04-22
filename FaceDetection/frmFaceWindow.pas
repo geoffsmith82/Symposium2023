@@ -24,6 +24,7 @@ uses
   System.Net.HttpClient,
   uBaseFaceRecognition,
   uMicrosoft.FaceRecognition,
+  uMicrosoft.FaceRecognition.DTO,
   uGoogle.FaceRecognition,
   uEngineManager
   ;
@@ -87,6 +88,7 @@ var
   HTTPClient: TNetHTTPClient;
   HTTPRequest: TNetHTTPRequest;
   LStream: TMemoryStream;
+  LBitmap: TBitmap;
   LImage: TGraphic;
   LResponse: IHTTPResponse;
 begin
@@ -112,7 +114,17 @@ begin
 
       try
         LImage.LoadFromStream(LStream);
-        AImage.Picture.Graphic := LImage;
+
+        // Create a new TBitmap object and assign the loaded image to its canvas
+        LBitmap := TBitmap.Create;
+        try
+          LBitmap.Assign(LImage);
+
+          // Assign the modified bitmap to the TImage component
+          AImage.Picture.Graphic := LBitmap;
+        finally
+          LBitmap.Free;
+        end;
       finally
         LImage.Free;
       end;
@@ -127,14 +139,78 @@ begin
   end;
 end;
 
+
+procedure DrawBoxAroundFace(AImage: TImage; ARect: TRect);
+var
+  Canvas: TCanvas;
+begin
+  Canvas := AImage.Canvas;
+  Canvas.Pen.Color := clRed;
+  Canvas.Pen.Width := 2;
+  Canvas.Brush.Style := bsClear;
+  Canvas.Rectangle(ARect);
+end;
+
+procedure DrawOvalAroundEye(AImage: TImage; ARect: TRect);
+var
+  Canvas: TCanvas;
+begin
+  Canvas := AImage.Canvas;
+  Canvas.Pen.Color := clBlue;
+  Canvas.Pen.Width := 2;
+  Canvas.Brush.Style := bsClear;
+  Canvas.Ellipse(ARect);
+end;
+
+procedure DrawOvalAroundLips(AImage: TImage; ARect: TRect);
+var
+  Canvas: TCanvas;
+begin
+  Canvas := AImage.Canvas;
+  Canvas.Pen.Color := $00FFC0CB;
+  Canvas.Pen.Width := 2;
+  Canvas.Brush.Style := bsClear;
+  Canvas.Ellipse(ARect);
+end;
+
 procedure TfrmFaceDetection.btnDetectFacesClick(Sender: TObject);
 var
   results : string;
+  faces : TMicrosoftFaceClass;
+  I: Integer;
+  FaceRect : TRect;
+  EyeRect: TRect;
+  MouthRect: TRect;
 begin
   results := FFaceRecognitionEngines.ActiveEngine.DetectFacesFromURL(edtImageURL.Text);
   mmoResults.Text := results;
   DownloadAndLoadImage(edtImageURL.Text, imgOriginal);
   DownloadAndLoadImage(edtImageURL.Text, imgDetectedPhoto);
+  faces := TMicrosoftFaceClass.FromJsonString(results);
+  for I := Low(faces.Items) to High(faces.Items) do
+  begin
+    FaceRect.Top  := Trunc(faces.Items[i].faceRectangle.top);
+    FaceRect.Left := Trunc(faces.Items[i].faceRectangle.left);
+    FaceRect.Width := Trunc(faces.Items[i].faceRectangle.width);
+    FaceRect.Height := Trunc(faces.Items[i].faceRectangle.height);
+    DrawBoxAroundFace(imgDetectedPhoto, FaceRect);
+    EyeRect.Top := Trunc(faces.Items[i].faceLandmarks.eyeLeftTop.y);
+    EyeRect.Left := Trunc(faces.Items[i].faceLandmarks.eyeLeftOuter.x);
+    EyeRect.Right := Trunc(faces.Items[i].faceLandmarks.eyeLeftInner.x);
+    EyeRect.Bottom := Trunc(faces.Items[i].faceLandmarks.eyeLeftBottom.y);
+    DrawOvalAroundEye(imgDetectedPhoto, EyeRect);
+    EyeRect.Top := Trunc(faces.Items[i].faceLandmarks.eyeRightTop.y);
+    EyeRect.Left := Trunc(faces.Items[i].faceLandmarks.eyeRightOuter.x);
+    EyeRect.Right := Trunc(faces.Items[i].faceLandmarks.eyeRightInner.x);
+    EyeRect.Bottom := Trunc(faces.Items[i].faceLandmarks.eyeRightBottom.y);
+    DrawOvalAroundEye(imgDetectedPhoto, EyeRect);
+    MouthRect.Top :=  Trunc(faces.Items[i].faceLandmarks.upperLipTop.y);
+    MouthRect.Bottom :=  Trunc(faces.Items[i].faceLandmarks.underLipBottom.y);
+    MouthRect.Left :=  Trunc(faces.Items[i].faceLandmarks.mouthLeft.x);
+    MouthRect.Right :=  Trunc(faces.Items[i].faceLandmarks.mouthRight.x);
+    DrawOvalAroundLips(imgDetectedPhoto, MouthRect);
+  end;
+  imgDetectedPhoto.Update;
 end;
 
 procedure TfrmFaceDetection.FormDestroy(Sender: TObject);
