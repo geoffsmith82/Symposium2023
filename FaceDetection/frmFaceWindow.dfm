@@ -147,5 +147,12 @@ object frmFaceDetection: TfrmFaceDetection
         OnClick = miSelectEngineClick
       end
     end
+    object miGoogleMenu: TMenuItem
+      Caption = 'Google'
+      object miGoogleLogin: TMenuItem
+        Caption = 'Login'
+        OnClick = miGoogleLoginClick
+      end
+    end
   end
 end

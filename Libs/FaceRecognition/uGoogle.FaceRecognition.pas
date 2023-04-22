@@ -16,6 +16,7 @@ uses
   IdHTTPServer,
   IdCustomHTTPServer,
   IdHTTPHeaderInfo,
+  Winapi.ShellAPI,
   IdContext
   ;
 
@@ -31,11 +32,14 @@ type
     FSecretKey : string;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+  private
+    function GetFaceDetectionRequestBody(const ImageUrl: string): TJSONObject;
   public
     function DetectFacesFromURL(imageUrl: string): string; override;
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
-    constructor Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string);
+    procedure Authenticate;
+    constructor Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string; ASettings : TIniFile);
   end;
 
 implementation
@@ -44,10 +48,11 @@ implementation
 
 { TGoogleFaceRecognition }
 
-constructor TGoogleFaceRecognition.Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string);
+constructor TGoogleFaceRecognition.Create(const AResourceKey, ASecretKey, AApplicationName: string; AHost: string; ASettings : TIniFile);
 begin
   inherited Create(AResourceKey, AApplicationName, AHost);
   FSecretKey := ASecretKey;
+  FSettings := ASettings;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
@@ -58,7 +63,6 @@ begin
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
-  FHTTPServer.Active := True;
 end;
 
 procedure TGoogleFaceRecognition.IdHTTPServer1CommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -78,6 +82,12 @@ begin
   FOAuth2.ChangeAuthCodeToAccesToken;
 
   FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
+end;
+
+procedure TGoogleFaceRecognition.Authenticate;
+begin
+  FHTTPServer.Active := True;
+  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
 function TGoogleFaceRecognition.Base64EncodedFile(const filename:string):string;
@@ -187,10 +197,75 @@ begin
   end;
 end;
 
+function TGoogleFaceRecognition.GetFaceDetectionRequestBody(const ImageUrl: string): TJSONObject;
+var
+  RequestObject: TJSONObject;
+  ImageObject: TJSONObject;
+  SourceObject: TJSONObject;
+  FeaturesObject: TJSONObject;
+begin
+  // Create the JSON objects for the request body
+  RequestObject := TJSONObject.Create;
+  ImageObject := TJSONObject.Create;
+  SourceObject := TJSONObject.Create;
+  FeaturesObject := TJSONObject.Create;
+
+  try
+    // Build the request body as a JSON object
+    SourceObject.AddPair('imageUri', ImageUrl);
+    ImageObject.AddPair('source', SourceObject);
+    FeaturesObject.AddPair('type', 'FACE_DETECTION');
+    FeaturesObject.AddPair('maxResults', '10');
+    RequestObject.AddPair('image', ImageObject);
+    RequestObject.AddPair('features', TJSONArray.Create(FeaturesObject));
+
+    // Return the JSON object for the request body
+    Result := RequestObject;
+  except
+    RequestObject.Free;
+    ImageObject.Free;
+    SourceObject.Free;
+    FeaturesObject.Free;
+    raise;
+  end;
+end;
+
 
 function TGoogleFaceRecognition.DetectFacesFromURL(imageUrl: string): string;
+var
+  RestClient: TRESTClient;
+  Request: TRESTRequest;
+  Response: TRESTResponse;
+  RequestBody: TJSONObject;
 begin
+  RestClient := TRESTClient.Create(nil);
+  Request := TRESTRequest.Create(nil);
+  Response := TRESTResponse.Create(nil);
 
+  try
+    RequestBody := GetFaceDetectionRequestBody(imageUrl);
+    // Set up the REST components
+    RestClient.BaseURL := 'https://vision.googleapis.com/v1/images:annotate';
+    RestClient.Authenticator := FOAuth2;
+    Request.Client := RestClient;
+    Request.Response := Response;
+    Request.Method := rmPOST;
+
+    // Set up the request body with the image URL
+    Request.AddBody(RequestBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+
+    // Send the request and handle the response
+    Request.Execute;
+    if Response.StatusCode = 200 then
+      Result := Response.Content
+    else
+      Result := 'Error: ' + Response.StatusText;
+  finally
+    FreeAndNil(RestClient);
+    FreeAndNil(Request);
+    FreeAndNil(Response);
+    FreeAndNil(RequestBody);
+  end;
 end;
 
 end.

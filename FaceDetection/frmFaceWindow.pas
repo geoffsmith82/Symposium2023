@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.IniFiles,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -53,15 +54,21 @@ type
     mmoResults: TMemo;
     imgOriginal: TImage;
     imgDetectedPhoto: TImage;
+    miGoogleMenu: TMenuItem;
+    miGoogleLogin: TMenuItem;
     procedure btnDetectFacesClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miSelectEngineClick(Sender: TObject);
+    procedure miGoogleLoginClick(Sender: TObject);
   private
     { Private declarations }
+    FSettings : TIniFile;
     FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition>;
     procedure DownloadAndLoadImage(const AUrl: string; AImage: TImage);
+    procedure OnMicrosoftSelected(Sender: TObject);
+    procedure OnGoogleSelected(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -133,11 +140,17 @@ end;
 procedure TfrmFaceDetection.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FFaceRecognitionEngines);
+  FreeAndNil(FSettings);
 end;
 
 procedure TfrmFaceDetection.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
+end;
+
+procedure TfrmFaceDetection.miGoogleLoginClick(Sender: TObject);
+begin
+  (FFaceRecognitionEngines.ActiveEngine as TGoogleFaceRecognition).Authenticate;
 end;
 
 procedure TfrmFaceDetection.miSelectEngineClick(Sender: TObject);
@@ -146,15 +159,27 @@ begin
   FFaceRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 
+procedure TfrmFaceDetection.OnMicrosoftSelected(Sender: TObject);
+begin
+  miGoogleMenu.Visible := False;
+end;
+
+procedure TfrmFaceDetection.OnGoogleSelected(Sender: TObject);
+begin
+  miGoogleMenu.Visible := True;
+end;
+
 procedure TfrmFaceDetection.FormCreate(Sender: TObject);
 var
   engine : TBaseFaceRecognition;
 begin
   FFaceRecognitionEngines:= TEngineManager<TBaseFaceRecognition>.Create;
+  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+
   engine := TMicrosoftFaceRecognition.Create(ms_face_key);
-  FFaceRecognitionEngines.RegisterEngine(engine, miMicrosoft);
-  engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '' , '');
-  FFaceRecognitionEngines.RegisterEngine(engine, miGoogle);
+  FFaceRecognitionEngines.RegisterEngine(engine, miMicrosoft, OnMicrosoftSelected);
+  engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '' , '', FSettings);
+  FFaceRecognitionEngines.RegisterEngine(engine, miGoogle, OnGoogleSelected);
   edtImageURL.Text := 'https://andergrovess.eq.edu.au/HomePagePictures/slide-01.jpg';
 end;
 
