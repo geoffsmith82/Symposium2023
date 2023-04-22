@@ -10,6 +10,7 @@ object frmFaceDetection: TfrmFaceDetection
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 13
@@ -36,13 +37,109 @@ object frmFaceDetection: TfrmFaceDetection
     TabOrder = 1
     OnClick = btnDetectFacesClick
   end
-  object Memo1: TMemo
-    Left = 40
-    Top = 88
-    Width = 505
-    Height = 233
-    Lines.Strings = (
-      'Memo1')
+  object PageControl1: TPageControl
+    Left = 0
+    Top = 96
+    Width = 690
+    Height = 247
+    ActivePage = tsResults
+    Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    object tsOriginalPhoto: TTabSheet
+      Caption = 'Original Photo'
+      object imgOriginal: TImage
+        Left = 0
+        Top = 0
+        Width = 682
+        Height = 219
+        Align = alClient
+        Proportional = True
+        Stretch = True
+        ExplicitLeft = 192
+        ExplicitTop = 80
+        ExplicitWidth = 105
+        ExplicitHeight = 105
+      end
+    end
+    object tsDetectedPhoto: TTabSheet
+      Caption = 'Detected Photo'
+      ImageIndex = 1
+      object imgDetectedPhoto: TImage
+        Left = 0
+        Top = 0
+        Width = 682
+        Height = 219
+        Align = alClient
+        Proportional = True
+        Stretch = True
+        ExplicitLeft = 192
+        ExplicitTop = 80
+        ExplicitWidth = 105
+        ExplicitHeight = 105
+      end
+    end
+    object tsResults: TTabSheet
+      Caption = 'Results'
+      ImageIndex = 2
+      object mmoResults: TMemo
+        Left = 0
+        Top = 0
+        Width = 682
+        Height = 219
+        Align = alClient
+        Lines.Strings = (
+          'Memo1')
+        TabOrder = 0
+        ExplicitLeft = -224
+        ExplicitTop = -68
+        ExplicitWidth = 505
+        ExplicitHeight = 233
+      end
+    end
+  end
+  object mmMainMenu: TMainMenu
+    Left = 600
+    Top = 192
+    object miFile: TMenuItem
+      Caption = '&File'
+      object New1: TMenuItem
+        Caption = '&New'
+      end
+      object Open1: TMenuItem
+        Caption = '&Open...'
+      end
+      object Save1: TMenuItem
+        Caption = '&Save'
+      end
+      object SaveAs1: TMenuItem
+        Caption = 'Save &As...'
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Print1: TMenuItem
+        Caption = '&Print...'
+      end
+      object PrintSetup1: TMenuItem
+        Caption = 'P&rint Setup...'
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object miExit: TMenuItem
+        Caption = 'E&xit'
+        OnClick = miExitClick
+      end
+    end
+    object miFaceRecognitionEngine: TMenuItem
+      Caption = 'Face Recognition Engine'
+      object miGoogle: TMenuItem
+        Caption = 'Google'
+      end
+      object miMicrosoft: TMenuItem
+        Caption = 'Microsoft'
+      end
+    end
   end
 end

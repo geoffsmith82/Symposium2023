@@ -51,6 +51,7 @@ var
   serviceUrl: string;
   uri : TURI;
   request: TJSONObject;
+  response : TJSONArray;
 begin
     restClient := nil;
     restRequest := nil;
@@ -90,7 +91,12 @@ begin
     restRequest.Execute;
 
     // Parse the JSON response and return the array of detected faces
-    Result := (TJSONObject.ParseJSONValue(restResponse.Content) as TJSONArray).ToJSON;
+    response := (TJSONObject.ParseJSONValue(restResponse.Content) as TJSONArray);
+    try
+      Result := response.ToJSON;
+    finally
+      FreeAndNil(response);
+    end;
   finally
     FreeAndNil(request);
     FreeAndNil(restResponse);

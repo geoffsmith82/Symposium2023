@@ -19,7 +19,8 @@ uses
   uBaseFaceRecognition in '..\Libs\FaceRecognition\uBaseFaceRecognition.pas',
   uMicrosoft.FaceRecognition in '..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  uGoogle.FaceRecognition in '..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas';
+  uGoogle.FaceRecognition in '..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas',
+  uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}
 
