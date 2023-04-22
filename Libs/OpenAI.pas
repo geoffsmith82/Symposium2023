@@ -30,7 +30,7 @@ type
   TOpenAI = class
   public
     class procedure ListOpenAIModels(out AModelList: TStringList); static;
-    class function SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse; static;
+    class function SendChatMessagesToOpenAI(const APIKey: string; AMessages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
     class function Embeddings(const Texts: TArray<string>): TArray<TArray<Double>>; static;
@@ -43,78 +43,81 @@ implementation
 const
   API_URL = 'https://api.openai.com/v1/embeddings';
 
-class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; Messages: TObjectList<TChatMessage>): TChatResponse;
+class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  JSONBody: TJSONObject;
-  JSONMessages: TJSONArray;
-  JSONMsg : TJSONObject;
-  Message: TChatMessage;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJSONBody: TJSONObject;
+  LJSONMessages: TJSONArray;
+  LJSONMsg : TJSONObject;
+  LMessage: TChatMessage;
+  LJSONResponse: TJSONObject;
+  LChoices: TJSONArray;
+  LUsage: TJSONObject;
+  LChoice: TJSONObject;
 begin
   Result.Content := '';
   Result.Completion_Tokens := 0;
   Result.Prompt_Tokens := 0;
   Result.Total_Tokens := 0;
-  RESTClient := TRESTClient.Create(nil);
-  RESTRequest := TRESTRequest.Create(nil);
-  RESTResponse := TRESTResponse.Create(nil);
+  LRESTClient := TRESTClient.Create(nil);
+  LRESTRequest := TRESTRequest.Create(nil);
+  LRESTResponse := TRESTResponse.Create(nil);
   try
-    RESTClient.BaseURL := 'https://api.openai.com/v1/chat/completions';
-    RESTClient.Accept := 'application/json';
-    RESTClient.AcceptCharset := 'UTF-8';
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.Method := TRESTRequestMethod.rmPOST;
-    RESTRequest.Timeout := 60000; // Set the timeout as needed
-    RESTRequest.Resource := '';
-    RESTRequest.Params.AddItem('Authorization', 'Bearer ' + APIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    JSONBody := TJSONObject.Create;
-    JSONMessages := TJSONArray.Create;
+    LRESTClient.BaseURL := 'https://api.openai.com/v1/chat/completions';
+    LRESTClient.Accept := 'application/json';
+    LRESTClient.AcceptCharset := 'UTF-8';
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.Method := TRESTRequestMethod.rmPOST;
+    LRESTRequest.Timeout := 60000; // Set the timeout as needed
+    LRESTRequest.Resource := '';
+    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + APIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LJSONBody := TJSONObject.Create;
+    LJSONMessages := TJSONArray.Create;
     try
-      for Message in Messages do
+      for LMessage in AMessages do
       begin
-        JSONMsg := TJSONObject.Create;
-        JSONMsg.AddPair('role', Message.Role.ToLower);
-        JSONMsg.AddPair('content', Message.Content);
-        JSONMessages.AddElement(JSONMsg);
+        LJSONMsg := TJSONObject.Create;
+        LJSONMsg.AddPair('role', LMessage.Role.ToLower);
+        LJSONMsg.AddPair('content', LMessage.Content);
+        LJSONMessages.AddElement(LJSONMsg);
       end;
 
-
-      JSONBody.AddPair('model', 'gpt-3.5-turbo');
-      JSONBody.AddPair('messages', JSONMessages);
-//      JSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
-//      JSONBody.AddPair('n', TJSONNumber.Create(1));
-      RESTRequest.AddBody(JSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
-      RESTRequest.Execute;
-      if RESTResponse.StatusCode = 200 then
+      LJSONBody.AddPair('model', 'gpt-3.5-turbo');
+      LJSONBody.AddPair('messages', LJSONMessages);
+//      LJSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
+//      LJSONBody.AddPair('n', TJSONNumber.Create(1));
+      LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
+      LRESTRequest.Execute;
+      if LRESTResponse.StatusCode = 200 then
       begin
-        var jsonResponse := TJSONObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
+        LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
         try
-          var choices := jsonResponse.GetValue<TJSONArray>('choices');
-          var usage := jsonResponse.GetValue<TJSONObject>('usage');
-          usage.TryGetValue('completion_tokens', Result.Completion_Tokens);
-          usage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
-          usage.TryGetValue('total_tokens', Result.Total_Tokens);
-          var choice := choices.Items[0] as TJSONObject;
-          Result.Content := choice.GetValue('message').GetValue<string>('content');
+          LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
+          LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
+          LUsage.TryGetValue('completion_tokens', Result.Completion_Tokens);
+          LUsage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
+          LUsage.TryGetValue('total_tokens', Result.Total_Tokens);
+          LChoice := LChoices.Items[0] as TJSONObject;
+          Result.Content := LChoice.GetValue('message').GetValue<string>('content');
         finally
-          FreeAndNil(jsonResponse);
+          FreeAndNil(LJSONResponse);
         end;
       end
       else
       begin
-        raise Exception.CreateFmt('Error: %d - %s', [RESTResponse.StatusCode, RESTResponse.StatusText]);
+        raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
       end;
     finally
-      FreeAndNil(JSONBody);
+      FreeAndNil(LJSONBody);
     end;
   finally
-    FreeAndNil(RESTClient);
-    FreeAndNil(RESTRequest);
-    FreeAndNil(RESTResponse);
+    FreeAndNil(LRESTClient);
+    FreeAndNil(LRESTRequest);
+    FreeAndNil(LRESTResponse);
   end;
 end;
 
@@ -282,7 +285,6 @@ begin
     end
     else
       raise Exception.CreateFmt('Error: %d - %s', [LRestResponse.StatusCode, LRestResponse.StatusText]);
-
 
   finally
     FreeAndNil(LJson);
