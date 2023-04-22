@@ -40,7 +40,6 @@ type
     constructor Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
     function ToLanguages: TArray<string>; override;
     procedure Authenticate;
@@ -96,11 +95,6 @@ begin
   FreeAndNil(FRESTRequest);
   FreeAndNil(FRESTClient);
   inherited;
-end;
-
-function TGoogleTranslate.EngineName: string;
-begin
-  Result := 'Google Translate';
 end;
 
 function TGoogleTranslate.FromLanguages: TArray<string>;

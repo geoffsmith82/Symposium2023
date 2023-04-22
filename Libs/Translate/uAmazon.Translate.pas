@@ -26,7 +26,6 @@ type
   public
     constructor Create(const AccessKey, SecretKey, Endpoint: string);
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function EngineName: string; override;
   end;
 
 implementation
@@ -103,11 +102,6 @@ begin
 }
   // Return the authorization header value
   Result := Signature;
-end;
-
-function TAmazonTranslate.EngineName: string;
-begin
-  Result := 'Amazon Translate';
 end;
 
 function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;

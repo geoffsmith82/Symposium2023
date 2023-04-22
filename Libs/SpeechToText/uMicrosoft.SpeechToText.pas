@@ -17,7 +17,6 @@ type
     FSubscriptionKey : string;
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
-    function SpeechEngineName: string; override;
   end;
 
 implementation
@@ -27,11 +26,6 @@ uses
   ;
 
 { TMicrosoftSpeechToText }
-
-function TMicrosoftSpeechToText.SpeechEngineName: string;
-begin
-  Result := 'MicrosoftSpeech';
-end;
 
 function TMicrosoftSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;
 var

@@ -26,7 +26,6 @@ type
     constructor Create(const SubscriptionKey, Endpoint: string);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function EngineName: string; override;
     function FromLanguages: TArray<string>; override;
     function ToLanguages: TArray<string>; override;
   end;
@@ -63,11 +62,6 @@ begin
   FreeAndNil(FRESTRequest);
 
   inherited;
-end;
-
-function TMicrosoftTranslate.EngineName: string;
-begin
-  Result := 'Microsoft Translate';
 end;
 
 function TMicrosoftTranslate.FromLanguages: TArray<string>;
