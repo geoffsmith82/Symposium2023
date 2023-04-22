@@ -10,7 +10,7 @@ object frmImageGenerator: TfrmImageGenerator
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
@@ -32,7 +32,7 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 0
   end
   object btnExecute: TButton
-    Left = 512
+    Left = 496
     Top = 23
     Width = 75
     Height = 25
@@ -40,10 +40,10 @@ object frmImageGenerator: TfrmImageGenerator
     Caption = 'Execute'
     TabOrder = 1
     OnClick = btnExecuteClick
-    ExplicitLeft = 508
+    ExplicitLeft = 492
   end
   object seImageCount: TSpinEdit
-    Left = 528
+    Left = 512
     Top = 54
     Width = 59
     Height = 24
@@ -52,11 +52,10 @@ object frmImageGenerator: TfrmImageGenerator
     MinValue = 0
     TabOrder = 2
     Value = 1
-    OnChange = seImageCountChange
-    ExplicitLeft = 524
+    ExplicitLeft = 508
   end
   object cboSize: TComboBox
-    Left = 495
+    Left = 479
     Top = 84
     Width = 92
     Height = 23
@@ -69,55 +68,37 @@ object frmImageGenerator: TfrmImageGenerator
       '256x256'
       '512x512'
       '1024x1024')
-    ExplicitLeft = 491
+    ExplicitLeft = 475
   end
   object ScrollBox1: TScrollBox
     Left = 16
     Top = 128
-    Width = 585
+    Width = 569
     Height = 289
     VertScrollBar.Range = 2000
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoScroll = False
     TabOrder = 4
-    ExplicitWidth = 581
+    ExplicitWidth = 565
     ExplicitHeight = 288
-    object GridPanel1: TGridPanel
+    object ImagesFlowPanel: TFlowPanel
       Left = 0
       Top = 0
-      Width = 564
+      Width = 548
       Height = 2000
-      Align = alClient
-      Caption = 'GridPanel1'
-      ColumnCollection = <
-        item
-          SizeStyle = ssAuto
-          Value = 50.000000000000000000
-        end
-        item
-          SizeStyle = ssAuto
-          Value = 100.000000000000000000
-        end
-        item
-          SizeStyle = ssAuto
-          Value = 100.000000000000000000
-        end>
-      ControlCollection = <>
-      RowCollection = <
-        item
-          Value = 50.000000000000000000
-        end
-        item
-          Value = 50.000000000000000000
-        end>
+      Align = alTop
+      Caption = 'ImagesFlowPanel'
       TabOrder = 0
-      ExplicitWidth = 560
+      ExplicitLeft = 48
+      ExplicitTop = 48
+      ExplicitWidth = 185
+      ExplicitHeight = 41
     end
   end
-  object MainMenu1: TMainMenu
+  object mmMainMenu: TMainMenu
     Left = 184
     Top = 120
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
         Caption = '&New'
@@ -143,12 +124,12 @@ object frmImageGenerator: TfrmImageGenerator
       object N1: TMenuItem
         Caption = '-'
       end
-      object Exit1: TMenuItem
+      object miExit: TMenuItem
         Caption = 'E&xit'
-        OnClick = Exit1Click
+        OnClick = miExitClick
       end
     end
-    object Generator1: TMenuItem
+    object miGenerator: TMenuItem
       Caption = 'Generator'
       object miDALLE2: TMenuItem
         Caption = 'OpenAI DALL-E 2'
@@ -156,12 +137,12 @@ object frmImageGenerator: TfrmImageGenerator
       end
     end
   end
-  object PopupMenu1: TPopupMenu
+  object pmPopupMenu: TPopupMenu
     Left = 368
     Top = 32
-    object SaveImage1: TMenuItem
+    object miSaveImage: TMenuItem
       Caption = 'Save Image...'
-      OnClick = SaveImage1Click
+      OnClick = miSaveImageClick
     end
   end
   object SaveDialog: TSaveDialog
