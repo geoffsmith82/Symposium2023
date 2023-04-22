@@ -18,7 +18,6 @@ uses
   Vcl.Imaging.pngimage,
   Vcl.ExtCtrls,
   Vcl.Menus,
-  Vcl.MPlayer,
   System.IOUtils,
   OpenAI,
   uElevenLabs.REST,
@@ -36,19 +35,18 @@ type
     mmoOutput: TMemo;
     Image1: TImage;
     mmoPrompt: TMemo;
-    MediaPlayer1: TMediaPlayer;
     chkSpeak: TCheckBox;
     btnSpeakQuestion: TButton;
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
+    mmMainMenu: TMainMenu;
+    miFile: TMenuItem;
     miExit: TMenuItem;
-    SpeechEngine1: TMenuItem;
+    miTextToSpeechEngine: TMenuItem;
     miMicrosoftSpeechEngine: TMenuItem;
     miAmazonSpeechEngine: TMenuItem;
     miGoogleSpeechEngine: TMenuItem;
     miElevenLabsSpeechEngine: TMenuItem;
     miWindowsSpeechEngine: TMenuItem;
-    ModelMenu: TMenuItem;
+    miModelMenu: TMenuItem;
     miTextDavinci003: TMenuItem;
     miTextCurie0011: TMenuItem;
     miTextBabbage001: TMenuItem;
@@ -64,7 +62,6 @@ type
   private
     FSpeedToTextEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
-    procedure PlayTextWithSelectedEngine(text: string);
     function SelectedModel: string;
     { Private declarations }
   public
@@ -104,11 +101,11 @@ begin
   FSpeedToTextEngine.SelectEngine(lSpeechEngine);
   FSpeedToTextEngine.ActiveMenuItem.Checked := True;
   currentModel := FSettings.ReadString('ChatGPT', 'Model', 'text-davinci-003').Replace('&', '');
-  for i := 0 to ModelMenu.Count - 1 do
+  for i := 0 to miModelMenu.Count - 1 do
   begin
-    if ModelMenu.Items[i].Caption = currentModel then
+    if miModelMenu.Items[i].Caption = currentModel then
     begin
-      ModelMenu.Items[i].Click;
+      miModelMenu.Items[i].Click;
       break;
     end;
   end;
@@ -124,15 +121,14 @@ function TForm1.SelectedModel: string;
 var
   i : Integer;
 begin
-  for i := 0 to ModelMenu.Count - 1 do
+  for i := 0 to miModelMenu.Count - 1 do
   begin
-    if ModelMenu.Items[i].Checked then
+    if miModelMenu.Items[i].Checked then
     begin
-      Result := ModelMenu.Items[i].Caption.Replace('&', '');
+      Result := miModelMenu.Items[i].Caption.Replace('&', '');
     end;
   end;
 end;
-
 
 procedure TForm1.SelectSpeechEngine(Sender: TObject);
 begin
@@ -152,32 +148,11 @@ begin
     Update;
     if chkSpeak.Checked then
     begin
-      PlayTextWithSelectedEngine(mmoOutput.Lines.Text);
+      FSpeedToTextEngine.ActiveEngine.PlayText(mmoOutput.Lines.Text);
     end;
   finally
     Screen.Cursor := OldCursor;
   end;
-end;
-
-procedure TForm1.PlayTextWithSelectedEngine(text:string);
-var
-  Stream: TMemoryStream;
-  FileName: string;
-begin
-  Stream := nil;
-  try
-    Stream := FSpeedToTextEngine.ActiveEngine.TextToSpeech(text);
-    if not Assigned(Stream) then
-      Exit;
-    FileName := TPath.GetTempFileName + '.mp3';
-    Stream.Position := 0;
-    Stream.SaveToFile(FileName);
-  finally
-    Stream.Free;
-  end;
-  MediaPlayer1.FileName := FileName;
-  MediaPlayer1.Open;
-  MediaPlayer1.Play;
 end;
 
 procedure TForm1.btnGoogleAuthClick(Sender: TObject);
@@ -187,7 +162,7 @@ end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);
 begin
-  PlayTextWithSelectedEngine(mmoPrompt.Lines.Text);
+  FSpeedToTextEngine.ActiveEngine.PlayText(mmoPrompt.Lines.Text);
 end;
 
 procedure TForm1.miExitClick(Sender: TObject);

@@ -2,20 +2,20 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Delphi ChatGPT interface'
-  ClientHeight = 401
-  ClientWidth = 512
+  ClientHeight = 400
+  ClientWidth = 508
   Color = clBtnHighlight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignSize = (
-    512
-    401)
+    508
+    400)
   TextHeight = 13
   object Image1: TImage
     Left = 0
@@ -334,12 +334,12 @@ object Form1: TForm1
   object mmoOutput: TMemo
     Left = 24
     Top = 119
-    Width = 462
-    Height = 257
+    Width = 450
+    Height = 256
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
-    ExplicitWidth = 458
-    ExplicitHeight = 256
+    ExplicitWidth = 446
+    ExplicitHeight = 255
   end
   object mmoPrompt: TMemo
     Left = 71
@@ -348,24 +348,13 @@ object Form1: TForm1
     Height = 66
     TabOrder = 2
   end
-  object MediaPlayer1: TMediaPlayer
-    Left = 187
-    Top = 28
-    Width = 29
-    Height = 30
-    VisibleButtons = [btPlay]
-    DoubleBuffered = True
-    Visible = False
-    ParentDoubleBuffered = False
-    TabOrder = 3
-  end
   object chkSpeak: TCheckBox
     Left = 232
     Top = 87
     Width = 98
     Height = 18
     Caption = 'Speak Answer'
-    TabOrder = 4
+    TabOrder = 3
   end
   object btnSpeakQuestion: TButton
     Left = 96
@@ -373,20 +362,20 @@ object Form1: TForm1
     Width = 103
     Height = 26
     Caption = 'Speak Question'
-    TabOrder = 5
+    TabOrder = 4
     OnClick = btnSpeakQuestionClick
   end
-  object MainMenu1: TMainMenu
+  object mmMainMenu: TMainMenu
     Left = 836
     Top = 616
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object miExit: TMenuItem
         Caption = 'E&xit'
         OnClick = miExitClick
       end
     end
-    object SpeechEngine1: TMenuItem
+    object miTextToSpeechEngine: TMenuItem
       Caption = 'Speech Engine'
       object miMicrosoftSpeechEngine: TMenuItem
         AutoCheck = True
@@ -419,7 +408,7 @@ object Form1: TForm1
         OnClick = SelectSpeechEngine
       end
     end
-    object ModelMenu: TMenuItem
+    object miModelMenu: TMenuItem
       Caption = 'Model'
       object miTextDavinci003: TMenuItem
         AutoCheck = True

@@ -28,6 +28,7 @@ uses
   uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
   OpenAI in '..\Libs\OpenAI.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
+  uEngineManager in '..\Libs\uEngineManager.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}
