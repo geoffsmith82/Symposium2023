@@ -33,7 +33,6 @@ type
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
 
   public
-    function SpeechEngineName: string;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
     constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
@@ -43,11 +42,6 @@ type
 implementation
 
 { TGoogleSpeechToText }
-
-function TGoogleSpeechToText.SpeechEngineName: string;
-begin
-  Result := 'GoogleSpeech';
-end;
 
 constructor TGoogleSpeechToText.Create(const AResourceKey: string; const ASecretKey: string;const AApplicationName: string; AHost: string; Settings: TIniFile);
 begin

@@ -93,20 +93,16 @@ begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
 
   googleEngine := TGoogleSpeechToText.Create(google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings);
-  googleEngine.OnSelectEngine := HandleGoogleEngineSelected;
-  FSpeechToTextEngines.RegisterEngine(googleEngine, miGoogle);
+  FSpeechToTextEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
   microsoftEngine := TMicrosoftSpeechToText.Create('', '', '');
-  microsoftEngine.OnSelectEngine := HandleMicrosoftEngineSelected;
-  FSpeechToTextEngines.RegisterEngine(microsoftEngine, miMicrosoft);
+  FSpeechToTextEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
 
   amazonEngine := TAmazonSpeechToText.Create('', '', '');
-  amazonEngine.OnSelectEngine := HandleAmazonEngineSelected;
-  FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon);
+  FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon, HandleAmazonEngineSelected);
 
   whisperOnlineEngine := TOpenAiWhisperOnline.Create('', '', '');
-  whisperOnlineEngine.OnSelectEngine := HandleWhisperOnlineEngineSelected;
-  FSpeechToTextEngines.RegisterEngine(whisperOnlineEngine, miOpenAIWhisper);
+  FSpeechToTextEngines.RegisterEngine(whisperOnlineEngine, miOpenAIWhisper, HandleWhisperOnlineEngineSelected);
 
   engine := FSettings.ReadString('Settings', 'Engine', 'MicrosoftSpeech');
   FSpeechToTextEngines.SelectEngine(engine);

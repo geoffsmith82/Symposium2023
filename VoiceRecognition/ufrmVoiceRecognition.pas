@@ -276,7 +276,6 @@ begin
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedRecognitionEngine', 'TAssemblyAiRecognition');
   FSpeechRecognitionEngines.SelectEngine(lSpeechEngine);
-  FSpeechRecognitionEngines.ActiveEngine.DoSelectEngine;
   FSpeechRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 

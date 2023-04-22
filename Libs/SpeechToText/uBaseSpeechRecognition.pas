@@ -39,8 +39,6 @@ type
     function GetOnConnect: TOnConnect;
     function GetOnDisconnect: TOnConnect;
   public
-    OnSelectEngine : TNotifyEvent;
-    procedure DoSelectEngine;
     constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
     procedure Finish; virtual; abstract;
     procedure Add(ms: TMemoryStream);
@@ -70,12 +68,6 @@ end;
 constructor TBaseSpeechRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
 begin
   FResourceKey := AResourceKey;
-end;
-
-procedure TBaseSpeechRecognition.DoSelectEngine;
-begin
-  if Assigned(OnSelectEngine) then
-    OnSelectEngine(Self);
 end;
 
 function TBaseSpeechRecognition.GetOnConnect: TOnConnect;
