@@ -166,7 +166,6 @@ begin
     Request.Response := Response;
     Request.Method := rmPOST;
     Request.Resource := '';
-  //  Request.AddParameter('key', APIKey);
 
     // Define the input data for the face recognition request
     Image := TJSONObject.Create;
