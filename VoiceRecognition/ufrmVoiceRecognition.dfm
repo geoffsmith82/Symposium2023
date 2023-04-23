@@ -530,14 +530,14 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Width = 82
       Height = 73
       Anchors = [akTop, akRight]
-      ImageCollection = ImageCollection1
+      ImageCollection = ImageCollection
       ImageWidth = 0
       ImageHeight = 0
       ImageIndex = -1
       ExplicitLeft = 25
     end
   end
-  object DXAudioIn1: TDXAudioIn
+  object DXAudioIn: TDXAudioIn
     Latency = 100
     SamplesToRead = -1
     DeviceNumber = 0
@@ -551,11 +551,11 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Left = 56
     Top = 168
   end
-  object AudioProcessor1: TAudioProcessor
-    Input = DXAudioIn1
-    OnGetData = AudioProcessor1GetData
-    Left = 272
-    Top = 64
+  object AudioProcessor: TAudioProcessor
+    Input = DXAudioIn
+    OnGetData = AudioProcessorGetData
+    Left = 336
+    Top = 304
   end
   object mmMainMenu: TMainMenu
     Left = 488
@@ -643,7 +643,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = 'Audio Input'
     end
   end
-  object ImageCollection1: TImageCollection
+  object ImageCollection: TImageCollection
     Images = <
       item
         Name = 'microphone'
@@ -1523,7 +1523,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Top = 368
   end
   object NULLOut: TNULLOut
-    Input = AudioProcessor1
+    Input = AudioProcessor
     Left = 400
     Top = 336
   end

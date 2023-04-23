@@ -24,6 +24,8 @@ type
     procedure WSOnRecv(Sender: TSslWebSocketCli; const APacket: String; var AFrame: TWebSocketReceivedFrame);
     procedure WSOnConnected(Sender: TObject);
     procedure WSOnDisconnected(Sender: TObject);
+  private
+    procedure SetupWebSocket;
   public
     procedure WriteData(data: string); override;
     procedure WriteDataStream(m: TStream); override;
@@ -107,6 +109,22 @@ begin
   FDeepGram_Key := deepgram_key;
 end;
 
+procedure TDeepGramSendThread.SetupWebSocket;
+begin
+  FreeAndNil(FWebSocket);
+  FWebSocket := TSslWebSocketCli.Create(nil);
+  FWebSocket.URL := 'https://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
+  FWebSocket.Proxy := 'localhost';
+  FWebSocket.ProxyPort := '8888';
+  FWebSocket.ExtraHeaders.Add('Authorization: Token ' + FDeepGram_Key);
+  FWebSocket.ExtraHeaders.Add('Origin: api.deepgram.com');
+  FWebSocket.Connection := 'Upgrade';
+  FWebSocket.OnWSFrameRcvd := WSOnRecv;
+  FWebSocket.OnWSConnected := WSOnConnected;
+  FWebSocket.OnWSDisconnected := WSOnDisconnected;
+  FWebSocket.WSConnect;
+end;
+
 procedure TDeepGramSendThread.WriteData(data: string);
 begin
   FWebSocket.WSSendText(nil, data);
@@ -124,18 +142,8 @@ var
 begin
   inherited;
   NameThreadForDebugging('DeepGram.Ai');
-  FWebSocket := TSslWebSocketCli.Create(nil);
   try
-    FWebSocket.URL := 'https://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
-    FWebSocket.Proxy := 'localhost';
-    FWebSocket.ProxyPort := '8888';
-    FWebSocket.ExtraHeaders.Add('Authorization: Token ' + FDeepGram_Key);
-    FWebSocket.ExtraHeaders.Add('Origin: api.deepgram.com');
-    FWebSocket.Connection := 'Upgrade';
-    FWebSocket.OnWSFrameRcvd := WSOnRecv;
-    FWebSocket.OnWSConnected := WSOnConnected;
-    FWebSocket.OnWSDisconnected := WSOnDisconnected;
-    FWebSocket.WSConnect;
+    SetupWebSocket;
 
     mm := TMemoryStream.Create;
     while not Terminated do
@@ -151,7 +159,8 @@ begin
       mm.Position := 0;
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
-
+        if not FWebSocket.Connected then
+          SetupWebSocket;
         WriteDataStream(mm);
         FWebSocket.ProcessMessages;
       finally

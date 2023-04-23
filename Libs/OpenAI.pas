@@ -27,6 +27,8 @@ type
     Total_Tokens : Cardinal;
   end;
 
+  TOnChatMessageMessageResults = procedure(ASessionID: Int64; AChatResponse: TChatResponse) of object;
+
   TParameterDictionary = TDictionary<string, string>;
 
   TPrompt = class

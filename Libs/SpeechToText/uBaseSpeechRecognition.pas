@@ -12,6 +12,8 @@ type
   TOnHandleMessage = procedure(const msg: string) of object;
   TOnConnect = procedure(Sender: TObject) of object;
 
+  TExitStream = TMemoryStream;
+
 type
   TBaseSendThread = class(TThread)
   strict protected

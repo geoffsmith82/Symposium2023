@@ -80,8 +80,8 @@ uses
 type
   TRecognitionStatus = (rsListening, rsThinking, rsSpeaking , rsStopped);
   TfrmVoiceRecognition = class(TForm)
-    DXAudioIn1: TDXAudioIn;
-    AudioProcessor1: TAudioProcessor;
+    DXAudioIn: TDXAudioIn;
+    AudioProcessor: TAudioProcessor;
     mmoQuestions: TMemo;
     mmoAnswers: TMemo;
     mmMainMenu: TMainMenu;
@@ -101,7 +101,7 @@ type
     miGoogleSpeechEngine: TMenuItem;
     miWindowsSpeechEngine: TMenuItem;
     miAudioInput: TMenuItem;
-    ImageCollection1: TImageCollection;
+    ImageCollection: TImageCollection;
     miSpeechRecognitionEngine: TMenuItem;
     miDeepGram: TMenuItem;
     miAssemblyAI: TMenuItem;
@@ -122,7 +122,7 @@ type
     Panel1: TPanel;
     VirtualImage1: TVirtualImage;
     procedure FormCreate(Sender: TObject);
-    procedure AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
+    procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -240,15 +240,15 @@ var
 begin
   miAudioInput.Clear;
   lAudioInput := FSettings.ReadInteger('Audio', 'Input', 0);
-  for i := 0 to DXAudioIn1.DeviceCount - 1 do
+  for i := 0 to DXAudioIn.DeviceCount - 1 do
   begin
     mi := TMenuItem.Create(nil);
-    mi.Caption := DXAudioIn1.DeviceName[i];
+    mi.Caption := DXAudioIn.DeviceName[i];
     mi.Tag := i;
     if lAudioInput = i then
     begin
       mi.Checked := True;
-      DXAudioIn1.DeviceNumber := i;
+      DXAudioIn.DeviceNumber := i;
     end;
     mi.GroupIndex := 10;
     mi.RadioItem := True;
@@ -448,7 +448,7 @@ begin
 end;
 
 
-procedure TfrmVoiceRecognition.AudioProcessor1GetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
+procedure TfrmVoiceRecognition.AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
 var
   mem : TMemoryStream;
 begin

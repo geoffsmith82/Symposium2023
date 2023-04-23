@@ -26,6 +26,8 @@ type
     procedure WSOnConnected(Sender: TObject);
     procedure WSOnDisconnected(Sender: TObject);
     procedure WSOnSent(Sender: TSslWebSocketCli; var AFrame: TWebSocketOutgoingFrame);
+  private
+    procedure SetupWebSocket;
   public
     procedure WriteData(data: string); override;
     procedure Execute; override;
@@ -102,6 +104,23 @@ begin
   inherited;
 end;
 
+procedure TAssemblyAiSendThread.SetupWebSocket;
+begin
+  FreeAndNil(FWebSocket);
+  FWebSocket := TSslWebSocketCli.Create(nil);
+  FWebSocket.URL := 'https://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
+  FWebSocket.Proxy := 'localhost';
+  FWebSocket.ProxyPort := '8888';
+  FWebSocket.ExtraHeaders.Add('Authorization: ' + FAssemblyai_key);
+  FWebSocket.ExtraHeaders.Add('Origin: api.assemblyai.com');
+  FWebSocket.Connection := 'Upgrade';
+  FWebSocket.OnWSFrameRcvd := WSOnRecv;
+  FWebSocket.OnWSFrameSent := WSOnSent;
+  FWebSocket.OnWSConnected := WSOnConnected;
+  FWebSocket.OnWSDisconnected := WSOnDisconnected;
+  FWebSocket.WSConnect;
+end;
+
 procedure TAssemblyAiSendThread.WSOnSent(Sender: TSslWebSocketCli; var AFrame: TWebSocketOutgoingFrame);
 begin
   OutputDebugString(PChar('Sent'));
@@ -136,24 +155,17 @@ var
 begin
   inherited;
   NameThreadForDebugging('Assembly.Ai');
-  FWebSocket := TSslWebSocketCli.Create(nil);
   try
-    FWebSocket.URL := 'https://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
-    FWebSocket.Proxy := 'localhost';
-    FWebSocket.ProxyPort := '8888';
-    FWebSocket.ExtraHeaders.Add('Authorization: ' + FAssemblyai_key);
-    FWebSocket.ExtraHeaders.Add('Origin: api.assemblyai.com');
-    FWebSocket.Connection := 'Upgrade';
-    FWebSocket.OnWSFrameRcvd := WSOnRecv;
-    FWebSocket.OnWSFrameSent := WSOnSent;
-    FWebSocket.OnWSConnected := WSOnConnected;
-    FWebSocket.OnWSDisconnected := WSOnDisconnected;
-    FWebSocket.WSConnect;
+    SetupWebSocket;
 
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
       m := FQueueItems.PopItem;
+      if m.ClassName = 'TExitStream' then
+      begin
+        Exit;
+      end;
       if mm.Size < 17000 then // Assembly AI needs chunks of audio of 1 second in size minimum
       begin
         m.Position := 0;
@@ -165,7 +177,7 @@ begin
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
         if not FWebSocket.Connected then
-          FWebSocket.WSConnect;
+          SetupWebSocket;
 
         msg := TJSONObject.Create;
         try
@@ -207,7 +219,7 @@ end;
 procedure TAssemblyAiRecognition.Finish;
 begin
   inherited;
-  TThread.Synchronize(FSendThread, procedure
+  TThread.Queue(FSendThread, procedure
   begin
     FSendThread.WriteData('{ "terminate_session": True }');
   end);
