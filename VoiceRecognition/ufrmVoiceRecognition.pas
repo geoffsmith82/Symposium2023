@@ -14,6 +14,7 @@ uses
   System.IOUtils,
   System.JSON,
   System.SyncObjs,
+  System.Threading,
   Vcl.ExtCtrls,
   Vcl.Menus,
   Vcl.MPlayer,
@@ -77,6 +78,7 @@ uses
   ;
 
 type
+  TRecognitionStatus = (rsListening, rsThinking, rsSpeaking , rsStopped);
   TfrmVoiceRecognition = class(TForm)
     DXAudioIn1: TDXAudioIn;
     AudioProcessor1: TAudioProcessor;
@@ -98,7 +100,6 @@ type
     miAmazonSpeechEngine: TMenuItem;
     miGoogleSpeechEngine: TMenuItem;
     miWindowsSpeechEngine: TMenuItem;
-    UserInterfaceUpdateTimer: TTimer;
     miAudioInput: TMenuItem;
     ImageCollection1: TImageCollection;
     miSpeechRecognitionEngine: TMenuItem;
@@ -126,7 +127,6 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miExitClick(Sender: TObject);
-    procedure UserInterfaceUpdateTimerTimer(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
     procedure btnNewChatSessionClick(Sender: TObject);
@@ -137,8 +137,11 @@ type
     { Private declarations }
     FSettings : TIniFile;
     FConnected : Boolean;
+    FShouldBeListening : Boolean;
     FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
+    task : ITask;
+    FStatus : TRecognitionStatus;
 
     procedure LoadAudioInputsMenu;
 
@@ -147,10 +150,16 @@ type
     procedure OnHandleDisconnect(Connection: TObject);
     procedure SetupTextToSpeechEngines;
     procedure SetupSpeechRecognitionEngines;
+    procedure OnHandleChatResponse(SessionID: Int64 ;ChatResponse: TChatResponse);
+    procedure AsyncSendChatMessagesToOpenAI(ASessionID: Int64;
+      AChatMessages: TObjectList<TChatMessage>;
+      AOnMessageResults: TOnChatMessageMessageResults);
+    procedure OnFinishedPlaying(Sender: TObject);
   public
     { Public declarations }
     procedure ShowListening;
     procedure ShowSpeaking;
+    procedure ShowThinking;
     procedure StopListening;
     procedure StartListening;
   end;
@@ -182,20 +191,27 @@ begin
   VirtualImage1.Update;
 end;
 
+procedure TfrmVoiceRecognition.ShowThinking;
+begin
+  VirtualImage1.ImageIndex := 2;
+  VirtualImage1.Update;
+end;
+
 procedure TfrmVoiceRecognition.StartListening;
 begin
+  FShouldBeListening := True;
+  FStatus := TRecognitionStatus.rsListening;
   FSpeechRecognitionEngines.ActiveEngine.Resume;
   NULLOut.Run;
   ShowListening;
-  UserInterfaceUpdateTimer.Enabled := True;
 end;
 
 procedure TfrmVoiceRecognition.StopListening;
 begin
+  FShouldBeListening := False;
   FSpeechRecognitionEngines.ActiveEngine.Finish;
   VirtualImage1.ImageIndex := -1;
   NULLOut.Stop(False);
-  UserInterfaceUpdateTimer.Enabled := False;
 end;
 
 procedure TfrmVoiceRecognition.ShowListening;
@@ -309,104 +325,126 @@ begin
   DBAdvGrid1.ColWidths[1] := DBAdvGrid1.ClientWidth - 150;
 end;
 
-procedure TfrmVoiceRecognition.UserInterfaceUpdateTimerTimer(Sender: TObject);
-begin
- // OutputDebugString(PChar(MediaPlayer1.EndPos.ToString + ' ' + MediaPlayer1.Position.ToString));
-  if FTextToSpeechEngines.ActiveEngine.Mode = mpStopped then
-  begin
-    if NULLOut.Status <> tosPlaying then
-      StartListening;
-  end;
-  if FTextToSpeechEngines.ActiveEngine.Mode = mpPlaying then
-  begin
-
-  end
-  else
-  begin
-    ShowListening;
-  end;
-end;
-
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);
 begin
   mmoQuestions.Lines.Add('Connected');
   FConnected := True;
+  if FShouldBeListening then
+    ShowListening;
 end;
 
 procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TObject);
 begin
   mmoQuestions.Lines.Add('Disconnected');
   FConnected := False;
+  if not FShouldBeListening then
+    StopListening;
 end;
+
+procedure TfrmVoiceRecognition.AsyncSendChatMessagesToOpenAI(ASessionID: Int64; AChatMessages: TObjectList<TChatMessage>; AOnMessageResults: TOnChatMessageMessageResults);
+begin
+  if AChatMessages.Count = 0 then
+  begin
+    FreeAndNil(AChatMessages);
+    Exit;
+  end;
+  FStatus := TRecognitionStatus.rsThinking;
+  ShowThinking;
+  task := TTask.Run(procedure ()
+               var
+                 ChatResponse: TChatResponse;
+               begin
+                 ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, AChatMessages);
+                 if not Assigned(AOnMessageResults) then
+                   raise Exception.Create('No Message Results Event given');
+
+                 TThread.Queue(nil, procedure
+                   begin
+                     AOnMessageResults(ASessionID, ChatResponse);
+                   end);
+                 FreeAndNil(AChatMessages);
+               end);
+  task.Start;
+end;
+
+procedure TfrmVoiceRecognition.OnHandleChatResponse(SessionID: Int64 ;ChatResponse: TChatResponse);
+begin
+  tblConversation.Append;
+  try
+    tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
+    tblConversation.FieldByName('User').AsString := 'Assistant';
+    tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
+    tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
+    tblConversation.Post;
+    DBAdvGrid1.AutoSizeRows(True, 4);
+  except
+    on e : Exception do
+    begin
+      tblConversation.Cancel;
+    end;
+  end;
+  NULLOut.Stop(False);
+  FStatus := TRecognitionStatus.rsSpeaking;
+  ShowSpeaking;
+  FTextToSpeechEngines.ActiveEngine.OnFinishedPlaying := OnFinishedPlaying;
+  FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content);
+end;
+
+procedure TfrmVoiceRecognition.OnFinishedPlaying(Sender: TObject);
+begin
+  // Change back to listening
+  StartListening;
+end;
+
 
 procedure TfrmVoiceRecognition.OnHandleSpeechRecognitionCompletion(const Text: string);
 var
   question : string;
   ChatMessages: TObjectList<TChatMessage>;
-  ChatResponse: TChatResponse;
   chat : TChatMessage;
   SessionID : Int64;
-  embedding: TArray<string>;
 begin
-   question := Text;
-   mmoQuestions.Lines.Add(question);
-//   response := TOpenAI.AskChatGPT(Text, 'text-davinci-003');
-   ChatMessages := TObjectList<TChatMessage>.Create(True);
-   try
-     tblConversation.DisableControls;
-     try
-       SessionID := tblSessions.FieldByName('SessionID').AsLargeInt;
+  question := Text;
+  if Text.IsEmpty then
+    Exit;
 
-       tblConversation.Append;
-       tblConversation.FieldByName('User').AsString := 'User';
-       tblConversation.FieldByName('Message').AsString := question;
-       tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
-       tblConversation.Post;
-     finally
-       tblConversation.EnableControls;
-     end;
-     DBAdvGrid1.AutoSizeRows(True, 4);
-     tblConversation.DisableControls;
-     try
-       tblConversation.First;
-       repeat
-         chat := TChatMessage.Create;
-         chat.Role := tblConversation.FieldByName('User').AsString;
-         chat.Content := tblConversation.FieldByName('Message').AsString;
-         ChatMessages.Add(chat);
-         tblConversation.Next;
-       until tblConversation.Eof;
+  StopListening;
 
-       ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, ChatMessages);
-       tblConversation.Append;
-       try
-         tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
-         tblConversation.FieldByName('User').AsString := 'Assistant';
-         tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
-         setlength(embedding, 2);
-         embedding[0] := question;
-         embedding[1] := ChatResponse.Content;
-         TOpenAI.Embeddings(embedding);
+  if Text.StartsWith('Stop Listening', true) then
+  begin
+    Exit;
+  end;
 
-         tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
-         tblConversation.Post;
-       except
-         on e : Exception do
-         begin
+  ChatMessages := TObjectList<TChatMessage>.Create(True);
+  tblConversation.DisableControls;
+  try
+    SessionID := tblSessions.FieldByName('SessionID').AsLargeInt;
 
-         end;
-       end;
-     finally
-       tblConversation.EnableControls;
-     end;
-   finally
-     FreeAndNil(ChatMessages);
-   end;
-   mmoAnswers.Lines.Text := ChatResponse.Content;
-   mmoAnswers.Update;
-   NULLOut.Stop(False);
-   ShowSpeaking;
-   FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content);
+    tblConversation.Append;
+    tblConversation.FieldByName('User').AsString := 'User';
+    tblConversation.FieldByName('Message').AsString := question;
+    tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
+    tblConversation.Post;
+  finally
+    tblConversation.EnableControls;
+  end;
+  DBAdvGrid1.AutoSizeRows(True, 4);
+  tblConversation.DisableControls;
+  try
+    tblConversation.First;
+    repeat
+      chat := TChatMessage.Create;
+      chat.Role := tblConversation.FieldByName('User').AsString;
+      chat.Content := tblConversation.FieldByName('Message').AsString;
+      ChatMessages.Add(chat);
+      tblConversation.Next;
+    until tblConversation.Eof;
+    FStatus := TRecognitionStatus.rsThinking;
+    ShowThinking;
+    AsyncSendChatMessagesToOpenAI(SessionID, ChatMessages, OnHandleChatResponse);
+  finally
+    tblConversation.EnableControls;
+  end;
 end;
 
 
@@ -433,8 +471,25 @@ begin
 end;
 
 procedure TfrmVoiceRecognition.btnStartClick(Sender: TObject);
+var
+  SessionID: Int64;
+  ChatMessages: TObjectList<TChatMessage>;
+  chat : TChatMessage;
 begin
-  StartListening;
+  SessionID := tblSessions.FieldByName('SessionID').AsLargeInt;
+  if tblConversation.RecordCount = 1 then
+  begin
+    ChatMessages:= TObjectList<TChatMessage>.Create;
+    chat := TChatMessage.Create;
+    chat.Role := 'System';
+    chat.Content := tblConversation.FieldByName('Message').AsString;
+    ChatMessages.Add(chat);
+    AsyncSendChatMessagesToOpenAI(SessionID, ChatMessages, OnHandleChatResponse);
+  end
+  else
+  begin
+    StartListening;
+  end;
 end;
 
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
@@ -448,7 +503,11 @@ begin
 end;
 
 procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);
+var
+  exitStream: TExitStream;
 begin
+  exitStream := TExitStream.Create;
+  FSpeechRecognitionEngines.ActiveEngine.Add(exitStream);
   Application.Terminate;
 end;
 
