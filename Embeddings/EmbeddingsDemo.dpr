@@ -2,7 +2,7 @@ program EmbeddingsDemo;
 
 uses
   Vcl.Forms,
-  frmEmbeddings in 'frmEmbeddings.pas' {Form4},
+  ufrmEmbeddings in 'ufrmEmbeddings.pas' {frmEmbeddings},
   uGoogleCustomSearch in '..\Libs\Search\uGoogleCustomSearch.pas',
   OpenAI in '..\Libs\OpenAI.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
@@ -12,6 +12,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm4, Form4);
+  Application.CreateForm(TfrmEmbeddings, frmEmbeddings);
   Application.Run;
 end.

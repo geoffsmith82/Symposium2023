@@ -1,7 +1,7 @@
-object Form4: TForm4
+object frmEmbeddings: TfrmEmbeddings
   Left = 0
   Top = 0
-  Caption = 'Form4'
+  Caption = 'frmEmbeddings'
   ClientHeight = 442
   ClientWidth = 628
   Color = clBtnFace
@@ -11,14 +11,14 @@ object Form4: TForm4
   Font.Name = 'Segoe UI'
   Font.Style = []
   TextHeight = 15
-  object Button1: TButton
-    Left = 528
+  object btnGoogleSearch: TButton
+    Left = 503
     Top = 16
-    Width = 75
+    Width = 117
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Google Search'
     TabOrder = 0
-    OnClick = Button1Click
+    OnClick = btnGoogleSearchClick
   end
   object Memo1: TMemo
     Left = 8
@@ -29,14 +29,14 @@ object Form4: TForm4
       'Memo1')
     TabOrder = 1
   end
-  object Button2: TButton
-    Left = 528
+  object btnEmbeddings: TButton
+    Left = 503
     Top = 72
-    Width = 75
+    Width = 117
     Height = 25
-    Caption = 'Button2'
+    Caption = 'Embeddings Demo'
     TabOrder = 2
-    OnClick = Button2Click
+    OnClick = btnEmbeddingsClick
   end
   object FDConnection1: TFDConnection
     Params.Strings = (

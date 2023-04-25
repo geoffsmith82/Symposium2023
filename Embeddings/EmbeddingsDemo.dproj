@@ -115,8 +115,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frmEmbeddings.pas">
-            <Form>Form4</Form>
+        <DCCReference Include="ufrmEmbeddings.pas">
+            <Form>frmEmbeddings</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\Search\uGoogleCustomSearch.pas"/>

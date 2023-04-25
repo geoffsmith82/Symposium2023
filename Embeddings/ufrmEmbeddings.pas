@@ -1,4 +1,4 @@
-unit frmEmbeddings;
+unit ufrmEmbeddings;
 
 interface
 
@@ -40,14 +40,14 @@ type
   end;
 
 
-  TForm4 = class(TForm)
-    Button1: TButton;
+  TfrmEmbeddings = class(TForm)
+    btnGoogleSearch: TButton;
     Memo1: TMemo;
     FDConnection1: TFDConnection;
     FDPhysPgDriverLink1: TFDPhysPgDriverLink;
-    Button2: TButton;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    btnEmbeddings: TButton;
+    procedure btnGoogleSearchClick(Sender: TObject);
+    procedure btnEmbeddingsClick(Sender: TObject);
   private
     function GetQuestionsArray: TArray<string>;
     function GetCompareQuestionsArray: TArray<string>;
@@ -61,7 +61,7 @@ type
   end;
 
 var
-  Form4: TForm4;
+  frmEmbeddings: TfrmEmbeddings;
 
 implementation
 
@@ -69,7 +69,7 @@ implementation
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm4.Button1Click(Sender: TObject);
+procedure TfrmEmbeddings.btnGoogleSearchClick(Sender: TObject);
 const
   API_KEY = google_custom_search_key;
   CX = google_custom_search_cx;
@@ -91,7 +91,7 @@ begin
   end;
 end;
 
-function TForm4.GetQuestionsArray: TArray<string>;
+function TfrmEmbeddings.GetQuestionsArray: TArray<string>;
 begin
   Result := TArray<string>.Create(
     'What is the time',
@@ -117,8 +117,7 @@ begin
     // add more questions here ...
   );
 end;
-
-function TForm4.GetCompareQuestionsArray: TArray<string>;
+function TfrmEmbeddings.GetCompareQuestionsArray: TArray<string>;
 begin
   Result := TArray<string>.Create(
     'What is the temperature outside?',
@@ -130,8 +129,7 @@ begin
     // add more compare questions here ...
   );
 end;
-
-procedure TForm4.Button2Click(Sender: TObject);
+procedure TfrmEmbeddings.btnEmbeddingsClick(Sender: TObject);
 var
   questions : TArray<string>;
   compareQuestions : TArray<string>;
@@ -142,28 +140,22 @@ var
 begin
   questions := GetQuestionsArray;
   embeddingsFromDB := TOpenAI.Embeddings(questions);
-
   compareQuestions := GetCompareQuestionsArray;
   compareQuestionEmbeddings := TOpenAI.Embeddings(compareQuestions);
-
   Memo1.Lines.Clear;
-
   SetLength(closestMatches, Length(compareQuestions));
-
   // Loop through each compare question
   for i := 0 to Length(compareQuestions) - 1 do
   begin
     Memo1.Lines.Add('Compare Question: ' + compareQuestions[i]);
-
     // Find top 3 closest matches for current compare question
     closestMatches[i] := FindClosestMatches(compareQuestionEmbeddings[i], questions, embeddingsFromDB);
-
     // Display closest matches for current compare question
     DisplayMatches(closestMatches[i], questions);
   end;
 end;
 
-function TForm4.FindClosestMatches(const compareEmbedding: TArray<Double>; const questions: TArray<string>; const embeddings: TArray<TArray<Double>>): TArray<TEmbeddingMatch>;
+function TfrmEmbeddings.FindClosestMatches(const compareEmbedding: TArray<Double>; const questions: TArray<string>; const embeddings: TArray<TArray<Double>>): TArray<TEmbeddingMatch>;
 var
   i: Integer;
   distances : TArray<Double>;
@@ -174,14 +166,12 @@ begin
   begin
     distances[i] := CosineDistance(compareEmbedding, embeddings[i]);
   end;
-
   SetLength(closestMatches, 3);
   for i := 0 to 2 do
   begin
     closestMatches[i].Index := -1;
     closestMatches[i].Distance := MaxDouble;
   end;
-
   for i := 0 to Length(questions) - 1 do
   begin
     for var j := 0 to 2 do
@@ -194,11 +184,10 @@ begin
       end;
     end;
   end;
-
   Result := closestMatches;
 end;
 
-procedure TForm4.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
+procedure TfrmEmbeddings.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
 var
   i: Integer;
 begin
@@ -210,7 +199,6 @@ begin
       Memo1.Lines.Add(closestMatches[i].Distance.ToString + ' | ' + questions[closestMatches[i].Index]);
     end;
   end;
-
   Memo1.Lines.Add('---');
 end;
 
