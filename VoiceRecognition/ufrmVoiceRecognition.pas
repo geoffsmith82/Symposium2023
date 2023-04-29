@@ -135,6 +135,9 @@ type
     procedure tblSessionsAfterScroll(DataSet: TDataSet);
     procedure DBCtrlGrid1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
+    procedure btnDeleteSessionClick(Sender: TObject);
+    procedure Model2Click(Sender: TObject);
+    procedure btnDeleteMessageClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -465,6 +468,36 @@ begin
   FSpeechRecognitionEngines.ActiveEngine.Add(mem);
 
   OutputDebugString(PChar('Len ' + Bytes.ToString));
+end;
+
+procedure TfrmVoiceRecognition.btnDeleteMessageClick(Sender: TObject);
+begin
+  tblConversation.Delete;
+end;
+
+procedure TfrmVoiceRecognition.btnDeleteSessionClick(Sender: TObject);
+var
+  SessionID : Int64;
+  qry : TFDQuery;
+begin
+  SessionID := tblSessions.FieldByName('SessionID').AsLargeInt;
+  FDConnection.StartTransaction;
+  try
+    qry := TFDQuery.Create(nil);
+    try
+      qry.Connection := FDConnection;
+      qry.SQL.Text := 'DELETE FROM Conversation WHERE (SessionID=:SessionID)';
+      qry.ParamByName('SessionID').AsLargeInt := SessionID;
+      qry.ExecSQL;
+    finally
+      FreeAndNil(qry);
+    end;
+
+    tblSessions.Delete;
+    FDConnection.Commit;
+  except
+    FDConnection.Rollback;
+  end;
 end;
 
 procedure TfrmVoiceRecognition.btnNewChatSessionClick(Sender: TObject);

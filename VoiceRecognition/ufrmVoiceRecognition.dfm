@@ -35,11 +35,14 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Width = 153
     Height = 351
     Align = alLeft
+    AllowDelete = False
+    AllowInsert = False
     DataSource = dsSessions
     PanelHeight = 50
     PanelWidth = 136
     TabOrder = 2
     RowCount = 7
+    SelectedColor = clHighlight
     OnClick = DBCtrlGrid1Click
     OnDblClick = DBCtrlGrid1Click
     ExplicitHeight = 350
@@ -105,6 +108,26 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       OnClick = btnStopClick
       ExplicitLeft = 596
     end
+    object btnDeleteSession: TButton
+      Left = 226
+      Top = 1
+      Width = 103
+      Height = 39
+      Align = alLeft
+      Caption = 'Delete Session'
+      TabOrder = 3
+      OnClick = btnDeleteSessionClick
+    end
+    object btnDeleteMessage: TButton
+      Left = 329
+      Top = 1
+      Width = 96
+      Height = 39
+      Align = alLeft
+      Caption = 'Delete Message'
+      TabOrder = 4
+      OnClick = btnDeleteMessageClick
+    end
   end
   object StatusBar: TStatusBar
     Left = 0
@@ -127,6 +150,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     FixedCols = 0
     RowCount = 2
     FixedRows = 1
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect, goFixedRowDefAlign]
     TabOrder = 5
     ActiveCellFont.Charset = DEFAULT_CHARSET
     ActiveCellFont.Color = 4474440
@@ -189,6 +213,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     FixedFont.Name = 'Segoe UI'
     FixedFont.Style = [fsBold]
     FloatFormat = '%.2f'
+    FocusHelper.Enabled = True
     HoverButtons.Buttons = <>
     HTMLSettings.ImageFolder = 'images'
     HTMLSettings.ImageBaseName = 'img'
