@@ -27,6 +27,19 @@ type
     Total_Tokens : Cardinal;
   end;
 
+  TChatSettings = record
+     model : string;
+     temperature : Double;
+     top_p : Double;
+     n : Integer;
+     stop : string;
+     max_tokens : Integer;
+     presence_penalty : Double;
+     frequency_penalty : Double;
+     user : string;
+  end;
+
+
   TOnChatMessageMessageResults = procedure(ASessionID: Int64; AChatResponse: TChatResponse) of object;
 
   TParameterDictionary = TDictionary<string, string>;
@@ -48,7 +61,7 @@ type
   TOpenAI = class
   public
     class procedure ListOpenAIModels(out AModelList: TStringList); static;
-    class function SendChatMessagesToOpenAI(const APIKey: string; AMessages: TObjectList<TChatMessage>): TChatResponse; static;
+    class function SendChatMessagesToOpenAI(const APIKey: string; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
     class function Embeddings(const Texts: TArray<string>): TEmbeddings; static;
@@ -87,7 +100,7 @@ begin
   Result := 1 - (DotProduct / (Magnitude1 * Magnitude2));
 end;
 
-class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; AMessages: TObjectList<TChatMessage>): TChatResponse;
+class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
@@ -132,6 +145,11 @@ begin
 
       LJSONBody.AddPair('model', 'gpt-3.5-turbo');
       LJSONBody.AddPair('messages', LJSONMessages);
+      if ChatConfig.max_tokens > 0 then
+        LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
+      if ChatConfig.user.Length > 0 then
+        LJSONBody.AddPair('user', ChatConfig.user);
+
 //      LJSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
 //      LJSONBody.AddPair('n', TJSONNumber.Create(1));
       LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);

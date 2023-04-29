@@ -349,6 +349,8 @@ begin
 end;
 
 procedure TfrmVoiceRecognition.AsyncSendChatMessagesToOpenAI(ASessionID: Int64; AChatMessages: TObjectList<TChatMessage>; AOnMessageResults: TOnChatMessageMessageResults);
+var
+  ChatConfig: TChatSettings;
 begin
   if AChatMessages.Count = 0 then
   begin
@@ -361,7 +363,7 @@ begin
                var
                  ChatResponse: TChatResponse;
                begin
-                 ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, AChatMessages);
+                 ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, ChatConfig, AChatMessages);
                  if not Assigned(AOnMessageResults) then
                    raise Exception.Create('No Message Results Event given');
 
