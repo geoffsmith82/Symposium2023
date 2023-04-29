@@ -75,7 +75,9 @@ begin
     try
       frmVoiceRecognition.tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
       frmVoiceRecognition.tblConversation.FieldByName('User').AsString := 'System';
-      frmVoiceRecognition.tblConversation.FieldByName('Message').AsString := tblChatSessionList.FieldByName('Prompt').AsString;
+      frmVoiceRecognition.tblConversation.FieldByName('Message').AsString := 'Task: ' + tblChatSessionList.FieldByName('Task').AsString +
+         System.sLineBreak + 'Personality: ' + tblChatSessionList.FieldByName('Personality').AsString +
+         System.sLineBreak + 'Prompt: "' + tblChatSessionList.FieldByName('Prompt').AsString +'"';
       frmVoiceRecognition.tblConversation.Post;
       Close;
     except
