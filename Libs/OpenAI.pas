@@ -30,6 +30,8 @@ type
   TOnChatMessageMessageResults = procedure(ASessionID: Int64; AChatResponse: TChatResponse) of object;
 
   TParameterDictionary = TDictionary<string, string>;
+  TEmbedding = TArray<Double>;
+  TEmbeddings = TArray<TEmbedding>;
 
   TPrompt = class
   private
@@ -49,10 +51,10 @@ type
     class function SendChatMessagesToOpenAI(const APIKey: string; AMessages: TObjectList<TChatMessage>): TChatResponse; static;
     class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     class function AskChatGPT(const AQuestion: string; const AModel: string): string;
-    class function Embeddings(const Texts: TArray<string>): TArray<TArray<Double>>; static;
+    class function Embeddings(const Texts: TArray<string>): TEmbeddings; static;
   end;
 
-function CosineDistance(const Vector1, Vector2: TArray<Double>): Double;
+function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
 
 implementation
 
@@ -61,7 +63,7 @@ implementation
 const
   API_URL = 'https://api.openai.com/v1/embeddings';
 
-function CosineDistance(const Vector1, Vector2: TArray<Double>): Double;
+function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
 var
   DotProduct, Magnitude1, Magnitude2: Double;
   i: Integer;
@@ -276,7 +278,7 @@ begin
   end;
 end;
 
-class function TOpenAI.Embeddings(const Texts: TArray<string>): TArray<TArray<Double>>;
+class function TOpenAI.Embeddings(const Texts: TArray<string>): TEmbeddings;
 var
   LRestClient: TRESTClient;
   LRestRequest: TRESTRequest;
