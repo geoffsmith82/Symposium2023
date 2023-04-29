@@ -51,7 +51,8 @@ implementation
 
 procedure TAssemblyAiSendThread.WriteData(data: string);
 begin
-   FWebSocket.WSSendText(nil, data);
+  if Assigned(FWebSocket) then
+    FWebSocket.WSSendText(nil, data);
 end;
 
 procedure TAssemblyAiSendThread.WSOnConnected(Sender: TObject);
@@ -154,10 +155,9 @@ var
   msg : TJSONObject;
 begin
   inherited;
+  FWebSocket := nil;
   NameThreadForDebugging('Assembly.Ai');
   try
-    SetupWebSocket;
-
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
@@ -176,7 +176,7 @@ begin
       mm.Position := 0;
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
-        if not FWebSocket.Connected then
+        if not Assigned(FWebSocket) or not FWebSocket.Connected then
           SetupWebSocket;
 
         msg := TJSONObject.Create;

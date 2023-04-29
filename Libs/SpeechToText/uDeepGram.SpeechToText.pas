@@ -142,9 +142,8 @@ var
 begin
   inherited;
   NameThreadForDebugging('DeepGram.Ai');
+  FWebSocket := nil;
   try
-    SetupWebSocket;
-
     mm := TMemoryStream.Create;
     while not Terminated do
     begin
@@ -159,7 +158,7 @@ begin
       mm.Position := 0;
       OutputDebugString(PChar('Size:' + mm.Size.ToString));
       try
-        if not FWebSocket.Connected then
+        if not Assigned(FWebSocket) or not FWebSocket.Connected then
           SetupWebSocket;
         WriteDataStream(mm);
         FWebSocket.ProcessMessages;
