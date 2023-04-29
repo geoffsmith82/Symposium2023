@@ -32,6 +32,7 @@ uses
   uDeepGram.SpeechToText in '..\Libs\SpeechToText\uDeepGram.SpeechToText.pas',
   uBaseSpeechRecognition in '..\Libs\SpeechToText\uBaseSpeechRecognition.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
+  ufrmChatSession in 'ufrmChatSession.pas' {frmNewChatSession},
   uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}
@@ -40,5 +41,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmVoiceRecognition, frmVoiceRecognition);
+  Application.CreateForm(TfrmNewChatSession, frmNewChatSession);
   Application.Run;
 end.

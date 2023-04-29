@@ -48,13 +48,19 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Left = 3
       Top = 3
       Width = 130
-      Height = 25
+      Height = 24
       Align = alTop
       DataField = 'CreationTime'
       DataSource = dsSessions
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 208
+    end
+    object DBText2: TDBText
+      Left = 0
+      Top = 24
+      Width = 136
+      Height = 26
+      Align = alBottom
+      DataField = 'SessionName'
+      DataSource = dsSessions
     end
   end
   object PnlButtons: TPanel
@@ -209,6 +215,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     PrintSettings.FooterFont.Name = 'Segoe UI'
     PrintSettings.FooterFont.Style = []
     PrintSettings.PageNumSep = '/'
+    ScrollWidth = 21
     SearchFooter.ColorTo = clNone
     SearchFooter.FindNextCaption = 'Find &next'
     SearchFooter.FindPrevCaption = 'Find &previous'
@@ -564,6 +571,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       Caption = '&File'
       object New1: TMenuItem
         Caption = '&New'
+        OnClick = New1Click
       end
       object Open1: TMenuItem
         Caption = '&Open...'

@@ -121,6 +121,7 @@ type
     DBAdvGrid1: TDBAdvGrid;
     Panel1: TPanel;
     VirtualImage1: TVirtualImage;
+    DBText2: TDBText;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -133,6 +134,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure tblSessionsAfterScroll(DataSet: TDataSet);
     procedure DBCtrlGrid1Click(Sender: TObject);
+    procedure New1Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -170,6 +172,8 @@ var
 implementation
 
 {$R *.dfm}
+
+uses ufrmChatSession;
 
 {$I ..\Libs\apikey.inc}
 
@@ -509,6 +513,11 @@ begin
   exitStream := TExitStream.Create;
   FSpeechRecognitionEngines.ActiveEngine.Add(exitStream);
   Application.Terminate;
+end;
+
+procedure TfrmVoiceRecognition.New1Click(Sender: TObject);
+begin
+  frmNewChatSession.ShowModal;
 end;
 
 end.

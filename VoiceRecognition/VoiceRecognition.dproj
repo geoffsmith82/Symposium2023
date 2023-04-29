@@ -146,6 +146,9 @@
         <DCCReference Include="..\Libs\SpeechToText\uDeepGram.SpeechToText.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uBaseSpeechRecognition.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="ufrmChatSession.pas">
+            <Form>frmNewChatSession</Form>
+        </DCCReference>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
