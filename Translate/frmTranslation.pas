@@ -131,6 +131,7 @@ var
   languageEngine : string;
   googleEngine : TGoogleTranslate;
   microsoftEngine : TMicrosoftTranslate;
+  amazonEngine : TAmazonTranslate;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
   FTranslateEngines := TEngineManager<TBaseTranslate>.Create;
@@ -139,13 +140,16 @@ begin
 
   microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
   FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
-    googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
+
+  googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
   FTranslateEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
+
+  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, '');
+  FTranslateEngines.RegisterEngine(amazonEngine, miAmazonTranslate, HandleMicrosoftEngineSelected);
 
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');
   FTranslateEngines.SelectEngine(languageEngine);
   FTranslateEngines.ActiveMenuItem.Checked := True;
-  FTranslateEngines.ActiveEngine.DoSelectEngine;
 end;
 
 procedure TfrmMainTranslationWindow.LoadLanguageMenus;
@@ -265,7 +269,6 @@ end;
 procedure TfrmMainTranslationWindow.miSelectEngineClick(Sender: TObject);
 begin
   FTranslateEngines.SelectEngine(Sender as TMenuItem);
-  FTranslateEngines.ActiveEngine.DoSelectEngine;
   TMenuItem(Sender).Checked := True;
   FSettings.WriteString('Settings', 'LanguageEngine', FTranslateEngines.ActiveEngine.ClassName);
 end;

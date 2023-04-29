@@ -20,8 +20,6 @@ type
     FAccessKey: string;
     FSecretKey: string;
     FEndpoint: string;
-    FSourceLang: string;
-    FTargetLang: string;
   public
     constructor Create(const AccessKey, SecretKey, Endpoint: string);
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
@@ -48,7 +46,7 @@ end;
 function TAmazonTranslate.ToLanguages: TArray<string>;
 begin
   SetLength(Result, 1);
-  Result[0] := 'English';
+  Result[0] := 'en';
 end;
 
 function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
