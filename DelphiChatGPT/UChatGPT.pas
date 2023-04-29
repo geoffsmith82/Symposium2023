@@ -93,7 +93,7 @@ begin
   FSpeedToTextEngine.RegisterEngine(
      TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);//'ADUG Demo', '');
   FSpeedToTextEngine.RegisterEngine(
-     TWindowsSpeechService.Create(Self, '','',''), miWindowsSpeechEngine);
+     TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FSpeedToTextEngine.RegisterEngine(
      TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 

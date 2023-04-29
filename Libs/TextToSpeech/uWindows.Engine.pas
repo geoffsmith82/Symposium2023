@@ -8,6 +8,7 @@ uses
   System.IOUtils,
   System.Win.ComObj,
   Winapi.ActiveX,
+  Vcl.Controls,
   System.Variants,
   uBaseSpeech,
   SpeechLib_TLB
@@ -21,11 +22,23 @@ type
     FSpFileStream: ISpeechFileStream;
   public
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
+    constructor Create(AOwner: TComponent);
+    destructor Destroy; override;
   end;
 
 implementation
 
 { TWindowsSpeechService }
+
+constructor TWindowsSpeechService.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner as TWinControl, '', '', '');
+end;
+
+destructor TWindowsSpeechService.Destroy;
+begin
+  inherited;
+end;
 
 function TWindowsSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;
 const
@@ -36,6 +49,7 @@ begin
   FFormatExt := '.wav';
   FSpeech := nil;
   FSpFileStream := nil;
+  CoInitialize(nil);
 
   try
     // Create the voice instance
@@ -67,6 +81,7 @@ begin
     // Free the file stream and voice instances
     FSpFileStream := nil;
     FSpeech := nil;
+    CoUnInitialize;
 
     // Delete the temporary file
     TFile.Delete(FileName);
