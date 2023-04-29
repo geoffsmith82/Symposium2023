@@ -54,7 +54,7 @@ end;
 
 constructor TGoogleSpeechService.Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
 begin
-  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, AHost);
   FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';

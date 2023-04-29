@@ -41,7 +41,7 @@ type
     function GetOnConnect: TOnConnect;
     function GetOnDisconnect: TOnConnect;
   public
-    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
+    constructor Create(const AResourceKey, AHost: string);
     procedure Finish; virtual; abstract;
     procedure Add(ms: TMemoryStream);
     procedure Resume; virtual; abstract;
@@ -67,7 +67,7 @@ begin
   FSendThread.Add(ms);
 end;
 
-constructor TBaseSpeechRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
+constructor TBaseSpeechRecognition.Create(const AResourceKey, AHost: string);
 begin
   FResourceKey := AResourceKey;
 end;

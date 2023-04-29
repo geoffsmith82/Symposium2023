@@ -268,8 +268,8 @@ procedure TfrmVoiceRecognition.SetupTextToSpeechEngines;
 var
   lSpeechEngine: string;
 begin
-  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'), miElevenLabsSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
@@ -285,13 +285,13 @@ var
   lAssemblyAi : TAssemblyAiRecognition;
   lDeepGram : TDeepGramRecognition;
 begin
-  lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key,'','');
+  lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key);
   lAssemblyAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lAssemblyAi.OnConnect := OnHandleConnect;
   lAssemblyAi.OnDisconnect := OnHandleDisconnect;
   FSpeechRecognitionEngines.RegisterEngine(lAssemblyAi, miAssemblyAI);
 
-  lDeepGram := TDeepGramRecognition.Create(deepgram_key,'','');
+  lDeepGram := TDeepGramRecognition.Create(deepgram_key);
   lDeepGram.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lDeepGram.OnConnect := OnHandleConnect;
   lDeepGram.OnDisconnect := OnHandleDisconnect;

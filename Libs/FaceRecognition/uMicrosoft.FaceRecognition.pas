@@ -29,7 +29,7 @@ implementation
 
 constructor TMicrosoftFaceRecognition.Create(const APIKey: string);
 begin
-  inherited Create(APIKey, '', '');
+  inherited Create(APIKey, '');
   FAPIKey := APIKey;
 end;
 

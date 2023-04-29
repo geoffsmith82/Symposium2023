@@ -35,7 +35,7 @@ implementation
 
 constructor TAmazonPollyService.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
 begin
-  inherited Create(Sender, '', '', '');
+  inherited Create(Sender, '', '');
   FAccountName := AccountName;
   FAccountKey := AccountKey;
 end;

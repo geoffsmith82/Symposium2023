@@ -32,7 +32,7 @@ implementation
 
 constructor TWindowsSpeechService.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner as TWinControl, '', '', '');
+  inherited Create(AOwner as TWinControl, '', '');
 end;
 
 destructor TWindowsSpeechService.Destroy;

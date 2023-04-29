@@ -15,16 +15,16 @@ uses
 type
   TElevenLabsService = class(TBaseTextToSpeech)
   public
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
+    constructor Create(Sender: TWinControl; const AResourceKey: string);
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
   end;
 
 implementation
 
-constructor TElevenLabsService.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
+constructor TElevenLabsService.Create(Sender: TWinControl; const AResourceKey: string);
 begin
-  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, '');
 end;
 
 procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);

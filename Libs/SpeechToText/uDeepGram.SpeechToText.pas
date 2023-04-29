@@ -37,7 +37,7 @@ type
   public
     procedure Resume; override;
     procedure Finish; override;
-    constructor Create(const AResourceKey, AApplicationName, AHost: string);
+    constructor Create(const AResourceKey: string);
   end;
 
 implementation
@@ -127,7 +127,8 @@ end;
 
 procedure TDeepGramSendThread.WriteData(data: string);
 begin
-  FWebSocket.WSSendText(nil, data);
+  if Assigned(FWebSocket) then
+    FWebSocket.WSSendText(nil, data);
 end;
 
 procedure TDeepGramSendThread.WriteDataStream(m: TStream);
@@ -175,9 +176,9 @@ end;
 
 { TDeepGramRecognition }
 
-constructor TDeepGramRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
+constructor TDeepGramRecognition.Create(const AResourceKey: string);
 begin
-  inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(AResourceKey, '');
   FSendThread := TDeepGramSendThread.Create(True, AResourceKey);
 end;
 

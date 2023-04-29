@@ -19,7 +19,7 @@ type
     FOutputFormat: string;
   public
     procedure GetAccessToken;
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
+    constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     function GetVoiceList: TMicrosoftCognitiveVoicesClass;
   end;
@@ -29,9 +29,9 @@ implementation
 uses
   System.DateUtils;
 
-constructor TMicrosoftCognitiveService.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName:string; const AHost: string);
+constructor TMicrosoftCognitiveService.Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
 begin
-  inherited Create(Sender, AResourceKey, AApplicationName, AHost);
+  inherited Create(Sender, AResourceKey, AHost);
   FOutputFormat := 'audio-24khz-48kbitrate-mono-mp3';
   FExpiryTime := 0;
 end;

@@ -94,14 +94,12 @@ var
 begin
   if not Assigned(AImage) then
     raise Exception.Create('AImage parameter cannot be nil.');
-
   HTTPClient := TNetHTTPClient.Create(nil);
   HTTPRequest := TNetHTTPRequest.Create(nil);
   LStream := TMemoryStream.Create;
   try
     HTTPRequest.Client := HTTPClient;
     LResponse := HTTPRequest.Get(AUrl, LStream);
-
     if LResponse.StatusCode = 200 then
     begin
       LStream.Position := 0;
@@ -111,15 +109,12 @@ begin
         LImage := TPngImage.Create
       else
         raise Exception.Create('Unsupported image format.');
-
       try
         LImage.LoadFromStream(LStream);
-
         // Create a new TBitmap object and assign the loaded image to its canvas
         LBitmap := TBitmap.Create;
         try
           LBitmap.Assign(LImage);
-
           // Assign the modified bitmap to the TImage component
           AImage.Picture.Graphic := LBitmap;
         finally
@@ -254,7 +249,7 @@ begin
 
   engine := TMicrosoftFaceRecognition.Create(ms_face_key);
   FFaceRecognitionEngines.RegisterEngine(engine, miMicrosoft, OnMicrosoftSelected);
-  engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '' , '', FSettings);
+  engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '', FSettings);
   FFaceRecognitionEngines.RegisterEngine(engine, miGoogle, OnGoogleSelected);
   edtImageURL.Text := 'https://andergrovess.eq.edu.au/HomePagePictures/slide-01.jpg';
 end;

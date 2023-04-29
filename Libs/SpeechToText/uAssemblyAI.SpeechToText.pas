@@ -37,7 +37,7 @@ type
 
   TAssemblyAiRecognition = class(TBaseSpeechRecognition)
   public
-    constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
+    constructor Create(const AResourceKey: string);
     destructor Destroy; override;
     procedure Resume; override;
     procedure Finish; override;
@@ -202,9 +202,9 @@ end;
 
 { TAssemblyAiRecognition }
 
-constructor TAssemblyAiRecognition.Create(const AResourceKey, AApplicationName, AHost: string);
+constructor TAssemblyAiRecognition.Create(const AResourceKey: string);
 begin
-  inherited Create(AResourceKey, AApplicationName, AHost);
+  inherited Create(AResourceKey, '');
   FSendThread := TAssemblyAiSendThread.Create(True, AResourceKey);
 end;
 

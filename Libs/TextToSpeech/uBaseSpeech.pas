@@ -29,7 +29,7 @@ type
   public
     OnFinishedPlaying:  TNotifyEvent;
     procedure PlayText(const text: string);
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName: string; const AHost: string);
+    constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
     function Mode: TMPModes;
@@ -99,10 +99,9 @@ begin
              end).Start;
 end;
 
-constructor TBaseTextToSpeech.Create(Sender: TWinControl; const AResourceKey: string; const AApplicationName: string; const AHost: string);
+constructor TBaseTextToSpeech.Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
 begin
   FResourceKey := AResourceKey;
-  FApplicationName := AApplicationName;
   FHost := AHost;
   FFormatExt := '.mp3';
   MediaPlayer := TMediaPlayer.Create(nil);
