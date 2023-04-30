@@ -124,13 +124,9 @@ begin
                 finally
                   FreeAndNil(chatMessages);
                 end;
-
-                TThread.Synchronize(nil, procedure
-                  begin
-                    mmWeatherAnswer.Text := answer.Content;
-                    // The second parameter needs to be the voice id for the voice you want to use.
-                    FElevenLabsVoiceService.PlayText(mmWeatherAnswer.Text, '7ikeV0TLG4sgVpT58eeU');
-                  end);
+                mmWeatherAnswer.Text := answer.Content;
+                // The second parameter needs to be the voice id for the voice you want to use.
+                FElevenLabsVoiceService.PlayText(mmWeatherAnswer.Text, '7ikeV0TLG4sgVpT58eeU');
             end);
          aTask.Start;
       end;
