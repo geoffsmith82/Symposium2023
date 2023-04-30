@@ -27,11 +27,6 @@ object frmWeatherWindow: TfrmWeatherWindow
     ControlCollection = <
       item
         Column = 0
-        Control = btnLatestForcast
-        Row = 0
-      end
-      item
-        Column = 0
         Control = mmoWeatherQuestion
         Row = 1
       end
@@ -39,6 +34,11 @@ object frmWeatherWindow: TfrmWeatherWindow
         Column = 0
         Control = mmWeatherAnswer
         Row = 2
+      end
+      item
+        Column = 0
+        Control = Panel1
+        Row = 0
       end>
     RowCollection = <
       item
@@ -49,24 +49,16 @@ object frmWeatherWindow: TfrmWeatherWindow
       end
       item
         Value = 38.461538461538460000
+      end
+      item
+        SizeStyle = ssAuto
+      end
+      item
+        SizeStyle = ssAuto
       end>
     TabOrder = 0
     ExplicitWidth = 517
     ExplicitHeight = 440
-    DesignSize = (
-      521
-      441)
-    object btnLatestForcast: TButton
-      Left = 136
-      Top = 9
-      Width = 249
-      Height = 43
-      Anchors = []
-      Caption = 'Latest Forcast'
-      TabOrder = 0
-      OnClick = btnLatestForcastClick
-      ExplicitLeft = 134
-    end
     object mmoWeatherQuestion: TMemo
       Left = 1
       Top = 60
@@ -74,8 +66,7 @@ object frmWeatherWindow: TfrmWeatherWindow
       Height = 211
       Align = alClient
       ScrollBars = ssVertical
-      TabOrder = 1
-      ExplicitWidth = 515
+      TabOrder = 0
     end
     object mmWeatherAnswer: TMemo
       Left = 1
@@ -84,9 +75,39 @@ object frmWeatherWindow: TfrmWeatherWindow
       Height = 169
       Align = alClient
       ScrollBars = ssVertical
+      TabOrder = 1
+    end
+    object Panel1: TPanel
+      Left = 1
+      Top = 1
+      Width = 519
+      Height = 59
+      Align = alClient
+      Caption = 'Panel1'
       TabOrder = 2
-      ExplicitWidth = 515
-      ExplicitHeight = 168
+      ExplicitTop = -5
+      DesignSize = (
+        519
+        59)
+      object btnLatestForcast: TButton
+        Left = 116
+        Top = 6
+        Width = 249
+        Height = 43
+        Anchors = []
+        Caption = 'Latest Forcast'
+        TabOrder = 0
+        OnClick = btnLatestForcastClick
+      end
+      object chkUseGPT4: TCheckBox
+        Left = 380
+        Top = 19
+        Width = 97
+        Height = 17
+        Anchors = []
+        Caption = 'Use GPT4'
+        TabOrder = 1
+      end
     end
   end
 end

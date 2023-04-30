@@ -28,7 +28,7 @@ type
     FStatus: TSpeechStatus;
   public
     OnFinishedPlaying:  TNotifyEvent;
-    procedure PlayText(const text: string);
+    procedure PlayText(const text: string; VoiceName: string = '');
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
@@ -66,7 +66,7 @@ begin
   FStatus := ssPlayStopping;
 end;
 
-procedure TBaseTextToSpeech.PlayText(const text:string);
+procedure TBaseTextToSpeech.PlayText(const text:string; VoiceName: string = '');
 var
   Stream: TMemoryStream;
   FileName: string;
@@ -78,7 +78,7 @@ begin
              begin
                 Stream := TMemoryStream.Create;
                 try
-                  Stream := TextToSpeech(text);
+                  Stream := TextToSpeech(text, VoiceName);
                   if not Assigned(Stream) then
                     Exit;
                   FileName := TPath.GetTempFileName + FFormatExt;
