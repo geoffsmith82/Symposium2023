@@ -31,8 +31,8 @@ type
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     function Base64EncodedFile(const filename:string): string;
     function CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
-
   public
+    function SupportedFormats: TArray<string>; override;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
     procedure Authenticate;
     constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; AHost: string; Settings: TIniFile);
@@ -106,6 +106,12 @@ begin
     FreeAndNil(fs);
     FreeAndNil(mem);
   end;
+end;
+
+function TGoogleSpeechToText.SupportedFormats(): TArray<string>;
+begin
+  SetLength(Result, 1);
+  Result[0] := 'flac'; {TODO: Add rest of supported types}
 end;
 
 function TGoogleSpeechToText.CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;

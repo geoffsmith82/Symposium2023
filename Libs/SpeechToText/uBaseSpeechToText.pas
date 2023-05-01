@@ -8,6 +8,7 @@ type
     FResourceKey : string;
   public
     function TranscribeAudio(const FilePath, ModelName: string): string; virtual; abstract;
+    function SupportedFormats(): TArray<string>; virtual; abstract;
     constructor Create(const AResourceKey: string; const AApplicationName: string; const AHost: string);
   end;
 
