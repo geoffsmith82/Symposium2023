@@ -16,6 +16,7 @@ type
   strict private
     FSubscriptionKey : string;
   public
+    function SupportedFormats(): TArray<string>; override;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
   end;
 
@@ -26,6 +27,12 @@ uses
   ;
 
 { TMicrosoftSpeechToText }
+
+function TMicrosoftSpeechToText.SupportedFormats: TArray<string>;
+begin
+  SetLength(Result, 1);
+  Result[0] := 'wav';
+end;
 
 function TMicrosoftSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;
 var

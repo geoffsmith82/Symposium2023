@@ -6,6 +6,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Net.HttpClient,
+  System.Net.HttpClientComponent,
   System.Net.Mime,
   uBaseSpeechToText;
 
@@ -34,14 +35,14 @@ end;
 
 function TOpenAiWhisperOnline.TranscribeAudio(const FilePath, ModelName: string): string;
 var
-  HTTPClient: THttpClient;
-  Request: THttpRequest;
+  HTTPClient: TNetHttpClient;
+  Request: TNetHttpRequest;
   Response: IHttpResponse;
   FormData: TMultipartFormData;
   url : string;
 begin
-  HTTPClient := THttpClient.Create;
-  Request := THttpRequest.Create;
+  HTTPClient := TNetHttpClient.Create(nil);
+  Request := TNetHttpRequest.Create(nil);
   Response := nil;
   FormData := TMultipartFormData.Create;
 
