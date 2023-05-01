@@ -62,6 +62,7 @@ type
   private
     FSpeedToTextEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
+    FOpenAI : TOpenAI;
     function SelectedModel: string;
     { Private declarations }
   public
@@ -85,11 +86,12 @@ var
 begin
   FSpeedToTextEngine := TEngineManager<TBaseTextToSpeech>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  FOpenAI := TOpenAI.Create(chatgpt_apikey);
 
   FSpeedToTextEngine.RegisterEngine(
-     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, '', 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FSpeedToTextEngine.RegisterEngine(
-     TElevenLabsService.Create(Self, ElevenLabsAPIKey, 'ADUG Demo', 'ElevenLabsAPIKey'), miElevenLabsSpeechEngine);
+     TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
   FSpeedToTextEngine.RegisterEngine(
      TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);//'ADUG Demo', '');
   FSpeedToTextEngine.RegisterEngine(
@@ -144,7 +146,7 @@ begin
   OldCursor := Screen.Cursor;
   try
     Screen.Cursor := crHourGlass;
-    mmoOutput.Lines.Text := TOpenAI.AskChatGPT(mmoPrompt.Text, SelectedModel);
+    mmoOutput.Lines.Text := FOpenAI.AskChatGPT(mmoPrompt.Text, SelectedModel);
     Update;
     if chkSpeak.Checked then
     begin

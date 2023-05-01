@@ -122,6 +122,8 @@ type
     Panel1: TPanel;
     VirtualImage1: TVirtualImage;
     DBText2: TDBText;
+    btnDeleteSession: TButton;
+    btnDeleteMessage: TButton;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -147,6 +149,7 @@ type
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
     task : ITask;
     FStatus : TRecognitionStatus;
+    FOpenAI : TOpenAI;
 
     procedure LoadAudioInputsMenu;
 
@@ -308,6 +311,8 @@ begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
+  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+
 
   tblSessions.Active := True;
   tblConversation.Active := True;
@@ -324,6 +329,7 @@ begin
   FreeAndNil(FSettings);
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
+  FreeAndNil(FOpenAI);
 end;
 
 procedure TfrmVoiceRecognition.FormResize(Sender: TObject);
@@ -363,7 +369,7 @@ begin
                var
                  ChatResponse: TChatResponse;
                begin
-                 ChatResponse := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, ChatConfig, AChatMessages);
+                 ChatResponse := FOpenAI.SendChatMessagesToOpenAI(ChatConfig, AChatMessages);
                  if not Assigned(AOnMessageResults) then
                    raise Exception.Create('No Message Results Event given');
 

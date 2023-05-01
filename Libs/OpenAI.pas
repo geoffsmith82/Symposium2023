@@ -59,12 +59,15 @@ type
   end;
 
   TOpenAI = class
+  strict private
+    FAPIKey : string;
   public
-    class procedure ListOpenAIModels(out AModelList: TStringList); static;
-    class function SendChatMessagesToOpenAI(const APIKey: string; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; static;
-    class function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
-    class function AskChatGPT(const AQuestion: string; const AModel: string): string;
-    class function Embeddings(const Texts: TArray<string>): TEmbeddings; static;
+    constructor Create(APIKey: string);
+    procedure ListOpenAIModels(out AModelList: TStringList);
+    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
+    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
+    function AskChatGPT(const AQuestion: string; const AModel: string): string;
+    function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
 function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
@@ -100,7 +103,7 @@ begin
   Result := 1 - (DotProduct / (Magnitude1 * Magnitude2));
 end;
 
-class function TOpenAI.SendChatMessagesToOpenAI(const APIKey: string; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
+function TOpenAI.SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
@@ -130,7 +133,7 @@ begin
     LRESTRequest.Method := TRESTRequestMethod.rmPOST;
     LRESTRequest.Timeout := 60000; // Set the timeout as needed
     LRESTRequest.Resource := '';
-    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + APIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LJSONBody := TJSONObject.Create;
     LJSONMessages := TJSONArray.Create;
@@ -149,6 +152,8 @@ begin
         LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
       if ChatConfig.user.Length > 0 then
         LJSONBody.AddPair('user', ChatConfig.user);
+      if ChatConfig.n > 0 then
+        LJSONBody.AddPair('n', ChatConfig.n);
 
 //      LJSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
 //      LJSONBody.AddPair('n', TJSONNumber.Create(1));
@@ -183,7 +188,7 @@ begin
   end;
 end;
 
-class function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
+function TOpenAI.CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
@@ -203,7 +208,7 @@ begin
     LClient.BaseURL := url;
     LRequest.Client := LClient;
     LRequest.Method := rmPOST;
-    LRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
     json := TJSONObject.Create;
     try
@@ -231,7 +236,12 @@ begin
   end;
 end;
 
-class function TOpenAI.AskChatGPT(const AQuestion: string; const AModel: string): string;
+constructor TOpenAI.Create(APIKey: string);
+begin
+  FAPIKey := APIKey;
+end;
+
+function TOpenAI.AskChatGPT(const AQuestion: string; const AModel: string): string;
 var
   LClient : TRESTClient;
   LRequest : TRESTRequest;
@@ -263,7 +273,7 @@ begin
     LClient.ReadTimeout := 180000;
 
     // Use JSON for the REST API calls and set API KEY via Authorization header
-    LRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRequest.Accept := '*/*';
 
     // Select HTTPS POST method, set POST data and specify endpoint URL
@@ -296,7 +306,7 @@ begin
   end;
 end;
 
-class function TOpenAI.Embeddings(const Texts: TArray<string>): TEmbeddings;
+function TOpenAI.Embeddings(const Texts: TArray<string>): TEmbeddings;
 var
   LRestClient: TRESTClient;
   LRestRequest: TRESTRequest;
@@ -326,7 +336,7 @@ begin
     LJson.AddPair('model', 'text-embedding-ada-002');
 
     LRestRequest.AddBody(LJson.ToString, TRESTContentType.ctAPPLICATION_JSON);
-    LRestRequest.AddAuthParameter('Authorization', 'Bearer ' + CHATGPT_APIKEY, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRestRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRestRequest.Execute;
 
     if LRestResponse.StatusCode = 200 then
@@ -355,7 +365,7 @@ begin
   end;
 end;
 
-class procedure TOpenAI.ListOpenAIModels(out AModelList: TStringList);
+procedure TOpenAI.ListOpenAIModels(out AModelList: TStringList);
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;

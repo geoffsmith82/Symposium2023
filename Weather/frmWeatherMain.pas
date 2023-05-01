@@ -15,8 +15,9 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
-  uElevenLabs.REST,
-  Vcl.ExtCtrls
+  Vcl.ExtCtrls,
+  OpenAI,
+  uElevenLabs.REST
   ;
 
 type
@@ -33,6 +34,7 @@ type
   private
     { Private declarations }
     FElevenLabsVoiceService : TElevenLabsService;
+    FOpenAI : TOpenAI;
   public
     { Public declarations }
   end;
@@ -47,7 +49,6 @@ implementation
 uses
   udmWeather,
   uXMLBOMPrecis,
-  OpenAI,
   System.IOUtils
   ;
 
@@ -61,6 +62,7 @@ end;
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
   FElevenLabsVoiceService := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  FOpenAI := TOpenAI.Create(chatgpt_apikey);
 end;
 
 procedure TfrmWeatherWindow.btnLatestForcastClick(Sender: TObject);
@@ -77,7 +79,7 @@ begin
     ' Start with variations on "now time for the weather". ' +
     ' Do not mention or specify temperature in Fahrenheit. When saying temperature, just say the number. ' +
     ' Change the word precipitation to rain.  Don''t give a percentage probability of rain.' +
-    ' If something doesn''t occur of the forcast, it should "over the forecast period".' +
+    ' If something doesn''t occur of the forcast, it should say "over the forecast period".' +
     ' Include the names of the days based on the date of the start time local. Do it in the style of Jane Bunn' + System.sLineBreak + System.sLineBreak;
 
   if chkUseGPT4.Checked then
@@ -120,7 +122,7 @@ begin
 
                   chatConfig.model := model;
 
-                  answer := TOpenAI.SendChatMessagesToOpenAI(CHATGPT_APIKEY, chatConfig, chatMessages);
+                  answer := FOpenAI.SendChatMessagesToOpenAI(chatConfig, chatMessages);
                 finally
                   FreeAndNil(chatMessages);
                 end;

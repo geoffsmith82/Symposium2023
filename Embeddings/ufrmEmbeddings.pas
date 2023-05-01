@@ -48,7 +48,10 @@ type
     btnEmbeddings: TButton;
     procedure btnGoogleSearchClick(Sender: TObject);
     procedure btnEmbeddingsClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    FOpenAI : TOpenAI;
     function GetQuestionsArray: TArray<string>;
     function GetCompareQuestionsArray: TArray<string>;
     procedure DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
@@ -139,9 +142,9 @@ var
   closestMatches : TArray<TArray<TEmbeddingMatch>>;
 begin
   questions := GetQuestionsArray;
-  embeddingsFromDB := TOpenAI.Embeddings(questions);
+  embeddingsFromDB := FOpenAI.Embeddings(questions);
   compareQuestions := GetCompareQuestionsArray;
-  compareQuestionEmbeddings := TOpenAI.Embeddings(compareQuestions);
+  compareQuestionEmbeddings := FOpenAI.Embeddings(compareQuestions);
   Memo1.Lines.Clear;
   SetLength(closestMatches, Length(compareQuestions));
   // Loop through each compare question
@@ -185,6 +188,16 @@ begin
     end;
   end;
   Result := closestMatches;
+end;
+
+procedure TfrmEmbeddings.FormCreate(Sender: TObject);
+begin
+  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+end;
+
+procedure TfrmEmbeddings.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FOpenAI);
 end;
 
 procedure TfrmEmbeddings.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
