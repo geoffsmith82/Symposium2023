@@ -117,6 +117,7 @@ procedure TForm1.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSpeedToTextEngine);
   FreeAndNil(FSettings);
+  FreeAndNil(FOpenAI);
 end;
 
 function TForm1.SelectedModel: string;

@@ -21,7 +21,9 @@ uses
   Vcl.Imaging.pngimage,
   System.Net.URLClient,
   System.Net.HttpClient,
-  System.Net.HttpClientComponent
+  System.Net.HttpClientComponent,
+  OpenAI,
+  uDALLe2.DTO
   ;
 
 type
@@ -59,6 +61,7 @@ type
     { Private declarations }
     FImageList : TObjectList<TImage>;
     FCurrentImage : TImage;
+    FOpenAI : TOpenAI;
   public
     { Public declarations }
   end;
@@ -70,18 +73,19 @@ implementation
 
 {$R *.dfm}
 
-uses OpenAI,
-  uDALLe2.DTO;
+{$I ..\Libs\apikey.inc}
 
 procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
   FImageList := TObjectList<TImage>.Create;
+  FOpenAI := TOpenAI.Create(chatgpt_apikey);
   FCurrentImage := nil;
 end;
 
 procedure TfrmImageGenerator.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FImageList);
+  FreeAndNil(FOpenAI);
 end;
 
 procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);
@@ -107,7 +111,7 @@ begin
     size := DALLE1024;
   end;
 
-  images := TOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
+  images := FOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
   try
     for i := 0 to length(images.data) - 1 do
     begin
