@@ -33,7 +33,7 @@ type
     btnRecognizeSpeech: TButton;
     Memo1: TMemo;
     Label1: TLabel;
-    MainMenu1: TMainMenu;
+    mmMainMenu: TMainMenu;
     File1: TMenuItem;
     New1: TMenuItem;
     Open1: TMenuItem;
@@ -101,7 +101,7 @@ begin
   amazonEngine := TAmazonSpeechToText.Create('', '', '');
   FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon, HandleAmazonEngineSelected);
 
-  whisperOnlineEngine := TOpenAiWhisperOnline.Create('', '', '');
+  whisperOnlineEngine := TOpenAiWhisperOnline.Create(CHATGPT_APIKEY, '', '');
   FSpeechToTextEngines.RegisterEngine(whisperOnlineEngine, miOpenAIWhisper, HandleWhisperOnlineEngineSelected);
 
   engine := FSettings.ReadString('Settings', 'Engine', 'MicrosoftSpeech');

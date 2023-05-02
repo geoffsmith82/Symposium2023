@@ -10,7 +10,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Menu = MainMenu1
+  Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
@@ -66,7 +66,7 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
     Left = 432
     Top = 88
   end
-  object MainMenu1: TMainMenu
+  object mmMainMenu: TMainMenu
     Left = 352
     Top = 208
     object File1: TMenuItem
