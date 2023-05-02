@@ -55,9 +55,9 @@ type
     function GetQuestionsArray: TArray<string>;
     function GetCompareQuestionsArray: TArray<string>;
     procedure DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
-    function FindClosestMatches(const compareEmbedding: TArray<Double>;
+    function FindClosestMatches(const compareEmbedding: TEmbedding;
       const questions: TArray<string>;
-      const embeddings: TArray<TArray<Double>>): TArray<TEmbeddingMatch>;
+      const embeddings: TEmbeddings): TArray<TEmbeddingMatch>;
     { Private declarations }
   public
     { Public declarations }
@@ -136,8 +136,8 @@ procedure TfrmEmbeddings.btnEmbeddingsClick(Sender: TObject);
 var
   questions : TArray<string>;
   compareQuestions : TArray<string>;
-  embeddingsFromDB : TArray<TArray<Double>>;
-  compareQuestionEmbeddings : TArray<TArray<Double>>;
+  embeddingsFromDB : TEmbeddings;
+  compareQuestionEmbeddings : TEmbeddings;
   i: Integer;
   closestMatches : TArray<TArray<TEmbeddingMatch>>;
 begin
@@ -158,7 +158,9 @@ begin
   end;
 end;
 
-function TfrmEmbeddings.FindClosestMatches(const compareEmbedding: TArray<Double>; const questions: TArray<string>; const embeddings: TArray<TArray<Double>>): TArray<TEmbeddingMatch>;
+function TfrmEmbeddings.FindClosestMatches(const compareEmbedding: TEmbedding;
+      const questions: TArray<string>;
+      const embeddings: TEmbeddings): TArray<TEmbeddingMatch>;
 var
   i: Integer;
   distances : TArray<Double>;
