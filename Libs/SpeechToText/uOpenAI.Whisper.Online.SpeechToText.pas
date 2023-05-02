@@ -8,6 +8,7 @@ uses
   System.Net.HttpClient,
   System.Net.HttpClientComponent,
   System.Net.Mime,
+  System.IOUtils,
   uBaseSpeechToText;
 
 type
@@ -40,6 +41,9 @@ var
   Response: IHttpResponse;
   FormData: TMultipartFormData;
   url : string;
+  mime : TMimeTypes;
+  mimeType : string;
+  kind : TMimeTypes.TKind;
 begin
   HTTPClient := TNetHttpClient.Create(nil);
   Request := TNetHttpRequest.Create(nil);
@@ -49,7 +53,9 @@ begin
   try
     HTTPClient.CustomHeaders['Authorization'] := 'Bearer ' + CHATGPT_APIKEY;
 
-    FormData.AddFile('file', FilePath, 'audio/mp3');
+    mime := TMimeTypes.Default;
+    mime.GetExtInfo(TPath.GetExtension(FilePath), mimeType, kind);
+    FormData.AddFile('file', FilePath, mimeType);
     FormData.AddField('model', ModelName);
     url := 'https://api.openai.com/v1/audio/transcriptions';
     Response := HTTPClient.Post(Url, FormData);
