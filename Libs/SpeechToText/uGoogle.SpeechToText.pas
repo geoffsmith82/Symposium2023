@@ -7,6 +7,7 @@ uses uBaseSpeechToText,
   System.SysUtils,
   System.JSON,
   System.IniFiles,
+  System.IOUtils,
   System.Net.URLClient,
   Winapi.ShellAPI,
   REST.Client,
@@ -110,8 +111,12 @@ end;
 
 function TGoogleSpeechToText.SupportedFormats(): TArray<string>;
 begin
-  SetLength(Result, 1);
+  SetLength(Result, 5);
   Result[0] := 'flac'; {TODO: Add rest of supported types}
+  Result[1] := 'mp3';
+  Result[2] := 'ogg';
+  Result[3] := 'wav';
+  Result[4] := 'spx';
 end;
 
 function TGoogleSpeechToText.CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
@@ -121,7 +126,7 @@ var
 begin
   // Create the JSON objects and pairs
   ConfigObj := TJSONObject.Create;
-  EncodingPair := TJSONPair.Create('encoding', 'FLAC');
+    EncodingPair := TJSONPair.Create('encoding', 'FLAC');
  // SampleRatePair := TJSONPair.Create('sampleRateHertz', TJSONNumber.Create(22050));
   LanguageCodePair := TJSONPair.Create('languageCode', 'en-US');
   ModelPair := TJSONPair.Create('model', 'default');// ModelName);
@@ -157,6 +162,12 @@ var
   jsonBody: TJSONObject;
   googleResults : TTGoogleSpeechToTextResultsClass;
 begin
+  if not IsFileSupported(FilePath) then
+  begin
+    raise Exception.Create('Unsupported file format');
+  end;
+
+
   // 1. Get authentication credentials
  // AccessToken := 'YOUR_ACCESS_TOKEN';
   // 2. Install a REST client library

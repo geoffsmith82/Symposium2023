@@ -20,8 +20,6 @@ type
 
 implementation
 
-{$i ..\apikey.inc}
-
 function TOpenAiWhisperOnline.SupportedFormats: TArray<string>;
 begin
   SetLength(Result, 7);
@@ -45,13 +43,18 @@ var
   mimeType : string;
   kind : TMimeTypes.TKind;
 begin
+  if not IsFileSupported(FilePath) then
+  begin
+    raise Exception.Create('Unsupported file format');
+  end;
+
   HTTPClient := TNetHttpClient.Create(nil);
   Request := TNetHttpRequest.Create(nil);
   Response := nil;
   FormData := TMultipartFormData.Create;
 
   try
-    HTTPClient.CustomHeaders['Authorization'] := 'Bearer ' + CHATGPT_APIKEY;
+    HTTPClient.CustomHeaders['Authorization'] := 'Bearer ' + FResourceKey;
 
     mime := TMimeTypes.Default;
     mime.GetExtInfo(TPath.GetExtension(FilePath), mimeType, kind);

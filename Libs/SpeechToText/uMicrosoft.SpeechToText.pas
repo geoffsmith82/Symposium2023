@@ -8,6 +8,7 @@ uses
   REST.Client,
   REST.Types,
   System.JSON,
+  System.Net.Mime,
   System.SysUtils
   ;
 
@@ -30,8 +31,9 @@ uses
 
 function TMicrosoftSpeechToText.SupportedFormats: TArray<string>;
 begin
-  SetLength(Result, 1);
+  SetLength(Result, 2);
   Result[0] := 'wav';
+  Result[1] := 'ogg';
 end;
 
 function TMicrosoftSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;
@@ -42,8 +44,16 @@ var
   AccessToken: string;
   SpeechToTextEndpoint: string;
   fileStream : TFileStream;
+  mime : TMimeTypes;
+  mimeType : string;
+  kind : TMimeTypes.TKind;
 begin
   Result := '';
+
+  if not IsFileSupported(FilePath) then
+  begin
+    raise Exception.Create('Unsupported file format');
+  end;
 
   // Get access token
   RestClient := TRESTClient.Create(nil);
@@ -73,8 +83,11 @@ begin
     RestRequest := TRESTRequest.Create(nil);
     RestRequest.Client := RestClient;
     RestRequest.Method := rmPOST;
+
+    mime := TMimeTypes.Default;
+    mime.GetExtInfo(TPath.GetExtension(FilePath), mimeType, kind);
     RestRequest.Params.AddItem('Authorization', 'Bearer ' + AccessToken, TRESTRequestParameterKind.pkHTTPHEADER);
-    RestRequest.Params.AddItem('Content-Type', 'audio/wav', TRESTRequestParameterKind.pkHTTPHEADER);
+    RestRequest.Params.AddItem('Content-Type', mimeType, TRESTRequestParameterKind.pkHTTPHEADER);
     fileStream := TFileStream.Create(filepath, fmOpenRead);
     try
       RestRequest.AddBody(fileStream);
