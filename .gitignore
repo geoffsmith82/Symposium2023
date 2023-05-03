@@ -70,6 +70,9 @@ modules/
 New folder
 TranscribeAudio/Win64
 Translate/Win32
+Translate/ComponentDinosOffice-OpenOffice-versionOficial
 VoiceRecognition/Win32
 Libs/TextToSpeech/Unused
+Libs/ICS-beta
 TranscribeAudio/models
+FaceDetection/Win32/Debug/FaceDetection.ini

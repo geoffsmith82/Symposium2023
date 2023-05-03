@@ -72,6 +72,7 @@ complete code without any omissions.
 
 - [CommonVoice](https://commonvoice.mozilla.org/en/languages) Public dataset of recordings for Voice Recognition
 - [Huggingface](https://huggingface.co/)
+- [Open-Assistant](https://open-assistant.io/)
 
 ### External Libraries required to build projects
  - [TMS Grid](https://www.tmssoftware.com/site/dbadvgrd.asp) TMS Software TDBAdvGrid... You can use the trail version to get the demo to work.
