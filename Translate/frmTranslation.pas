@@ -25,7 +25,8 @@ uses
   uGoogle.Translate,
   uMicrosoft.Translate,
   uTranslatedfn,
-  uOutputChangedLanguageTokens
+  uOutputChangedLanguageTokens,
+  OpenAI
   ;
 
 type

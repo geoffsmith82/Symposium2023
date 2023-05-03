@@ -24,7 +24,9 @@ uses
   uOutputChangedLanguageTokens in 'uOutputChangedLanguageTokens.pas',
   uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
-  LanguageCodes in '..\Libs\Translate\LanguageCodes.pas';
+  LanguageCodes in '..\Libs\Translate\LanguageCodes.pas',
+  OpenAI in '..\Libs\OpenAI.pas',
+  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}
 
