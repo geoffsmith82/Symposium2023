@@ -17,6 +17,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
   - [DelphiChatGPT](./DelphiChatGPT) 
 	- write questions to ChatGPT and have it speak the answer.
+	![image](./DelphiChatGPT/delphichatgpt.png)
   - [FaceDetection](./FaceDetection)  
 	- Detect faces in a photo.
   - [Weather](./Weather)  
@@ -26,6 +27,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [VoiceRecognition](./VoiceRecognition)
     - convert speech to text in real-time straight from your microphone, feed it to OpenAI's GPT and have the response 
 	read back to you.
+	![image](./VoiceRecognition/screenshot-hal9000.png)
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide using OpenAI's DALLE-2 API.
 ### Providers Used/Available
