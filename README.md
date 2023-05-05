@@ -34,14 +34,17 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - Google
   - Microsoft Azure
   - Amazon  
-  - [ElevenLabs](https://beta.elevenlabs.io/)
-  - [OpenAI](https://platform.openai.com)
-  - [AssemblyAI](https://www.assemblyai.com/app)
-  - [DeepGram](https://deepgram.com/)
+  - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
+  - [OpenAI](https://platform.openai.com) 
+  - [AssemblyAI](https://www.assemblyai.com/app) Voice Recognition
+  - [DeepGram](https://deepgram.com/) Voice Recognition
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.
   - A file in [/libs/APIKEY.INC.EXAMPLE](./Libs/apikey.inc.example) shows all the available keys to enter.  If you're not using a particular provider you don't need a key for it.
+
+## Questions about code and how to set things up
+  - Please feel free to raise issues about any questions you have about the code.  I would like to improve the documentation to make it easy for everyone to use this project.
 
 ## ChatGPT Prompts
 ```
