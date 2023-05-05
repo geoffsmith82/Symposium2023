@@ -44,7 +44,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - A file in [/libs/APIKEY.INC.EXAMPLE](./Libs/apikey.inc.example) shows all the available keys to enter.  If you're not using a particular provider you don't need a key for it.
 
 ## Questions about code and how to set things up
-  - Please feel free to raise issues about any questions you have about the code.  I would like to improve the documentation to make it easy for everyone to use this project.
+  - Please feel free to raise issues about any questions you have about the code.  I know there is a lot to this project and lots to setup, so I would like to improve the documentation to make it easy for everyone to use all the parts of this project.
 
 ## ChatGPT Prompts
 ```
