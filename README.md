@@ -20,6 +20,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	![image](./DelphiChatGPT/delphichatgpt.png)
   - [FaceDetection](./FaceDetection)  
 	- Detect faces in a photo.
+	![image](./FaceDetection/FaceDetectionScreenshot.png)	
   - [Weather](./Weather)  
 	- Query the weather forcast for Bendigo from the bureau of meteorology generate a paragraph or two and read it out
   - [TranscribeAudio](./TranscribeAudio)
