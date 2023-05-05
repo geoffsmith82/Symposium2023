@@ -1,0 +1,13 @@
+const chatgpt_apikey = '';// insert your private ChatGTP API key here
+const ms_cognative_service_resource_key = '';
+const ms_translate_key = '';
+const ms_face_key = '';
+const ElevenLabsAPIKey = '';
+const AWSAccessKey = '';
+const AWSSecretKey = '';
+const google_clientid = '';
+const google_clientsecret = '';
+const google_custom_search_key =  '';
+const google_custom_search_cx = '';
+const assemblyai_key = '';
+const deepgram_key = '';

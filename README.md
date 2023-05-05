@@ -39,6 +39,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.
+  - A file in [/libs/APIKEY.INC.EXAMPLE](./Libs/apikey.inc.example) shows all the available keys to enter.  If you're not using a particular provider you don't need a key for it.
 
 ## ChatGPT Prompts
 ```
