@@ -26,6 +26,7 @@ uses
   uEngineManager in '..\Libs\uEngineManager.pas',
   LanguageCodes in '..\Libs\Translate\LanguageCodes.pas',
   OpenAI in '..\Libs\OpenAI.pas',
+  uGPT in '..\Libs\uGPT.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}

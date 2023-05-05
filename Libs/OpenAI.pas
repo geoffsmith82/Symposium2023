@@ -9,58 +9,19 @@ uses
   System.Generics.Collections,
   REST.Client,
   REST.Types,
+  uGPT,
   uDALLe2.DTO
   ;
 
 type
   TDALLESize = (DALLE256, DALLE512, DALLE1024);
 
-  TChatMessage = class
-    Role: string;
-    Content: string;
-  end;
 
-  TChatResponse = record
-    Content : string;
-    Completion_Tokens : Cardinal;
-    Prompt_Tokens : Cardinal;
-    Total_Tokens : Cardinal;
-  end;
-
-  TChatSettings = record
-     model : string;
-     temperature : Double;
-     top_p : Double;
-     n : Integer;
-     stop : string;
-     max_tokens : Integer;
-     presence_penalty : Double;
-     frequency_penalty : Double;
-     user : string;
-  end;
-
-
-  TOnChatMessageMessageResults = procedure(ASessionID: Int64; AChatResponse: TChatResponse) of object;
-
-  TParameterDictionary = TDictionary<string, string>;
   TEmbedding = TArray<Double>;
   TEmbeddings = TArray<TEmbedding>;
 
-  TPrompt = class
-  private
-    FPromptText: string;
-    FParameters: TParameterDictionary;
-    function ReplaceParameters: string;
-  public
-    constructor Create(const APromptText: string);
-    destructor Destroy; override;
-    function AsString: string;
-    property Parameters: TParameterDictionary read FParameters;
-  end;
 
-  TOpenAI = class
-  strict private
-    FAPIKey : string;
+  TOpenAI = class(TBaseOpenAI)
   public
     constructor Create(APIKey: string);
     procedure ListOpenAIModels(out AModelList: TStringList);
@@ -238,7 +199,7 @@ end;
 
 constructor TOpenAI.Create(APIKey: string);
 begin
-  FAPIKey := APIKey;
+  inherited Create(APIKey);
 end;
 
 function TOpenAI.AskChatGPT(const AQuestion: string; const AModel: string): string;
@@ -418,34 +379,6 @@ begin
   end;
 end;
 
-{ TPrompt }
 
-constructor TPrompt.Create(const APromptText: string);
-begin
-  FPromptText := APromptText;
-  FParameters := TParameterDictionary.Create;
-end;
-
-destructor TPrompt.Destroy;
-begin
-  FParameters.Free;
-  inherited;
-end;
-
-function TPrompt.AsString: string;
-begin
-  Result := ReplaceParameters;
-end;
-
-function TPrompt.ReplaceParameters: string;
-var
-  Param: TPair<string, string>;
-begin
-  Result := FPromptText;
-  for Param in FParameters do
-  begin
-    Result := StringReplace(Result, '{' + Param.Key + '}', Param.Value, [rfReplaceAll, rfIgnoreCase]);
-  end;
-end;
 
 end.

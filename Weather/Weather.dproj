@@ -112,6 +112,7 @@
         <DCCReference Include="..\Libs\OpenAI.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\uGPT.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

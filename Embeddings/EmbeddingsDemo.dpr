@@ -5,6 +5,7 @@ uses
   ufrmEmbeddings in 'ufrmEmbeddings.pas' {frmEmbeddings},
   uGoogleCustomSearch in '..\Libs\Search\uGoogleCustomSearch.pas',
   OpenAI in '..\Libs\OpenAI.pas',
+  uGPT in '..\Libs\uGPT.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}

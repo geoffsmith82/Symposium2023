@@ -20,6 +20,7 @@ uses
   Vcl.Menus,
   System.IOUtils,
   OpenAI,
+  uAzureGPT,
   uElevenLabs.REST,
   uMicrosoft.Cognitive.REST,
   uAmazon.Polly,

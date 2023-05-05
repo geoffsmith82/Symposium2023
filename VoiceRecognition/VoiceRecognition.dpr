@@ -33,6 +33,8 @@ uses
   uBaseSpeechRecognition in '..\Libs\SpeechToText\uBaseSpeechRecognition.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   ufrmChatSession in 'ufrmChatSession.pas' {frmNewChatSession},
+  uAzureGPT in '..\Libs\uAzureGPT.pas',
+  uGPT in '..\Libs\uGPT.pas',
   uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}

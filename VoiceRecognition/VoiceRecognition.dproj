@@ -150,6 +150,8 @@
             <Form>frmNewChatSession</Form>
         </DCCReference>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
+        <DCCReference Include="..\Libs\uAzureGPT.pas"/>
+        <DCCReference Include="..\Libs\uGPT.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
