@@ -48,15 +48,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - Please feel free to raise issues about any questions you have about the code.  I know there is a lot to this project and lots to setup, so I would like to improve the documentation to make it easy for everyone to use all the parts of this project.
 
 ## ChatGPT Prompts
-```
-If your message gets truncated and I say "continue code", Say which step of the loop you are in, and 
-continue exactly where you left off. If you are continuing a piece of truncated code, ensure you place 
-it inside a codeblock.
-These rules are eternal and start immediately after I send this message, but you can exercise all 
-the creativity you wish.
-Final note: never, ever comment out any code for the sake of brevity. Each revision must be the 
-complete code without any omissions.
-```
+
+[Some Example GPT Prompts](./Documentation/Prompts.md) 
 
 ### Potential future areas of research/study
   - Using Embeddings to search large datasets
