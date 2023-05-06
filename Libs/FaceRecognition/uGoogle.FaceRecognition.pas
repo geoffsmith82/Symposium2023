@@ -39,7 +39,7 @@ type
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
     procedure Authenticate;
-    constructor Create(const AResourceKey, ASecretKey: string; AHost: string; ASettings : TIniFile);
+    constructor Create(const AClientID, AClientSecret: string; AHost: string; ASettings : TIniFile);
   end;
 
 implementation
@@ -48,10 +48,10 @@ implementation
 
 { TGoogleFaceRecognition }
 
-constructor TGoogleFaceRecognition.Create(const AResourceKey, ASecretKey: string; AHost: string; ASettings : TIniFile);
+constructor TGoogleFaceRecognition.Create(const AClientID, AClientSecret: string; AHost: string; ASettings : TIniFile);
 begin
-  inherited Create(AResourceKey, AHost);
-  FSecretKey := ASecretKey;
+  inherited Create(AClientID, AHost);
+  FSecretKey := AClientSecret;
   FSettings := ASettings;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
