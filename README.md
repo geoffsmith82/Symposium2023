@@ -1,5 +1,5 @@
 # Symposium 2023 Artificial Intelligence and ChatGPT
-Source code and Documentation for my ADUG Symposium Talk presented on the 28th of April 2023.
+Source code and Documentation for my [ADUG](https://www.adug.org.au) Symposium Talk presented on the 28th of April 2023.
 
 Artificial intelligence (AI) is an interdisciplinary field that combines computer science, mathematics, and cognitive psychology to create intelligent systems capable of performing complex tasks. Its rapid advancements have led to a wide array of applications demonstrating AI's versatility.
 
@@ -11,6 +11,12 @@ AI's ability to analyze and process data, and generate comprehensive reports hig
 
 The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. Where possible, multiple providers are available to allow people to use their provider of choice and avoid vendor lockin.
 
+## ChatGPT Prompts
+
+[Some Example GPT Prompts](./Documentation/Prompts.md) 
+
+## Presentation Slides
+  - [AI and ChatGPT](./Documentation/AI%20and%20ChatGPT.pptx)
 ## Example programs
   - [Translate](./Translate)
 	- translates between languages using the various cloud API's.  
@@ -46,10 +52,6 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 ## Questions about code and how to set things up
   - Please feel free to raise issues about any questions you have about the code.  I know there is a lot to this project and lots to setup, so I would like to improve the documentation to make it easy for everyone to use all the parts of this project.
-
-## ChatGPT Prompts
-
-[Some Example GPT Prompts](./Documentation/Prompts.md) 
 
 ### Potential future areas of research/study
   - Using Embeddings to search large datasets
