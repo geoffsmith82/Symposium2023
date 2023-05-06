@@ -16,18 +16,16 @@ uses
 type
   TDALLESize = (DALLE256, DALLE512, DALLE1024);
 
-
   TEmbedding = TArray<Double>;
   TEmbeddings = TArray<TEmbedding>;
-
 
   TOpenAI = class(TBaseOpenAI)
   public
     constructor Create(APIKey: string);
     procedure ListOpenAIModels(out AModelList: TStringList);
-    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
+    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
-    function AskChatGPT(const AQuestion: string; const AModel: string): string;
+    function AskChatGPT(const AQuestion: string; const AModel: string): string; override;
     function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
@@ -116,8 +114,6 @@ begin
       if ChatConfig.n > 0 then
         LJSONBody.AddPair('n', ChatConfig.n);
 
-//      LJSONBody.AddPair('max_tokens', TJSONNumber.Create(50)); // Adjust the number of tokens as needed
-//      LJSONBody.AddPair('n', TJSONNumber.Create(1));
       LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
       LRESTRequest.Execute;
       if LRESTResponse.StatusCode = 200 then

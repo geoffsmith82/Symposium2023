@@ -32,6 +32,9 @@ type
      user : string;
   end;
 
+  TEmbedding = TArray<Double>;
+  TEmbeddings = TArray<TEmbedding>;
+
   TParameterDictionary = TDictionary<string, string>;
 
   TOnChatMessageMessageResults = procedure(ASessionID: Int64; AChatResponse: TChatResponse) of object;
