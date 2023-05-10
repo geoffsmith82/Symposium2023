@@ -110,8 +110,6 @@ begin
   FreeAndNil(FWebSocket);
   FWebSocket := TSslWebSocketCli.Create(nil);
   FWebSocket.URL := 'https://api.assemblyai.com/v2/realtime/ws?sample_rate=16000';
-  FWebSocket.Proxy := 'localhost';
-  FWebSocket.ProxyPort := '8888';
   FWebSocket.ExtraHeaders.Add('Authorization: ' + FAssemblyai_key);
   FWebSocket.ExtraHeaders.Add('Origin: api.assemblyai.com');
   FWebSocket.Connection := 'Upgrade';

@@ -114,8 +114,6 @@ begin
   FreeAndNil(FWebSocket);
   FWebSocket := TSslWebSocketCli.Create(nil);
   FWebSocket.URL := 'https://api.deepgram.com/v1/listen?sample_rate=16000&encoding=linear16';
-  FWebSocket.Proxy := 'localhost';
-  FWebSocket.ProxyPort := '8888';
   FWebSocket.ExtraHeaders.Add('Authorization: Token ' + FDeepGram_Key);
   FWebSocket.ExtraHeaders.Add('Origin: api.deepgram.com');
   FWebSocket.Connection := 'Upgrade';
