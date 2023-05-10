@@ -1,7 +1,6 @@
 unit uAzureGPT;
 
 interface
-
 uses
   System.Generics.Collections,
   REST.Client,
@@ -11,7 +10,6 @@ uses
   System.SysUtils,
   uGPT
   ;
-
 type
   TMicrosoftOpenAI = class(TBaseOpenAI)
   strict private
@@ -24,9 +22,7 @@ type
   end;
 
 implementation
-
 {$I APIKEY.INC}
-
 { TMicrosoftOpenAI }
 
 constructor TMicrosoftOpenAI.Create(APIKey: string);

@@ -58,8 +58,8 @@ begin
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
   FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
-  FOAuth2.ClientID := FResourceKey;
-  FOAuth2.ClientSecret := FSecretKey;
+  FOAuth2.ClientID := AClientID;
+  FOAuth2.ClientSecret := AClientSecret;
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;

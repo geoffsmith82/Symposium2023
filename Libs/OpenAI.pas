@@ -16,8 +16,7 @@ uses
 type
   TDALLESize = (DALLE256, DALLE512, DALLE1024);
 
-  TEmbedding = TArray<Double>;
-  TEmbeddings = TArray<TEmbedding>;
+
 
   TOpenAI = class(TBaseOpenAI)
   public
