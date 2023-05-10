@@ -65,8 +65,10 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [llama-pas](https://github.com/Kagamma/llama-pas)
 - [Bing Image Creator](https://www.bing.com/images/create/)
 - [Bing](https://www.bing.com/)
+- [RDOpenAI](https://github.com/baumwollschaf/RDOpenAI) Delphi implementation of ChatGPT - an event based component 
 - [ChatGPT](https://chat.openai.com/chat) OpenAI ChatGPT
 - [DelphiOpenAI](https://github.com/HemulGM/DelphiOpenAI) a Delphi Library for OpenAI 
+- [ChatGPTPluginForLazarus](https://github.com/AliDehbansiahkarbon/ChatGPTPluginForLazarus)  An OpenAI (ChatGPT) plug-in for Lazarus IDE. 
 - [ChatGPT](https://github.com/HemulGM/ChatGPT) a Firemonkey ChatGPT interface written in Delphi.
 - [AI-Playground-DesktopClient](https://github.com/FMXExpress/AI-Playground-DesktopClient) A Firemonkey Language model playground to access languages models like StableLM, ChatGPT, and more.
 - [TOpenALPR](https://github.com/r1me/TOpenALPR) Open Source Number Plate recognition
