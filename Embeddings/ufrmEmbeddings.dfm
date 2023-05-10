@@ -40,22 +40,5 @@ object frmEmbeddings: TfrmEmbeddings
     TabOrder = 2
     OnClick = btnEmbeddingsClick
   end
-  object FDConnection1: TFDConnection
-    Params.Strings = (
-      'Server=172.29.34.21'
-      'Database=embeddings'
-      'User_Name=myuser'
-      'Password=password'
-      'DriverID=PG')
-    LoginPrompt = False
-    Left = 536
-    Top = 224
-  end
-  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
-    VendorLib = 
-      'D:\Programming\ADUG\Symposium2023\Embeddings\Win32\Debug\libpq.d' +
-      'll'
-    Left = 552
-    Top = 312
   end
 end

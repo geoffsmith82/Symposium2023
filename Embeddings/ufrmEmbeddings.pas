@@ -30,7 +30,8 @@ uses
   FireDAC.VCLUI.Wait,
   Data.DB,
   FireDAC.Comp.Client,
-  OpenAI
+  OpenAI,
+  uGPT
   ;
 
 type
@@ -43,8 +44,6 @@ type
   TfrmEmbeddings = class(TForm)
     btnGoogleSearch: TButton;
     Memo1: TMemo;
-    FDConnection1: TFDConnection;
-    FDPhysPgDriverLink1: TFDPhysPgDriverLink;
     btnEmbeddings: TButton;
     procedure btnGoogleSearchClick(Sender: TObject);
     procedure btnEmbeddingsClick(Sender: TObject);
