@@ -18,6 +18,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
 ## Presentation Slides
   - [AI and ChatGPT](./Documentation/AI%20and%20ChatGPT.pptx)
 ## Example programs
+  - [EmbeddingsDemo](./EmbeddingsDemo)
+	- Simple demo showing how Embeddings work
   - [Translate](./Translate)
 	- translates between languages using the various cloud API's.  
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
