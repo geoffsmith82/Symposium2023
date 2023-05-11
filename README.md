@@ -31,6 +31,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	![image](./FaceDetection/FaceDetectionScreenshot.png)	
   - [Weather](./Weather)  
 	- Query the weather forcast for Bendigo from the bureau of meteorology generate a paragraph or two and read it out
+	![image](./Weather/WeatherScreenshot.png)	
   - [TranscribeAudio](./TranscribeAudio)
     - Upload a audio file and have it translated via a cloud speech to text api.
   - [VoiceRecognition](./VoiceRecognition)
