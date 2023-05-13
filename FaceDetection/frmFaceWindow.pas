@@ -17,8 +17,11 @@ uses
   Vcl.Menus,
   Vcl.ComCtrls,
   Vcl.ExtCtrls,
+  Vcl.Mask,
   Vcl.Imaging.Jpeg,
   Vcl.Imaging.PngImage,
+  JvExMask,
+  JvToolEdit,
   System.Net.HttpClientComponent,
   System.Net.URLClient,
   System.Net.HttpClient,
@@ -57,12 +60,15 @@ type
     imgDetectedPhoto: TImage;
     miGoogleMenu: TMenuItem;
     miGoogleLogin: TMenuItem;
+    JvFilenameEdit1: TJvFilenameEdit;
+    btnDetectFacesFromLocalFile: TButton;
     procedure btnDetectFacesClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miSelectEngineClick(Sender: TObject);
     procedure miGoogleLoginClick(Sender: TObject);
+    procedure btnDetectFacesFromLocalFileClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -70,6 +76,10 @@ type
     procedure DownloadAndLoadImage(const AUrl: string; AImage: TImage);
     procedure OnMicrosoftSelected(Sender: TObject);
     procedure OnGoogleSelected(Sender: TObject);
+    procedure DrawBoxAroundFace(AImage: TImage; ARect: TRect);
+    procedure DrawOvalAroundEye(AImage: TImage; ARect: TRect);
+    procedure DrawOvalAroundLips(AImage: TImage; ARect: TRect);
+    procedure LoadImage(const AFilename: string; AImage: TImage);
   public
     { Public declarations }
   end;
@@ -82,6 +92,90 @@ implementation
 {$R *.dfm}
 
 {$I ..\LIBS\APIKEY.INC}
+
+procedure TfrmFaceDetection.btnDetectFacesFromLocalFileClick(Sender: TObject);
+var
+  results : string;
+  faces : TMicrosoftFaceClass;
+  I: Integer;
+  FaceRect : TRect;
+  EyeRect: TRect;
+  MouthRect: TRect;
+begin
+  results := FFaceRecognitionEngines.ActiveEngine.DetectFacesFromFile(JvFilenameEdit1.Filename);
+  mmoResults.Text := results;
+  LoadImage(JvFilenameEdit1.Filename, imgOriginal);
+  LoadImage(JvFilenameEdit1.Filename, imgDetectedPhoto);
+  faces := TMicrosoftFaceClass.FromJsonString(results);
+  for I := Low(faces.Items) to High(faces.Items) do
+  begin
+    FaceRect.Top  := Trunc(faces.Items[i].faceRectangle.top);
+    FaceRect.Left := Trunc(faces.Items[i].faceRectangle.left);
+    FaceRect.Width := Trunc(faces.Items[i].faceRectangle.width);
+    FaceRect.Height := Trunc(faces.Items[i].faceRectangle.height);
+    DrawBoxAroundFace(imgDetectedPhoto, FaceRect);
+    EyeRect.Top := Trunc(faces.Items[i].faceLandmarks.eyeLeftTop.y);
+    EyeRect.Left := Trunc(faces.Items[i].faceLandmarks.eyeLeftOuter.x);
+    EyeRect.Right := Trunc(faces.Items[i].faceLandmarks.eyeLeftInner.x);
+    EyeRect.Bottom := Trunc(faces.Items[i].faceLandmarks.eyeLeftBottom.y);
+    DrawOvalAroundEye(imgDetectedPhoto, EyeRect);
+    EyeRect.Top := Trunc(faces.Items[i].faceLandmarks.eyeRightTop.y);
+    EyeRect.Left := Trunc(faces.Items[i].faceLandmarks.eyeRightOuter.x);
+    EyeRect.Right := Trunc(faces.Items[i].faceLandmarks.eyeRightInner.x);
+    EyeRect.Bottom := Trunc(faces.Items[i].faceLandmarks.eyeRightBottom.y);
+    DrawOvalAroundEye(imgDetectedPhoto, EyeRect);
+    MouthRect.Top :=  Trunc(faces.Items[i].faceLandmarks.upperLipTop.y);
+    MouthRect.Bottom :=  Trunc(faces.Items[i].faceLandmarks.underLipBottom.y);
+    MouthRect.Left :=  Trunc(faces.Items[i].faceLandmarks.mouthLeft.x);
+    MouthRect.Right :=  Trunc(faces.Items[i].faceLandmarks.mouthRight.x);
+    DrawOvalAroundLips(imgDetectedPhoto, MouthRect);
+  end;
+  imgDetectedPhoto.Update;
+end;
+
+procedure TfrmFaceDetection.LoadImage(const AFilename: string; AImage: TImage);
+var
+  LStream: TMemoryStream;
+  LBitmap: TBitmap;
+  LImage: TGraphic;
+begin
+
+
+  if not Assigned(AImage) then
+    raise Exception.Create('AImage parameter cannot be nil.');
+
+    LImage := TJPEGImage.Create;
+    LImage.LoadFromFile(AFilename);
+    LBitmap := TBitmap.Create;
+    LBitmap.Assign(LImage);
+    AImage.Picture.Graphic := LBitmap;
+//  AImage.Picture.Graphic.LoadFromFile(AFilename);
+  Exit;
+  LStream := TMemoryStream.Create;
+  try
+
+    begin
+      LStream.Position := 0;
+
+      try
+        LImage.LoadFromStream(LStream);
+        // Create a new TBitmap object and assign the loaded image to its canvas
+        LBitmap := TBitmap.Create;
+        try
+          LBitmap.Assign(LImage);
+          // Assign the modified bitmap to the TImage component
+          AImage.Picture.Graphic := LBitmap;
+        finally
+          LBitmap.Free;
+        end;
+      finally
+        LImage.Free;
+      end;
+    end
+  finally
+    LStream.Free;
+  end;
+end;
 
 procedure TfrmFaceDetection.DownloadAndLoadImage(const AUrl: string; AImage: TImage);
 var
@@ -135,7 +229,7 @@ begin
 end;
 
 
-procedure DrawBoxAroundFace(AImage: TImage; ARect: TRect);
+procedure TfrmFaceDetection.DrawBoxAroundFace(AImage: TImage; ARect: TRect);
 var
   Canvas: TCanvas;
 begin
@@ -146,7 +240,7 @@ begin
   Canvas.Rectangle(ARect);
 end;
 
-procedure DrawOvalAroundEye(AImage: TImage; ARect: TRect);
+procedure TfrmFaceDetection.DrawOvalAroundEye(AImage: TImage; ARect: TRect);
 var
   Canvas: TCanvas;
 begin
@@ -157,7 +251,7 @@ begin
   Canvas.Ellipse(ARect);
 end;
 
-procedure DrawOvalAroundLips(AImage: TImage; ARect: TRect);
+procedure TfrmFaceDetection.DrawOvalAroundLips(AImage: TImage; ARect: TRect);
 var
   Canvas: TCanvas;
 begin

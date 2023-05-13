@@ -1,4 +1,4 @@
-program FaceDetection;
+program FaceDetectionCloud;
 
 uses
   {$IFDEF EurekaLog}

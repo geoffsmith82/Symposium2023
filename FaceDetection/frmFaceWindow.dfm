@@ -2,8 +2,8 @@ object frmFaceDetection: TfrmFaceDetection
   Left = 0
   Top = 0
   Caption = 'Face Detection'
-  ClientHeight = 343
-  ClientWidth = 690
+  ClientHeight = 342
+  ClientWidth = 686
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -40,19 +40,21 @@ object frmFaceDetection: TfrmFaceDetection
   object PageControl1: TPageControl
     Left = 0
     Top = 96
-    Width = 690
-    Height = 247
+    Width = 686
+    Height = 246
     ActivePage = tsResults
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
+    ExplicitWidth = 682
+    ExplicitHeight = 245
     object tsOriginalPhoto: TTabSheet
       Caption = 'Original Photo'
       object imgOriginal: TImage
         Left = 0
         Top = 0
-        Width = 682
-        Height = 219
+        Width = 678
+        Height = 218
         Align = alClient
         Proportional = True
         Stretch = True
@@ -68,8 +70,8 @@ object frmFaceDetection: TfrmFaceDetection
       object imgDetectedPhoto: TImage
         Left = 0
         Top = 0
-        Width = 682
-        Height = 219
+        Width = 678
+        Height = 218
         Align = alClient
         Proportional = True
         Stretch = True
@@ -85,18 +87,33 @@ object frmFaceDetection: TfrmFaceDetection
       object mmoResults: TMemo
         Left = 0
         Top = 0
-        Width = 682
-        Height = 219
+        Width = 678
+        Height = 218
         Align = alClient
         Lines.Strings = (
           'Memo1')
         TabOrder = 0
-        ExplicitLeft = -224
-        ExplicitTop = -68
-        ExplicitWidth = 505
-        ExplicitHeight = 233
+        ExplicitWidth = 674
+        ExplicitHeight = 217
       end
     end
+  end
+  object JvFilenameEdit1: TJvFilenameEdit
+    Left = 32
+    Top = 67
+    Width = 513
+    Height = 21
+    TabOrder = 3
+    Text = 'JvFilenameEdit1'
+  end
+  object btnDetectFacesFromLocalFile: TButton
+    Left = 568
+    Top = 65
+    Width = 83
+    Height = 25
+    Caption = 'Detect Faces'
+    TabOrder = 4
+    OnClick = btnDetectFacesFromLocalFileClick
   end
   object mmMainMenu: TMainMenu
     Left = 600
