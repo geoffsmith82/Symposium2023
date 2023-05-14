@@ -2,10 +2,10 @@ object dmEmbeddings: TdmEmbeddings
   OnCreate = DataModuleCreate
   Height = 480
   Width = 640
-  object FDConnection1: TFDConnection
+  object EmbeddingConnection: TFDConnection
     Params.Strings = (
-      'Server=172.17.69.52'
-      'Database=postgres'
+      'Server=172.20.74.30'
+      'Database=embeddings'
       'User_Name=geoff'
       'Password=HelloWorld!'
       'CharacterSet=UTF8'
@@ -15,7 +15,7 @@ object dmEmbeddings: TdmEmbeddings
     Top = 16
   end
   object PhysPgDriverLink: TFDPhysPgDriverLink
-    VendorLib = 'C:\Program Files (x86)\PostgreSQL\psqlODBC\bin\libpq.dll'
+    VendorLib = 'C:\Program Files\PostgreSQL\psqlODBC\bin\libpq.dll'
     Left = 48
     Top = 104
   end

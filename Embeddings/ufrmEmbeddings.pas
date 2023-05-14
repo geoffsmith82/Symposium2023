@@ -9,6 +9,7 @@ uses
   System.Variants,
   System.Classes,
   System.Math,
+  System.JSON,
   System.Generics.Collections,
   Vcl.Graphics,
   Vcl.Controls,
@@ -45,10 +46,16 @@ type
     btnGoogleSearch: TButton;
     Memo1: TMemo;
     btnEmbeddings: TButton;
+    Button1: TButton;
+    Button2: TButton;
+    Memo2: TMemo;
+    btnQuery: TButton;
     procedure btnGoogleSearchClick(Sender: TObject);
     procedure btnEmbeddingsClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure btnQueryClick(Sender: TObject);
   private
     FOpenAI : TOpenAI;
     function GetQuestionsArray: TArray<string>;
@@ -68,6 +75,8 @@ var
 implementation
 
 {$R *.dfm}
+
+uses udmEmbeddings;
 
 {$I ..\Libs\apikey.inc}
 
@@ -90,6 +99,83 @@ begin
     end;
   finally
     FreeAndNil(GoogleCustomSearch);
+  end;
+end;
+
+procedure TfrmEmbeddings.btnQueryClick(Sender: TObject);
+var
+  questionEmbedding : TEmbeddings;
+  prompt : TPrompt;
+  chatSettings : TChatSettings;
+  chatMessages : TObjectList<TChatMessage>;
+  chatMessage : TChatMessage;
+  chatResponse : TChatResponse;
+  sections : TArray<string>;
+begin
+  questionEmbedding := FOpenAI.Embeddings([Memo2.Lines.Text]);
+  prompt := TPrompt.Create(
+                           '{question}' + sLineBreak + sLineBreak +
+                           'CONTEXT' + sLineBreak +
+                           '{embedding1}' + sLineBreak + sLineBreak +
+                           '{embedding2}' + sLineBreak);
+  chatSettings.model := 'gpt-4';
+  chatMessages := TObjectList<TChatMessage>.Create;
+  try
+    chatMessage := TChatMessage.Create;
+    chatMessage.Role := 'System';
+    chatMessage.Content := 'Answer the following question using the context following the question';
+    chatMessages.Add(chatMessage);
+    chatMessage := TChatMessage.Create;
+    chatMessage.Role := 'User';
+    sections := dmEmbeddings.LookupSections(questionEmbedding[0], 2);
+
+    prompt.Parameters.Add('question', Memo2.Lines.Text);
+    prompt.Parameters.Add('embedding1', sections[0]);
+    prompt.Parameters.Add('embedding2', sections[1]);
+
+
+    chatMessage.Content := prompt.AsString;
+    chatMessages.Add(chatMessage);
+
+    chatResponse := FOpenAI.SendChatMessagesToOpenAI(chatSettings, chatMessages);
+
+    Memo1.Lines.Add(chatResponse.Content);
+  finally
+    FreeAndNil(prompt);
+    FreeAndNil(chatMessages);
+  end;
+end;
+
+procedure TfrmEmbeddings.Button2Click(Sender: TObject);
+var
+  sl : TStringList;
+  sections : TArray<string>;
+  i: Integer;
+  j : Integer;
+  embeddings : TEmbeddings;
+  json :TJSONObject;
+begin
+  sl := nil;
+  try
+    j := 0;
+    sl := TStringList.Create;
+    sl.LoadFromFile('D:\Programming\ADUG\Symposium2023\Embeddings\inputText.txt');
+    SetLength(sections, sl.Count);
+    for i := 0 to sl.Count - 1 do
+    begin
+      sections[j] := sections[j] + sl[i] + System.sLineBreak;
+      if Length(sections[j]) > 2048 then
+      begin
+        Inc(j);
+      end;
+    end;
+    SetLength(sections, j);
+    embeddings := FOpenAI.Embeddings(sections);
+    json := TJSONObject.Create;
+    json.AddPair('filename', 'inputText.txt');
+    dmEmbeddings.AddDocument(embeddings, sections, 'inputText.txt', json);
+  finally
+    FreeAndNil(sl);
   end;
 end;
 
