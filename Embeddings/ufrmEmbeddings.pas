@@ -129,13 +129,15 @@ begin
     chatMessage.Role := 'User';
     sections := dmEmbeddings.LookupSections(questionEmbedding[0], 2);
 
-    prompt.Parameters.Add('question', Memo2.Lines.Text);
-    prompt.Parameters.Add('embedding1', sections[0]);
-    prompt.Parameters.Add('embedding2', sections[1]);
+    prompt.Parameters['question'] := Memo2.Lines.Text;
+    prompt.Parameters['embedding1'] := sections[0];
+    prompt.Parameters['embedding2'] := sections[1];
 
 
     chatMessage.Content := prompt.AsString;
     chatMessages.Add(chatMessage);
+    chatSettings.max_tokens := 2500;
+    chatSettings.n := 1;
 
     chatResponse := FOpenAI.SendChatMessagesToOpenAI(chatSettings, chatMessages);
 
