@@ -89,7 +89,7 @@ begin
     LRESTRequest.Client := LRESTClient;
     LRESTRequest.Response := LRESTResponse;
     LRESTRequest.Method := TRESTRequestMethod.rmPOST;
-    LRESTRequest.Timeout := 60000; // Set the timeout as needed
+    LRESTRequest.Timeout := 80000; // Set the timeout as needed
     LRESTRequest.Resource := '';
     LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
@@ -104,7 +104,10 @@ begin
         LJSONMessages.AddElement(LJSONMsg);
       end;
 
-      LJSONBody.AddPair('model', 'gpt-3.5-turbo');
+      if ChatConfig.model.IsEmpty then
+        ChatConfig.model := 'gpt-3.5-turbo';
+
+      LJSONBody.AddPair('model', ChatConfig.model);
       LJSONBody.AddPair('messages', LJSONMessages);
       if ChatConfig.max_tokens > 0 then
         LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);

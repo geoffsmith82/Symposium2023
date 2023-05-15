@@ -58,6 +58,7 @@ uses
 procedure TfrmWeatherWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FElevenLabsVoiceService);
+  FreeAndNil(FOpenAI);
 end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
