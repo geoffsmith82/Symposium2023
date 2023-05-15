@@ -44,11 +44,13 @@ type
     FPromptText: string;
     FParameters: TParameterDictionary;
     function ReplaceParameters: string;
+    procedure SetParameter(const Key, Value: string);
+    function GetParameter(const Key: string): string;
   public
     constructor Create(const APromptText: string);
     destructor Destroy; override;
     function AsString: string;
-    property Parameters: TParameterDictionary read FParameters;
+    property Parameters[const Key: string]: string read GetParameter write SetParameter;
   end;
 
   TBaseOpenAI = class
@@ -80,6 +82,11 @@ begin
   inherited;
 end;
 
+function TPrompt.GetParameter(const Key: string): string;
+begin
+  Result := FParameters[Key];
+end;
+
 function TPrompt.AsString: string;
 begin
   Result := ReplaceParameters;
@@ -94,6 +101,11 @@ begin
   begin
     Result := StringReplace(Result, '{' + Param.Key + '}', Param.Value, [rfReplaceAll, rfIgnoreCase]);
   end;
+end;
+
+procedure TPrompt.SetParameter(const Key: string; const Value: string);
+begin
+    FParameters.AddOrSetValue(Key, Value);
 end;
 
 { TBaseOpenAI }
