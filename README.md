@@ -74,7 +74,10 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [ChatGPTPluginForLazarus](https://github.com/AliDehbansiahkarbon/ChatGPTPluginForLazarus)  An OpenAI (ChatGPT) plug-in for Lazarus IDE. 
 - [ChatGPT](https://github.com/HemulGM/ChatGPT) a Firemonkey ChatGPT interface written in Delphi.
 - [AI-Playground-DesktopClient](https://github.com/FMXExpress/AI-Playground-DesktopClient) A Firemonkey Language model playground to access languages models like StableLM, ChatGPT, and more.
+- [AI-Code-Translator](https://github.com/FMXExpress/AI-Code-Translator) Use GPT to translate between programming languages
 - [TOpenALPR](https://github.com/r1me/TOpenALPR) Open Source Number Plate recognition
+- [PgVector](https://github.com/pgvector/pgvector) PgVector allows storing and querying of Vectors/Embeddings in an SQL database
+
 
 
 - [CommonVoice](https://commonvoice.mozilla.org/en/languages) Public dataset of recordings for Voice Recognition
