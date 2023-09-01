@@ -11,7 +11,7 @@ AI's ability to analyze and process data, and generate comprehensive reports hig
 
 The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. Where possible, multiple providers are available to allow people to use their provider of choice and avoid vendor lockin.
 
-## ChatGPT Prompts
+## ChatGPT Prompts  
 
 [Some Example GPT Prompts](./Documentation/Prompts.md) 
 
@@ -74,7 +74,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [ChatGPTPluginForLazarus](https://github.com/AliDehbansiahkarbon/ChatGPTPluginForLazarus)  An OpenAI (ChatGPT) plug-in for Lazarus IDE. 
 - [ChatGPT](https://github.com/HemulGM/ChatGPT) a Firemonkey ChatGPT interface written in Delphi.
 - [AI-Playground-DesktopClient](https://github.com/FMXExpress/AI-Playground-DesktopClient) A Firemonkey Language model playground to access languages models like StableLM, ChatGPT, and more.
-- [AI-Code-Translator](https://github.com/FMXExpress/AI-Code-Translator) Use GPT to translate between programming languages
+- [AI-Code-Translator](https://github.com/FMXExpress/AI-Code-Translator) Use GPT to translate between programming languages		
 - [TOpenALPR](https://github.com/r1me/TOpenALPR) Open Source Number Plate recognition
 - [PgVector](https://github.com/pgvector/pgvector) PgVector allows storing and querying of Vectors/Embeddings in an SQL database
 
@@ -86,7 +86,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 ### External Libraries required to build projects
  - [TMS Grid](https://www.tmssoftware.com/site/dbadvgrd.asp) TMS Software TDBAdvGrid... You can use the trail version to get the demo to work.
- - [ICS Daily Snapshot 8.71](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) ICS WebSockets are a new feature coming in v8.71
+ - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
  - [newac](https://github.com/geoffsmith82/newac) New Audio Components
  - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11
 
