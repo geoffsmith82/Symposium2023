@@ -19,6 +19,7 @@ type
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
     Log_Id : string;
+    Model : string;
   end;
 
   TChatSettings = record
