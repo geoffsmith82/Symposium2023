@@ -139,7 +139,7 @@ begin
     chatSettings.max_tokens := 2500;
     chatSettings.n := 1;
 
-    chatResponse := FOpenAI.SendChatMessagesToOpenAI(chatSettings, chatMessages);
+    chatResponse := FOpenAI.ChatCompletion(chatSettings, chatMessages);
 
     Memo1.Lines.Add(chatResponse.Content);
   finally

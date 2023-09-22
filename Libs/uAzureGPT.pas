@@ -11,13 +11,13 @@ uses
   uGPT
   ;
 type
-  TMicrosoftOpenAI = class(TBaseOpenAI)
+  TMicrosoftOpenAI = class(TBaseGPT)
   strict private
     FAPIKey : string;
   public
     constructor Create(APIKey: string);
-    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
-    function AskChatGPT(const AQuestion: string; const AModel: string): string; override;
+    function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
+    function Completion(const AQuestion: string; const AModel: string): string; override;
     function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
@@ -30,7 +30,7 @@ begin
   inherited Create(APIKey);
 end;
 
-function TMicrosoftOpenAI.SendChatMessagesToOpenAI(ChatConfig: TChatSettings;
+function TMicrosoftOpenAI.ChatCompletion(ChatConfig: TChatSettings;
   AMessages: TObjectList<TChatMessage>): TChatResponse;
 const
   API_Version = '2023-03-15-preview';
@@ -103,7 +103,7 @@ begin
 end;
 
 
-function TMicrosoftOpenAI.AskChatGPT(const AQuestion, AModel: string): string;
+function TMicrosoftOpenAI.Completion(const AQuestion, AModel: string): string;
 begin
   raise Exception.Create('Not Implemented');
 end;

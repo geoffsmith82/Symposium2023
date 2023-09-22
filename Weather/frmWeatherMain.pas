@@ -124,7 +124,7 @@ begin
 
                   chatConfig.model := model;
 
-                  answer := FOpenAI.SendChatMessagesToOpenAI(chatConfig, chatMessages);
+                  answer := FOpenAI.ChatCompletion(chatConfig, chatMessages);
                 finally
                   FreeAndNil(chatMessages);
                 end;

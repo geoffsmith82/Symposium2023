@@ -53,15 +53,15 @@ type
     property Parameters[const Key: string]: string read GetParameter write SetParameter;
   end;
 
-  TBaseOpenAI = class
+  TBaseGPT = class
   protected
     FAPIKey : string;
   public
     constructor Create(APIKey: string);
 //    procedure ListOpenAIModels(out AModelList: TStringList);
-    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
+    function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
 //    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
-    function AskChatGPT(const AQuestion: string; const AModel: string): string; virtual; abstract;
+    function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
 //    function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
@@ -110,7 +110,7 @@ end;
 
 { TBaseOpenAI }
 
-constructor TBaseOpenAI.Create(APIKey: string);
+constructor TBaseGPT.Create(APIKey: string);
 begin
   FAPIKey := APIKey;
 end;

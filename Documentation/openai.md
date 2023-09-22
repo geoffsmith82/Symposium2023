@@ -91,10 +91,10 @@ begin
 end;
 ```
 
-### SendChatMessagesToOpenAI
+### ChatCompletion
 
 ```pascal
-function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
+function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
 ```
 
 Send a series of chat messages to the ChatGPT model with the specified `ChatConfig` settings. Returns a `TChatResponse` object containing the AI's response.
@@ -133,7 +133,7 @@ begin
       ChatMessages.Add(ChatMessage);
 
       // Send messages to ChatGPT
-      Response := OpenAI.SendChatMessagesToOpenAI(ChatConfig, ChatMessages);
+      Response := OpenAI.ChatCompletion(ChatConfig, ChatMessages);
 
       // Print the response
       WriteLn(Response.Text);

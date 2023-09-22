@@ -371,7 +371,7 @@ begin
                var
                  ChatResponse: TChatResponse;
                begin
-                 ChatResponse := FOpenAI.SendChatMessagesToOpenAI(ChatConfig, AChatMessages);
+                 ChatResponse := FOpenAI.ChatCompletion(ChatConfig, AChatMessages);
                  if not Assigned(AOnMessageResults) then
                    raise Exception.Create('No Message Results Event given');
 

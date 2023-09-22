@@ -19,6 +19,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.Menus,
   System.IOUtils,
+  uGPT,
   OpenAI,
   uAzureGPT,
   uElevenLabs.REST,
@@ -52,6 +53,10 @@ type
     miTextCurie0011: TMenuItem;
     miTextBabbage001: TMenuItem;
     miTextAda0011: TMenuItem;
+    Button1: TButton;
+    gpt41: TMenuItem;
+    gpt432k1: TMenuItem;
+    gpt35turbo16k1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnAskTheMachineClick(Sender: TObject);
     procedure btnGoogleAuthClick(Sender: TObject);
@@ -64,6 +69,7 @@ type
     FSpeedToTextEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
     FOpenAI : TOpenAI;
+    FModels : TStringList;
     function SelectedModel: string;
     { Private declarations }
   public
@@ -144,11 +150,29 @@ end;
 procedure TForm1.btnAskTheMachineClick(Sender: TObject);
 var
   OldCursor : TCursor;
+  Config : TChatSettings;
+  msgs: TObjectList<TChatMessage>;
+  msg: TChatMessage;
 begin
   OldCursor := Screen.Cursor;
   try
     Screen.Cursor := crHourGlass;
-    mmoOutput.Lines.Text := FOpenAI.AskChatGPT(mmoPrompt.Text, SelectedModel);
+    msgs := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'System';
+    msg.Content := 'The following is part of a church service. Output the first sentence of the actual sermon that follows the songs, not the talking in between though';
+    msgs.Add(msg);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'User';
+    msg.Content := mmoPrompt.Text;
+    msgs.Add(msg);
+
+//    mmoOutput.Lines.Text := FOpenAI.Completion(mmoPrompt.Text, SelectedModel);
+    config.model := SelectedModel;
+    config.n := 1;
+    config.max_tokens := 6200;
+    mmoOutput.Lines.Text := FOpenAI.ChatCompletion(Config, msgs).Content;
     Update;
     if chkSpeak.Checked then
     begin

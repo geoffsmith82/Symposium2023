@@ -18,13 +18,13 @@ type
 
 
 
-  TOpenAI = class(TBaseOpenAI)
+  TOpenAI = class(TBaseGPT)
   public
     constructor Create(APIKey: string);
     procedure ListOpenAIModels(out AModelList: TStringList);
-    function SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
+    function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
-    function AskChatGPT(const AQuestion: string; const AModel: string): string; override;
+    function Completion(const AQuestion: string; const AModel: string): string; override;
     function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
@@ -61,7 +61,7 @@ begin
   Result := 1 - (DotProduct / (Magnitude1 * Magnitude2));
 end;
 
-function TOpenAI.SendChatMessagesToOpenAI(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
+function TOpenAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
@@ -200,7 +200,7 @@ begin
   inherited Create(APIKey);
 end;
 
-function TOpenAI.AskChatGPT(const AQuestion: string; const AModel: string): string;
+function TOpenAI.Completion(const AQuestion: string; const AModel: string): string;
 var
   LClient : TRESTClient;
   LRequest : TRESTRequest;
