@@ -18,6 +18,7 @@ type
     Completion_Tokens : Cardinal;
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
+    Log_Id : string;
   end;
 
   TChatSettings = record
