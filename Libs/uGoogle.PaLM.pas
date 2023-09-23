@@ -13,6 +13,14 @@ uses
   ;
 
 type
+  EGooglePaLMError = class(Exception)
+  private
+    FErrorType: string;
+  public
+    constructor Create(const AErrorType, AMessage: string);
+    property ErrorType: string read FErrorType;
+  end;
+
   TGooglePaLM = class(TBaseGPT)
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
@@ -34,6 +42,9 @@ var
   Params: TJSONObject;
   JSONCandidates: TJSONArray;
   JSONCandidate: TJSONObject;
+  ErrorJSON: TJSONObject;
+  ErrorMsg: string;
+  ErrorCode: string;
   ChatPrompt: TJSONArray;
   Msgs : TJSONObject;
   I: Integer;
@@ -92,9 +103,16 @@ begin
         JSONCandidate := JSONCandidates[0] as TJSONObject;
         Result.Content := JSONCandidate.GetValue('content').Value;
       end;
-    end else
-      raise Exception.Create('Error calling API: ' + IntToStr(RESTRequest.Response.StatusCode));
-
+    end
+    else
+    begin
+      // Parse error message
+      ErrorJSON := (RESTResponse.JSONValue as TJSONObject).GetValue('error') as TJSONObject;
+      ErrorMsg := ErrorJSON.GetValue('message').Value;
+      ErrorCode := ErrorJSON.GetValue('code').Value;
+      // Raise exception
+      raise EGooglePaLMError.Create(ErrorCode, ErrorMsg);
+    end;
   finally
     FreeAndNil(RESTResponse);
     FreeAndNil(RESTClient);
@@ -111,6 +129,14 @@ end;
 function TGooglePaLM.Embeddings(const Texts: TArray<string>): TEmbeddings;
 begin
   raise Exception.Create('Not Implemented Yet');
+end;
+
+{ EGooglePaLMError }
+
+constructor EGooglePaLMError.Create(const AErrorType, AMessage: string);
+begin
+  inherited Create(AMessage);
+  FErrorType := AErrorType;
 end;
 
 end.
