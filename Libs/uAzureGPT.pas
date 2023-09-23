@@ -7,13 +7,45 @@ uses
   REST.Types,
   REST.Response.Adapter,
   System.JSON,
+  REST.Json,
   System.SysUtils,
   uLLM
   ;
 type
+  TCapabilities = class
+    fine_tune: Boolean;
+    inference: Boolean;
+    completion: Boolean;
+    chat_completion: Boolean;
+    embeddings: Boolean;
+  end;
+
+  TDeprecation = class
+    fine_tune: Int64;
+    inference: Int64;
+  end;
+
+  TModelData = class
+    capabilities: TCapabilities;
+    lifecycle_status: string;
+    deprecation: TDeprecation;
+    id: string;
+    status: string;
+    created_at: Int64;
+    updated_at: Int64;
+    object_type: string;
+  end;
+
+  TModelsResponse = class
+    data: TArray<TModelData>;
+  end;
+
+
   TMicrosoftOpenAI = class(TBaseLLM)
-  strict private
-    FAPIKey : string;
+  private
+    function GetAzureModels: TModelsResponse;
+  protected
+    function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   public
     constructor Create(APIKey: string);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
@@ -170,6 +202,76 @@ begin
     FreeAndNil(LRestRequest);
     FreeAndNil(LRestClient);
   end;
+end;
+
+function TMicrosoftOpenAI.GetAzureModels: TModelsResponse;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+  JsonResponse: TJSONObject;
+  JSONValue: TJSONValue;
+begin
+  RestClient := TRESTClient.Create(nil);
+  RestRequest := TRESTRequest.Create(nil);
+  RestResponse := TRESTResponse.Create(nil);
+
+  try
+    RestClient.BaseURL := AzureOpenAIEndpoint;
+    RestClient.Accept := 'application/json';
+    RestClient.AcceptCharset := 'UTF-8';
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Method := rmGET;
+    RestRequest.Resource := '/openai/models?api-version=2023-05-15';
+    RestRequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
+
+    RestRequest.Execute;
+
+    if RestResponse.StatusCode = 200 then
+    begin
+      JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
+      try
+        if JSONValue is TJSONObject then
+        begin
+          JsonResponse := JSONValue as TJSONObject;
+          Result := TJSON.JsonToObject<TModelsResponse>(JsonResponse);
+        end;
+      finally
+        JSONValue.Free;
+      end;
+    end
+    else
+      raise Exception.CreateFmt('Error: %s (%d)', [RestResponse.StatusText, RestResponse.StatusCode]);
+  finally
+    RestClient.Free;
+    RestRequest.Free;
+    RestResponse.Free;
+  end;
+end;
+
+
+function TMicrosoftOpenAI.GetModelInfo: TObjectList<TBaseModelInfo>;
+var
+  modellist : TModelsResponse;
+  modelObj: TBaseModelInfo;
+  modelData: TModelData;
+begin
+  FModelInfo.Clear;
+
+  modellist := GetAzureModels;
+  try
+    for modelData in modelList.data do
+    begin
+      modelObj := TBaseModelInfo.Create;
+      modelObj.modelName := modelData.id;
+      FModelInfo.Add(modelObj);
+    end;
+  finally
+    FreeAndNil(modellist);
+  end;
+  Result := FModelInfo;
 end;
 
 end.
