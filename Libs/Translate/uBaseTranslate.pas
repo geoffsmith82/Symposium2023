@@ -6,7 +6,7 @@ uses
   Classes;
 
 type
-  TBaseTranslate = class
+  TBaseTranslate = class abstract
   public
     function FromLanguages: TArray<string>; virtual; abstract;
     function ToLanguages: TArray<string>; virtual; abstract;
