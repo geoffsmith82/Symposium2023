@@ -123,6 +123,12 @@ begin
         LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
         try
           LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
+          if Assigned(LJSONResponse.GetValue('model')) then
+            Result.Model := LJSONResponse.GetValue('model').Value;
+
+          if Assigned(LJSONResponse.GetValue('id')) then
+            Result.Log_Id := LJSONResponse.GetValue('id').Value;
+
           LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
           LUsage.TryGetValue('completion_tokens', Result.Completion_Tokens);
           LUsage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
