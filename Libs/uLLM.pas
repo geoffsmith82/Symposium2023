@@ -55,16 +55,25 @@ type
     property Parameters[const Key: string]: string read GetParameter write SetParameter;
   end;
 
-  TBaseLLM = class
+  TBaseModelInfo = class
+    modelName: string;
+  end;
+
+  TBaseLLM = class abstract
   protected
     FAPIKey : string;
+    FModelInfo : TObjectList<TBaseModelInfo>;
+    function GetModelInfo: TObjectList<TBaseModelInfo>; virtual; abstract;
   public
     constructor Create(APIKey: string);
+    destructor Destroy; override;
 //    procedure ListOpenAIModels(out AModelList: TStringList);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
 //    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
 //    function Embeddings(const Texts: TArray<string>): TEmbeddings;
+  published
+    property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
   end;
 
 
@@ -115,6 +124,13 @@ end;
 constructor TBaseLLM.Create(APIKey: string);
 begin
   FAPIKey := APIKey;
+  FModelInfo := TObjectList<TBaseModelInfo>.Create;
 end;
+
+destructor TBaseLLM.Destroy;
+begin
+  FreeAndNil(ModelInfo);
+end;
+
 
 end.

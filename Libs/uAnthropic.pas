@@ -23,6 +23,8 @@ type
 
 
   TAnthropic = class(TBaseLLM)
+  protected
+    function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
@@ -139,6 +141,30 @@ end;
 function TAnthropic.Embeddings(const Texts: TArray<string>): TEmbeddings;
 begin
   raise Exception.Create('Not Available');
+end;
+
+function TAnthropic.GetModelInfo: TObjectList<TBaseModelInfo>;
+var
+  modelObj : TBaseModelInfo;
+begin
+  FModelInfo.Clear;
+  modelObj := TBaseModelInfo.Create;
+  modelObj.modelName := 'claude-instant-1';
+  FModelInfo.Add(modelObj);
+
+  modelObj := TBaseModelInfo.Create;
+  modelObj.modelName := 'claude-instant-1.2';
+  FModelInfo.Add(modelObj);
+
+  modelObj := TBaseModelInfo.Create;
+  modelObj.modelName := 'claude-2';
+  FModelInfo.Add(modelObj);
+
+  modelObj := TBaseModelInfo.Create;
+  modelObj.modelName := 'claude-2.0';
+  FModelInfo.Add(modelObj);
+
+  Result := FModelInfo;
 end;
 
 end.

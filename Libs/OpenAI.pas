@@ -19,9 +19,12 @@ type
 
 
   TOpenAI = class(TBaseLLM)
+  protected
+    function GetModelInfo: TObjectList<TBaseModelInfo>; override;
+  private
+    procedure ListOpenAIModels(out AModelList: TStringList);
   public
     constructor Create(APIKey: string);
-    procedure ListOpenAIModels(out AModelList: TStringList);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     function Completion(const AQuestion: string; const AModel: string): string; override;
@@ -330,6 +333,28 @@ begin
     FreeAndNil(LRestRequest);
     FreeAndNil(LRestClient);
   end;
+end;
+
+function TOpenAI.GetModelInfo: TObjectList<TBaseModelInfo>;
+var
+  modelList : TStringList;
+  model : string;
+  modelObj : TBaseModelInfo;
+begin
+  modelList := TStringList.Create;
+  try
+    ListOpenAIModels(modelList);
+    FModelInfo.Clear;
+    for model in modelList do
+    begin
+      modelObj := TBaseModelInfo.Create;
+      modelObj.modelName := model;
+      FModelInfo.Add(modelObj);
+    end;
+  finally
+    FreeandNil(modelList);
+  end;
+  Result := FModelInfo;
 end;
 
 procedure TOpenAI.ListOpenAIModels(out AModelList: TStringList);

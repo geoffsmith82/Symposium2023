@@ -21,7 +21,26 @@ type
     property ErrorType: string read FErrorType;
   end;
 
+  TGenerativeModelResponse = record
+    name: string;
+    baseModelId: string;
+    version: string;
+    displayName: string;
+    description: string;
+    inputTokenLimit: Integer;
+    outputTokenLimit: Integer;
+    supportedGenerationMethods: TArray<string>;
+    temperature: Double;
+    topP: Double;
+    topK: Integer;
+  end;
+
   TGooglePaLM = class(TBaseLLM)
+  private
+    function GetGenerativeLanguageModels: string;
+    function ParseModelsResponse(const AJsonStr: string): TArray<TGenerativeModelResponse>;
+  protected
+    function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
@@ -129,6 +148,105 @@ end;
 function TGooglePaLM.Embeddings(const Texts: TArray<string>): TEmbeddings;
 begin
   raise Exception.Create('Not Implemented Yet');
+end;
+
+function TGooglePaLM.ParseModelsResponse(const AJsonStr: string): TArray<TGenerativeModelResponse>;
+var
+  JsonObj, ModelObj: TJSONObject;
+  ModelsArr: TJSONArray;
+  I, J: Integer;
+  GenMethodsArr: TJSONArray;
+begin
+  JsonObj := TJSONObject.ParseJSONValue(AJsonStr) as TJSONObject;
+  try
+    ModelsArr := JsonObj.GetValue<TJSONArray>('models');
+    SetLength(Result, ModelsArr.Count);
+
+    for I := 0 to ModelsArr.Count - 1 do
+    begin
+      ModelObj := ModelsArr.Items[I] as TJSONObject;
+      with Result[I] do
+      begin
+        name := ModelObj.GetValue<string>('name');
+        version := ModelObj.GetValue<string>('version');
+        displayName := ModelObj.GetValue<string>('displayName');
+        description := ModelObj.GetValue<string>('description');
+        inputTokenLimit := ModelObj.GetValue<Integer>('inputTokenLimit');
+        outputTokenLimit := ModelObj.GetValue<Integer>('outputTokenLimit');
+
+        if ModelObj.TryGetValue<TJSONArray>('supportedGenerationMethods', GenMethodsArr) then
+        begin
+          SetLength(supportedGenerationMethods, GenMethodsArr.Count);
+          for J := 0 to GenMethodsArr.Count - 1 do
+            supportedGenerationMethods[J] := GenMethodsArr.Items[J].Value;
+        end;
+        if Assigned(ModelObj.GetValue('temperature')) then
+          temperature := ModelObj.GetValue<Double>('temperature');
+        if Assigned(ModelObj.GetValue('topP')) then
+          topP := ModelObj.GetValue<Double>('topP');
+        if Assigned(ModelObj.GetValue('topK')) then
+          topK := ModelObj.GetValue<Integer>('topK');
+      end;
+    end;
+  finally
+    JsonObj.Free;
+  end;
+end;
+
+
+function TGooglePaLM.GetGenerativeLanguageModels: string;
+var
+  RestClient: TRESTClient;
+  RestRequest: TRESTRequest;
+  RestResponse: TRESTResponse;
+begin
+  Result := '';
+
+  RestClient := TRESTClient.Create(nil);
+  RestRequest := TRESTRequest.Create(nil);
+  RestResponse := TRESTResponse.Create(nil);
+
+  try
+    RestClient.BaseURL := 'https://generativelanguage.googleapis.com';
+
+    RestRequest.Client := RestClient;
+    RestRequest.Response := RestResponse;
+    RestRequest.Resource := Format('/v1beta2/models?key=%s', [FAPIKey]);
+
+    RestRequest.Execute;
+
+    Result := RestResponse.Content;
+  finally
+    RestClient.Free;
+    RestRequest.Free;
+    RestResponse.Free;
+  end;
+end;
+
+
+function TGooglePaLM.GetModelInfo: TObjectList<TBaseModelInfo>;
+var
+  JsonResponse: string;
+  ParsedResponses: TArray<TGenerativeModelResponse>;
+  SingleResponse: TGenerativeModelResponse;
+  i: Integer;
+  modelObj: TBaseModelInfo;
+begin
+  FModelInfo.Clear;
+  JsonResponse := GetGenerativeLanguageModels;
+  ParsedResponses := ParseModelsResponse(JsonResponse);
+
+  // Example of accessing each model:
+  for i := 0 to Length(ParsedResponses) - 1 do
+  begin
+    SingleResponse := ParsedResponses[i];
+    modelObj := TBaseModelInfo.Create;
+    // Now you can use fields of SingleResponse like SingleResponse.name, SingleResponse.version, etc.
+    modelObj.modelName := SingleResponse.name;
+    FModelInfo.Add(modelObj);
+  end;
+
+  Result := FModelInfo;
 end;
 
 { EGooglePaLMError }
