@@ -34,9 +34,6 @@ implementation
 
 {$I APIKEY.INC}
 
-const
-  API_URL = 'https://api.openai.com/v1/embeddings';
-
 function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
 var
   DotProduct, Magnitude1, Magnitude2: Double;
@@ -83,14 +80,14 @@ begin
   LRESTRequest := TRESTRequest.Create(nil);
   LRESTResponse := TRESTResponse.Create(nil);
   try
-    LRESTClient.BaseURL := 'https://api.openai.com/v1/chat/completions';
+    LRESTClient.BaseURL := 'https://api.openai.com';
     LRESTClient.Accept := 'application/json';
     LRESTClient.AcceptCharset := 'UTF-8';
     LRESTRequest.Client := LRESTClient;
     LRESTRequest.Response := LRESTResponse;
     LRESTRequest.Method := TRESTRequestMethod.rmPOST;
     LRESTRequest.Timeout := 80000; // Set the timeout as needed
-    LRESTRequest.Resource := '';
+    LRESTRequest.Resource := '/v1/chat/completions';
     LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LJSONBody := TJSONObject.Create;
@@ -158,21 +155,20 @@ var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
   LResponse: TRESTResponse;
-  url: string;
   json: TJSONObject;
 begin
   LClient := nil;
   LRequest := nil;
   LResponse := nil;
   json := nil;
-  LClient := TRESTClient.Create(nil);
-  LClient.ReadTimeout := 60000;
   try
+    LClient := TRESTClient.Create(nil);
+    LClient.ReadTimeout := 60000;
     LRequest := TRESTRequest.Create(nil);
-    url := 'https://api.openai.com/v1/images/generations';
-    LClient.BaseURL := url;
+    LClient.BaseURL := 'https://api.openai.com';
     LRequest.Client := LClient;
     LRequest.Method := rmPOST;
+    LRequest.Resource := '/v1/images/generations';
     LRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
     json := TJSONObject.Create;
@@ -245,7 +241,7 @@ begin
     LRequest.Method := rmPOST;
     LRequest.AddBody(LJsonPostData);
     LClient.BaseURL := 'https://api.openai.com';
-    LRequest.Resource := 'v1/completions';
+    LRequest.Resource := '/v1/completions';
 
     // Execute the HTTPS POST request synchronously (last param Async = false)
     LRequest.Execute;
@@ -282,12 +278,18 @@ var
   LJson: TJSONObject;
   I, J: Integer;
 begin
-  LRestClient := TRESTClient.Create(API_URL);
-  LRestRequest := TRESTRequest.Create(nil);
-  LRestResponse := TRESTResponse.Create(nil);
+  LRestClient := nil;
+  LRestRequest := nil;
+  LRestResponse := nil;
 
   try
+    LRestClient := TRESTClient.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
+
     LRestRequest.Client := LRestClient;
+    LRestClient.BaseURL := 'https://api.openai.com';
+    LRestRequest.Resource := '/v1/embeddings';
     LRestRequest.Response := LRestResponse;
     LRestRequest.Method := TRESTRequestMethod.rmPOST;
 
@@ -343,46 +345,38 @@ begin
   LRESTClient := TRESTClient.Create('https://api.openai.com');
   try
     LRESTRequest := TRESTRequest.Create(nil);
-    try
-      LRESTResponse := TRESTResponse.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Resource := '/v1/models';
+    LRESTRequest.Method := rmGET;
+    LRESTRequest.Response := LRESTResponse;
+
+    // Add your API key to the request header
+    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + CHATGPT_APIKEY, pkHTTPHEADER, [poDoNotEncode]);
+
+    LRESTRequest.Execute;
+
+    if LRESTResponse.StatusCode = 200 then
+    begin
+      LBaseJSONObject := TJSONObject.ParseJSONValue(LRESTResponse.JSONText) as TJSONObject;
       try
-        LRESTRequest.Client := LRESTClient;
-        LRESTRequest.Resource := '/v1/models';
-        LRESTRequest.Method := rmGET;
-        LRESTRequest.Response := LRESTResponse;
-
-        // Add your API key to the request header
-        LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + CHATGPT_APIKEY, pkHTTPHEADER, [poDoNotEncode]);
-
-        LRESTRequest.Execute;
-
-        if LRESTResponse.StatusCode = 200 then
+        if LBaseJSONObject.TryGetValue<TJSONArray>('data', LJSONArray) then
         begin
-          LBaseJSONObject := TJSONObject.ParseJSONValue(LRESTResponse.JSONText) as TJSONObject;
-          try
-            if LBaseJSONObject.TryGetValue<TJSONArray>('data', LJSONArray) then
-            begin
-              for i := 0 to LJSONArray.Count - 1 do
-              begin
-                LJSONModel := LJSONArray.Items[i] as TJSONObject;
-                AModelList.Add(LJSONModel.GetValue<string>('id'));
-              end;
-            end;
-          finally
-            FreeAndNil(LBaseJSONObject);
+          for i := 0 to LJSONArray.Count - 1 do
+          begin
+            LJSONModel := LJSONArray.Items[i] as TJSONObject;
+            AModelList.Add(LJSONModel.GetValue<string>('id'));
           end;
         end;
       finally
-        FreeAndNil(LRESTResponse);
+        FreeAndNil(LBaseJSONObject);
       end;
-    finally
-      FreeAndNil(LRESTRequest);
     end;
   finally
+    FreeAndNil(LRESTResponse);
+    FreeAndNil(LRESTRequest);
     FreeAndNil(LRESTClient);
   end;
 end;
-
-
 
 end.
