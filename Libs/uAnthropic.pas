@@ -9,7 +9,7 @@ uses
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
-  uGPT
+  uLLM
   ;
 
 type
@@ -22,7 +22,7 @@ type
   end;
 
 
-  TAnthropic = class(TBaseGPT)
+  TAnthropic = class(TBaseLLM)
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;

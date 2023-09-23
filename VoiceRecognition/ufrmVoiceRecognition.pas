@@ -59,7 +59,7 @@ uses
   ACS_smpeg,
   NewACIndicators,
   ACS_Wave,
-  uGPT,
+  uLLM,
   OpenAI,
   uAzureGPT,
   uBaseSpeech,

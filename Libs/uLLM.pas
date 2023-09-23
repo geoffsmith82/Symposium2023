@@ -1,4 +1,4 @@
-unit uGPT;
+unit uLLM;
 
 interface
 
@@ -55,7 +55,7 @@ type
     property Parameters[const Key: string]: string read GetParameter write SetParameter;
   end;
 
-  TBaseGPT = class
+  TBaseLLM = class
   protected
     FAPIKey : string;
   public
@@ -112,7 +112,7 @@ end;
 
 { TBaseOpenAI }
 
-constructor TBaseGPT.Create(APIKey: string);
+constructor TBaseLLM.Create(APIKey: string);
 begin
   FAPIKey := APIKey;
 end;

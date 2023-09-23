@@ -34,7 +34,7 @@ uses
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   ufrmChatSession in 'ufrmChatSession.pas' {frmNewChatSession},
   uAzureGPT in '..\Libs\uAzureGPT.pas',
-  uGPT in '..\Libs\uGPT.pas',
+  uLLM in '..\Libs\uLLM.pas',
   uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}

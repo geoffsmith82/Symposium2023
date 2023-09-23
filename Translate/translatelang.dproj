@@ -99,8 +99,8 @@
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <DCCReference Include="..\Libs\Translate\LanguageCodes.pas"/>
         <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\uLLM.pas"/>
         <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
-        <DCCReference Include="..\Libs\uGPT.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

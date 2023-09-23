@@ -32,7 +32,9 @@ uses
   Data.DB,
   FireDAC.Comp.Client,
   OpenAI,
-  uGPT
+  uAnthropic,
+  uGoogle.PaLM,
+  uLLM
   ;
 
 type

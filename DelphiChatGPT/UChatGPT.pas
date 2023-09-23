@@ -19,7 +19,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.Menus,
   System.IOUtils,
-  uGPT,
+  uLLM,
   OpenAI,
   uAzureGPT,
   uElevenLabs.REST,

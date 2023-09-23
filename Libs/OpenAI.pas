@@ -9,7 +9,7 @@ uses
   System.Generics.Collections,
   REST.Client,
   REST.Types,
-  uGPT,
+  uLLM,
   uDALLe2.DTO
   ;
 
@@ -18,7 +18,7 @@ type
 
 
 
-  TOpenAI = class(TBaseGPT)
+  TOpenAI = class(TBaseLLM)
   public
     constructor Create(APIKey: string);
     procedure ListOpenAIModels(out AModelList: TStringList);

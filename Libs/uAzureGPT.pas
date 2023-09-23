@@ -8,10 +8,10 @@ uses
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
-  uGPT
+  uLLM
   ;
 type
-  TMicrosoftOpenAI = class(TBaseGPT)
+  TMicrosoftOpenAI = class(TBaseLLM)
   strict private
     FAPIKey : string;
   public

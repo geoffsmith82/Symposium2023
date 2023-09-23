@@ -121,13 +121,15 @@
         </DCCReference>
         <DCCReference Include="..\Libs\Search\uGoogleCustomSearch.pas"/>
         <DCCReference Include="..\Libs\OpenAI.pas"/>
-        <DCCReference Include="..\Libs\uGPT.pas"/>
+        <DCCReference Include="..\Libs\uLLM.pas"/>
         <DCCReference Include="udmEmbeddings.pas">
             <Form>dmEmbeddings</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\uAnthropic.pas"/>
+        <DCCReference Include="..\Libs\uGoogle.PaLM.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

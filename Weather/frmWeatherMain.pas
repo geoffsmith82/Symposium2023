@@ -16,7 +16,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  uGPT,
+  uLLM,
   OpenAI,
   uElevenLabs.REST
   ;

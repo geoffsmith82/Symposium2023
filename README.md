@@ -1,5 +1,5 @@
 # Symposium 2023 Artificial Intelligence and ChatGPT
-Source code and Documentation for my [ADUG](https://www.adug.org.au) Symposium Talk presented on the 28th of April 2023.
+Source code and Documentation for my [ADUG](https://www.adug.org.au) Symposium Talk presented on the 28th of April 2023. I have since added to and enhanced the code to further demonstrate capabilities of AI.
 
 Artificial intelligence (AI) is an interdisciplinary field that combines computer science, mathematics, and cognitive psychology to create intelligent systems capable of performing complex tasks. Its rapid advancements have led to a wide array of applications demonstrating AI's versatility.
 
