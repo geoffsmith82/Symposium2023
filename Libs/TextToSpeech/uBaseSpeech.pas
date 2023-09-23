@@ -5,17 +5,28 @@ interface
 uses
   System.Classes,
   System.SysUtils,
-  Vcl.Controls,
   System.IOUtils,
   System.Threading,
+  System.Generics.Collections,
   Winapi.Windows,
-  Dialogs,
-  Forms,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.Controls,
   Vcl.MPlayer;
 
 type
+  TVoiceInfo = class
+    VoiceName : string;
+    VoiceGender : string;
+    VoiceId: string;
+  end;
+
   TSpeechStatus = (ssPlayStarting, ssPlayStopping);
-  TBaseTextToSpeech = class
+
+  TBaseTextToSpeech = class abstract
+  protected
+    FVoicesInfo : TObjectList<TVoiceInfo>;
+    function GetVoiceInfo: TObjectList<TVoiceInfo>; virtual; abstract;
   strict private
     MediaPlayer : TMediaPlayer;
   private
@@ -33,6 +44,8 @@ type
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
     function Mode: TMPModes;
+  public
+    property Voices: TObjectList<TVoiceInfo> read GetVoiceInfo;
   end;
 
 implementation
@@ -42,6 +55,7 @@ implementation
 destructor TBaseTextToSpeech.Destroy;
 begin
   FreeAndNil(MediaPlayer);
+  FreeAndNil(FVoicesInfo);
 end;
 
 function TBaseTextToSpeech.Mode: TMPModes;
@@ -107,6 +121,7 @@ begin
   MediaPlayer := TMediaPlayer.Create(nil);
   MediaPlayer.Parent := Sender;
   MediaPlayer.Visible := False;
+  FVoicesInfo := TObjectList<TVoiceInfo>.Create;
 end;
 
 end.

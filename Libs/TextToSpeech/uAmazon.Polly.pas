@@ -9,6 +9,7 @@ uses
   Vcl.Controls,
   Data.Cloud.AmazonAPI,
   Data.Cloud.CloudAPI,
+  System.Generics.Collections,
   System.Net.URLClient,
   System.Net.HttpClient,
   System.NetEncoding,
@@ -25,6 +26,8 @@ type
   private
     FAccountName : string;
     FAccountKey: string;
+  private
+    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
     destructor Destroy; override;
@@ -43,6 +46,47 @@ end;
 destructor TAmazonPollyService.Destroy;
 begin
   inherited;
+end;
+
+function TAmazonPollyService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+{$IFNDEF NOPOLLY}
+var
+  polly : TPollyClient;
+  request : TPollyDescribeVoicesRequest;
+  response : IPollyDescribeVoicesResponse;
+  options : IAWSOptions;
+  pollyVoice : IPollyVoice;
+  i : Integer;
+  voice : TVoiceInfo;
+{$ENDIF}
+begin
+  FVoicesInfo.Clear;
+{$IFNDEF NOPOLLY}
+  options := TAWSOptions.Create;
+  options.AccessKeyId := FAccountName;
+  options.SecretAccessKey := FAccountKey;
+  options.Region := 'ap-southeast-2';
+  polly := TPollyClient.Create(options);
+  try
+    request := TPollyDescribeVoicesRequest.Create;
+    response := polly.DescribeVoices(request);
+    for i  := 0 to response.Voices.Count - 1 do
+    begin
+      pollyVoice := response.Voices[i];
+      voice := TVoiceInfo.Create;
+      voice.VoiceName := pollyVoice.Name;
+      voice.VoiceId := pollyVoice.Id;
+      voice.VoiceGender := pollyVoice.Gender;
+      FVoicesInfo.Add(voice);
+    end;
+  finally
+    FreeAndNil(polly);
+  end;
+{$ENDIF}
+{$IFDEF NOPOLLY}
+  raise Exception.Create('Polly Not Available/Not Compiled in');
+{$ENDIF}
+  Result := FVoicesInfo;
 end;
 
 function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStream;

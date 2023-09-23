@@ -11,6 +11,7 @@ uses
   IdContext,
   IdHTTPHeaderInfo,
   IdCustomHTTPServer,
+  System.Generics.Collections,
   System.Classes,
   System.SysUtils,
   System.Net.URLClient,
@@ -30,6 +31,8 @@ type
     FSettings : TIniFile;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+  private
+    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
@@ -97,6 +100,28 @@ begin
   inherited;
 end;
 
+function TGoogleSpeechService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+var
+  googleVoiceList : TGoogleVoicesListClass;
+  googleVoice : TGoogleVoiceClass;
+  voice : TVoiceInfo;
+begin
+  FVoicesInfo.Clear;
+  googleVoiceList := GetVoiceList;
+  try
+    for googleVoice in googleVoiceList.voices do
+    begin
+      voice := TVoiceInfo.Create;
+      voice.VoiceName := googleVoice.name;
+      voice.VoiceId := googleVoice.name;
+      FVoicesInfo.Add(voice);
+    end;
+  finally
+    FreeAndNil(googleVoiceList);
+  end;
+  Result := FVoicesInfo;
+end;
+
 function TGoogleSpeechService.GetVoiceList: TGoogleVoicesListClass;
 var
   RESTClient1: TRESTClient;
@@ -108,10 +133,10 @@ begin
   RESTRequest1 := TRESTRequest.Create(RESTClient1);
   RESTResponse1 := TRESTResponse.Create(RESTClient1);
   try
-    RESTClient1.BaseURL := 'https://texttospeech.googleapis.com/v1/voices';
+    RESTClient1.BaseURL := 'https://texttospeech.googleapis.com';
     RESTRequest1.Client := RESTClient1;
     RESTRequest1.Method := rmGET;
-    RESTRequest1.Resource := '';
+    RESTRequest1.Resource := '/v1/voices';
     RESTRequest1.Response := RESTResponse1;
     FOAuth2.RefreshAccessTokenIfRequired;
     RESTClient1.Authenticator := FOAuth2;

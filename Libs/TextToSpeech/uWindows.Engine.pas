@@ -7,6 +7,7 @@ uses
   System.Classes,
   System.IOUtils,
   System.Win.ComObj,
+  System.Generics.Collections,
   Winapi.ActiveX,
   Vcl.Controls,
   System.Variants,
@@ -17,6 +18,8 @@ uses
 type
 
   TWindowsSpeechService = class(TBaseTextToSpeech)
+  private
+    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
   strict private
     FSpeech : ISpeechVoice;
     FSpFileStream: ISpeechFileStream;
@@ -38,6 +41,48 @@ end;
 destructor TWindowsSpeechService.Destroy;
 begin
   inherited;
+end;
+
+function TWindowsSpeechService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+var
+  SpVoice: ISpeechVoice;
+  Voices: ISpeechObjectTokens;
+  Token: ISpeechObjectToken;
+  DataKey: ISpDataKey;
+  Description: WideString;
+  VoiceInfo: TVoiceInfo;
+  i : Integer;
+  gender : string;
+begin
+  Result := nil;
+  FVoicesInfo.Clear;
+  CoInitialize(nil);
+  try
+    try
+      SpVoice := CoSpVoice.Create;
+      Voices := SpVoice.GetVoices('', '');
+      for I := 0 to Voices.Count - 1 do
+      begin
+        Token := Voices.Item(I) as ISpeechObjectToken;
+        VoiceInfo := TVoiceInfo.Create;
+        Description := Token.GetDescription(0);
+        begin
+          VoiceInfo.VoiceName := Description;
+          VoiceInfo.VoiceId := Token.Id;
+          FVoicesInfo.Add(VoiceInfo);
+        end;
+      end;
+    finally
+      CoUnInitialize;
+      Result := FVoicesInfo;
+    end;
+  except
+    on E: Exception do
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
 end;
 
 function TWindowsSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;

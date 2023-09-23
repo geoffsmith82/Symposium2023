@@ -212,6 +212,7 @@ var
   JsonResponse: TJSONObject;
   JSONValue: TJSONValue;
 begin
+  Result := nil;
   RestClient := TRESTClient.Create(nil);
   RestRequest := TRESTRequest.Create(nil);
   RestResponse := TRESTResponse.Create(nil);

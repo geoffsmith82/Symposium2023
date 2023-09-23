@@ -7,6 +7,7 @@ uses
   REST.Types,
   Vcl.Controls,
   System.SysUtils,
+  System.Generics.Collections,
   System.Classes,
   System.JSON,
   uBaseSpeech
@@ -14,6 +15,8 @@ uses
 
 type
   TElevenLabsService = class(TBaseTextToSpeech)
+  private
+    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(Sender: TWinControl; const AResourceKey: string);
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
@@ -25,6 +28,81 @@ implementation
 constructor TElevenLabsService.Create(Sender: TWinControl; const AResourceKey: string);
 begin
   inherited Create(Sender, AResourceKey, '');
+end;
+
+function TElevenLabsService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+var
+  RESTClient: TRESTClient;
+  RESTRequest: TRESTRequest;
+  RESTResponse: TRESTResponse;
+  JSONValue: TJSONValue;
+  JSONLabels: TJSONObject;
+  voice : TVoiceInfo;
+begin
+  FVoicesInfo.Clear;
+
+  RESTClient := nil;
+  RESTRequest := nil;
+  RESTResponse := nil;
+
+  try
+    RESTClient := TRESTClient.Create('https://api.elevenlabs.io');
+    RESTRequest := TRESTRequest.Create(nil);
+    RESTResponse := TRESTResponse.Create(nil);
+
+
+    RESTClient.Authenticator := nil; // Add authentication if required
+
+    RESTRequest.Client := RESTClient;
+    RESTRequest.Response := RESTResponse;
+    RESTRequest.Method := TRESTRequestMethod.rmGET;
+    RESTRequest.Resource := '/v1/voices';
+    RESTRequest.Params.AddHeader('accept', 'application/json');
+    RESTRequest.AddParameter('xi-api-key', FResourceKey, pkHTTPHEADER, [poDoNotEncode]);
+
+    RESTRequest.Execute;
+
+    if RESTResponse.StatusCode = 200 then
+    begin
+      JSONValue := TJSONObject.ParseJSONValue(RESTResponse.Content);
+
+      if JSONValue is TJSONObject then
+      begin
+        // Parse the JSON response and populate the VoiceList
+        // assuming that "voices" is an array of voice objects
+        for JSONValue in ((JSONValue as TJSONObject).Values['voices'] as TJSONArray) do
+        begin
+          // Parse the individual voice object
+          // Modify this part according to your JSON structure
+          with JSONValue as TJSONObject do
+          begin
+            voice := TVoiceInfo.Create;
+            if Assigned(GetValue('labels')) then
+            begin
+              JSONLabels := GetValue('labels') as TJSONObject;
+              if Assigned(JSONLabels.GetValue('gender')) then
+                voice.VoiceGender := JSONLabels.GetValue<string>('gender');
+            end;
+            voice.VoiceName := GetValue('name').Value;
+
+            voice.VoiceId := GetValue('voice_id').Value;
+            FVoicesInfo.Add(voice);
+          end;
+        end;
+      end;
+    end
+    else
+    begin
+      // Handle the error response if needed
+      raise Exception.Create('Failed to fetch voice data: ' + RESTResponse.StatusText);
+    end;
+  finally
+    RESTClient.Free;
+    RESTRequest.Free;
+    RESTResponse.Free;
+  end;
+
+  Result := FVoicesInfo;
 end;
 
 procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
