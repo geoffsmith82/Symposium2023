@@ -26,8 +26,8 @@ type
   private
     FAccountName : string;
     FAccountKey: string;
-  private
-    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
+  protected
+    function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string);
     destructor Destroy; override;
@@ -48,7 +48,7 @@ begin
   inherited;
 end;
 
-function TAmazonPollyService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+function TAmazonPollyService.GetVoices: TObjectList<TVoiceInfo>;
 {$IFNDEF NOPOLLY}
 var
   polly : TPollyClient;

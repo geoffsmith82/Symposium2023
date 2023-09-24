@@ -15,8 +15,8 @@ uses
 
 type
   TElevenLabsService = class(TBaseTextToSpeech)
-  private
-    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
+  protected
+    function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(Sender: TWinControl; const AResourceKey: string);
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
@@ -30,7 +30,7 @@ begin
   inherited Create(Sender, AResourceKey, '');
 end;
 
-function TElevenLabsService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+function TElevenLabsService.GetVoices: TObjectList<TVoiceInfo>;
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
@@ -49,9 +49,6 @@ begin
     RESTClient := TRESTClient.Create('https://api.elevenlabs.io');
     RESTRequest := TRESTRequest.Create(nil);
     RESTResponse := TRESTResponse.Create(nil);
-
-
-    RESTClient.Authenticator := nil; // Add authentication if required
 
     RESTRequest.Client := RESTClient;
     RESTRequest.Response := RESTResponse;

@@ -24,13 +24,14 @@ type
   TSpeechStatus = (ssPlayStarting, ssPlayStopping);
 
   TBaseTextToSpeech = class abstract
-  protected
+  strict protected
     FVoicesInfo : TObjectList<TVoiceInfo>;
-    function GetVoiceInfo: TObjectList<TVoiceInfo>; virtual; abstract;
+    function GetVoices: TObjectList<TVoiceInfo>; virtual; abstract;
   strict private
-    MediaPlayer : TMediaPlayer;
+    FMediaPlayer : TMediaPlayer;
   private
     procedure MediaPlayerNotify(Sender: TObject);
+    procedure PlayText(const text:string; const VoiceName: string = '');
   protected
     FFormatExt : string;
     FResourceKey: string;
@@ -39,13 +40,12 @@ type
     FStatus: TSpeechStatus;
   public
     OnFinishedPlaying:  TNotifyEvent;
-    procedure PlayText(const text: string; VoiceName: string = '');
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
     function Mode: TMPModes;
   public
-    property Voices: TObjectList<TVoiceInfo> read GetVoiceInfo;
+    property Voices: TObjectList<TVoiceInfo> read GetVoices;
   end;
 
 implementation
@@ -54,13 +54,14 @@ implementation
 
 destructor TBaseTextToSpeech.Destroy;
 begin
-  FreeAndNil(MediaPlayer);
+  inherited;
+  FreeAndNil(FMediaPlayer);
   FreeAndNil(FVoicesInfo);
 end;
 
 function TBaseTextToSpeech.Mode: TMPModes;
 begin
-  Result := MediaPlayer.Mode;
+  Result := FMediaPlayer.Mode;
 end;
 
 procedure TBaseTextToSpeech.MediaPlayerNotify(Sender: TObject);
@@ -80,14 +81,14 @@ begin
   FStatus := ssPlayStopping;
 end;
 
-procedure TBaseTextToSpeech.PlayText(const text:string; VoiceName: string = '');
+procedure TBaseTextToSpeech.PlayText(const text:string; const VoiceName: string = '');
 var
   Stream: TMemoryStream;
   FileName: string;
   task : ITask;
 begin
-  MediaPlayer.Notify := true;
-  MediaPlayer.OnNotify := MediaPlayerNotify;
+  FMediaPlayer.Notify := true;
+  FMediaPlayer.OnNotify := MediaPlayerNotify;
   task := TTask.Create(procedure ()
              begin
                 Stream := TMemoryStream.Create;
@@ -104,11 +105,11 @@ begin
 
                TThread.Queue(nil, procedure ()
                  begin
-                   MediaPlayer.FileName := FileName;
-                   MediaPlayer.Open;
-                   MediaPlayer.Notify := true;
+                   FMediaPlayer.FileName := FileName;
+                   FMediaPlayer.Open;
+                   FMediaPlayer.Notify := true;
                    FStatus := ssPlayStarting;
-                   MediaPlayer.Play;
+                   FMediaPlayer.Play;
                  end);
              end).Start;
 end;
@@ -118,9 +119,9 @@ begin
   FResourceKey := AResourceKey;
   FHost := AHost;
   FFormatExt := '.mp3';
-  MediaPlayer := TMediaPlayer.Create(nil);
-  MediaPlayer.Parent := Sender;
-  MediaPlayer.Visible := False;
+  FMediaPlayer := TMediaPlayer.Create(nil);
+  FMediaPlayer.Parent := Sender;
+  FMediaPlayer.Visible := False;
   FVoicesInfo := TObjectList<TVoiceInfo>.Create;
 end;
 

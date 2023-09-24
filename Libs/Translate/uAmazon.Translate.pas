@@ -40,7 +40,6 @@ end;
 function TAmazonTranslate.FromLanguages: TArray<string>;
 var
   AwsTranslate : TTranslateClient;
-  response : ITranslateTranslateTextResponse;
   options : IAWSOptions;
   language : ITranslateLanguage;
   i : Integer;
@@ -62,7 +61,6 @@ end;
 function TAmazonTranslate.ToLanguages: TArray<string>;
 var
   AwsTranslate : TTranslateClient;
-  response : ITranslateTranslateTextResponse;
   options : IAWSOptions;
   language : ITranslateLanguage;
   i : Integer;

@@ -18,8 +18,8 @@ uses
 type
 
   TWindowsSpeechService = class(TBaseTextToSpeech)
-  private
-    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
+  protected
+    function GetVoices: TObjectList<TVoiceInfo>; override;
   strict private
     FSpeech : ISpeechVoice;
     FSpFileStream: ISpeechFileStream;
@@ -43,16 +43,14 @@ begin
   inherited;
 end;
 
-function TWindowsSpeechService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+function TWindowsSpeechService.GetVoices: TObjectList<TVoiceInfo>;
 var
   SpVoice: ISpeechVoice;
   Voices: ISpeechObjectTokens;
   Token: ISpeechObjectToken;
-  DataKey: ISpDataKey;
   Description: WideString;
   VoiceInfo: TVoiceInfo;
   i : Integer;
-  gender : string;
 begin
   Result := nil;
   FVoicesInfo.Clear;

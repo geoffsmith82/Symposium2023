@@ -104,8 +104,6 @@ var
   dataJson : TJSONObject;
   I: Integer;
 begin
-//  RequestUrl := Format('%s/languages?target=%s&key=%s', [Endpoint, DefaultLanguage, ApiKey]);
-
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/language/translate/v2/languages';
 

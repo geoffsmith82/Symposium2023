@@ -31,13 +31,13 @@ type
     FSettings : TIniFile;
     procedure IdHTTPServer1CommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
-  private
-    function GetVoiceInfo: TObjectList<TVoiceInfo>; override;
+  protected
+    function GetVoices: TObjectList<TVoiceInfo>; override;
+    function GetVoiceList: TGoogleVoicesListClass;
   public
     constructor Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    function GetVoiceList: TGoogleVoicesListClass;
     procedure Authenticate;
   end;
 
@@ -100,7 +100,7 @@ begin
   inherited;
 end;
 
-function TGoogleSpeechService.GetVoiceInfo: TObjectList<TVoiceInfo>;
+function TGoogleSpeechService.GetVoices: TObjectList<TVoiceInfo>;
 var
   googleVoiceList : TGoogleVoicesListClass;
   googleVoice : TGoogleVoiceClass;
