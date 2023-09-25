@@ -51,12 +51,16 @@ begin
   options.SecretAccessKey := FSecretKey;
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
-  langlist := AwsTranslate.ListLanguages.Languages;
-  SetLength(Result, langlist.Count + 1);
-  for i := 0 to langlist.Count - 1 do
-  begin
-    language := langlist[i];
-    Result[i + 1] := language.LanguageName;
+  try
+    langlist := AwsTranslate.ListLanguages.Languages;
+    SetLength(Result, langlist.Count + 1);
+    for i := 0 to langlist.Count - 1 do
+    begin
+      language := langlist[i];
+      Result[i + 1] := language.LanguageName;
+    end;
+  finally
+    FreeAndNil(AwsTranslate);
   end;
   Result[0] := 'auto';
 end;
@@ -74,12 +78,16 @@ begin
   options.SecretAccessKey := FSecretKey;
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
-  langlist := AwsTranslate.ListLanguages.Languages;
-  SetLength(Result, langlist.Count);
-  for i := 0 to langlist.Count - 1 do
-  begin
-    language := langlist[i];
-    Result[i] := language.LanguageName;
+  try
+    langlist := AwsTranslate.ListLanguages.Languages;
+    SetLength(Result, langlist.Count);
+    for i := 0 to langlist.Count - 1 do
+    begin
+      language := langlist[i];
+      Result[i] := language.LanguageName;
+    end;
+  finally
+    FreeAndNil(AwsTranslate);
   end;
 end;
 
