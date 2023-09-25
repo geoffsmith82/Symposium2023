@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  System.Generics.Collections,
   Vcl.Controls,
   REST.Client,
   REST.Types,
@@ -17,11 +18,13 @@ type
     FAccessToken: string;
     FExpiryTime: TDateTime;
     FOutputFormat: string;
+    function GetVoiceList: TMicrosoftCognitiveVoicesClass;
+  strict protected
+    function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     procedure GetAccessToken;
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    function GetVoiceList: TMicrosoftCognitiveVoicesClass;
   end;
 
 implementation
@@ -74,14 +77,39 @@ begin
   try
     RESTRequest.Method := TRESTRequestMethod.rmGET;
     RESTRequest.Resource := '/cognitiveservices/voices/list';
+    RESTRequest.Response := RESTResponse;
     RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
     RESTRequest.Execute;
-    ResultString := RESTResponse.Content;
+    ResultString := '{ "items": ' + RESTResponse.Content + '}';
     Result := TMicrosoftCognitiveVoicesClass.FromJsonString(ResultString);
   finally
     RESTResponse.Free;
     RESTRequest.Free;
     RESTClient.Free;
+  end;
+end;
+
+function TMicrosoftCognitiveService.GetVoices: TObjectList<TVoiceInfo>;
+var
+  microsoftVoice : TItemClass;
+  voice : TVoiceInfo;
+  voices : TMicrosoftCognitiveVoicesClass;
+begin
+  FVoicesInfo.Clear;
+  voices := nil;
+  try
+    voices := GetVoiceList;
+    for microsoftVoice in voices.Items do
+    begin
+      voice := TVoiceInfo.Create;
+      voice.VoiceName := microsoftVoice.DisplayName;
+      voice.VoiceGender := microsoftVoice.Gender;
+      voice.VoiceId := microsoftVoice.Name;
+      FVoicesInfo.Add(voice);
+    end;
+  finally
+    FreeAndNil(voices);
+    Result := FVoicesInfo;
   end;
 end;
 

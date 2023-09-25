@@ -6,6 +6,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Hash,
+  System.Generics.Collections,
   REST.Types,
   REST.Client,
   REST.Response.Adapter,
@@ -42,6 +43,7 @@ var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
   language : ITranslateLanguage;
+  langlist : TList<ITranslateLanguage>;
   i : Integer;
 begin
   options := TAWSOptions.Create;
@@ -49,10 +51,11 @@ begin
   options.SecretAccessKey := FSecretKey;
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
-  SetLength(Result, AwsTranslate.ListLanguages.Languages.Count + 1);
-  for i := 0 to AwsTranslate.ListLanguages.Languages.Count - 1 do
+  langlist := AwsTranslate.ListLanguages.Languages;
+  SetLength(Result, langlist.Count + 1);
+  for i := 0 to langlist.Count - 1 do
   begin
-    language := AwsTranslate.ListLanguages.Languages[i];
+    language := langlist[i];
     Result[i + 1] := language.LanguageName;
   end;
   Result[0] := 'auto';
@@ -63,6 +66,7 @@ var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
   language : ITranslateLanguage;
+  langlist : TList<ITranslateLanguage>;
   i : Integer;
 begin
   options := TAWSOptions.Create;
@@ -70,10 +74,11 @@ begin
   options.SecretAccessKey := FSecretKey;
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
-  SetLength(Result, AwsTranslate.ListLanguages.Languages.Count + 1);
-  for i := 0 to AwsTranslate.ListLanguages.Languages.Count - 1 do
+  langlist := AwsTranslate.ListLanguages.Languages;
+  SetLength(Result, langlist.Count);
+  for i := 0 to langlist.Count - 1 do
   begin
-    language := AwsTranslate.ListLanguages.Languages[i];
+    language := langlist[i];
     Result[i] := language.LanguageName;
   end;
 end;

@@ -36,6 +36,7 @@ var
   RESTRequest: TRESTRequest;
   RESTResponse: TRESTResponse;
   JSONValue: TJSONValue;
+  JSONValue2: TJSONValue;
   JSONLabels: TJSONObject;
   voice : TVoiceInfo;
 begin
@@ -62,30 +63,33 @@ begin
     if RESTResponse.StatusCode = 200 then
     begin
       JSONValue := TJSONObject.ParseJSONValue(RESTResponse.Content);
-
-      if JSONValue is TJSONObject then
-      begin
-        // Parse the JSON response and populate the VoiceList
-        // assuming that "voices" is an array of voice objects
-        for JSONValue in ((JSONValue as TJSONObject).Values['voices'] as TJSONArray) do
+      try
+        if JSONValue is TJSONObject then
         begin
-          // Parse the individual voice object
-          // Modify this part according to your JSON structure
-          with JSONValue as TJSONObject do
+          // Parse the JSON response and populate the VoiceList
+          // assuming that "voices" is an array of voice objects
+          for JSONValue2 in ((JSONValue as TJSONObject).Values['voices'] as TJSONArray) do
           begin
-            voice := TVoiceInfo.Create;
-            if Assigned(GetValue('labels')) then
+            // Parse the individual voice object
+            // Modify this part according to your JSON structure
+            with JSONValue2 as TJSONObject do
             begin
-              JSONLabels := GetValue('labels') as TJSONObject;
-              if Assigned(JSONLabels.GetValue('gender')) then
-                voice.VoiceGender := JSONLabels.GetValue<string>('gender');
-            end;
-            voice.VoiceName := GetValue('name').Value;
+              voice := TVoiceInfo.Create;
+              if Assigned(GetValue('labels')) then
+              begin
+                JSONLabels := GetValue('labels') as TJSONObject;
+                if Assigned(JSONLabels.GetValue('gender')) then
+                  voice.VoiceGender := JSONLabels.GetValue<string>('gender');
+              end;
+              voice.VoiceName := GetValue('name').Value;
 
-            voice.VoiceId := GetValue('voice_id').Value;
-            FVoicesInfo.Add(voice);
+              voice.VoiceId := GetValue('voice_id').Value;
+              FVoicesInfo.Add(voice);
+            end;
           end;
         end;
+      finally
+        FreeAndNil(JSONValue);
       end;
     end
     else
