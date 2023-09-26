@@ -671,6 +671,11 @@ object frmVoiceRecognition: TfrmVoiceRecognition
         RadioItem = True
         OnClick = SelectSpeechRecognitionClick
       end
+      object miRevAI: TMenuItem
+        Caption = 'RevAI'
+        GroupIndex = 5
+        OnClick = SelectSpeechRecognitionClick
+      end
     end
     object miAudioInput: TMenuItem
       Caption = 'Audio Input'

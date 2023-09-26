@@ -152,6 +152,7 @@
         <DCCReference Include="..\Libs\uAzureGPT.pas"/>
         <DCCReference Include="..\Libs\uLLM.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
+        <DCCReference Include="..\Libs\SpeechToText\uRevAI.SpeechToText.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

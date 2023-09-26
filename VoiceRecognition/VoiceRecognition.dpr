@@ -35,7 +35,8 @@ uses
   ufrmChatSession in 'ufrmChatSession.pas' {frmNewChatSession},
   uAzureGPT in '..\Libs\uAzureGPT.pas',
   uLLM in '..\Libs\uLLM.pas',
-  uEngineManager in '..\Libs\uEngineManager.pas';
+  uEngineManager in '..\Libs\uEngineManager.pas',
+  uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas';
 
 {$R *.res}
 

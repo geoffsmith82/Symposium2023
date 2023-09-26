@@ -289,7 +289,14 @@ var
   lSpeechEngine: string;
   lAssemblyAi : TAssemblyAiRecognition;
   lDeepGram : TDeepGramRecognition;
+  lRevAi : TRevAiRecognition;
 begin
+  lRevAi := TRevAiRecognition.Create(revai_key);
+  lRevAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
+  lRevAi.OnConnect := OnHandleConnect;
+  lRevAi.OnDisconnect := OnHandleDisconnect;  
+  FSpeechRecognitionEngines.RegisterEngine(lRevAi, miRevAI);
+
   lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key);
   lAssemblyAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lAssemblyAi.OnConnect := OnHandleConnect;
@@ -314,7 +321,6 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
-
 
   tblSessions.Active := True;
   tblConversation.Active := True;
