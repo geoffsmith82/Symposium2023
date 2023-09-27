@@ -16,7 +16,6 @@ type
     cancel: string;
     get: string;
   end;
-
   TPredictionInfo = class
   private
     FId: string;
@@ -192,7 +191,6 @@ begin
   begin
     GetModelInfo;
   end;
-
   version := '';
   for i := 0 to FModelInfo.Count - 1 do
   begin
@@ -202,10 +200,8 @@ begin
       Break;
     end;
   end;
-
   if version.IsEmpty then
     raise Exception.Create('Could not find model ' + AModel);
-
   // Create and setup REST client, request and response
   RestClient := TRESTClient.Create('https://api.replicate.com');
   try
@@ -215,27 +211,19 @@ begin
       RestRequest.Client := RestClient;
       RestRequest.Response := RestResponse;
       RestRequest.Resource := '/v1/predictions';
-
       RestRequest.Method := rmPOST;
-
       // Adding headers
       RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
-
       // Create JSON body for POST request
       JSONRoot := TJSONObject.Create;
       try
         JSONRoot.AddPair('version', version);
-
         JSONInput := TJSONObject.Create;
         JSONInput.AddPair('prompt', AQuestion);
-
         JSONRoot.AddPair('input', JSONInput);
-
         RestRequest.AddBody(JSONRoot.ToString, TRESTContentType.ctAPPLICATION_JSON);
-
         // Execute the request
         RestRequest.Execute;
-
         if (RestResponse.StatusCode = 200) or (RestResponse.StatusCode = 201) then
         begin
           // Assuming the response contains a field called 'completion' with the answer
@@ -252,16 +240,13 @@ begin
           // Handle errors or exceptions if needed
           raise Exception.CreateFmt('Error making prediction: %s', [RestResponse.Content]);
         end;
-
       finally
         JSONRoot.Free;
       end;
-
     finally
       RestRequest.Free;
       RestResponse.Free;
     end;
-
   finally
     RestClient.Free;
   end;

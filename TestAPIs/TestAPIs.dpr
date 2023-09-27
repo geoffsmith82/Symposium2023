@@ -37,7 +37,8 @@ uses
   uGoogle.PaLM in '..\Libs\LLM\uGoogle.PaLM.pas',
   uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
-  uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas';
+  uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas',
+  uHuggingFace.LLM in '..\Libs\LLM\uHuggingFace.LLM.pas';
 
 {$R *.res}
 

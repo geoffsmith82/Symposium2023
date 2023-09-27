@@ -53,6 +53,7 @@ uses
   uAzureGPT,
   uGoogle.PaLM,
   uAnthropic,
+  uHuggingFace.LLM,
   uReplicate.LLM,
   uLLM
   ;
@@ -89,6 +90,7 @@ var
   anthropic : TAnthropic;
   microsoftOpenAI : TMicrosoftOpenAI;
   replicate: TReplicateLLM;
+  huggingFace: THuggingFaceLLM;
   answer : string;
 begin
   Memo1.Lines.Add('======== Model OpenAI');
@@ -114,6 +116,20 @@ begin
     Memo1.Lines.Add('Answer : ' + answer);
   finally
     FreeAndNil(replicate);
+  end;
+
+  Memo1.Lines.Add('======== Model HuggingFace');
+  huggingFace := THuggingFaceLLM.Create(HuggingFace_APIKey);
+  try
+    for modelObj in huggingFace.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+
+    answer := huggingFace.Completion('How long is a piece of string', 'gpt2');
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(huggingFace);
   end;
 
   Memo1.Lines.Add('======== Microsoft OpenAI');
