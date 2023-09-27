@@ -55,7 +55,9 @@ uses
   uAnthropic,
   uHuggingFace.LLM,
   uReplicate.LLM,
-  uLLM
+  uLLM,
+  uImageGeneration,
+  uImageGeneration.Replicate
   ;
 
 {$I ..\Libs\apikey.inc}
@@ -86,11 +88,13 @@ var
   openAI: TOpenAI;
   model: TBaseModelInfo;
   modelObj : TBaseModelInfo;
+  modelImg : TImageModelInfo;
   palm : TGooglePaLM;
   anthropic : TAnthropic;
   microsoftOpenAI : TMicrosoftOpenAI;
   replicate: TReplicateLLM;
   huggingFace: THuggingFaceLLM;
+  imageGenReplicate : TImageGenerationReplicate;
   answer : string;
 begin
   Memo1.Lines.Add('======== Model OpenAI');
@@ -104,7 +108,7 @@ begin
     FreeAndNil(openAI);
   end;
 
-  Memo1.Lines.Add('======== Model Replicate');
+  Memo1.Lines.Add('======== Model Replicate LLM');
   replicate := TReplicateLLM.Create(Replicate_APIKey);
   try
     for modelObj in replicate.ModelInfo do
@@ -116,6 +120,17 @@ begin
     Memo1.Lines.Add('Answer : ' + answer);
   finally
     FreeAndNil(replicate);
+  end;
+
+  Memo1.Lines.Add('======== Model Replicate ImageGen');
+  imageGenReplicate := TImageGenerationReplicate.Create(Replicate_APIKey);
+  try
+    for modelImg in imageGenReplicate.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelImg.modelName + ' ' + modelImg.version);
+    end;
+  finally
+    FreeAndNil(imageGenReplicate);
   end;
 
   Memo1.Lines.Add('======== Model HuggingFace');

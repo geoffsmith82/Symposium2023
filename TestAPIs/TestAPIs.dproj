@@ -113,6 +113,9 @@
         <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
         <DCCReference Include="..\Libs\LLM\uReplicate.LLM.pas"/>
         <DCCReference Include="..\Libs\LLM\uHuggingFace.LLM.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.Replicate.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

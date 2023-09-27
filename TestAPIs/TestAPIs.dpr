@@ -38,7 +38,10 @@ uses
   uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas',
-  uHuggingFace.LLM in '..\Libs\LLM\uHuggingFace.LLM.pas';
+  uHuggingFace.LLM in '..\Libs\LLM\uHuggingFace.LLM.pas',
+  uImageGeneration.Replicate in '..\Libs\ImageGeneration\uImageGeneration.Replicate.pas',
+  uImageGeneration in '..\Libs\ImageGeneration\uImageGeneration.pas',
+  uImageGeneration.OpenAI in '..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas';
 
 {$R *.res}
 
