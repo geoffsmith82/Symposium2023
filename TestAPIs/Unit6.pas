@@ -48,7 +48,13 @@ uses
   uWindows.Engine,
   uMicrosoft.Cognitive.REST,
   uMicrosoft.Translate,
-  uAmazon.Translate
+  uAmazon.Translate,
+  OpenAI,
+  uAzureGPT,
+  uGoogle.PaLM,
+  uAnthropic,
+  uReplicate.LLM,
+  uLLM
   ;
 
 {$I ..\Libs\apikey.inc}
@@ -76,7 +82,75 @@ var
   amazonEngine : TAmazonTranslate;
   lang : string;
   langlist : TArray<string>;
+  openAI: TOpenAI;
+  model: TBaseModelInfo;
+  modelObj : TBaseModelInfo;
+  palm : TGooglePaLM;
+  anthropic : TAnthropic;
+  microsoftOpenAI : TMicrosoftOpenAI;
+  replicate: TReplicateLLM;
+  answer : string;
 begin
+  Memo1.Lines.Add('======== Model OpenAI');
+  openAI := TOpenAI.Create(chatgpt_apikey);
+  try
+    for modelObj in openAI.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(openAI);
+  end;
+
+  Memo1.Lines.Add('======== Model Replicate');
+  replicate := TReplicateLLM.Create(Replicate_APIKey);
+  try
+    for modelObj in replicate.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+
+    answer := replicate.Completion('How long is a piece of string', 'llama-2-70b-chat');
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(replicate);
+  end;
+
+  Memo1.Lines.Add('======== Microsoft OpenAI');
+  microsoftOpenAI := TMicrosoftOpenAI.Create(AzureAPIKey);
+  try
+    for modelObj in microsoftOpenAI.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(microsoftOpenAI);
+  end;
+
+  Memo1.Lines.Add('======== Model Google');
+  palm := TGooglePaLM.Create(google_makersuite);
+  try
+    for modelObj in palm.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(palm);
+  end;
+
+  Memo1.Lines.Add('======== Model Anthropic');
+  anthropic := TAnthropic.Create(Claude_APIKey);
+  try
+    for modelObj in anthropic.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(anthropic);
+  end;
+
+
+  Memo1.Lines.Add('======== ElevenLabs Voices');
   elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
   try
     for voice in elevenlabs.Voices do
@@ -87,6 +161,7 @@ begin
     FreeAndNil(elevenlabs);
   end;
 
+  Memo1.Lines.Add('======== Amazon Polly Voices');
   polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey);
   try
     for voice in polly.Voices do
@@ -97,6 +172,7 @@ begin
     FreeAndNil(polly);
   end;
 
+  Memo1.Lines.Add('======== Windows Voices');
   mswindows := TWindowsSpeechService.Create(Self);
   try
     for voice in mswindows.Voices do
@@ -107,7 +183,7 @@ begin
     FreeAndNil(mswindows);
   end;
 
-
+  Memo1.Lines.Add('======== Microsoft Voices');
   msvoice := TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
   try
     for voice in msvoice.Voices do
@@ -118,7 +194,7 @@ begin
     FreeAndNil(msvoice);
   end;
 
-
+  Memo1.Lines.Add('======== Google Voices');
   for voice in Fgooglespeech.Voices do
   begin
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -126,7 +202,7 @@ begin
 
   msTranslate := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
   try
-    Memo1.Lines.Add('Microsoft Translate');
+    Memo1.Lines.Add('======== Microsoft Translate');
     for lang in msTranslate.FromLanguages do
     begin
       Memo1.Lines.Add('lang= ' + lang);
@@ -143,7 +219,7 @@ begin
 
   amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, '');
   try
-    Memo1.Lines.Add('Amazon Translate');
+    Memo1.Lines.Add('======== Amazon Translate');
     langlist := amazonEngine.FromLanguages;
     for lang in langlist do
     begin

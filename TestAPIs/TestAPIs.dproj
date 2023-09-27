@@ -97,7 +97,6 @@
         <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uWindows.Engine.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
-        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
         <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
@@ -105,6 +104,14 @@
         <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
         <DCCReference Include="..\Libs\Translate\uAmazon.Translate.pas"/>
         <DCCReference Include="..\Libs\Translate\LanguageCodes.pas"/>
+        <DCCReference Include="..\Libs\uLLM.pas"/>
+        <DCCReference Include="..\Libs\uAzureGPT.pas"/>
+        <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
+        <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\uGoogle.PaLM.pas"/>
+        <DCCReference Include="..\Libs\uAnthropic.pas"/>
+        <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\uReplicate.LLM.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

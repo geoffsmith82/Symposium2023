@@ -45,6 +45,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - Microsoft Azure
   - Amazon  
   - [Anthropic](https://www.anthropic.com) claude-2 and claude-instant-1 support one of largest context windows currently available
+  - [Replicate](https://www.replicate.com) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
   - [OpenAI](https://platform.openai.com) 
   - [AssemblyAI](https://www.assemblyai.com/app) Voice Recognition
