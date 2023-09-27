@@ -16,8 +16,8 @@ uses
   {$ENDIF EurekaLog}
   Vcl.Forms,
   frmImageGenWindow in 'frmImageGenWindow.pas' {frmImageGenerator},
-  OpenAI in '..\Libs\OpenAI.pas',
-  uLLM in '..\Libs\uLLM.pas',
+  OpenAI in '..\Libs\LLM\OpenAI.pas',
+  uLLM in '..\Libs\LLM\uLLM.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
 
 {$R *.res}

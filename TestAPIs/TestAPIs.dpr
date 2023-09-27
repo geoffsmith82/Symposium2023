@@ -30,14 +30,14 @@ uses
   uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
   uAmazon.Translate in '..\Libs\Translate\uAmazon.Translate.pas',
   LanguageCodes in '..\Libs\Translate\LanguageCodes.pas',
-  uLLM in '..\Libs\uLLM.pas',
-  uAzureGPT in '..\Libs\uAzureGPT.pas',
+  uLLM in '..\Libs\LLM\uLLM.pas',
+  uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  OpenAI in '..\Libs\OpenAI.pas',
-  uGoogle.PaLM in '..\Libs\uGoogle.PaLM.pas',
-  uAnthropic in '..\Libs\uAnthropic.pas',
+  OpenAI in '..\Libs\LLM\OpenAI.pas',
+  uGoogle.PaLM in '..\Libs\LLM\uGoogle.PaLM.pas',
+  uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
-  uReplicate.LLM in '..\Libs\uReplicate.LLM.pas';
+  uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas';
 
 {$R *.res}
 

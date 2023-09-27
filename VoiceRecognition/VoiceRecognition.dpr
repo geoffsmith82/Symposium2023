@@ -16,7 +16,7 @@ uses
   {$ENDIF EurekaLog}
   Vcl.Forms,
   ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {frmVoiceRecognition},
-  OpenAI in '..\Libs\OpenAI.pas',
+  OpenAI in '..\Libs\LLM\OpenAI.pas',
   uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
   uMicrosoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas',
@@ -33,8 +33,8 @@ uses
   uBaseSpeechRecognition in '..\Libs\SpeechToText\uBaseSpeechRecognition.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   ufrmChatSession in 'ufrmChatSession.pas' {frmNewChatSession},
-  uAzureGPT in '..\Libs\uAzureGPT.pas',
-  uLLM in '..\Libs\uLLM.pas',
+  uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
+  uLLM in '..\Libs\LLM\uLLM.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
   uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas';
 

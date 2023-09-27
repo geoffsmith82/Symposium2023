@@ -130,7 +130,7 @@
             <Form>frmVoiceRecognition</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Libs\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\OpenAI.pas"/>
         <DCCReference Include="..\Libs\uDALLe2.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uWindows.Engine.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
@@ -149,8 +149,8 @@
         <DCCReference Include="ufrmChatSession.pas">
             <Form>frmNewChatSession</Form>
         </DCCReference>
-        <DCCReference Include="..\Libs\uAzureGPT.pas"/>
-        <DCCReference Include="..\Libs\uLLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAzureGPT.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uRevAI.SpeechToText.pas"/>
         <BuildConfiguration Include="Base">

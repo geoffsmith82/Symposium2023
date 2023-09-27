@@ -54,8 +54,9 @@ type
   end;
 
 implementation
-{$I APIKEY.INC}
 { TMicrosoftOpenAI }
+
+const AzureOpenAIEndpoint = 'https://symposiumdemoopenai.openai.azure.com';
 
 constructor TMicrosoftOpenAI.Create(APIKey: string);
 begin

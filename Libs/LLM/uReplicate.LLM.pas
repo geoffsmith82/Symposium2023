@@ -181,7 +181,7 @@ var
   RestClient: TRESTClient;
   RestRequest: TRESTRequest;
   RestResponse: TRESTResponse;
-  JSONBody, JSONRoot, JSONInput: TJSONObject;
+  JSONRoot, JSONInput: TJSONObject;
   version: string;
   i: Integer;
   prediction: TPredictionInfo;

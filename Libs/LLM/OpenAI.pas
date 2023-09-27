@@ -35,8 +35,6 @@ function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
 
 implementation
 
-{$I APIKEY.INC}
-
 function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
 var
   DotProduct, Magnitude1, Magnitude2: Double;
@@ -377,7 +375,7 @@ begin
     LRESTRequest.Response := LRESTResponse;
 
     // Add your API key to the request header
-    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + CHATGPT_APIKEY, pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
     LRESTRequest.Execute;
 
