@@ -680,6 +680,17 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     object miAudioInput: TMenuItem
       Caption = 'Audio Input'
     end
+    object Model1: TMenuItem
+      Caption = 'Model'
+      object Model2: TMenuItem
+        Caption = 'gpt-3.5-turbo'
+        OnClick = Model2Click
+      end
+      object gpt41: TMenuItem
+        Caption = 'gpt-4'
+        OnClick = Model2Click
+      end
+    end
   end
   object ImageCollection: TImageCollection
     Images = <

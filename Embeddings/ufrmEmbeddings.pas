@@ -34,6 +34,7 @@ uses
   OpenAI,
   uAnthropic,
   uGoogle.PaLM,
+  uAzureGPT,
   uLLM
   ;
 

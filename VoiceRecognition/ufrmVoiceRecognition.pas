@@ -15,9 +15,9 @@ uses
   System.JSON,
   System.SyncObjs,
   System.Threading,
+  Vcl.StdCtrls,
   Vcl.ExtCtrls,
   Vcl.Menus,
-  Vcl.MPlayer,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.ComCtrls,
@@ -26,10 +26,9 @@ uses
   Vcl.BaseImageCollection,
   Vcl.ImageCollection,
   Vcl.VirtualImage,
-  Vcl.DBCGrids,
-  Vcl.DBCtrls,
-  Vcl.DBGrids,
   Vcl.Grids,
+  Vcl.DBCtrls,
+  Vcl.DBCGrids,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
@@ -51,14 +50,13 @@ uses
   ACS_Classes,
   ACS_DXAudio,
   ACS_Misc,
-  Vcl.StdCtrls,
   ACS_Streams,
   ACS_LAME,
   ACS_FLAC,
   ACS_WinMedia,
   ACS_smpeg,
-  NewACIndicators,
   ACS_Wave,
+  NewACIndicators,
   uLLM,
   OpenAI,
   uAzureGPT,
@@ -70,6 +68,7 @@ uses
   uWindows.Engine,
   uAssemblyAI.SpeechToText,
   uDeepGram.SpeechToText,
+  uRevAI.SpeechToText,
   uBaseSpeechRecognition,
   uEngineManager,
   AdvUtil,
@@ -126,6 +125,10 @@ type
     DBText2: TDBText;
     btnDeleteSession: TButton;
     btnDeleteMessage: TButton;
+    Model1: TMenuItem;
+    Model2: TMenuItem;
+    gpt41: TMenuItem;
+    miRevAI: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -562,6 +565,11 @@ begin
   exitStream := TExitStream.Create;
   FSpeechRecognitionEngines.ActiveEngine.Add(exitStream);
   Application.Terminate;
+end;
+
+procedure TfrmVoiceRecognition.Model2Click(Sender: TObject);
+begin
+  FSettings.WriteString('Settings', 'Model', (Sender as TMenuItem).Caption);
 end;
 
 procedure TfrmVoiceRecognition.New1Click(Sender: TObject);
