@@ -57,6 +57,7 @@ type
 
   TBaseModelInfo = class
     modelName: string;
+    version: string;
   end;
 
   TBaseLLM = class abstract
@@ -67,11 +68,8 @@ type
   public
     constructor Create(APIKey: string);
     destructor Destroy; override;
-//    procedure ListOpenAIModels(out AModelList: TStringList);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
-//    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
-//    function Embeddings(const Texts: TArray<string>): TEmbeddings;
   published
     property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
   end;
