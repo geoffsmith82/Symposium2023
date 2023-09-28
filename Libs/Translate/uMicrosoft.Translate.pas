@@ -26,8 +26,8 @@ type
     constructor Create(const SubscriptionKey, Endpoint: string);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<TLanguageInfo>; override;
-    function ToLanguages: TArray<TLanguageInfo>; override;
+    function FromLanguages: TObjectList<TLanguageInfo>; override;
+    function ToLanguages: TObjectList<TLanguageInfo>; override;
   end;
 implementation
 
@@ -36,9 +36,8 @@ uses System.DateUtils;
 
 constructor TMicrosoftTranslate.Create(const SubscriptionKey, Endpoint: string);
 begin
-  inherited Create;
+  inherited Create(SubscriptionKey);
   FExpiryTime := 0;
-  FSubscriptionKey := SubscriptionKey;
   FEndpoint := Endpoint;
   // Create a new REST client and set the base URL to the Microsoft Translate API endpoint
   FRESTClient := TRESTClient.Create(nil);
@@ -64,7 +63,7 @@ begin
   inherited;
 end;
 
-function TMicrosoftTranslate.FromLanguages: TArray<TLanguageInfo>;
+function TMicrosoftTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONObject;
@@ -72,6 +71,7 @@ var
   LangCode: string;
   I: Integer;
   ApiVersion : string;
+  langInfo: TLanguageInfo;
 begin
   ApiVersion := '3.0';
   FRESTRequest.Method := rmGET;
@@ -86,19 +86,20 @@ begin
   ResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
 
   LanguagesArray := ResponseJson.Values['translation'] as TJSONObject;
-  SetLength(Result, LanguagesArray.Count);
-
+  FFromLanguages.Clear;
   for I := 0 to LanguagesArray.Count - 1 do
   begin
     LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
     LangCode := LanguagesArray.Pairs[i].JsonString.Value;
-    Result[i] := TLanguageInfo.Create;
-    Result[I].LanguageName := LanguageObj.Values['name'].Value;
-    Result[I].LanguageCode := LangCode;
+    langInfo := TLanguageInfo.Create;
+    langInfo.LanguageName := LanguageObj.Values['name'].Value;
+    langInfo.LanguageCode := LangCode;
+    FFromLanguages.Add(langInfo);
   end;
+  Result := FFromLanguages;
 end;
 
-function TMicrosoftTranslate.ToLanguages: TArray<TLanguageInfo>;
+function TMicrosoftTranslate.ToLanguages: TObjectList<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONObject;
@@ -106,6 +107,7 @@ var
   LangCode: string;
   I: Integer;
   ApiVersion : string;
+  langInfo : TLanguageInfo;
 begin
   ApiVersion := '3.0';
   FRESTRequest.Method := rmGET;
@@ -120,16 +122,23 @@ begin
   ResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
 
   LanguagesArray := ResponseJson.Values['translation'] as TJSONObject;
-  SetLength(Result, LanguagesArray.Count);
+  FToLanguages.Clear;
+
+  langInfo := TLanguageInfo.Create;
+  langInfo.LanguageName := 'auto';
+  langInfo.LanguageCode := 'auto';
+  FFromLanguages.Add(langInfo);
 
   for I := 0 to LanguagesArray.Count - 1 do
   begin
     LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
     LangCode := LanguagesArray.Pairs[i].JsonString.Value;
-    Result[I] := TLanguageInfo.Create;
-    Result[i].LanguageName := LanguageObj.Values['name'].Value;
-    Result[i].LanguageCode := Langcode;
+    langInfo := TLanguageInfo.Create;
+    langInfo.LanguageName := LanguageObj.Values['name'].Value;
+    langInfo.LanguageCode := Langcode;
+    FToLanguages.Add(langInfo);
   end;
+  Result := FToLanguages;
 end;
 
 procedure TMicrosoftTranslate.GetAccessToken;

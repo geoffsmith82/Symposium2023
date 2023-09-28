@@ -24,27 +24,28 @@ type
   public
     constructor Create(const AccessKey, SecretKey, Endpoint: string);
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<TLanguageInfo>; override;
-    function ToLanguages: TArray<TLanguageInfo>; override;
+    function FromLanguages: TObjectList<TLanguageInfo>; override;
+    function ToLanguages: TObjectList<TLanguageInfo>; override;
   end;
 
 implementation
 
 constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Endpoint: string);
 begin
-  inherited Create;
+  inherited Create('');
   FAccessKey := AccessKey;
   FSecretKey := SecretKey;
   FEndpoint := Endpoint;
 end;
 
-function TAmazonTranslate.FromLanguages: TArray<TLanguageInfo>;
+function TAmazonTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
   language : ITranslateLanguage;
   langlist : TList<ITranslateLanguage>;
   i : Integer;
+  langInfo : TLanguageInfo;
 begin
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccessKey;
@@ -52,30 +53,35 @@ begin
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
   try
+    FFromLanguages.Clear;
+    langInfo := TLanguageInfo.Create;
+    langInfo.LanguageName := 'auto';
+    langInfo.LanguageCode := 'auto';
+    FFromLanguages.Add(langInfo);
+
     langlist := AwsTranslate.ListLanguages.Languages;
-    SetLength(Result, langlist.Count + 1);
     for i := 0 to langlist.Count - 1 do
     begin
-      Result[i + 1] := TLanguageInfo.Create;
       language := langlist[i];
-      Result[i + 1].LanguageName := language.LanguageName;
-      Result[i + 1].LanguageCode := language.LanguageCode;
+      langInfo := TLanguageInfo.Create;
+      langInfo.LanguageName := language.LanguageName;
+      langInfo.LanguageCode := language.LanguageCode;
+      FFromLanguages.Add(langInfo);
     end;
   finally
     FreeAndNil(AwsTranslate);
   end;
-  Result[0] := TLanguageInfo.Create;
-  Result[0].LanguageName := 'auto';
-  Result[0].LanguageCode := 'auto';
+  Result := FFromLanguages;
 end;
 
-function TAmazonTranslate.ToLanguages: TArray<TLanguageInfo>;
+function TAmazonTranslate.ToLanguages: TObjectList<TLanguageInfo>;
 var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
   language : ITranslateLanguage;
   langlist : TList<ITranslateLanguage>;
   i : Integer;
+  langInfo : TLanguageInfo;
 begin
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccessKey;
@@ -83,18 +89,20 @@ begin
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
   try
+    FToLanguages.Clear;
     langlist := AwsTranslate.ListLanguages.Languages;
-    SetLength(Result, langlist.Count);
     for i := 0 to langlist.Count - 1 do
     begin
       language := langlist[i];
-      Result[i] := TLanguageInfo.Create;
-      Result[i].LanguageName := language.LanguageName;
-      Result[i].LanguageCode := language.LanguageCode;
+      langInfo := TLanguageInfo.Create;
+      langInfo.LanguageName := language.LanguageName;
+      langInfo.LanguageCode := language.LanguageCode;
+      FToLanguages.Add(langInfo);
     end;
   finally
     FreeAndNil(AwsTranslate);
   end;
+  Result := FToLanguages;
 end;
 
 function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
@@ -108,7 +116,6 @@ begin
   options.SecretAccessKey := FSecretKey;
   options.Region := 'ap-southeast-2';
   AwsTranslate := TTranslateClient.Create(options);
-
   response := AwsTranslate.TranslateText(fromlang, toLang, SourceText);
   Result := response.TranslatedText;
 end;

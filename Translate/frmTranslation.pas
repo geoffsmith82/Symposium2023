@@ -76,7 +76,6 @@ type
     { Private declarations }
     FTranslateEngines: TEngineManager<TBaseTranslate>;
     FSettings : TIniFile;
-    FOpenAI : TOpenAI;
     fromLanguageCode : string;
     toLanguageCode : string;
     procedure LoadLanguageMenus;
@@ -163,7 +162,7 @@ end;
 
 procedure TfrmMainTranslationWindow.LoadLanguageMenus;
 var
-  languages : TArray<TLanguageInfo>;
+  languages : TObjectList<TLanguageInfo>;
   lang: TLanguageInfo;
   menu : TLanguageMenuItem;
 begin

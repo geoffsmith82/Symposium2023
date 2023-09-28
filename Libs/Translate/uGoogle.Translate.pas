@@ -1,6 +1,5 @@
 unit uGoogle.Translate;
 
-
 interface
 
 uses
@@ -13,7 +12,6 @@ uses
   ShellApi,
   REST.Types,
   REST.Client,
-  REST.Response.Adapter,
   REST.Authenticator.EnhancedOAuth,
   IdHTTPServer,
   IdCustomHTTPServer,
@@ -40,8 +38,8 @@ type
     constructor Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<TLanguageInfo>; override;
-    function ToLanguages: TArray<TLanguageInfo>; override;
+    function FromLanguages: TObjectList<TLanguageInfo>; override;
+    function ToLanguages: TObjectList<TLanguageInfo>; override;
     procedure Authenticate;
   end;
 
@@ -53,12 +51,13 @@ uses
 
 procedure TGoogleTranslate.Authenticate;
 begin
+  FHTTPServer.Active := True;
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
 constructor TGoogleTranslate.Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
 begin
-  inherited Create;
+  inherited Create('');
   FAPIKey := APIKey;
   FAPISecret := APISecret;
 
@@ -87,8 +86,7 @@ begin
   FHTTPServer := TIdHttpServer.Create;
   FHTTPServer.DefaultPort := 7777;
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
-  FHTTPServer.Active := True;
-
+  FHTTPServer.Active := False;
 end;
 
 destructor TGoogleTranslate.Destroy;
@@ -101,12 +99,13 @@ begin
   inherited;
 end;
 
-function TGoogleTranslate.FromLanguages: TArray<TLanguageInfo>;
+function TGoogleTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONArray;
   dataJson : TJSONObject;
   I: Integer;
+  langInfo : TLanguageInfo;
 begin
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/language/translate/v2/languages';
@@ -121,16 +120,23 @@ begin
   ResponseJson := FRESTResponse.JSONValue  as TJSONObject;
   dataJson := (ResponseJson.GetValue('data') as TJSONObject);
   LanguagesArray := datajson.GetValue('languages') as TJSONArray;
-  SetLength(Result, LanguagesArray.Count);
+  FFromLanguages.Clear;
+
+  langInfo := TLanguageInfo.Create;
+  langInfo.LanguageName := 'auto';
+  langInfo.LanguageCode := 'auto';
+  FFromLanguages.Add(langInfo);
+
 
   for I := 0 to LanguagesArray.Count - 1 do
   begin
-    Result[I] := TLanguageInfo.Create;
-    Result[I].LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
-    Result[I].LanguageName := GetLanguageNameFromCode(Result[I].LanguageCode);
+    langInfo := TLanguageInfo.Create;
+    langInfo.LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
+    langInfo.LanguageName := GetLanguageNameFromCode(langInfo.LanguageCode);
+    FFromLanguages.Add(langInfo);
   end;
+  Result := FFromLanguages;
 end;
-
 
 procedure TGoogleTranslate.IdHTTPServer1CommandGet(AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -152,9 +158,38 @@ begin
   FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
 end;
 
-function TGoogleTranslate.ToLanguages: TArray<TLanguageInfo>;
+function TGoogleTranslate.ToLanguages: TObjectList<TLanguageInfo>;
+var
+  ResponseJson: TJSONObject;
+  LanguagesArray: TJSONArray;
+  dataJson : TJSONObject;
+  I: Integer;
+  langInfo : TLanguageInfo;
 begin
-  Result := FromLanguages;
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Resource := '/language/translate/v2/languages';
+
+  FRESTClient.Authenticator := FOAuth2;
+  FOAuth2.RefreshAccessTokenIfRequired;
+
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.Execute;
+
+  ResponseJson := FRESTResponse.JSONValue  as TJSONObject;
+  dataJson := (ResponseJson.GetValue('data') as TJSONObject);
+  LanguagesArray := datajson.GetValue('languages') as TJSONArray;
+  FToLanguages.Clear;
+
+
+  for I := 0 to LanguagesArray.Count - 1 do
+  begin
+    langInfo := TLanguageInfo.Create;
+    langInfo.LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
+    langInfo.LanguageName := GetLanguageNameFromCode(langInfo.LanguageCode);
+    FToLanguages.Add(langInfo);
+  end;
+  Result := FToLanguages;
 end;
 
 function TGoogleTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
