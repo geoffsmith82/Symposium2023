@@ -229,11 +229,15 @@ begin
           // Assuming the response contains a field called 'completion' with the answer
          // JSONBody := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONObject;
           prediction := DeserializePredictionInfo(RestResponse.Content);
-          Stopwatch := TStopwatch.StartNew;
-          OperationCompleted := False;
-          repeat
-          Result := GetPredictionDetails(prediction, OperationCompleted);
-          until (Stopwatch.ElapsedMilliseconds > 30000) or OperationCompleted;
+          try
+            Stopwatch := TStopwatch.StartNew;
+            OperationCompleted := False;
+            repeat
+              Result := GetPredictionDetails(prediction, OperationCompleted);
+            until (Stopwatch.ElapsedMilliseconds > 30000) or OperationCompleted;
+          finally
+            FreeAndNil(prediction);
+          end;
         end
         else
         begin

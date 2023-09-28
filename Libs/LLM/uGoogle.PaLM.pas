@@ -201,20 +201,15 @@ var
   RestResponse: TRESTResponse;
 begin
   Result := '';
-
   RestClient := TRESTClient.Create(nil);
   RestRequest := TRESTRequest.Create(nil);
   RestResponse := TRESTResponse.Create(nil);
-
   try
     RestClient.BaseURL := 'https://generativelanguage.googleapis.com';
-
     RestRequest.Client := RestClient;
     RestRequest.Response := RestResponse;
     RestRequest.Resource := Format('/v1beta2/models?key=%s', [FAPIKey]);
-
     RestRequest.Execute;
-
     Result := RestResponse.Content;
   finally
     RestClient.Free;

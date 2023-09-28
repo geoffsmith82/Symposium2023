@@ -22,12 +22,10 @@ type
     FAPIKey : string;
     FModelInfo : TObjectList<TImageModelInfo>;
     function GetModelInfo: TObjectList<TImageModelInfo>; virtual; abstract;
-  private
-    procedure ListOpenAIModels(out AModelList: TStringList); virtual; abstract;
   public
     constructor Create(APIKey: string);
     destructor Destroy; override;
-    function Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; virtual; abstract;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass; virtual; abstract;
     property ModelInfo: TObjectList<TImageModelInfo> read GetModelInfo;
   end;
 

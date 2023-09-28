@@ -17,14 +17,14 @@ type
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
-    function Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; override;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string = 'DALLE-2'): TGeneratedImagesClass; override;
   end;
 
 implementation
 
 { TImageGenerationOpenAI }
 
-function TImageGenerationOpenAI.Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
+function TImageGenerationOpenAI.Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass;
 var
   LClient: TRESTClient;
   LRequest: TRESTRequest;

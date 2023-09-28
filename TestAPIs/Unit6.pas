@@ -56,6 +56,7 @@ uses
   uHuggingFace.LLM,
   uReplicate.LLM,
   uLLM,
+  uDALLe2.DTO,
   uImageGeneration,
   uImageGeneration.Replicate
   ;
@@ -96,6 +97,8 @@ var
   huggingFace: THuggingFaceLLM;
   imageGenReplicate : TImageGenerationReplicate;
   answer : string;
+  imgs : TGeneratedImagesClass;
+  i : Integer;
 begin
   Memo1.Lines.Add('======== Model OpenAI');
   openAI := TOpenAI.Create(chatgpt_apikey);
@@ -129,6 +132,17 @@ begin
     begin
       Memo1.Lines.Add('Model:' + modelImg.modelName + ' ' + modelImg.version);
     end;
+
+    imgs := imageGenReplicate.Generate('A bird sitting on a branch in a tree', 1, TDALLESIZE.DALLE1024, 'stable-diffusion');
+    try
+      for I := 0 to length(imgs.data) - 1 do
+      begin
+        Memo1.Lines.Add('ImageURL: ' + imgs.data[i].url);
+      end;
+    finally
+      FreeAndNil(imgs);
+    end;
+
   finally
     FreeAndNil(imageGenReplicate);
   end;
