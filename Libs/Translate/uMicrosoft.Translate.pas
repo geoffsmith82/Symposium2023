@@ -26,8 +26,8 @@ type
     constructor Create(const SubscriptionKey, Endpoint: string);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<string>; override;
-    function ToLanguages: TArray<string>; override;
+    function FromLanguages: TArray<TLanguageInfo>; override;
+    function ToLanguages: TArray<TLanguageInfo>; override;
   end;
 implementation
 
@@ -64,11 +64,12 @@ begin
   inherited;
 end;
 
-function TMicrosoftTranslate.FromLanguages: TArray<string>;
+function TMicrosoftTranslate.FromLanguages: TArray<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONObject;
   LanguageObj : TJSONObject;
+  LangCode: string;
   I: Integer;
   ApiVersion : string;
 begin
@@ -90,15 +91,19 @@ begin
   for I := 0 to LanguagesArray.Count - 1 do
   begin
     LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
-    Result[I] := LanguageObj.Values['name'].Value;
+    LangCode := LanguagesArray.Pairs[i].JsonString.Value;
+    Result[i] := TLanguageInfo.Create;
+    Result[I].LanguageName := LanguageObj.Values['name'].Value;
+    Result[I].LanguageCode := LangCode;
   end;
 end;
 
-function TMicrosoftTranslate.ToLanguages: TArray<string>;
+function TMicrosoftTranslate.ToLanguages: TArray<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONObject;
   LanguageObj : TJSONObject;
+  LangCode: string;
   I: Integer;
   ApiVersion : string;
 begin
@@ -120,7 +125,10 @@ begin
   for I := 0 to LanguagesArray.Count - 1 do
   begin
     LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
-    Result[I] := LanguageObj.Values['name'].Value;
+    LangCode := LanguagesArray.Pairs[i].JsonString.Value;
+    Result[I] := TLanguageInfo.Create;
+    Result[i].LanguageName := LanguageObj.Values['name'].Value;
+    Result[i].LanguageCode := Langcode;
   end;
 end;
 

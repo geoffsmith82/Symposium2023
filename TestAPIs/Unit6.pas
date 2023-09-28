@@ -46,6 +46,8 @@ uses
   uAmazon.Polly,
   uBaseSpeech,
   uWindows.Engine,
+  LanguageCodes,
+  uBaseTranslate,
   uMicrosoft.Cognitive.REST,
   uMicrosoft.Translate,
   uAmazon.Translate,
@@ -84,8 +86,8 @@ var
   msvoice : TMicrosoftCognitiveService;
   msTranslate : TMicrosoftTranslate;
   amazonEngine : TAmazonTranslate;
-  lang : string;
-  langlist : TArray<string>;
+  lang : TLanguageInfo;
+  langlist : TArray<TLanguageInfo>;
   openAI: TOpenAI;
   model: TBaseModelInfo;
   modelObj : TBaseModelInfo;
@@ -250,12 +252,12 @@ begin
     Memo1.Lines.Add('======== Microsoft Translate');
     for lang in msTranslate.FromLanguages do
     begin
-      Memo1.Lines.Add('lang= ' + lang);
+      Memo1.Lines.Add('lang= ' + lang.LanguageCode + ' | ' + lang.LanguageName);
     end;
 
     for lang in msTranslate.ToLanguages do
     begin
-      Memo1.Lines.Add('lang= ' + lang);
+      Memo1.Lines.Add('lang= ' + lang.LanguageCode + ' | ' + lang.LanguageName);
     end;
 
   finally
@@ -268,13 +270,13 @@ begin
     langlist := amazonEngine.FromLanguages;
     for lang in langlist do
     begin
-      Memo1.Lines.Add('lang= ' + lang);
+      Memo1.Lines.Add('lang= ' + lang.LanguageCode + ' | ' + lang.LanguageName);
     end;
 
     langlist := amazonEngine.ToLanguages;
     for lang in langlist do
     begin
-      Memo1.Lines.Add('lang= ' + lang);
+      Memo1.Lines.Add('lang= ' + lang.LanguageCode + ' | ' + lang.LanguageName);
     end;
 
   finally

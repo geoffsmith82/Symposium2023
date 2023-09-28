@@ -40,12 +40,16 @@ type
     constructor Create(const APIKey: string; const APISecret: string; Settings: TiniFile);
     destructor Destroy; override;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<string>; override;
-    function ToLanguages: TArray<string>; override;
+    function FromLanguages: TArray<TLanguageInfo>; override;
+    function ToLanguages: TArray<TLanguageInfo>; override;
     procedure Authenticate;
   end;
 
 implementation
+
+uses
+  LanguageCodes
+  ;
 
 procedure TGoogleTranslate.Authenticate;
 begin
@@ -97,7 +101,7 @@ begin
   inherited;
 end;
 
-function TGoogleTranslate.FromLanguages: TArray<string>;
+function TGoogleTranslate.FromLanguages: TArray<TLanguageInfo>;
 var
   ResponseJson: TJSONObject;
   LanguagesArray: TJSONArray;
@@ -120,7 +124,11 @@ begin
   SetLength(Result, LanguagesArray.Count);
 
   for I := 0 to LanguagesArray.Count - 1 do
-    Result[I] := LanguagesArray.Items[I].GetValue<string>('language');
+  begin
+    Result[I] := TLanguageInfo.Create;
+    Result[I].LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
+    Result[I].LanguageName := GetLanguageNameFromCode(Result[I].LanguageCode);
+  end;
 end;
 
 
@@ -144,7 +152,7 @@ begin
   FSettings.WriteString('GoogleAuthentication', 'RefreshToken', FOAuth2.RefreshToken);
 end;
 
-function TGoogleTranslate.ToLanguages: TArray<string>;
+function TGoogleTranslate.ToLanguages: TArray<TLanguageInfo>;
 begin
   Result := FromLanguages;
 end;

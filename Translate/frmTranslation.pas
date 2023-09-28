@@ -30,6 +30,12 @@ uses
   ;
 
 type
+  TLanguageMenuItem = class(TMenuItem)
+  public
+     LanguageCode: string;
+  end;
+
+
   TfrmMainTranslationWindow = class(TForm)
     MainMenu1: TMainMenu;
     File1: TMenuItem;
@@ -70,7 +76,9 @@ type
     { Private declarations }
     FTranslateEngines: TEngineManager<TBaseTranslate>;
     FSettings : TIniFile;
-    toLanguage : string;
+    FOpenAI : TOpenAI;
+    fromLanguageCode : string;
+    toLanguageCode : string;
     procedure LoadLanguageMenus;
     procedure HandleGoogleEngineSelected(Sender: TObject);
     procedure HandleMicrosoftEngineSelected(Sender: TObject);
@@ -92,7 +100,7 @@ uses
 
 procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
 begin
-  mmoTranslatedText.Text := FTranslateEngines.ActiveEngine.Translate(mmoSourceText.Text, toLanguage, '');
+  mmoTranslatedText.Text := FTranslateEngines.ActiveEngine.Translate(mmoSourceText.Text, toLanguageCode, fromLanguageCode);
 end;
 
 procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
@@ -137,7 +145,7 @@ begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
   FTranslateEngines := TEngineManager<TBaseTranslate>.Create;
   FSettings := TIniFile.Create(filename);
-  toLanguage := FSettings.ReadString('Settings', 'ToLanguage', 'English');
+  toLanguageCode := FSettings.ReadString('Settings', 'ToLanguageCode', 'en');
 
   microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
   FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
@@ -155,20 +163,18 @@ end;
 
 procedure TfrmMainTranslationWindow.LoadLanguageMenus;
 var
-  languages : TArray<string>;
-  lang: string;
-  menu : TMenuItem;
+  languages : TArray<TLanguageInfo>;
+  lang: TLanguageInfo;
+  menu : TLanguageMenuItem;
 begin
   miFromLanguage.Clear;
   miToLanguage.Clear;
   languages := FTranslateEngines.ActiveEngine.FromLanguages;
   for lang in languages do
   begin
-    menu := TMenuItem.Create(miFromLanguage);
-    if lang.Length = 2 then
-      menu.Caption := GetLanguageNameFromCode(lang)
-    else
-      menu.Caption := lang;
+    menu := TLanguageMenuItem.Create(miFromLanguage);
+    menu.Caption := lang.LanguageName;
+    menu.LanguageCode := lang.LanguageCode;
     menu.OnClick := miSelectSourceLanguageClick;
     menu.GroupIndex := 120;
     menu.RadioItem := True;
@@ -178,8 +184,9 @@ begin
   languages := FTranslateEngines.ActiveEngine.ToLanguages;
   for lang in languages do
   begin
-    menu := TMenuItem.Create(miToLanguage);
-    menu.Caption := lang;
+    menu := TLanguageMenuItem.Create(miToLanguage);
+    menu.Caption := lang.LanguageName;
+    menu.LanguageCode := lang.LanguageCode;
     menu.OnClick := miSelectDestinationLanguageClick;
     menu.GroupIndex := 140;
     menu.RadioItem := True;
@@ -189,12 +196,14 @@ end;
 
 procedure TfrmMainTranslationWindow.miSelectSourceLanguageClick(Sender: TObject);
 begin
-  TMenuItem(Sender).Checked := True;
+  TLanguageMenuItem(Sender).Checked := True;
+  fromLanguageCode := TLanguageMenuItem(Sender).LanguageCode;
 end;
 
 procedure TfrmMainTranslationWindow.miSelectDestinationLanguageClick(Sender: TObject);
 begin
-  TMenuItem(Sender).Checked := True;
+  TLanguageMenuItem(Sender).Checked := True;
+  ToLanguageCode := TLanguageMenuItem(Sender).LanguageCode;
 end;
 
 procedure TfrmMainTranslationWindow.Button1Click(Sender: TObject);
@@ -221,7 +230,6 @@ var
   doc : TXMLDocument;
   xml : IXMLXliffType;
   v : IXMLVType;
-  w : IXMLWType;
   k, i : Integer;
   destInt : Integer;
   dest : string;

@@ -24,8 +24,8 @@ type
   public
     constructor Create(const AccessKey, SecretKey, Endpoint: string);
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
-    function FromLanguages: TArray<string>; override;
-    function ToLanguages: TArray<string>; override;
+    function FromLanguages: TArray<TLanguageInfo>; override;
+    function ToLanguages: TArray<TLanguageInfo>; override;
   end;
 
 implementation
@@ -38,7 +38,7 @@ begin
   FEndpoint := Endpoint;
 end;
 
-function TAmazonTranslate.FromLanguages: TArray<string>;
+function TAmazonTranslate.FromLanguages: TArray<TLanguageInfo>;
 var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
@@ -56,16 +56,20 @@ begin
     SetLength(Result, langlist.Count + 1);
     for i := 0 to langlist.Count - 1 do
     begin
+      Result[i + 1] := TLanguageInfo.Create;
       language := langlist[i];
-      Result[i + 1] := language.LanguageName;
+      Result[i + 1].LanguageName := language.LanguageName;
+      Result[i + 1].LanguageCode := language.LanguageCode;
     end;
   finally
     FreeAndNil(AwsTranslate);
   end;
-  Result[0] := 'auto';
+  Result[0] := TLanguageInfo.Create;
+  Result[0].LanguageName := 'auto';
+  Result[0].LanguageCode := 'auto';
 end;
 
-function TAmazonTranslate.ToLanguages: TArray<string>;
+function TAmazonTranslate.ToLanguages: TArray<TLanguageInfo>;
 var
   AwsTranslate : TTranslateClient;
   options : IAWSOptions;
@@ -84,7 +88,9 @@ begin
     for i := 0 to langlist.Count - 1 do
     begin
       language := langlist[i];
-      Result[i] := language.LanguageName;
+      Result[i] := TLanguageInfo.Create;
+      Result[i].LanguageName := language.LanguageName;
+      Result[i].LanguageCode := language.LanguageCode;
     end;
   finally
     FreeAndNil(AwsTranslate);
@@ -93,7 +99,7 @@ end;
 
 function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
-  AwsTranslate : TTranslateClient;
+  AwsTranslate : ITranslateClient;
   response : ITranslateTranslateTextResponse;
   options : IAWSOptions;
 begin
