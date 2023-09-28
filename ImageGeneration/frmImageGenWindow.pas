@@ -22,7 +22,8 @@ uses
   System.Net.URLClient,
   System.Net.HttpClient,
   System.Net.HttpClientComponent,
-  OpenAI,
+  uImageGeneration.OpenAI,
+  uImageGeneration,
   uDALLe2.DTO
   ;
 
@@ -61,7 +62,7 @@ type
     { Private declarations }
     FImageList : TObjectList<TImage>;
     FCurrentImage : TImage;
-    FOpenAI : TOpenAI;
+    FOpenAI : TImageGenerationOpenAI;
   public
     { Public declarations }
   end;
@@ -78,7 +79,7 @@ implementation
 procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
   FImageList := TObjectList<TImage>.Create;
-  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FOpenAI := TImageGenerationOpenAI.Create(chatgpt_apikey);
   FCurrentImage := nil;
 end;
 
@@ -111,7 +112,7 @@ begin
     size := DALLE1024;
   end;
 
-  images := FOpenAI.CallDALL_E(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
+  images := FOpenAI.Generate(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
   try
     for i := 0 to length(images.data) - 1 do
     begin

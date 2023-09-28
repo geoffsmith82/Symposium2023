@@ -7,7 +7,6 @@ uses
   OpenAI in '..\Libs\LLM\OpenAI.pas',
   uLLM in '..\Libs\LLM\uLLM.pas',
   udmEmbeddings in 'udmEmbeddings.pas' {dmEmbeddings: TDataModule},
-  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uGoogle.PaLM in '..\Libs\LLM\uGoogle.PaLM.pas',
   uAzureGPT in '..\Libs\LLM\uAzureGPT.pas';

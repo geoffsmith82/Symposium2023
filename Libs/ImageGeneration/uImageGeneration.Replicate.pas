@@ -17,15 +17,14 @@ type
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
-    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; override;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; override;
   end;
 
 implementation
 
 { TImageGenerationReplicate }
 
-function TImageGenerationReplicate.CallDALL_E(const prompt: string; n: Integer;
-  size: TDALLESize): TGeneratedImagesClass;
+function TImageGenerationReplicate.Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass;
 begin
 
 end;

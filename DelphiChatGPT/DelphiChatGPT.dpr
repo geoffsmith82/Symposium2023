@@ -31,7 +31,6 @@ uses
   uEngineManager in '..\Libs\uEngineManager.pas',
   uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
   uLLM in '..\Libs\LLM\uLLM.pas',
-  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas';
 

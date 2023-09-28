@@ -17,7 +17,6 @@ uses
   Vcl.Forms,
   ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {frmVoiceRecognition},
   OpenAI in '..\Libs\LLM\OpenAI.pas',
-  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas',
   uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
   uMicrosoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas',
   uMicrosoft.Cognitive.REST in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas',

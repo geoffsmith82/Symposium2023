@@ -30,8 +30,7 @@ uses
   uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
   OpenAI in '..\Libs\LLM\OpenAI.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  uLLM in '..\Libs\LLM\uLLM.pas',
-  uDALLe2.DTO in '..\Libs\uDALLe2.DTO.pas';
+  uLLM in '..\Libs\LLM\uLLM.pas';
 
 {$R *.res}
 

@@ -27,7 +27,7 @@ type
   public
     constructor Create(APIKey: string);
     destructor Destroy; override;
-    function CallDALL_E(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; virtual; abstract;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize): TGeneratedImagesClass; virtual; abstract;
     property ModelInfo: TObjectList<TImageModelInfo> read GetModelInfo;
   end;
 
