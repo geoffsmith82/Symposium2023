@@ -75,6 +75,8 @@ type
 var
   frmEmbeddings: TfrmEmbeddings;
 
+const AzureOpenAIEndpoint = 'https://symposiumdemoopenai.openai.azure.com';
+
 implementation
 
 {$R *.dfm}

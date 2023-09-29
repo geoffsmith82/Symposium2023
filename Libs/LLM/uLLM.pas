@@ -55,6 +55,11 @@ type
     property Parameters[const Key: string]: string read GetParameter write SetParameter;
   end;
 
+  ELLMException = class(Exception)
+
+  end;
+
+
   TBaseModelInfo = class
     modelName: string;
     version: string;

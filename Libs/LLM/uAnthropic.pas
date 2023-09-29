@@ -13,7 +13,7 @@ uses
   ;
 
 type
-  EAnthropicError = class(Exception)
+  EAnthropicError = class(ELLMException)
   private
     FErrorType: string;
   public

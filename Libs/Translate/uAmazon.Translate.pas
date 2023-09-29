@@ -20,9 +20,9 @@ type
   strict private
     FAccessKey: string;
     FSecretKey: string;
-    FEndpoint: string;
+    FRegion: string;
   public
-    constructor Create(const AccessKey, SecretKey, Endpoint: string);
+    constructor Create(const AccessKey, SecretKey, Region: string);
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; override;
     function FromLanguages: TObjectList<TLanguageInfo>; override;
     function ToLanguages: TObjectList<TLanguageInfo>; override;
@@ -30,12 +30,12 @@ type
 
 implementation
 
-constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Endpoint: string);
+constructor TAmazonTranslate.Create(const AccessKey, SecretKey, Region: string);
 begin
   inherited Create('');
   FAccessKey := AccessKey;
   FSecretKey := SecretKey;
-  FEndpoint := Endpoint;
+  FRegion := Region;
 end;
 
 function TAmazonTranslate.FromLanguages: TObjectList<TLanguageInfo>;
@@ -50,7 +50,7 @@ begin
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccessKey;
   options.SecretAccessKey := FSecretKey;
-  options.Region := 'ap-southeast-2';
+  options.Region := FRegion;
   AwsTranslate := TTranslateClient.Create(options);
   try
     FFromLanguages.Clear;
@@ -86,7 +86,7 @@ begin
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccessKey;
   options.SecretAccessKey := FSecretKey;
-  options.Region := 'ap-southeast-2';
+  options.Region := FRegion;
   AwsTranslate := TTranslateClient.Create(options);
   try
     FToLanguages.Clear;

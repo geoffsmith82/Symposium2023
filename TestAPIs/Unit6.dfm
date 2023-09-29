@@ -45,6 +45,17 @@ object Form6: TForm6
     Caption = 'Authenticate'
     TabOrder = 2
     OnClick = Button2Click
-    ExplicitWidth = 622
+    ExplicitWidth = 624
+  end
+  object Button3: TButton
+    Left = 0
+    Top = 50
+    Width = 628
+    Height = 25
+    Align = alTop
+    Caption = 'Button3'
+    TabOrder = 3
+    OnClick = Button3Click
+    ExplicitWidth = 624
   end
 end

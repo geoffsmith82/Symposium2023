@@ -40,6 +40,8 @@ type
 var
   Form6: TForm6;
 
+const AzureOpenAIEndpoint = 'https://symposiumdemoopenai.openai.azure.com';
+
 implementation
 
 {$R *.dfm}
@@ -167,7 +169,7 @@ begin
   end;
 
   Memo1.Lines.Add('======== Microsoft OpenAI');
-  microsoftOpenAI := TMicrosoftOpenAI.Create(AzureAPIKey);
+  microsoftOpenAI := TMicrosoftOpenAI.Create(AzureAPIKey, AzureOpenAIEndpoint);
   try
     for modelObj in microsoftOpenAI.ModelInfo do
     begin
@@ -266,7 +268,7 @@ begin
     FreeAndNil(msTranslate);
   end;
 
-  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, '');
+  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, 'ap-southeast-2');
   try
     Memo1.Lines.Add('======== Amazon Translate');
     langlist := amazonEngine.FromLanguages;

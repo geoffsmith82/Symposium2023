@@ -152,7 +152,7 @@ begin
   googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
   FTranslateEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
-  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, '');
+  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, 'ap-southeast-2');
   FTranslateEngines.RegisterEngine(amazonEngine, miAmazonTranslate, HandleMicrosoftEngineSelected);
 
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');

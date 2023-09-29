@@ -43,11 +43,12 @@ type
 
   TMicrosoftOpenAI = class(TBaseLLM)
   private
+    FEndpoint : string;
     function GetAzureModels: TModelsResponse;
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   public
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string; const Endpoint: string);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
     function Embeddings(const Texts: TArray<string>): TEmbeddings;
@@ -56,11 +57,10 @@ type
 implementation
 { TMicrosoftOpenAI }
 
-const AzureOpenAIEndpoint = 'https://symposiumdemoopenai.openai.azure.com';
-
-constructor TMicrosoftOpenAI.Create(APIKey: string);
+constructor TMicrosoftOpenAI.Create(const APIKey: string; const Endpoint: string);
 begin
   inherited Create(APIKey);
+  FEndpoint := Endpoint;
 end;
 
 function TMicrosoftOpenAI.ChatCompletion(ChatConfig: TChatSettings;
@@ -80,7 +80,7 @@ var
   LUsage: TJSONObject;
   LChoice: TJSONObject;
 begin
-  LRESTClient := TRESTClient.Create(AzureOpenAIEndpoint);
+  LRESTClient := TRESTClient.Create(FEndpoint);
   try
     LRESTRequest := TRESTRequest.Create(nil);
     LRESTResponse := TRESTResponse.Create(nil);
@@ -152,7 +152,7 @@ var
   LJson: TJSONObject;
   I, J: Integer;
 begin
-  LRestClient := TRESTClient.Create(AzureOpenAIEndpoint);
+  LRestClient := TRESTClient.Create(FEndpoint);
   LRestRequest := TRESTRequest.Create(nil);
   LRestResponse := TRESTResponse.Create(nil);
 
@@ -219,7 +219,7 @@ begin
   RestResponse := TRESTResponse.Create(nil);
 
   try
-    RestClient.BaseURL := AzureOpenAIEndpoint;
+    RestClient.BaseURL := FEndpoint;
     RestClient.Accept := 'application/json';
     RestClient.AcceptCharset := 'UTF-8';
 

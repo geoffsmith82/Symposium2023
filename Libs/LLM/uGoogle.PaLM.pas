@@ -13,7 +13,7 @@ uses
   ;
 
 type
-  EGooglePaLMError = class(Exception)
+  EGooglePaLMError = class(ELLMException)
   private
     FErrorType: string;
   public
