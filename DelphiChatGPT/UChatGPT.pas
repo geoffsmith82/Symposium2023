@@ -100,7 +100,7 @@ begin
   FSpeedToTextEngine.RegisterEngine(
      TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
   FSpeedToTextEngine.RegisterEngine(
-     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey), miAmazonSpeechEngine);//'ADUG Demo', '');
+     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
   FSpeedToTextEngine.RegisterEngine(
      TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FSpeedToTextEngine.RegisterEngine(

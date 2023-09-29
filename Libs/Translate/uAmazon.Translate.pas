@@ -114,7 +114,7 @@ begin
   options := TAWSOptions.Create;
   options.AccessKeyId := FAccessKey;
   options.SecretAccessKey := FSecretKey;
-  options.Region := 'ap-southeast-2';
+  options.Region := FRegion;
   AwsTranslate := TTranslateClient.Create(options);
   response := AwsTranslate.TranslateText(fromlang, toLang, SourceText);
   Result := response.TranslatedText;

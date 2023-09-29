@@ -213,7 +213,7 @@ begin
   end;
 
   Memo1.Lines.Add('======== Amazon Polly Voices');
-  polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey);
+  polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, AWSRegion);
   try
     for voice in polly.Voices do
     begin
@@ -268,7 +268,7 @@ begin
     FreeAndNil(msTranslate);
   end;
 
-  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, 'ap-southeast-2');
+  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, AWSRegion);
   try
     Memo1.Lines.Add('======== Amazon Translate');
     langlist := amazonEngine.FromLanguages;
@@ -319,7 +319,7 @@ begin
   end;
 
   Memo1.Lines.Add('======== Amazon Polly Voices');
-  polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey);
+  polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, AWSRegion);
   try
     voice := polly.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);

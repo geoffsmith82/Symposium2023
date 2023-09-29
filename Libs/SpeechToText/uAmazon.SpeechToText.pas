@@ -17,7 +17,7 @@ type
     FRegion: string;
     FBucket: string;
   public
-    constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string; bucket: string);
+    constructor Create(Sender: TWinControl; const AccessKey:string; const SecretKey: string; const Region: string; bucket: string);
     function SupportedFormats: TArray<string>; override;
     function TranscribeAudio(const FilePath, ModelName: string): string; override;
   end;
@@ -33,11 +33,11 @@ uses
 
 { TAmazonSpeechToText }
 
-constructor TAmazonSpeechToText.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string; bucket: string);
+constructor TAmazonSpeechToText.Create(Sender: TWinControl; const AccessKey:string; const SecretKey: string; const Region: string; bucket: string);
 begin
   inherited Create('','', '');
-  FAccessKey := AccountName;
-  FSecretKey := AccountKey;
+  FAccessKey := AccessKey;
+  FSecretKey := SecretKey;
   FRegion := Region;
   FBucket := Bucket;
 end;

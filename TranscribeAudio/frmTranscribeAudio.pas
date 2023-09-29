@@ -98,7 +98,7 @@ begin
   microsoftEngine := TMicrosoftSpeechToText.Create('', '', '');
   FSpeechToTextEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
 
-  amazonEngine := TAmazonSpeechToText.Create('', '', '');
+  amazonEngine := TAmazonSpeechToText.Create(nil, AWSAccessKey, AWSSecretKey, AWSRegion, 'bucket');
   FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon, HandleAmazonEngineSelected);
 
   whisperOnlineEngine := TOpenAiWhisperOnline.Create(CHATGPT_APIKEY, '', '');
