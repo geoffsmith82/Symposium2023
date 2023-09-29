@@ -5,6 +5,7 @@ interface
 uses
   Winapi.Windows,
   Winapi.Messages,
+  System.Generics.Collections,
   System.SysUtils,
   System.Variants,
   System.Classes,
@@ -22,10 +23,12 @@ type
     Memo1: TMemo;
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -87,7 +90,7 @@ var
   msTranslate : TMicrosoftTranslate;
   amazonEngine : TAmazonTranslate;
   lang : TLanguageInfo;
-  langlist : TArray<TLanguageInfo>;
+  langlist : TObjectList<TLanguageInfo>;
   openAI: TOpenAI;
   model: TBaseModelInfo;
   modelObj : TBaseModelInfo;
@@ -196,7 +199,6 @@ begin
     FreeAndNil(anthropic);
   end;
 
-
   Memo1.Lines.Add('======== ElevenLabs Voices');
   elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
   try
@@ -288,6 +290,82 @@ end;
 procedure TForm6.Button2Click(Sender: TObject);
 begin
   Fgooglespeech.Authenticate;
+end;
+
+procedure TForm6.Button3Click(Sender: TObject);
+var
+  elevenlabs : TElevenLabsService;
+  polly: TAmazonPollyService;
+  voice : TVoiceInfo;
+  mswindows : TWindowsSpeechService;
+  msvoice : TMicrosoftCognitiveService;
+  ticks : UInt64;
+begin
+
+  Memo1.Lines.Add('======== ElevenLabs Voices');
+  elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  try
+    voice := elevenlabs.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    elevenlabs.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(elevenlabs);
+  end;
+
+  Memo1.Lines.Add('======== Amazon Polly Voices');
+  polly := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey);
+  try
+    voice := polly.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    polly.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(polly);
+  end;
+
+  Memo1.Lines.Add('======== Windows Voices');
+  mswindows := TWindowsSpeechService.Create(Self);
+  try
+    voice := mswindows.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    mswindows.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(mswindows);
+  end;
+
+  Memo1.Lines.Add('======== Microsoft Voices');
+  msvoice := TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
+  try
+    voice := msvoice.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    msvoice.PlayText('Hello from voice ' + voice.VoiceName,voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(msvoice);
+  end;
+
+  Memo1.Lines.Add('======== Google Voices');
+  voice := Fgooglespeech.Voices[1];
+  Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+  Fgooglespeech.PlayText('Hello from voice ' + voice.VoiceName,voice.VoiceId);
+  ticks := GetTickCount64;
+  repeat
+    Application.ProcessMessages;
+  until (GetTickCount64 - ticks) > 10000;
 end;
 
 end.

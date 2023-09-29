@@ -31,7 +31,6 @@ type
     FMediaPlayer : TMediaPlayer;
   private
     procedure MediaPlayerNotify(Sender: TObject);
-    procedure PlayText(const text:string; const VoiceName: string = '');
   protected
     FFormatExt : string;
     FResourceKey: string;
@@ -43,6 +42,7 @@ type
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
+    procedure PlayText(const text:string; const VoiceName: string = '');
     function Mode: TMPModes;
   public
     property Voices: TObjectList<TVoiceInfo> read GetVoices;
@@ -83,31 +83,32 @@ end;
 
 procedure TBaseTextToSpeech.PlayText(const text:string; const VoiceName: string = '');
 var
-  Stream: TMemoryStream;
   FileName: string;
   task : ITask;
 begin
-  FMediaPlayer.Notify := true;
-  FMediaPlayer.OnNotify := MediaPlayerNotify;
   task := TTask.Create(procedure ()
+             var
+               Stream: TMemoryStream;
              begin
-                Stream := TMemoryStream.Create;
-                try
-                  Stream := TextToSpeech(text, VoiceName);
-                  if not Assigned(Stream) then
-                    Exit;
-                  FileName := TPath.GetTempFileName + FFormatExt;
-                  Stream.Position := 0;
-                  Stream.SaveToFile(FileName);
-                finally
-                  FreeAndNil(Stream);
-                end;
+               Stream := nil;
+               try
+                 Stream := TextToSpeech(text, VoiceName);
+                 if not Assigned(Stream) then
+                   Exit;
+                 FileName := TPath.GetTempFileName + FFormatExt;
+                 Stream.Position := 0;
+                 Stream.SaveToFile(FileName);
+               finally
+                 FreeAndNil(Stream);
+               end;
 
                TThread.Queue(nil, procedure ()
                  begin
+                   FMediaPlayer.OnNotify := MediaPlayerNotify;
+                   FMediaPlayer.Notify := true;
+
                    FMediaPlayer.FileName := FileName;
                    FMediaPlayer.Open;
-                   FMediaPlayer.Notify := true;
                    FStatus := ssPlayStarting;
                    FMediaPlayer.Play;
                  end);

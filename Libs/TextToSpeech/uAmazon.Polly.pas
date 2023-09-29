@@ -52,7 +52,7 @@ function TAmazonPollyService.GetVoices: TObjectList<TVoiceInfo>;
 {$IFNDEF NOPOLLY}
 var
   polly : TPollyClient;
-  request : TPollyDescribeVoicesRequest;
+  request : IPollyDescribeVoicesRequest;
   response : IPollyDescribeVoicesResponse;
   options : IAWSOptions;
   pollyVoice : IPollyVoice;
@@ -80,6 +80,7 @@ begin
       FVoicesInfo.Add(voice);
     end;
   finally
+    response := nil;
     FreeAndNil(polly);
   end;
 {$ENDIF}
@@ -93,7 +94,7 @@ function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStrea
 {$IFNDEF NOPOLLY}
 var
   polly : TPollyClient;
-  request : TPollySynthesizeSpeechRequest;
+  request : IPollySynthesizeSpeechRequest;
   response : IPollySynthesizeSpeechResponse;
   options : IAWSOptions;
 {$ENDIF}
@@ -108,7 +109,7 @@ begin
     request := TPollySynthesizeSpeechRequest.Create;
     request.Text := text;
     request.OutputFormat := 'mp3';
-    request.VoiceId := 'Olivia';
+    request.VoiceId := VoiceName;
     request.SetEngine('neural');
     response := polly.SynthesizeSpeech(request);
     Result := TMemoryStream.Create;
