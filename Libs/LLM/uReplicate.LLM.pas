@@ -268,9 +268,11 @@ var
   LModelInfo: TBaseModelInfo;
 begin
   FModelInfo.Clear;
-
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := nil;
+  LRestRequest := nil;
+  LRestResponse := nil;
   try
+    LRestClient := TRESTClient.Create('https://api.replicate.com');
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
     try
