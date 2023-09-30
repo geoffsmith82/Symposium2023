@@ -87,8 +87,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit6.pas">
-            <Form>Form6</Form>
+        <DCCReference Include="frmTestAPI.pas">
+            <Form>frmTestApiWindow</Form>
         </DCCReference>
         <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>

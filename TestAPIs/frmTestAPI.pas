@@ -1,4 +1,4 @@
-unit Unit6;
+unit frmTestAPI;
 
 interface
 
@@ -19,7 +19,7 @@ uses
   ;
 
 type
-  TForm6 = class(TForm)
+  TfrmTestApiWindow = class(TForm)
     Memo1: TMemo;
     Button1: TButton;
     Button2: TButton;
@@ -38,7 +38,7 @@ type
   end;
 
 var
-  Form6: TForm6;
+  frmTestApiWindow: TfrmTestApiWindow;
 
 const AzureOpenAIEndpoint = 'https://symposiumdemoopenai.openai.azure.com';
 
@@ -70,19 +70,19 @@ uses
 
 {$I ..\Libs\apikey.inc}
 
-procedure TForm6.FormDestroy(Sender: TObject);
+procedure TfrmTestApiWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(Fgooglespeech);
   FreeAndNil(FSettings);
 end;
 
-procedure TForm6.FormCreate(Sender: TObject);
+procedure TfrmTestApiWindow.FormCreate(Sender: TObject);
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   Fgooglespeech := TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
 end;
 
-procedure TForm6.Button1Click(Sender: TObject);
+procedure TfrmTestApiWindow.Button1Click(Sender: TObject);
 var
   elevenlabs : TElevenLabsService;
   polly: TAmazonPollyService;
@@ -289,12 +289,12 @@ begin
 
 end;
 
-procedure TForm6.Button2Click(Sender: TObject);
+procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
 begin
   Fgooglespeech.Authenticate;
 end;
 
-procedure TForm6.Button3Click(Sender: TObject);
+procedure TfrmTestApiWindow.Button3Click(Sender: TObject);
 var
   elevenlabs : TElevenLabsService;
   polly: TAmazonPollyService;

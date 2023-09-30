@@ -15,7 +15,7 @@ uses
   ExceptionLog7,
   {$ENDIF EurekaLog}
   Vcl.Forms,
-  Unit6 in 'Unit6.pas' {Form6},
+  frmTestAPI in 'frmTestAPI.pas' {frmTestApiWindow},
   uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
   uBaseSpeech in '..\Libs\TextToSpeech\uBaseSpeech.pas',
   uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
@@ -48,7 +48,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm6, Form6);
+  Application.CreateForm(TfrmTestApiWindow, frmTestApiWindow);
   Application.Run;
 end.
 
