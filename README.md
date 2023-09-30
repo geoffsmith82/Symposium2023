@@ -9,7 +9,7 @@ In creative and artistic domains, AI can generate images based on textual descri
 
 AI's ability to analyze and process data, and generate comprehensive reports highlights its value in various domains. Furthermore, AI-powered tools can transcribe audio files into written text, making transcription tasks more efficient and accurate.
 
-The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. Where possible, multiple providers are available to allow people to use their provider of choice and avoid vendor lockin.
+The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. I have worked on creating generic API's so that different providers can be swapped in or out to experiment or for any other reason.
 
 ## ChatGPT Prompts  
 
@@ -41,9 +41,9 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide using OpenAI's DALLE-2 API.
 ### Providers Used/Available
-  - Google
-  - Microsoft Azure
-  - Amazon  
+  - Google - Text to Speech, LLM, Translate
+  - Microsoft Azure - Text to Speech, GPT, Translate
+  - Amazon - Text to Speech, Translate
   - [Anthropic](https://www.anthropic.com) claude-2 and claude-instant-1 support one of largest context windows currently available
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
