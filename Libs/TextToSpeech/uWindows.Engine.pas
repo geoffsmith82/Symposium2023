@@ -45,11 +45,11 @@ end;
 
 function TWindowsSpeechService.GetVoices: TObjectList<TVoiceInfo>;
 var
-  SpVoice: ISpeechVoice;
-  Voices: ISpeechObjectTokens;
-  Token: ISpeechObjectToken;
-  Description: WideString;
-  VoiceInfo: TVoiceInfo;
+  LSpVoice: ISpeechVoice;
+  LVoices: ISpeechObjectTokens;
+  LToken: ISpeechObjectToken;
+  LDescription: WideString;
+  LVoiceInfo: TVoiceInfo;
   i : Integer;
 begin
   Result := nil;
@@ -57,17 +57,17 @@ begin
   CoInitialize(nil);
   try
     try
-      SpVoice := CoSpVoice.Create;
-      Voices := SpVoice.GetVoices('', '');
-      for I := 0 to Voices.Count - 1 do
+      LSpVoice := CoSpVoice.Create;
+      LVoices := LSpVoice.GetVoices('', '');
+      for I := 0 to LVoices.Count - 1 do
       begin
-        Token := Voices.Item(I) as ISpeechObjectToken;
-        VoiceInfo := TVoiceInfo.Create;
-        Description := Token.GetDescription(0);
+        LToken := LVoices.Item(I) as ISpeechObjectToken;
+        LVoiceInfo := TVoiceInfo.Create;
+        LDescription := LToken.GetDescription(0);
         begin
-          VoiceInfo.VoiceName := Description;
-          VoiceInfo.VoiceId := Token.Id;
-          FVoicesInfo.Add(VoiceInfo);
+          LVoiceInfo.VoiceName := LDescription;
+          LVoiceInfo.VoiceId := LToken.Id;
+          FVoicesInfo.Add(LVoiceInfo);
         end;
       end;
     finally
@@ -84,10 +84,8 @@ begin
 end;
 
 function TWindowsSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;
-const
-  OutputFileName = 'output.wav';
 var
-  FileName: string;
+  LFileName: string;
 begin
   FFormatExt := '.wav';
   FSpeech := nil;
@@ -102,11 +100,11 @@ begin
     FSpFileStream := CoSpFileStream.Create;
 
     // Generate a temporary file name
-    FileName := TPath.GetTempFileName;
+    LFileName := TPath.GetTempFileName;
 
     // Configure the speech file stream
     FSpFileStream.Format.Type_ := SAFT22kHz16BitMono;
-    FSpFileStream.Open(FileName, SSFMCreateForWrite, False);
+    FSpFileStream.Open(LFileName, SSFMCreateForWrite, False);
 
     // Assign the output file stream to the voice
     FSpeech.AudioOutputStream := FSpFileStream;
@@ -119,7 +117,7 @@ begin
 
     // Load the speech file into the provided memory stream
     Result := TMemoryStream.Create;
-    Result.LoadFromFile(FileName);
+    Result.LoadFromFile(LFileName);
   finally
     // Free the file stream and voice instances
     FSpFileStream := nil;
@@ -127,7 +125,7 @@ begin
     CoUnInitialize;
 
     // Delete the temporary file
-    TFile.Delete(FileName);
+    TFile.Delete(LFileName);
   end;
 end;
 

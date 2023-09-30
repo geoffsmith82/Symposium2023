@@ -101,11 +101,11 @@ end;
 
 function TGoogleTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
-  ResponseJson: TJSONObject;
-  LanguagesArray: TJSONArray;
-  dataJson : TJSONObject;
+  LResponseJson: TJSONObject;
+  LLanguagesArray: TJSONArray;
+  LDataJson : TJSONObject;
   I: Integer;
-  langInfo : TLanguageInfo;
+  LLangInfo : TLanguageInfo;
 begin
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/language/translate/v2/languages';
@@ -117,23 +117,23 @@ begin
   FRESTRequest.Response := FRESTResponse;
   FRESTRequest.Execute;
 
-  ResponseJson := FRESTResponse.JSONValue  as TJSONObject;
-  dataJson := (ResponseJson.GetValue('data') as TJSONObject);
-  LanguagesArray := datajson.GetValue('languages') as TJSONArray;
+  LResponseJson := FRESTResponse.JSONValue  as TJSONObject;
+  LDataJson := (LResponseJson.GetValue('data') as TJSONObject);
+  LLanguagesArray := LDataJson.GetValue('languages') as TJSONArray;
   FFromLanguages.Clear;
 
-  langInfo := TLanguageInfo.Create;
-  langInfo.LanguageName := 'auto';
-  langInfo.LanguageCode := 'auto';
-  FFromLanguages.Add(langInfo);
+  LLangInfo := TLanguageInfo.Create;
+  LLangInfo.LanguageName := 'auto';
+  LLangInfo.LanguageCode := 'auto';
+  FFromLanguages.Add(LLangInfo);
 
 
-  for I := 0 to LanguagesArray.Count - 1 do
+  for I := 0 to LLanguagesArray.Count - 1 do
   begin
-    langInfo := TLanguageInfo.Create;
-    langInfo.LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
-    langInfo.LanguageName := GetLanguageNameFromCode(langInfo.LanguageCode);
-    FFromLanguages.Add(langInfo);
+    LLangInfo := TLanguageInfo.Create;
+    LLangInfo.LanguageCode := LLanguagesArray.Items[I].GetValue<string>('language');
+    LLangInfo.LanguageName := GetLanguageNameFromCode(LLangInfo.LanguageCode);
+    FFromLanguages.Add(LLangInfo);
   end;
   Result := FFromLanguages;
 end;
@@ -160,11 +160,11 @@ end;
 
 function TGoogleTranslate.ToLanguages: TObjectList<TLanguageInfo>;
 var
-  ResponseJson: TJSONObject;
-  LanguagesArray: TJSONArray;
-  dataJson : TJSONObject;
+  LResponseJson: TJSONObject;
+  LLanguagesArray: TJSONArray;
+  LDataJson : TJSONObject;
   I: Integer;
-  langInfo : TLanguageInfo;
+  LLangInfo : TLanguageInfo;
 begin
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/language/translate/v2/languages';
@@ -176,37 +176,37 @@ begin
   FRESTRequest.Response := FRESTResponse;
   FRESTRequest.Execute;
 
-  ResponseJson := FRESTResponse.JSONValue  as TJSONObject;
-  dataJson := (ResponseJson.GetValue('data') as TJSONObject);
-  LanguagesArray := datajson.GetValue('languages') as TJSONArray;
+  LResponseJson := FRESTResponse.JSONValue  as TJSONObject;
+  LDataJson := (LResponseJson.GetValue('data') as TJSONObject);
+  LLanguagesArray := LDataJson.GetValue('languages') as TJSONArray;
   FToLanguages.Clear;
 
 
-  for I := 0 to LanguagesArray.Count - 1 do
+  for I := 0 to LLanguagesArray.Count - 1 do
   begin
-    langInfo := TLanguageInfo.Create;
-    langInfo.LanguageCode := LanguagesArray.Items[I].GetValue<string>('language');
-    langInfo.LanguageName := GetLanguageNameFromCode(langInfo.LanguageCode);
-    FToLanguages.Add(langInfo);
+    LLangInfo := TLanguageInfo.Create;
+    LLangInfo.LanguageCode := LLanguagesArray.Items[I].GetValue<string>('language');
+    LLangInfo.LanguageName := GetLanguageNameFromCode(LLangInfo.LanguageCode);
+    FToLanguages.Add(LLangInfo);
   end;
   Result := FToLanguages;
 end;
 
 function TGoogleTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
-  jsonRequest : TJSONObject;
+  LJsonRequest : TJSONObject;
 begin
   // Set the source text parameter and execute the REST request
-  jsonRequest := TJSONObject.Create;
-  jsonRequest.AddPair('q', SourceText);
-  jsonRequest.AddPair('target', toLang);
+  LJsonRequest := TJSONObject.Create;
+  LJsonRequest.AddPair('q', SourceText);
+  LJsonRequest.AddPair('target', toLang);
 
   FRESTClient.Authenticator := FOAuth2;
   FRESTRequest.Resource := '/language/translate/v2?textType=html';
 
   FOAuth2.RefreshAccessTokenIfRequired;
   FRESTRequest.Method := rmPOST;
-  FRESTRequest.AddBody(jsonRequest);
+  FRESTRequest.AddBody(LJsonRequest);
   FRESTRequest.Response := FRESTResponse;
   FRESTRequest.Execute;
 

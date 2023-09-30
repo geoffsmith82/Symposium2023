@@ -22,7 +22,7 @@ type
     function FromLanguages: TObjectList<TLanguageInfo>; virtual; abstract;
     function ToLanguages: TObjectList<TLanguageInfo>; virtual; abstract;
     function Translate(const SourceText: string; const toLang: string; const fromLang: string): string; virtual; abstract;
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string);
     destructor Destroy; override;
   end;
 
@@ -30,9 +30,7 @@ implementation
 
 { TBaseTranslate }
 
-{ TBaseTranslate }
-
-constructor TBaseTranslate.Create(APIKey: string);
+constructor TBaseTranslate.Create(const APIKey: string);
 begin
   FAPIKey := APIKey;
   FFromLanguages := TObjectList<TLanguageInfo>.Create;

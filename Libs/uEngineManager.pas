@@ -62,12 +62,12 @@ end;
 
 procedure TEngineManager<T>.RegisterEngine(engineClass: T; menuItem: TMenuItem; OnSelect: TNotifyEvent);
 var
-  engineName: string;
+  LEngineName: string;
 begin
-  engineName := engineClass.ClassName;
-  FEngines.AddOrSetValue(engineName, engineClass);
-  FEngineMenuItems.Add(engineName, menuItem);
-  FEngineNames.Add(menuItem, engineName);
+  LEngineName := engineClass.ClassName;
+  FEngines.AddOrSetValue(LEngineName, engineClass);
+  FEngineMenuItems.Add(LEngineName, menuItem);
+  FEngineNames.Add(menuItem, LEngineName);
   FEngineOnSelect.Add(engineClass, OnSelect);
   if FEngines.Count = 1 then
   begin
@@ -83,12 +83,12 @@ end;
 
 procedure TEngineManager<T>.SelectEngine(engineName: string);
 var
-  newEngine : T;
+  LNewEngine : T;
   LOnSelect : TNotifyEvent;
 begin
-  if FEngines.TryGetValue(engineName, newEngine) then
+  if FEngines.TryGetValue(engineName, LNewEngine) then
   begin
-    FActiveEngine := newEngine;
+    FActiveEngine := LNewEngine;
     FEngineMenuItems.TryGetValue(engineName, FActiveMenu);
     if FEngineOnSelect.TryGetValue(FActiveEngine, LOnSelect) then
     begin

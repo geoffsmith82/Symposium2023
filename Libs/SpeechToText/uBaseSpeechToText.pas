@@ -30,15 +30,15 @@ end;
 function TBaseSpeechToText.IsFileSupported(const FilePath: string): Boolean;
 var
   i : Integer;
-  formats : TArray<string>;
-  ext : string;
+  LFormats : TArray<string>;
+  LExt : string;
 begin
   Result := False;
-  formats := SupportedFormats();
-  ext := TPath.GetExtension(FilePath).ToLower;
-  for i := 0 to High(formats) do
+  LFormats := SupportedFormats();
+  LExt := TPath.GetExtension(FilePath).ToLower;
+  for i := 0 to High(LFormats) do
   begin
-    if ('.' + SupportedFormats[i].ToLower = ext) then
+    if ('.' + SupportedFormats[i].ToLower = LExt) then
       Exit(True);
   end;
 end;

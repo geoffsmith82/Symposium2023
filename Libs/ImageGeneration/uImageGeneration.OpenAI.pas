@@ -29,12 +29,12 @@ var
   LClient: TRESTClient;
   LRequest: TRESTRequest;
   LResponse: TRESTResponse;
-  json: TJSONObject;
+  LJson: TJSONObject;
 begin
   LClient := nil;
   LRequest := nil;
   LResponse := nil;
-  json := nil;
+  LJson := nil;
   try
     LClient := TRESTClient.Create(nil);
     LClient.ReadTimeout := 60000;
@@ -45,18 +45,18 @@ begin
     LRequest.Resource := '/v1/images/generations';
     LRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    json := TJSONObject.Create;
+    LJson := TJSONObject.Create;
     try
-      json.AddPair('prompt', TJSONString.Create(prompt));
-      json.AddPair('n', TJSONNumber.Create(n));
+      LJson.AddPair('prompt', TJSONString.Create(prompt));
+      LJson.AddPair('n', TJSONNumber.Create(n));
       case size of
-        DALLE256: json.AddPair('size', '256x256');
-        DALLE512: json.AddPair('size', '512x512');
-        DALLE1024: json.AddPair('size', '1024x1024');
+        DALLE256: LJson.AddPair('size', '256x256');
+        DALLE512: LJson.AddPair('size', '512x512');
+        DALLE1024: LJson.AddPair('size', '1024x1024');
       end;
-      LRequest.AddBody(json.ToString, ctAPPLICATION_JSON);
+      LRequest.AddBody(LJson.ToString, ctAPPLICATION_JSON);
     finally
-      FreeAndNil(json);
+      FreeAndNil(LJson);
     end;
 
     LResponse := TRESTResponse.Create(nil);
@@ -73,13 +73,13 @@ end;
 
 function TImageGenerationOpenAI.GetModelInfo: TObjectList<TImageModelInfo>;
 var
-  model : TImageModelInfo;
+  LModel : TImageModelInfo;
 begin
   FModelInfo.Clear;
-  model := TImageModelInfo.Create;
-  model.ModelName := 'DALLE-2';
-  model.Version := 'DALLE-2';
-  FModelInfo.Add(model);
+  LModel := TImageModelInfo.Create;
+  LModel.ModelName := 'DALLE-2';
+  LModel.Version := 'DALLE-2';
+  FModelInfo.Add(LModel);
   Result := FModelInfo;
 end;
 

@@ -80,8 +80,12 @@ var
   LUsage: TJSONObject;
   LChoice: TJSONObject;
 begin
-  LRESTClient := TRESTClient.Create(FEndpoint);
+  Result := Default(TChatResponse);
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
   try
+    LRESTClient := TRESTClient.Create(FEndpoint);
     LRESTRequest := TRESTRequest.Create(nil);
     LRESTResponse := TRESTResponse.Create(nil);
 
@@ -152,11 +156,14 @@ var
   LJson: TJSONObject;
   I, J: Integer;
 begin
-  LRestClient := TRESTClient.Create(FEndpoint);
-  LRestRequest := TRESTRequest.Create(nil);
-  LRestResponse := TRESTResponse.Create(nil);
-
+  LJson := nil;
+  LRestClient := nil;
+  LRestRequest := nil;
+  LRestResponse := nil;
   try
+    LRestClient := TRESTClient.Create(FEndpoint);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     LRestRequest.Client := LRestClient;
     LRestRequest.Response := LRestResponse;
     LRestRequest.Method := TRESTRequestMethod.rmPOST;
@@ -207,71 +214,71 @@ end;
 
 function TMicrosoftOpenAI.GetAzureModels: TModelsResponse;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JsonResponse: TJSONObject;
-  JSONValue: TJSONValue;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJsonResponse: TJSONObject;
+  LJSONValue: TJSONValue;
 begin
   Result := nil;
-  RestClient := TRESTClient.Create(nil);
-  RestRequest := TRESTRequest.Create(nil);
-  RestResponse := TRESTResponse.Create(nil);
+  LRestClient := TRESTClient.Create(nil);
+  LRestRequest := TRESTRequest.Create(nil);
+  LRestResponse := TRESTResponse.Create(nil);
 
   try
-    RestClient.BaseURL := FEndpoint;
-    RestClient.Accept := 'application/json';
-    RestClient.AcceptCharset := 'UTF-8';
+    LRestClient.BaseURL := FEndpoint;
+    LRestClient.Accept := 'application/json';
+    LRestClient.AcceptCharset := 'UTF-8';
 
-    RestRequest.Client := RestClient;
-    RestRequest.Response := RestResponse;
-    RestRequest.Method := rmGET;
-    RestRequest.Resource := '/openai/models?api-version=2023-05-15';
-    RestRequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Response := LRestResponse;
+    LRestRequest.Method := rmGET;
+    LRestRequest.Resource := '/openai/models?api-version=2023-05-15';
+    LRestRequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
 
-    RestRequest.Execute;
+    LRestRequest.Execute;
 
-    if RestResponse.StatusCode = 200 then
+    if LRestResponse.StatusCode = 200 then
     begin
-      JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
+      LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content);
       try
-        if JSONValue is TJSONObject then
+        if LJSONValue is TJSONObject then
         begin
-          JsonResponse := JSONValue as TJSONObject;
-          Result := TJSON.JsonToObject<TModelsResponse>(JsonResponse);
+          LJsonResponse := LJSONValue as TJSONObject;
+          Result := TJSON.JsonToObject<TModelsResponse>(LJsonResponse);
         end;
       finally
-        JSONValue.Free;
+        LJSONValue.Free;
       end;
     end
     else
-      raise Exception.CreateFmt('Error: %s (%d)', [RestResponse.StatusText, RestResponse.StatusCode]);
+      raise Exception.CreateFmt('Error: %s (%d)', [LRestResponse.StatusText, LRestResponse.StatusCode]);
   finally
-    RestClient.Free;
-    RestRequest.Free;
-    RestResponse.Free;
+    LRestClient.Free;
+    LRestRequest.Free;
+    LRestResponse.Free;
   end;
 end;
 
 
 function TMicrosoftOpenAI.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  modellist : TModelsResponse;
-  modelObj: TBaseModelInfo;
-  modelData: TModelData;
+  LModelList : TModelsResponse;
+  LModelObj: TBaseModelInfo;
+  LModelData: TModelData;
 begin
   FModelInfo.Clear;
 
-  modellist := GetAzureModels;
+  LModelList := GetAzureModels;
   try
-    for modelData in modelList.data do
+    for LModelData in LModelList.data do
     begin
-      modelObj := TBaseModelInfo.Create;
-      modelObj.modelName := modelData.id;
-      FModelInfo.Add(modelObj);
+      LModelObj := TBaseModelInfo.Create;
+      LModelObj.modelName := LModelData.id;
+      FModelInfo.Add(LModelObj);
     end;
   finally
-    FreeAndNil(modellist);
+    FreeAndNil(LModelList);
   end;
   Result := FModelInfo;
 end;

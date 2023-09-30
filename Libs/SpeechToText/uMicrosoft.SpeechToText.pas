@@ -38,15 +38,15 @@ end;
 
 function TMicrosoftSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  AccessToken: string;
-  SpeechToTextEndpoint: string;
-  fileStream : TFileStream;
-  mime : TMimeTypes;
-  mimeType : string;
-  kind : TMimeTypes.TKind;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LAccessToken: string;
+  LSpeechToTextEndpoint: string;
+  LFileStream : TFileStream;
+  LMime : TMimeTypes;
+  LMimeType : string;
+  LKind : TMimeTypes.TKind;
 begin
   Result := '';
 
@@ -56,54 +56,54 @@ begin
   end;
 
   // Get access token
-  RestClient := TRESTClient.Create(nil);
+  LRestClient := TRESTClient.Create(nil);
   try
-    RestClient.BaseURL := 'https://westus.api.cognitive.microsoft.com/sts/v1.0';
-    RestRequest := TRESTRequest.Create(nil);
-    RestRequest.Client := RestClient;
-    RestRequest.Method := rmPOST;
-    RestRequest.Resource := '/issueToken';
-    RestRequest.Params.AddItem('Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestClient.BaseURL := 'https://westus.api.cognitive.microsoft.com/sts/v1.0';
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Method := rmPOST;
+    LRestRequest.Resource := '/issueToken';
+    LRestRequest.Params.AddItem('Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Execute;
-      AccessToken := RestResponse.Content;
+      LRestRequest.Execute;
+      LAccessToken := LRestResponse.Content;
     finally
-      RestResponse.Free;
+      LRestResponse.Free;
     end;
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
 
   // Convert speech to text
-  RestClient := TRESTClient.Create(nil);
+  LRestClient := TRESTClient.Create(nil);
   try
-    SpeechToTextEndpoint := 'https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US';
-    RestClient.BaseURL := SpeechToTextEndpoint;
-    RestRequest := TRESTRequest.Create(nil);
-    RestRequest.Client := RestClient;
-    RestRequest.Method := rmPOST;
+    LSpeechToTextEndpoint := 'https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US';
+    LRestClient.BaseURL := LSpeechToTextEndpoint;
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Method := rmPOST;
 
-    mime := TMimeTypes.Default;
-    mime.GetExtInfo(TPath.GetExtension(FilePath), mimeType, kind);
-    RestRequest.Params.AddItem('Authorization', 'Bearer ' + AccessToken, TRESTRequestParameterKind.pkHTTPHEADER);
-    RestRequest.Params.AddItem('Content-Type', mimeType, TRESTRequestParameterKind.pkHTTPHEADER);
-    fileStream := TFileStream.Create(filepath, fmOpenRead);
+    LMime := TMimeTypes.Default;
+    LMime.GetExtInfo(TPath.GetExtension(FilePath), LMimeType, LKind);
+    LRestRequest.Params.AddItem('Authorization', 'Bearer ' + LAccessToken, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRestRequest.Params.AddItem('Content-Type', LMimeType, TRESTRequestParameterKind.pkHTTPHEADER);
+    LFileStream := TFileStream.Create(filepath, fmOpenRead);
     try
-      RestRequest.AddBody(fileStream);
+      LRestRequest.AddBody(LFileStream);
     finally
-      FreeAndNil(fileStream);
+      FreeAndNil(LFileStream);
     end;
 
-    RestResponse := TRESTResponse.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Execute;
-      Result := RestResponse.Content;
+      LRestRequest.Execute;
+      Result := LRestResponse.Content;
     finally
-      FreeAndNil(RestResponse);
+      FreeAndNil(LRestResponse);
     end;
   finally
-    FreeAndNil(RestClient);
+    FreeAndNil(LRestClient);
   end;
 end;
 

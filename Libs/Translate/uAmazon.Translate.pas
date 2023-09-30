@@ -40,84 +40,84 @@ end;
 
 function TAmazonTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
-  AwsTranslate : TTranslateClient;
-  options : IAWSOptions;
-  language : ITranslateLanguage;
-  langlist : TList<ITranslateLanguage>;
+  LAwsTranslate : TTranslateClient;
+  LOptions : IAWSOptions;
+  LLanguage : ITranslateLanguage;
+  LLanglist : TList<ITranslateLanguage>;
   i : Integer;
-  langInfo : TLanguageInfo;
+  LLangInfo : TLanguageInfo;
 begin
-  options := TAWSOptions.Create;
-  options.AccessKeyId := FAccessKey;
-  options.SecretAccessKey := FSecretKey;
-  options.Region := FRegion;
-  AwsTranslate := TTranslateClient.Create(options);
+  LOptions := TAWSOptions.Create;
+  LOptions.AccessKeyId := FAccessKey;
+  LOptions.SecretAccessKey := FSecretKey;
+  LOptions.Region := FRegion;
+  LAwsTranslate := TTranslateClient.Create(LOptions);
   try
     FFromLanguages.Clear;
-    langInfo := TLanguageInfo.Create;
-    langInfo.LanguageName := 'auto';
-    langInfo.LanguageCode := 'auto';
-    FFromLanguages.Add(langInfo);
+    LLangInfo := TLanguageInfo.Create;
+    LLangInfo.LanguageName := 'auto';
+    LLangInfo.LanguageCode := 'auto';
+    FFromLanguages.Add(LLangInfo);
 
-    langlist := AwsTranslate.ListLanguages.Languages;
-    for i := 0 to langlist.Count - 1 do
+    LLanglist := LAwsTranslate.ListLanguages.Languages;
+    for i := 0 to LLanglist.Count - 1 do
     begin
-      language := langlist[i];
-      langInfo := TLanguageInfo.Create;
-      langInfo.LanguageName := language.LanguageName;
-      langInfo.LanguageCode := language.LanguageCode;
-      FFromLanguages.Add(langInfo);
+      LLanguage := LLanglist[i];
+      LLangInfo := TLanguageInfo.Create;
+      LLangInfo.LanguageName := LLanguage.LanguageName;
+      LLangInfo.LanguageCode := LLanguage.LanguageCode;
+      FFromLanguages.Add(LLangInfo);
     end;
   finally
-    FreeAndNil(AwsTranslate);
+    FreeAndNil(LAwsTranslate);
   end;
   Result := FFromLanguages;
 end;
 
 function TAmazonTranslate.ToLanguages: TObjectList<TLanguageInfo>;
 var
-  AwsTranslate : TTranslateClient;
-  options : IAWSOptions;
-  language : ITranslateLanguage;
-  langlist : TList<ITranslateLanguage>;
+  LAwsTranslate : TTranslateClient;
+  LOptions : IAWSOptions;
+  LLanguage : ITranslateLanguage;
+  LLanglist : TList<ITranslateLanguage>;
   i : Integer;
-  langInfo : TLanguageInfo;
+  LLangInfo : TLanguageInfo;
 begin
-  options := TAWSOptions.Create;
-  options.AccessKeyId := FAccessKey;
-  options.SecretAccessKey := FSecretKey;
-  options.Region := FRegion;
-  AwsTranslate := TTranslateClient.Create(options);
+  LOptions := TAWSOptions.Create;
+  LOptions.AccessKeyId := FAccessKey;
+  LOptions.SecretAccessKey := FSecretKey;
+  LOptions.Region := FRegion;
+  LAwsTranslate := TTranslateClient.Create(LOptions);
   try
     FToLanguages.Clear;
-    langlist := AwsTranslate.ListLanguages.Languages;
-    for i := 0 to langlist.Count - 1 do
+    LLanglist := LAwsTranslate.ListLanguages.Languages;
+    for i := 0 to LLanglist.Count - 1 do
     begin
-      language := langlist[i];
-      langInfo := TLanguageInfo.Create;
-      langInfo.LanguageName := language.LanguageName;
-      langInfo.LanguageCode := language.LanguageCode;
-      FToLanguages.Add(langInfo);
+      LLanguage := LLanglist[i];
+      LLangInfo := TLanguageInfo.Create;
+      LLangInfo.LanguageName := LLanguage.LanguageName;
+      LLangInfo.LanguageCode := LLanguage.LanguageCode;
+      FToLanguages.Add(LLangInfo);
     end;
   finally
-    FreeAndNil(AwsTranslate);
+    FreeAndNil(LAwsTranslate);
   end;
   Result := FToLanguages;
 end;
 
 function TAmazonTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
-  AwsTranslate : ITranslateClient;
-  response : ITranslateTranslateTextResponse;
-  options : IAWSOptions;
+  LAwsTranslate : ITranslateClient;
+  LResponse : ITranslateTranslateTextResponse;
+  LOptions : IAWSOptions;
 begin
-  options := TAWSOptions.Create;
-  options.AccessKeyId := FAccessKey;
-  options.SecretAccessKey := FSecretKey;
-  options.Region := FRegion;
-  AwsTranslate := TTranslateClient.Create(options);
-  response := AwsTranslate.TranslateText(fromlang, toLang, SourceText);
-  Result := response.TranslatedText;
+  LOptions := TAWSOptions.Create;
+  LOptions.AccessKeyId := FAccessKey;
+  LOptions.SecretAccessKey := FSecretKey;
+  LOptions.Region := FRegion;
+  LAwsTranslate := TTranslateClient.Create(LOptions);
+  LResponse := LAwsTranslate.TranslateText(fromlang, toLang, SourceText);
+  Result := LResponse.TranslatedText;
 end;
 
 end.

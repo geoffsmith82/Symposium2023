@@ -66,12 +66,12 @@ end;
 
 procedure TBaseTextToSpeech.MediaPlayerNotify(Sender: TObject);
 var
-  ticks : UInt64;
+  LTicks : UInt64;
 begin
-  ticks := GetTickCount64;
+  LTicks := GetTickCount64;
   repeat
   Application.ProcessMessages;
-  until GetTickCount64 - ticks > 200;
+  until GetTickCount64 - LTicks > 200;
  // if MediaPlayer.Mode = mpStopped then
   if FStatus = ssPlayStopping then
   begin
@@ -83,10 +83,10 @@ end;
 
 procedure TBaseTextToSpeech.PlayText(const text:string; const VoiceName: string = '');
 var
-  FileName: string;
-  task : ITask;
+  LFileName: string;
+  LTask : ITask;
 begin
-  task := TTask.Create(procedure ()
+  LTask := TTask.Create(procedure ()
              var
                Stream: TMemoryStream;
              begin
@@ -95,9 +95,9 @@ begin
                  Stream := TextToSpeech(text, VoiceName);
                  if not Assigned(Stream) then
                    Exit;
-                 FileName := TPath.GetTempFileName + FFormatExt;
+                 LFileName := TPath.GetTempFileName + FFormatExt;
                  Stream.Position := 0;
-                 Stream.SaveToFile(FileName);
+                 Stream.SaveToFile(LFileName);
                finally
                  FreeAndNil(Stream);
                end;
@@ -107,7 +107,7 @@ begin
                    FMediaPlayer.OnNotify := MediaPlayerNotify;
                    FMediaPlayer.Notify := true;
 
-                   FMediaPlayer.FileName := FileName;
+                   FMediaPlayer.FileName := LFileName;
                    FMediaPlayer.Open;
                    FStatus := ssPlayStarting;
                    FMediaPlayer.Play;

@@ -53,37 +53,37 @@ end;
 function TAmazonPollyService.GetVoices: TObjectList<TVoiceInfo>;
 {$IFNDEF NOPOLLY}
 var
-  polly : TPollyClient;
-  request : IPollyDescribeVoicesRequest;
-  response : IPollyDescribeVoicesResponse;
-  options : IAWSOptions;
-  pollyVoice : IPollyVoice;
+  LPolly : TPollyClient;
+  LRequest : IPollyDescribeVoicesRequest;
+  LResponse : IPollyDescribeVoicesResponse;
+  LOptions : IAWSOptions;
+  LPollyVoice : IPollyVoice;
   i : Integer;
-  voice : TVoiceInfo;
+  LVoice : TVoiceInfo;
 {$ENDIF}
 begin
   FVoicesInfo.Clear;
 {$IFNDEF NOPOLLY}
-  options := TAWSOptions.Create;
-  options.AccessKeyId := FAccountName;
-  options.SecretAccessKey := FAccountKey;
-  options.Region := FRegion;
-  polly := TPollyClient.Create(options);
+  LOptions := TAWSOptions.Create;
+  LOptions.AccessKeyId := FAccountName;
+  LOptions.SecretAccessKey := FAccountKey;
+  LOptions.Region := FRegion;
+  LPolly := TPollyClient.Create(LOptions);
   try
-    request := TPollyDescribeVoicesRequest.Create;
-    response := polly.DescribeVoices(request);
-    for i  := 0 to response.Voices.Count - 1 do
+    LRequest := TPollyDescribeVoicesRequest.Create;
+    LResponse := LPolly.DescribeVoices(LRequest);
+    for i  := 0 to LResponse.Voices.Count - 1 do
     begin
-      pollyVoice := response.Voices[i];
-      voice := TVoiceInfo.Create;
-      voice.VoiceName := pollyVoice.Name;
-      voice.VoiceId := pollyVoice.Id;
-      voice.VoiceGender := pollyVoice.Gender;
-      FVoicesInfo.Add(voice);
+      LPollyVoice := LResponse.Voices[i];
+      LVoice := TVoiceInfo.Create;
+      LVoice.VoiceName := LPollyVoice.Name;
+      LVoice.VoiceId := LPollyVoice.Id;
+      LVoice.VoiceGender := LPollyVoice.Gender;
+      FVoicesInfo.Add(LVoice);
     end;
   finally
-    response := nil;
-    FreeAndNil(polly);
+    LResponse := nil;
+    FreeAndNil(LPolly);
   end;
 {$ENDIF}
 {$IFDEF NOPOLLY}
@@ -95,29 +95,29 @@ end;
 function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStream;
 {$IFNDEF NOPOLLY}
 var
-  polly : TPollyClient;
-  request : IPollySynthesizeSpeechRequest;
-  response : IPollySynthesizeSpeechResponse;
-  options : IAWSOptions;
+  LPolly : TPollyClient;
+  LRequest : IPollySynthesizeSpeechRequest;
+  LResponse : IPollySynthesizeSpeechResponse;
+  LOptions : IAWSOptions;
 {$ENDIF}
 begin
 {$IFNDEF NOPOLLY}
-  options := TAWSOptions.Create;
-  options.AccessKeyId := FAccountName;
-  options.SecretAccessKey := FAccountKey;
-  options.Region := FRegion;
-  polly := TPollyClient.Create(options);
+  LOptions := TAWSOptions.Create;
+  LOptions.AccessKeyId := FAccountName;
+  LOptions.SecretAccessKey := FAccountKey;
+  LOptions.Region := FRegion;
+  LPolly := TPollyClient.Create(LOptions);
   try
-    request := TPollySynthesizeSpeechRequest.Create;
-    request.Text := text;
-    request.OutputFormat := 'mp3';
-    request.VoiceId := VoiceName;
-    request.SetEngine('neural');
-    response := polly.SynthesizeSpeech(request);
+    LRequest := TPollySynthesizeSpeechRequest.Create;
+    LRequest.Text := text;
+    LRequest.OutputFormat := 'mp3';
+    LRequest.VoiceId := VoiceName;
+    LRequest.SetEngine('neural');
+    LResponse := LPolly.SynthesizeSpeech(LRequest);
     Result := TMemoryStream.Create;
-    Result.CopyFrom(response.AudioStream, response.AudioStream.Size);
+    Result.CopyFrom(LResponse.AudioStream, LResponse.AudioStream.Size);
   finally
-    FreeAndNil(polly);
+    FreeAndNil(LPolly);
   end;
 {$ENDIF}
 {$IFDEF NOPOLLY}

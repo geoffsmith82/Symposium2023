@@ -26,81 +26,84 @@ implementation
 
 function THuggingFaceLLM.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 begin
-
+  raise Exception.Create('Not Implemented yet');
 end;
 
 function THuggingFaceLLM.Completion(const AQuestion, AModel: string): string;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  JSONPayload: TJSONObject;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJSONPayload: TJSONObject;
 begin
-  // Create REST components dynamically
-  RESTClient := TRESTClient.Create('https://api-inference.huggingface.co');
-  RESTResponse := TRESTResponse.Create(nil);
-  RESTRequest := TRESTRequest.Create(nil);
-
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
+  LJSONPayload := nil;
   try
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
+    // Create REST components dynamically
+    LRESTClient := TRESTClient.Create('https://api-inference.huggingface.co');
+    LRESTResponse := TRESTResponse.Create(nil);
+    LRESTRequest := TRESTRequest.Create(nil);
 
-    RESTRequest.Resource := 'models/{models}';
-    RESTRequest.AddParameter('models', AModel, TRESTRequestParameterKind.pkURLSEGMENT);
-    RESTRequest.Method := rmPOST;
-    RESTRequest.Accept := 'application/json';
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
 
+    LRESTRequest.Resource := 'models/{models}';
+    LRESTRequest.AddParameter('models', AModel, TRESTRequestParameterKind.pkURLSEGMENT);
+    LRESTRequest.Method := rmPOST;
+    LRESTRequest.Accept := 'application/json';
     // Authorization header
-    RESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+    LRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
 
     // Construct the JSON payload
-    JSONPayload := TJSONObject.Create;
+    LJSONPayload := TJSONObject.Create;
     try
-      JSONPayload.AddPair('inputs', AQuestion);
-      RESTRequest.AddBody(JSONPayload.ToString, ctAPPLICATION_JSON);
+      LJSONPayload.AddPair('inputs', AQuestion);
+      LRESTRequest.AddBody(LJSONPayload.ToString, ctAPPLICATION_JSON);
 
       // Execute request
-      RESTRequest.Execute;
+      LRESTRequest.Execute;
 
-      if RESTResponse.StatusCode = 200 then
+      if LRESTResponse.StatusCode = 200 then
       begin
         // Here, I'm assuming the response is just a plain text. If it's a JSON, you'll need to parse it accordingly.
-        Result := RESTResponse.Content;
+        Result := LRESTResponse.Content;
       end
       else
       begin
-        Result := 'Error: ' + RESTResponse.StatusCode.ToString + ' ' + RESTResponse.StatusText;
+        Result := 'Error: ' + LRESTResponse.StatusCode.ToString + ' ' + LRESTResponse.StatusText;
       end;
 
     finally
-      JSONPayload.Free;
+      LJSONPayload.Free;
     end;
 
   finally
-    RESTRequest.Free;
-    RESTResponse.Free;
-    RESTClient.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
+    LRESTClient.Free;
   end;
 end;
 
 function THuggingFaceLLM.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  model: TBaseModelInfo;
+  LModel: TBaseModelInfo;
 begin
   {TODO: Convert to a DB call or REST API}
 
   FModelInfo.Clear;
-  model := TBaseModelInfo.Create;
-  model.ModelName := 'gpt2';
-  FModelInfo.Add(model);
+  LModel := TBaseModelInfo.Create;
+  LModel.ModelName := 'gpt2';
+  FModelInfo.Add(LModel);
 
-  model := TBaseModelInfo.Create;
-  model.ModelName := 'EleutherAI/gpt-j-6b';
-  FModelInfo.Add(model);
+  LModel := TBaseModelInfo.Create;
+  LModel.ModelName := 'EleutherAI/gpt-j-6b';
+  FModelInfo.Add(LModel);
 
-  model := TBaseModelInfo.Create;
-  model.ModelName := 'TheBloke/Wizard-Vicuna-30B-Uncensored-GPTQ';
-  FModelInfo.Add(model);
+  LModel := TBaseModelInfo.Create;
+  LModel.ModelName := 'TheBloke/Wizard-Vicuna-30B-Uncensored-GPTQ';
+  FModelInfo.Add(LModel);
 
 
   Result := FModelInfo;

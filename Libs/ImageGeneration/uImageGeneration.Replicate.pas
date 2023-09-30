@@ -13,10 +13,11 @@ uses
   ;
 
 type
-  TUrls = record
+  TUrls = class
     cancel: string;
     get: string;
   end;
+
   TPredictionInfo = class
   private
     FId: string;
@@ -26,8 +27,8 @@ type
     FError: Variant;  // or you can use another type if you know more details about possible values
     FStatus: string;
     FCreatedAt: TDateTime; // Note: you might need to convert the JSON date string to TDateTime
+    FUrls: TUrls;
   public
-    Urls: TUrls;
     property Id: string read FId write FId;
     property Version: string read FVersion write FVersion;
     property Prompt: string read FPrompt write FPrompt;
@@ -35,24 +36,17 @@ type
     property Error: Variant read FError write FError;
     property Status: string read FStatus write FStatus;
     property CreatedAt: TDateTime read FCreatedAt write FCreatedAt;
-  //  property Urls: TUrls read FUrls write FUrls;
-  end;
+    property Urls: TUrls read FUrls write FUrls;
 
+    constructor Create;
+    destructor Destroy; override;
+  end;
 
   TInput = class
   private
     FPrompt: string;
   public
     property Prompt: string read FPrompt write FPrompt;
-  end;
-
-  TUrl2s = class
-  private
-    FCancel: string;
-    FGet: string;
-  public
-    property Cancel: string read FCancel write FCancel;
-    property Get: string read FGet write FGet;
   end;
 
   TMetrics = class
@@ -75,7 +69,7 @@ type
     FStartedAt: TDateTime;
     FCompletedAt: TDateTime;
     FMetrics: TMetrics;
-    FUrls: TUrl2s;
+    FUrls: TUrls;
     procedure ParseJsonToObj(const AJsonStr: string);
   public
     property Id: string read FId write FId;
@@ -89,7 +83,7 @@ type
     property StartedAt: TDateTime read FStartedAt write FStartedAt;
     property CompletedAt: TDateTime read FCompletedAt write FCompletedAt;
     property Metrics: TMetrics read FMetrics write FMetrics;
-    property Urls: TUrl2s read FUrls write FUrls;
+    property Urls: TUrls read FUrls write FUrls;
 
     constructor Create;
     destructor Destroy; override;
@@ -100,8 +94,7 @@ type
   TImageGenerationReplicate = class(TBaseImageGeneration)
   private
     function DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
-    function GetPredictionDetails(const Prediction: TPredictionInfo;
-      out IsCompleted: Boolean): string;
+    function GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
@@ -120,7 +113,7 @@ begin
   inherited;
   FInput := TInput.Create;
   FMetrics := TMetrics.Create;
-  FUrls := TUrl2s.Create;
+  FUrls := TUrls.Create;
 end;
 
 destructor TJsonRepresentation.Destroy;
@@ -136,57 +129,57 @@ end;
 
 function TImageGenerationReplicate.DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
 var
-  JsonValue: TJSONValue;
-  JsonObject: TJSONObject;
-  InputObj: TJSONObject;
-  UrlsObj: TJSONObject;
+  LJsonValue: TJSONValue;
+  LJsonObject: TJSONObject;
+  LInputObj: TJSONObject;
+  LUrlsObj: TJSONObject;
 begin
   Result := TPredictionInfo.Create;
 
-  JsonValue := TJSONObject.ParseJSONValue(AJsonStr);
-  if not Assigned(JsonValue) then
+  LJsonValue := TJSONObject.ParseJSONValue(AJsonStr);
+  if not Assigned(LJsonValue) then
     raise Exception.Create('Invalid JSON string');
 
   try
-    if JsonValue is TJSONObject then
+    if LJsonValue is TJSONObject then
     begin
-      JsonObject := JsonValue as TJSONObject;
+      LJsonObject := LJsonValue as TJSONObject;
 
-      Result.Id := JsonObject.GetValue<string>('id');
-      Result.Version := JsonObject.GetValue<string>('version');
+      Result.Id := LJsonObject.GetValue<string>('id');
+      Result.Version := LJsonObject.GetValue<string>('version');
 
       // Extracting input.prompt
-      InputObj := JsonObject.GetValue<TJSONObject>('input');
-      if Assigned(InputObj) then
-        Result.Prompt := InputObj.GetValue<string>('prompt');
+      LInputObj := LJsonObject.GetValue<TJSONObject>('input');
+      if Assigned(LInputObj) then
+        Result.Prompt := LInputObj.GetValue<string>('prompt');
 
-      Result.Logs := JsonObject.GetValue<string>('logs');
+      Result.Logs := LJsonObject.GetValue<string>('logs');
    //   Result.Error := JsonObject.GetValue<Variant>('error');
-      Result.Status := JsonObject.GetValue<string>('status');
+      Result.Status := LJsonObject.GetValue<string>('status');
 
       // Convert JSON date string to TDateTime
-      Result.CreatedAt := ISO8601ToDate(JsonObject.GetValue<string>('created_at'));
+      Result.CreatedAt := ISO8601ToDate(LJsonObject.GetValue<string>('created_at'));
 
       // Extracting urls object
-      UrlsObj := JsonObject.GetValue<TJSONObject>('urls');
-      if Assigned(UrlsObj) then
+      LUrlsObj := LJsonObject.GetValue<TJSONObject>('urls');
+      if Assigned(LUrlsObj) then
       begin
-        Result.Urls.cancel := UrlsObj.GetValue<string>('cancel');
-        Result.Urls.get := UrlsObj.GetValue<string>('get');
+        Result.Urls.cancel := LUrlsObj.GetValue<string>('cancel');
+        Result.Urls.get := LUrlsObj.GetValue<string>('get');
       end;
     end;
   finally
-    JsonValue.Free;
+    LJsonValue.Free;
   end;
 end;
 
 function TImageGenerationReplicate.GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONValue: TJSONValue;
-  JSONObj: TJSONObject;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONValue: TJSONValue;
+  LJSONObj: TJSONObject;
 begin
   Result := '';
   IsCompleted := False;
@@ -194,54 +187,54 @@ begin
   if not Assigned(Prediction) then
     raise Exception.Create('Prediction object is not assigned');
 
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
 
-      RestRequest.Resource := '/v1/predictions/{predictionId}';
-      RestRequest.AddParameter('predictionId', Prediction.Id, TRESTRequestParameterKind.pkURLSEGMENT);
+      LRestRequest.Resource := '/v1/predictions/{predictionId}';
+      LRestRequest.AddParameter('predictionId', Prediction.Id, TRESTRequestParameterKind.pkURLSEGMENT);
 
-      RestRequest.Method := rmGET;
+      LRestRequest.Method := rmGET;
 
       // Adding the Authorization header
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
 
       // Execute the request
-      RestRequest.Execute;
+      LRestRequest.Execute;
 
-      if RestResponse.StatusCode = 200 then
+      if LRestResponse.StatusCode = 200 then
       begin
-        JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
+        LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content);
         try
-          if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+          if Assigned(LJSONValue) and (LJSONValue is TJSONObject) then
           begin
-            JSONObj := JSONValue as TJSONObject;
-            if JSONObj.GetValue<string>('status') = 'succeeded' then
+            LJSONObj := LJSONValue as TJSONObject;
+            if LJSONObj.GetValue<string>('status') = 'succeeded' then
             begin
               IsCompleted := True;
-              Result := RestResponse.Content;
+              Result := LRestResponse.Content;
             end;
           end;
         finally
-          JSONValue.Free;
+          LJSONValue.Free;
         end;
       end
       else
       begin
-        raise Exception.CreateFmt('Error fetching prediction details: %s', [RestResponse.Content]);
+        raise Exception.CreateFmt('Error fetching prediction details: %s', [LRestResponse.Content]);
       end;
 
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
 
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
 end;
 
@@ -297,160 +290,160 @@ end;
 
 function TImageGenerationReplicate.Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONBody: TJSONObject;
-  InputJSON: TJSONObject;
-  ResponseString: String;
-  prediction: TPredictionInfo;
-  Stopwatch: TStopwatch;
-  OperationCompleted: Boolean;
-  version : string;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONBody: TJSONObject;
+  LInputJSON: TJSONObject;
+  LResponseString: String;
+  LPrediction: TPredictionInfo;
+  LStopwatch: TStopwatch;
+  LOperationCompleted: Boolean;
+  LVersion : string;
   i : Integer;
-  data: TArray<TDataClass>;
-  rep : TJsonRepresentation;
+  LData: TArray<TDataClass>;
+  LRepresentation : TJsonRepresentation;
 begin
-  version := '';
+  LVersion := '';
   Result := nil;
   for i := 0 to FModelInfo.Count - 1 do
   begin
     if FModelInfo[i].modelName = modelVersion then
     begin
-      version := FModelInfo[i].version;
+      LVersion := FModelInfo[i].version;
       Break;
     end;
   end;
 
-  if version.IsEmpty then
+  if LVersion.IsEmpty then
     raise Exception.Create('Could not find model ' + modelVersion);
 
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
 
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
-      RestRequest.Resource := '/v1/predictions';
-      RestRequest.Method := rmPOST;
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
+      LRestRequest.Resource := '/v1/predictions';
+      LRestRequest.Method := rmPOST;
 
       // Set headers using AddParameter
-      RestRequest.AddParameter('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+      LRestRequest.AddParameter('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
       // Set JSON body
-      JSONBody := TJSONObject.Create;
+      LJSONBody := TJSONObject.Create;
       try
-        JSONBody.AddPair('version', version);
-        InputJSON := TJSONObject.Create;
-        InputJSON.AddPair('prompt', prompt);
+        LJSONBody.AddPair('version', LVersion);
+        LInputJSON := TJSONObject.Create;
+        LInputJSON.AddPair('prompt', prompt);
         // If you have other parameters like 'n' or 'size' to send with the request, add them to the InputJSON here.
-        JSONBody.AddPair('input', InputJSON);
-        RestRequest.AddBody(JSONBody.ToString, ctAPPLICATION_JSON);
+        LJSONBody.AddPair('input', LInputJSON);
+        LRestRequest.AddBody(LJSONBody.ToString, ctAPPLICATION_JSON);
       finally
-        JSONBody.Free;
+        LJSONBody.Free;
       end;
 
-      RestRequest.Execute;
+      LRestRequest.Execute;
 
       // Handle response
-      if (RestResponse.StatusCode = 200) or (RestResponse.StatusCode = 201) then
+      if (LRestResponse.StatusCode = 200) or (LRestResponse.StatusCode = 201) then
       begin
         //ResponseString := RestResponse.Content;  // Return the response content. Modify as necessary.
-        prediction := DeserializePredictionInfo(RestResponse.Content);
+        LPrediction := DeserializePredictionInfo(LRestResponse.Content);
         try
-          Stopwatch := TStopwatch.StartNew;
-          OperationCompleted := False;
+          LStopwatch := TStopwatch.StartNew;
+          LOperationCompleted := False;
           repeat
-            ResponseString := GetPredictionDetails(prediction, OperationCompleted);
+            LResponseString := GetPredictionDetails(LPrediction, LOperationCompleted);
             Sleep(500);
-          until (Stopwatch.ElapsedMilliseconds > 30000) or OperationCompleted;
+          until (LStopwatch.ElapsedMilliseconds > 30000) or LOperationCompleted;
         finally
-          FreeAndNil(prediction);
+          FreeAndNil(LPrediction);
         end;
 
-        rep := TJsonRepresentation.Create;
+        LRepresentation := TJsonRepresentation.Create;
         try
-          rep.ParseJsonToObj(ResponseString);
+          LRepresentation.ParseJsonToObj(LResponseString);
 
           Result := TGeneratedImagesClass.Create;
 
-          SetLength(data, Length(rep.FOutput));
-          Result.data := data;
-          for i := 0 to Length(rep.Output) - 1 do
+          SetLength(LData, Length(LRepresentation.FOutput));
+          Result.data := LData;
+          for i := 0 to Length(LRepresentation.Output) - 1 do
           begin
             Result.data[i] := TDataClass.Create;
-            Result.data[i].url := rep.Output[i];
+            Result.data[i].url := LRepresentation.Output[i];
           end;
-          Result.created := rep.CreatedAt;
+          Result.created := LRepresentation.CreatedAt;
         finally
-          FreeAndNil(rep);
+          FreeAndNil(LRepresentation);
         end;
       end
       else
       begin
-        raise Exception.CreateFmt('Error %d: %s', [RestResponse.StatusCode, RestResponse.StatusText]);
+        raise Exception.CreateFmt('Error %d: %s', [LRestResponse.StatusCode, LRestResponse.StatusText]);
       end;
 
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
 
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
 end;
 
 function TImageGenerationReplicate.GetModelInfo: TObjectList<TImageModelInfo>;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONValue: TJSONObject;
-  JSONVersion: TJSONObject;
-  JSONArray: TJSONArray;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONValue: TJSONObject;
+  LJSONVersion: TJSONObject;
+  LJSONArray: TJSONArray;
   I: Integer;
-  ModelInfo: TImageModelInfo;
+  LModelInfo: TImageModelInfo;
 begin
   FModelInfo.Clear;
 
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
-      RestRequest.Resource := '/v1/collections/text-to-image';
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
+      LRestRequest.Resource := '/v1/collections/text-to-image';
 
-      RestRequest.Method := rmGET;
+      LRestRequest.Method := rmGET;
 
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
 
-      RestRequest.Execute;
+      LRestRequest.Execute;
 
-      if RestResponse.StatusCode = 200 then
+      if LRestResponse.StatusCode = 200 then
       begin
-        JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONObject;
+        LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
 
-        if Assigned(JSONValue) and Assigned(JSONValue.GetValue('models')) then
+        if Assigned(LJSONValue) and Assigned(LJSONValue.GetValue('models')) then
         begin
-          JSONArray := JSONValue.GetValue('models') as TJSONArray;
-          for I := 0 to JSONArray.Count - 1 do
+          LJSONArray := LJSONValue.GetValue('models') as TJSONArray;
+          for I := 0 to LJSONArray.Count - 1 do
           begin
-            ModelInfo := TImageModelInfo.Create;
-            ModelInfo.modelName := JSONArray.Items[I].GetValue<string>('name');
-            JSONVersion := JSONArray.Items[I].GetValue<TJSONObject>('latest_version');
-            if Assigned(JSONVersion.GetValue('id')) then
-              ModelInfo.version := JSONVersion.GetValue<string>('id');
-            FModelInfo.Add(ModelInfo);
+            LModelInfo := TImageModelInfo.Create;
+            LModelInfo.modelName := LJSONArray.Items[I].GetValue<string>('name');
+            LJSONVersion := LJSONArray.Items[I].GetValue<TJSONObject>('latest_version');
+            if Assigned(LJSONVersion.GetValue('id')) then
+              LModelInfo.version := LJSONVersion.GetValue<string>('id');
+            FModelInfo.Add(LModelInfo);
           end;
         end;
 
-        FreeAndNil(JSONValue);
+        FreeAndNil(LJSONValue);
       end
       else
       begin
@@ -458,14 +451,27 @@ begin
       end;
 
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
 
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
   Result := FModelInfo;
+end;
+
+{ TPredictionInfo }
+
+constructor TPredictionInfo.Create;
+begin
+  FUrls := TUrls.Create;
+end;
+
+destructor TPredictionInfo.Destroy;
+begin
+  FreeAndNil(FUrls);
+  inherited;
 end;
 
 end.

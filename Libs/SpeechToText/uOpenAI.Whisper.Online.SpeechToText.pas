@@ -34,39 +34,39 @@ end;
 
 function TOpenAiWhisperOnline.TranscribeAudio(const FilePath, ModelName: string): string;
 var
-  HTTPClient: TNetHttpClient;
-  Request: TNetHttpRequest;
-  Response: IHttpResponse;
-  FormData: TMultipartFormData;
-  url : string;
-  mime : TMimeTypes;
-  mimeType : string;
-  kind : TMimeTypes.TKind;
+  LHTTPClient: TNetHttpClient;
+  LRequest: TNetHttpRequest;
+  LResponse: IHttpResponse;
+  LFormData: TMultipartFormData;
+  LUrl : string;
+  LMime : TMimeTypes;
+  LMimeType : string;
+  LKind : TMimeTypes.TKind;
 begin
   if not IsFileSupported(FilePath) then
   begin
     raise Exception.Create('Unsupported file format');
   end;
 
-  HTTPClient := TNetHttpClient.Create(nil);
-  Request := TNetHttpRequest.Create(nil);
-  Response := nil;
-  FormData := TMultipartFormData.Create;
+  LHTTPClient := TNetHttpClient.Create(nil);
+  LRequest := TNetHttpRequest.Create(nil);
+  LResponse := nil;
+  LFormData := TMultipartFormData.Create;
 
   try
-    HTTPClient.CustomHeaders['Authorization'] := 'Bearer ' + FResourceKey;
+    LHTTPClient.CustomHeaders['Authorization'] := 'Bearer ' + FResourceKey;
 
-    mime := TMimeTypes.Default;
-    mime.GetExtInfo(TPath.GetExtension(FilePath), mimeType, kind);
-    FormData.AddFile('file', FilePath, mimeType);
-    FormData.AddField('model', ModelName);
-    url := 'https://api.openai.com/v1/audio/transcriptions';
-    Response := HTTPClient.Post(Url, FormData);
-    Result := Response.ContentAsString();
+    LMime := TMimeTypes.Default;
+    LMime.GetExtInfo(TPath.GetExtension(FilePath), LMimeType, LKind);
+    LFormData.AddFile('file', FilePath, LMimeType);
+    LFormData.AddField('model', ModelName);
+    LUrl := 'https://api.openai.com/v1/audio/transcriptions';
+    LResponse := LHTTPClient.Post(LUrl, LFormData);
+    Result := LResponse.ContentAsString();
   finally
-    HTTPClient.Free;
-    Request.Free;
-    FormData.Free;
+    LHTTPClient.Free;
+    LRequest.Free;
+    LFormData.Free;
   end;
 end;
 

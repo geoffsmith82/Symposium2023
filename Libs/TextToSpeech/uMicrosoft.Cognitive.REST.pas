@@ -41,85 +41,85 @@ end;
 
 procedure TMicrosoftCognitiveService.GetAccessToken;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
 begin
-  RESTClient := TRESTClient.Create('https://australiaeast.api.cognitive.microsoft.com');
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
+  LRESTClient := TRESTClient.Create('https://australiaeast.api.cognitive.microsoft.com');
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   try
-    RESTRequest.Method := TRESTRequestMethod.rmPOST;
-    RESTRequest.Resource := '/sts/v1.0/issueToken';
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
-    RESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.Execute;
-    FAccessToken := RESTResponse.Content;
+    LRESTRequest.Method := TRESTRequestMethod.rmPOST;
+    LRESTRequest.Resource := '/sts/v1.0/issueToken';
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Execute;
+    FAccessToken := LRESTResponse.Content;
     FExpiryTime := IncMinute(FExpiryTime, 8);
   finally
-    RESTResponse.Free;
-    RESTRequest.Free;
-    RESTClient.Free;
+    LRESTResponse.Free;
+    LRESTRequest.Free;
+    LRESTClient.Free;
   end;
 end;
 
 function TMicrosoftCognitiveService.GetVoiceList: TMicrosoftCognitiveVoicesClass;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  ResultString: string;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LResultString: string;
 begin
-  RESTClient := TRESTClient.Create('https://australiaeast.tts.speech.microsoft.com');
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
+  LRESTClient := TRESTClient.Create('https://australiaeast.tts.speech.microsoft.com');
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   try
-    RESTRequest.Method := TRESTRequestMethod.rmGET;
-    RESTRequest.Resource := '/cognitiveservices/voices/list';
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
-    RESTRequest.Execute;
-    ResultString := '{ "items": ' + RESTResponse.Content + '}';
-    Result := TMicrosoftCognitiveVoicesClass.FromJsonString(ResultString);
+    LRESTRequest.Method := TRESTRequestMethod.rmGET;
+    LRESTRequest.Resource := '/cognitiveservices/voices/list';
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FResourceKey, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRESTRequest.Execute;
+    LResultString := '{ "items": ' + LRESTResponse.Content + '}';
+    Result := TMicrosoftCognitiveVoicesClass.FromJsonString(LResultString);
   finally
-    RESTResponse.Free;
-    RESTRequest.Free;
-    RESTClient.Free;
+    LRESTResponse.Free;
+    LRESTRequest.Free;
+    LRESTClient.Free;
   end;
 end;
 
 function TMicrosoftCognitiveService.GetVoices: TObjectList<TVoiceInfo>;
 var
-  microsoftVoice : TItemClass;
-  voice : TVoiceInfo;
-  voices : TMicrosoftCognitiveVoicesClass;
+  LMicrosoftVoice : TItemClass;
+  LVoice : TVoiceInfo;
+  LVoices : TMicrosoftCognitiveVoicesClass;
 begin
   FVoicesInfo.Clear;
-  voices := nil;
+  LVoices := nil;
   try
-    voices := GetVoiceList;
-    for microsoftVoice in voices.Items do
+    LVoices := GetVoiceList;
+    for LMicrosoftVoice in LVoices.Items do
     begin
-      voice := TVoiceInfo.Create;
-      voice.VoiceName := microsoftVoice.DisplayName;
-      voice.VoiceGender := microsoftVoice.Gender;
-      voice.VoiceId := microsoftVoice.Name;
-      FVoicesInfo.Add(voice);
+      LVoice := TVoiceInfo.Create;
+      LVoice.VoiceName := LMicrosoftVoice.DisplayName;
+      LVoice.VoiceGender := LMicrosoftVoice.Gender;
+      LVoice.VoiceId := LMicrosoftVoice.Name;
+      FVoicesInfo.Add(LVoice);
     end;
   finally
-    FreeAndNil(voices);
+    FreeAndNil(LVoices);
     Result := FVoicesInfo;
   end;
 end;
 
 function TMicrosoftCognitiveService.TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  ssmlText : string;
-  param : TRESTRequestParameter;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LssmlText : string;
+  LParam : TRESTRequestParameter;
 begin
   if (Now > FExpiryTime) then
     GetAccessToken;
@@ -127,33 +127,33 @@ begin
   if VoiceName.IsEmpty then
     VoiceName := 'en-US-ChristopherNeural';
 
-  RESTClient := TRESTClient.Create('https://' + FHost);
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
+  LRESTClient := TRESTClient.Create('https://' + FHost);
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   try
-    RESTRequest.Method := TRESTRequestMethod.rmPOST;
-    RESTRequest.Resource := '/cognitiveservices/v1';
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.AddParameter('X-Microsoft-OutputFormat', FOutputFormat, TRESTRequestParameterKind.pkHTTPHEADER);
-    RESTRequest.AddParameter('Content-Type', 'application/ssml+xml', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('Authorization', 'Bearer ' + FAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('User-Agent', FApplicationName, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Method := TRESTRequestMethod.rmPOST;
+    LRESTRequest.Resource := '/cognitiveservices/v1';
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.AddParameter('X-Microsoft-OutputFormat', FOutputFormat, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRESTRequest.AddParameter('Content-Type', 'application/ssml+xml', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('Authorization', 'Bearer ' + FAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('User-Agent', FApplicationName, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    ssmlText := '<speak version=''1.0'' xml:lang=''en-US''><voice xml:lang=''en-US'' xml:gender=''Male'' ' +
+    LssmlText := '<speak version=''1.0'' xml:lang=''en-US''><voice xml:lang=''en-US'' xml:gender=''Male'' ' +
       'name=''' + VoiceName +  '''>' + text + '</voice></speak>';
 //    RESTRequest.AddBody(ssmlText);
-    param := RESTRequest.Params.AddItem;
-    param.Kind := pkREQUESTBODY;
-    param.Options := [poDoNotEncode];
-    param.Value := ssmlText;
-    RESTRequest.Execute;
+    LParam := LRESTRequest.Params.AddItem;
+    LParam.Kind := pkREQUESTBODY;
+    LParam.Options := [poDoNotEncode];
+    LParam.Value := LssmlText;
+    LRESTRequest.Execute;
 
     Result := TMemoryStream.Create;
-    Result.Write(RESTResponse.RawBytes, Length(RESTResponse.RawBytes));
+    Result.Write(LRESTResponse.RawBytes, Length(LRESTResponse.RawBytes));
   finally
-    RESTResponse.Free;
-    RESTRequest.Free;
-    RESTClient.Free;
+    LRESTResponse.Free;
+    LRESTRequest.Free;
+    LRESTClient.Free;
   end;
 end;
 

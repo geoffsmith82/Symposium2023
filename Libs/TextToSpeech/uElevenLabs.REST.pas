@@ -32,75 +32,75 @@ end;
 
 function TElevenLabsService.GetVoices: TObjectList<TVoiceInfo>;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  JSONValue: TJSONValue;
-  JSONValue2: TJSONValue;
-  JSONLabels: TJSONObject;
-  voice : TVoiceInfo;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJSONValue: TJSONValue;
+  LJSONValue2: TJSONValue;
+  LJSONLabels: TJSONObject;
+  LVoice : TVoiceInfo;
 begin
   FVoicesInfo.Clear;
 
-  RESTClient := nil;
-  RESTRequest := nil;
-  RESTResponse := nil;
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
 
   try
-    RESTClient := TRESTClient.Create('https://api.elevenlabs.io');
-    RESTRequest := TRESTRequest.Create(nil);
-    RESTResponse := TRESTResponse.Create(nil);
+    LRESTClient := TRESTClient.Create('https://api.elevenlabs.io');
+    LRESTRequest := TRESTRequest.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
 
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.Method := TRESTRequestMethod.rmGET;
-    RESTRequest.Resource := '/v1/voices';
-    RESTRequest.Params.AddHeader('accept', 'application/json');
-    RESTRequest.AddParameter('xi-api-key', FResourceKey, pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.Method := TRESTRequestMethod.rmGET;
+    LRESTRequest.Resource := '/v1/voices';
+    LRESTRequest.Params.AddHeader('accept', 'application/json');
+    LRESTRequest.AddParameter('xi-api-key', FResourceKey, pkHTTPHEADER, [poDoNotEncode]);
 
-    RESTRequest.Execute;
+    LRESTRequest.Execute;
 
-    if RESTResponse.StatusCode = 200 then
+    if LRESTResponse.StatusCode = 200 then
     begin
-      JSONValue := TJSONObject.ParseJSONValue(RESTResponse.Content);
+      LJSONValue := TJSONObject.ParseJSONValue(LRESTResponse.Content);
       try
-        if JSONValue is TJSONObject then
+        if LJSONValue is TJSONObject then
         begin
           // Parse the JSON response and populate the VoiceList
           // assuming that "voices" is an array of voice objects
-          for JSONValue2 in ((JSONValue as TJSONObject).Values['voices'] as TJSONArray) do
+          for LJSONValue2 in ((LJSONValue as TJSONObject).Values['voices'] as TJSONArray) do
           begin
             // Parse the individual voice object
             // Modify this part according to your JSON structure
-            with JSONValue2 as TJSONObject do
+            with LJSONValue2 as TJSONObject do
             begin
-              voice := TVoiceInfo.Create;
+              LVoice := TVoiceInfo.Create;
               if Assigned(GetValue('labels')) then
               begin
-                JSONLabels := GetValue('labels') as TJSONObject;
-                if Assigned(JSONLabels.GetValue('gender')) then
-                  voice.VoiceGender := JSONLabels.GetValue<string>('gender');
+                LJSONLabels := GetValue('labels') as TJSONObject;
+                if Assigned(LJSONLabels.GetValue('gender')) then
+                  LVoice.VoiceGender := LJSONLabels.GetValue<string>('gender');
               end;
-              voice.VoiceName := GetValue('name').Value;
+              LVoice.VoiceName := GetValue('name').Value;
 
-              voice.VoiceId := GetValue('voice_id').Value;
-              FVoicesInfo.Add(voice);
+              LVoice.VoiceId := GetValue('voice_id').Value;
+              FVoicesInfo.Add(LVoice);
             end;
           end;
         end;
       finally
-        FreeAndNil(JSONValue);
+        FreeAndNil(LJSONValue);
       end;
     end
     else
     begin
       // Handle the error response if needed
-      raise Exception.Create('Failed to fetch voice data: ' + RESTResponse.StatusText);
+      raise Exception.Create('Failed to fetch voice data: ' + LRESTResponse.StatusText);
     end;
   finally
-    RESTClient.Free;
-    RESTRequest.Free;
-    RESTResponse.Free;
+    LRESTClient.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
   end;
 
   Result := FVoicesInfo;
@@ -108,75 +108,75 @@ end;
 
 procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  size : Integer;
-  jsonBody : TJSONObject;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LSize : Integer;
+  LJsonBody : TJSONObject;
 begin
-  RESTClient := TRESTClient.Create(Format('https://api.elevenlabs.io/v1/text-to-speech/%s', [voice]));
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
+  LRESTClient := TRESTClient.Create(Format('https://api.elevenlabs.io/v1/text-to-speech/%s', [voice]));
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   responseStream := TMemoryStream.Create;
   try
-    RESTRequest.Method := rmPOST;
-    RESTRequest.AddParameter('xi-api-key', apiKey, pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('Content-Type', 'application/json', pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('accept', 'audio/mpeg', pkHTTPHEADER, [poDoNotEncode]);
-    jsonBody := TJSONObject.Create;
+    LRESTRequest.Method := rmPOST;
+    LRESTRequest.AddParameter('xi-api-key', apiKey, pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('Content-Type', 'application/json', pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('accept', 'audio/mpeg', pkHTTPHEADER, [poDoNotEncode]);
+    LJsonBody := TJSONObject.Create;
     try
-      jsonBody.AddPair('text', text);
-      RESTRequest.AddBody(jsonBody.ToJson, ctAPPLICATION_JSON);
+      LJsonBody.AddPair('text', text);
+      LRESTRequest.AddBody(LJsonBody.ToJson, ctAPPLICATION_JSON);
     finally
-      FreeAndNil(jsonBody);
+      FreeAndNil(LJsonBody);
     end;
-    RESTRequest.Response := RESTResponse;
+    LRESTRequest.Response := LRESTResponse;
 
-    RESTRequest.Execute;
-    size := Length(RESTResponse.RawBytes);
-    responseStream.Write(RESTResponse.RawBytes, size)
+    LRESTRequest.Execute;
+    LSize := Length(LRESTResponse.RawBytes);
+    responseStream.Write(LRESTResponse.RawBytes, LSize)
   finally
-    RESTRequest.Free;
-    RESTResponse.Free;
-    RESTClient.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
+    LRESTClient.Free;
   end;
 end;
 
 function TElevenLabsService.TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  jsonBody : TJSONObject;
-  responseStream : TMemoryStream;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJsonBody : TJSONObject;
+  LResponseStream : TMemoryStream;
 begin
   if VoiceName.IsEmpty then
     VoiceName := '21m00Tcm4TlvDq8ikWAM';
-  RESTClient := TRESTClient.Create(Format('https://api.elevenlabs.io/v1/text-to-speech/%s', [VoiceName]));
-  RESTRequest := TRESTRequest.Create(RESTClient);
-  RESTResponse := TRESTResponse.Create(RESTClient);
-  responseStream := TMemoryStream.Create;
+  LRESTClient := TRESTClient.Create(Format('https://api.elevenlabs.io/v1/text-to-speech/%s', [VoiceName]));
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
+  LResponseStream := TMemoryStream.Create;
   try
-    RESTRequest.Method := rmPOST;
-    RESTRequest.AddParameter('xi-api-key', FResourceKey, pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('Content-Type', 'application/json', pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.AddParameter('accept', 'audio/mpeg', pkHTTPHEADER, [poDoNotEncode]);
-    jsonBody := TJSONObject.Create;
+    LRESTRequest.Method := rmPOST;
+    LRESTRequest.AddParameter('xi-api-key', FResourceKey, pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('Content-Type', 'application/json', pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.AddParameter('accept', 'audio/mpeg', pkHTTPHEADER, [poDoNotEncode]);
+    LJsonBody := TJSONObject.Create;
     try
-      jsonBody.AddPair('text', text);
-      RESTRequest.AddBody(jsonBody.ToJson, ctAPPLICATION_JSON);
+      LJsonBody.AddPair('text', text);
+      LRESTRequest.AddBody(LJsonBody.ToJson, ctAPPLICATION_JSON);
     finally
-      FreeAndNil(jsonBody);
+      FreeAndNil(LJsonBody);
     end;
-    RESTRequest.Response := RESTResponse;
+    LRESTRequest.Response := LRESTResponse;
 
-    RESTRequest.Execute;
-    responseStream.Write(RESTResponse.RawBytes, Length(RESTResponse.RawBytes));
-    Result := responseStream;
+    LRESTRequest.Execute;
+    LResponseStream.Write(LRESTResponse.RawBytes, Length(LRESTResponse.RawBytes));
+    Result := LResponseStream;
   finally
-    RESTRequest.Free;
-    RESTResponse.Free;
-    RESTClient.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
+    LRESTClient.Free;
   end;
 end;
 

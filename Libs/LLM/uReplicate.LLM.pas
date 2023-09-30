@@ -66,11 +66,11 @@ end;
 
 function TReplicateLLM.GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONValue: TJSONValue;
-  JSONObj: TJSONObject;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONValue: TJSONValue;
+  LJSONObj: TJSONObject;
 begin
   Result := '';
   IsCompleted := False;
@@ -78,231 +78,231 @@ begin
   if not Assigned(Prediction) then
     raise Exception.Create('Prediction object is not assigned');
 
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
 
-      RestRequest.Resource := '/v1/predictions/{predictionId}';
-      RestRequest.AddParameter('predictionId', Prediction.Id, TRESTRequestParameterKind.pkURLSEGMENT);
+      LRestRequest.Resource := '/v1/predictions/{predictionId}';
+      LRestRequest.AddParameter('predictionId', Prediction.Id, TRESTRequestParameterKind.pkURLSEGMENT);
 
-      RestRequest.Method := rmGET;
+      LRestRequest.Method := rmGET;
 
       // Adding the Authorization header
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
 
       // Execute the request
-      RestRequest.Execute;
+      LRestRequest.Execute;
 
-      if RestResponse.StatusCode = 200 then
+      if LRestResponse.StatusCode = 200 then
       begin
-        JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content);
+        LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content);
         try
-          if Assigned(JSONValue) and (JSONValue is TJSONObject) then
+          if Assigned(LJSONValue) and (LJSONValue is TJSONObject) then
           begin
-            JSONObj := JSONValue as TJSONObject;
-            if JSONObj.GetValue<string>('status') = 'succeeded' then
+            LJSONObj := LJSONValue as TJSONObject;
+            if LJSONObj.GetValue<string>('status') = 'succeeded' then
             begin
               IsCompleted := True;
-              Result := RestResponse.Content;
+              Result := LRestResponse.Content;
             end;
           end;
         finally
-          JSONValue.Free;
+          LJSONValue.Free;
         end;
       end
       else
       begin
-        raise Exception.CreateFmt('Error fetching prediction details: %s', [RestResponse.Content]);
+        raise Exception.CreateFmt('Error fetching prediction details: %s', [LRestResponse.Content]);
       end;
 
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
 
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
 end;
 
 function TReplicateLLM.DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
 var
-  JsonValue: TJSONValue;
-  JsonObject: TJSONObject;
-  InputObj: TJSONObject;
-  UrlsObj: TJSONObject;
+  LJsonValue: TJSONValue;
+  LJsonObject: TJSONObject;
+  LInputObj: TJSONObject;
+  LUrlsObj: TJSONObject;
 begin
   Result := TPredictionInfo.Create;
 
-  JsonValue := TJSONObject.ParseJSONValue(AJsonStr);
-  if not Assigned(JsonValue) then
+  LJsonValue := TJSONObject.ParseJSONValue(AJsonStr);
+  if not Assigned(LJsonValue) then
     raise Exception.Create('Invalid JSON string');
 
   try
-    if JsonValue is TJSONObject then
+    if LJsonValue is TJSONObject then
     begin
-      JsonObject := JsonValue as TJSONObject;
+      LJsonObject := LJsonValue as TJSONObject;
 
-      Result.Id := JsonObject.GetValue<string>('id');
-      Result.Version := JsonObject.GetValue<string>('version');
+      Result.Id := LJsonObject.GetValue<string>('id');
+      Result.Version := LJsonObject.GetValue<string>('version');
 
       // Extracting input.prompt
-      InputObj := JsonObject.GetValue<TJSONObject>('input');
-      if Assigned(InputObj) then
-        Result.Prompt := InputObj.GetValue<string>('prompt');
+      LInputObj := LJsonObject.GetValue<TJSONObject>('input');
+      if Assigned(LInputObj) then
+        Result.Prompt := LInputObj.GetValue<string>('prompt');
 
-      Result.Logs := JsonObject.GetValue<string>('logs');
+      Result.Logs := LJsonObject.GetValue<string>('logs');
    //   Result.Error := JsonObject.GetValue<Variant>('error');
-      Result.Status := JsonObject.GetValue<string>('status');
+      Result.Status := LJsonObject.GetValue<string>('status');
 
       // Convert JSON date string to TDateTime
-      Result.CreatedAt := ISO8601ToDate(JsonObject.GetValue<string>('created_at'));
+      Result.CreatedAt := ISO8601ToDate(LJsonObject.GetValue<string>('created_at'));
 
       // Extracting urls object
-      UrlsObj := JsonObject.GetValue<TJSONObject>('urls');
-      if Assigned(UrlsObj) then
+      LUrlsObj := LJsonObject.GetValue<TJSONObject>('urls');
+      if Assigned(LUrlsObj) then
       begin
-        Result.Urls.cancel := UrlsObj.GetValue<string>('cancel');
-        Result.Urls.get := UrlsObj.GetValue<string>('get');
+        Result.Urls.cancel := LUrlsObj.GetValue<string>('cancel');
+        Result.Urls.get := LUrlsObj.GetValue<string>('get');
       end;
     end;
   finally
-    JsonValue.Free;
+    LJsonValue.Free;
   end;
 end;
 
 function TReplicateLLM.Completion(const AQuestion, AModel: string): string;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONRoot, JSONInput: TJSONObject;
-  version: string;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONRoot, LJSONInput: TJSONObject;
+  LVersion: string;
   i: Integer;
-  prediction: TPredictionInfo;
-  Stopwatch: TStopwatch;
-  OperationCompleted: Boolean;
+  LPrediction: TPredictionInfo;
+  LStopwatch: TStopwatch;
+  LOperationCompleted: Boolean;
 begin
   if ModelInfo.Count = 0 then
   begin
     GetModelInfo;
   end;
-  version := '';
+  LVersion := '';
   for i := 0 to FModelInfo.Count - 1 do
   begin
     if FModelInfo[i].modelName = AModel then
     begin
-      version := FModelInfo[i].version;
+      LVersion := FModelInfo[i].version;
       Break;
     end;
   end;
-  if version.IsEmpty then
+  if LVersion.IsEmpty then
     raise Exception.Create('Could not find model ' + AModel);
   // Create and setup REST client, request and response
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
-      RestRequest.Resource := '/v1/predictions';
-      RestRequest.Method := rmPOST;
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
+      LRestRequest.Resource := '/v1/predictions';
+      LRestRequest.Method := rmPOST;
       // Adding headers
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
       // Create JSON body for POST request
-      JSONRoot := TJSONObject.Create;
+      LJSONRoot := TJSONObject.Create;
       try
-        JSONRoot.AddPair('version', version);
-        JSONInput := TJSONObject.Create;
-        JSONInput.AddPair('prompt', AQuestion);
-        JSONRoot.AddPair('input', JSONInput);
-        RestRequest.AddBody(JSONRoot.ToString, TRESTContentType.ctAPPLICATION_JSON);
+        LJSONRoot.AddPair('version', LVersion);
+        LJSONInput := TJSONObject.Create;
+        LJSONInput.AddPair('prompt', AQuestion);
+        LJSONRoot.AddPair('input', LJSONInput);
+        LRestRequest.AddBody(LJSONRoot.ToString, TRESTContentType.ctAPPLICATION_JSON);
         // Execute the request
-        RestRequest.Execute;
-        if (RestResponse.StatusCode = 200) or (RestResponse.StatusCode = 201) then
+        LRestRequest.Execute;
+        if (LRestResponse.StatusCode = 200) or (LRestResponse.StatusCode = 201) then
         begin
           // Assuming the response contains a field called 'completion' with the answer
          // JSONBody := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONObject;
-          prediction := DeserializePredictionInfo(RestResponse.Content);
+          LPrediction := DeserializePredictionInfo(LRestResponse.Content);
           try
-            Stopwatch := TStopwatch.StartNew;
-            OperationCompleted := False;
+            LStopwatch := TStopwatch.StartNew;
+            LOperationCompleted := False;
             repeat
-              Result := GetPredictionDetails(prediction, OperationCompleted);
-            until (Stopwatch.ElapsedMilliseconds > 30000) or OperationCompleted;
+              Result := GetPredictionDetails(LPrediction, LOperationCompleted);
+            until (LStopwatch.ElapsedMilliseconds > 30000) or LOperationCompleted;
           finally
-            FreeAndNil(prediction);
+            FreeAndNil(LPrediction);
           end;
         end
         else
         begin
           // Handle errors or exceptions if needed
-          raise Exception.CreateFmt('Error making prediction: %s', [RestResponse.Content]);
+          raise Exception.CreateFmt('Error making prediction: %s', [LRestResponse.Content]);
         end;
       finally
-        JSONRoot.Free;
+        LJSONRoot.Free;
       end;
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
 end;
 
 function TReplicateLLM.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
-  JSONValue: TJSONObject;
-  JSONVersion: TJSONObject;
-  JSONArray: TJSONArray;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONValue: TJSONObject;
+  LJSONVersion: TJSONObject;
+  LJSONArray: TJSONArray;
   I: Integer;
-  ModelInfo: TBaseModelInfo;
+  LModelInfo: TBaseModelInfo;
 begin
   FModelInfo.Clear;
 
-  RestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create('https://api.replicate.com');
   try
-    RestRequest := TRESTRequest.Create(nil);
-    RestResponse := TRESTResponse.Create(nil);
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
     try
-      RestRequest.Client := RestClient;
-      RestRequest.Response := RestResponse;
-      RestRequest.Resource := '/v1/collections/streaming-language-models';
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
+      LRestRequest.Resource := '/v1/collections/streaming-language-models';
 
-      RestRequest.Method := rmGET;
+      LRestRequest.Method := rmGET;
 
-      RestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
 
-      RestRequest.Execute;
+      LRestRequest.Execute;
 
-      if RestResponse.StatusCode = 200 then
+      if LRestResponse.StatusCode = 200 then
       begin
-        JSONValue := TJSONObject.ParseJSONValue(RestResponse.Content) as TJSONObject;
+        LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
 
-        if Assigned(JSONValue) and Assigned(JSONValue.GetValue('models')) then
+        if Assigned(LJSONValue) and Assigned(LJSONValue.GetValue('models')) then
         begin
-          JSONArray := JSONValue.GetValue('models') as TJSONArray;
-          for I := 0 to JSONArray.Count - 1 do
+          LJSONArray := LJSONValue.GetValue('models') as TJSONArray;
+          for I := 0 to LJSONArray.Count - 1 do
           begin
-            ModelInfo := TBaseModelInfo.Create;
-            ModelInfo.modelName := JSONArray.Items[I].GetValue<string>('name');
-            JSONVersion := JSONArray.Items[I].GetValue<TJSONObject>('latest_version');
-            if Assigned(JSONVersion.GetValue('id')) then
-              ModelInfo.version := JSONVersion.GetValue<string>('id');
-            FModelInfo.Add(ModelInfo);
+            LModelInfo := TBaseModelInfo.Create;
+            LModelInfo.modelName := LJSONArray.Items[I].GetValue<string>('name');
+            LJSONVersion := LJSONArray.Items[I].GetValue<TJSONObject>('latest_version');
+            if Assigned(LJSONVersion.GetValue('id')) then
+              LModelInfo.version := LJSONVersion.GetValue<string>('id');
+            FModelInfo.Add(LModelInfo);
           end;
         end;
 
-        FreeAndNil(JSONValue);
+        FreeAndNil(LJSONValue);
       end
       else
       begin
@@ -310,12 +310,12 @@ begin
       end;
 
     finally
-      RestRequest.Free;
-      RestResponse.Free;
+      LRestRequest.Free;
+      LRestResponse.Free;
     end;
 
   finally
-    RestClient.Free;
+    LRestClient.Free;
   end;
   Result := FModelInfo;
 end;

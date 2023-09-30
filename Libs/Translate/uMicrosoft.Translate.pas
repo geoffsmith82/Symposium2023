@@ -65,116 +65,119 @@ end;
 
 function TMicrosoftTranslate.FromLanguages: TObjectList<TLanguageInfo>;
 var
-  ResponseJson: TJSONObject;
-  LanguagesArray: TJSONObject;
-  LanguageObj : TJSONObject;
-  LangCode: string;
+  LResponseJson: TJSONObject;
+  LLanguagesArray: TJSONObject;
+  LLanguageObj : TJSONObject;
+  LLangCode: string;
   I: Integer;
-  ApiVersion : string;
-  langInfo: TLanguageInfo;
+  LApiVersion : string;
+  LLangInfo: TLanguageInfo;
 begin
-  ApiVersion := '3.0';
+  LApiVersion := '3.0';
   FRESTRequest.Method := rmGET;
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/languages?api-version={version}&scope={scope}';
-  FRESTRequest.AddParameter('version', ApiVersion, TRESTRequestParameterKind.pkURLSEGMENT);
+  FRESTRequest.AddParameter('version', LApiVersion, TRESTRequestParameterKind.pkURLSEGMENT);
   FRESTRequest.AddParameter('scope', 'translation', TRESTRequestParameterKind.pkURLSEGMENT);
   FRESTRequest.Response := FRESTResponse;
 
   FRESTRequest.Execute;
 
-  ResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
+  LResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
 
-  LanguagesArray := ResponseJson.Values['translation'] as TJSONObject;
+  LLanguagesArray := LResponseJson.Values['translation'] as TJSONObject;
   FFromLanguages.Clear;
-  for I := 0 to LanguagesArray.Count - 1 do
+  for I := 0 to LLanguagesArray.Count - 1 do
   begin
-    LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
-    LangCode := LanguagesArray.Pairs[i].JsonString.Value;
-    langInfo := TLanguageInfo.Create;
-    langInfo.LanguageName := LanguageObj.Values['name'].Value;
-    langInfo.LanguageCode := LangCode;
-    FFromLanguages.Add(langInfo);
+    LLanguageObj := LLanguagesArray.Pairs[i].JsonValue as TJSONObject;
+    LLangCode := LLanguagesArray.Pairs[i].JsonString.Value;
+    LLangInfo := TLanguageInfo.Create;
+    LLangInfo.LanguageName := LLanguageObj.Values['name'].Value;
+    LLangInfo.LanguageCode := LLangCode;
+    FFromLanguages.Add(LLangInfo);
   end;
   Result := FFromLanguages;
 end;
 
 function TMicrosoftTranslate.ToLanguages: TObjectList<TLanguageInfo>;
 var
-  ResponseJson: TJSONObject;
-  LanguagesArray: TJSONObject;
-  LanguageObj : TJSONObject;
-  LangCode: string;
+  LResponseJson: TJSONObject;
+  LLanguagesArray: TJSONObject;
+  LLanguageObj : TJSONObject;
+  LLangCode: string;
   I: Integer;
-  ApiVersion : string;
-  langInfo : TLanguageInfo;
+  LApiVersion : string;
+  LLangInfo : TLanguageInfo;
 begin
-  ApiVersion := '3.0';
+  LApiVersion := '3.0';
   FRESTRequest.Method := rmGET;
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Resource := '/languages?api-version={version}&scope={scope}';
-  FRESTRequest.AddParameter('version', ApiVersion, TRESTRequestParameterKind.pkURLSEGMENT);
+  FRESTRequest.AddParameter('version', LApiVersion, TRESTRequestParameterKind.pkURLSEGMENT);
   FRESTRequest.AddParameter('scope', 'translation', TRESTRequestParameterKind.pkURLSEGMENT);
   FRESTRequest.Response := FRESTResponse;
 
   FRESTRequest.Execute;
 
-  ResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
+  LResponseJson := FRESTResponse.JSONValue as TJSONObject; //TJSONObject.ParseJSONValue(ResponseText) as TJSONObject;
 
-  LanguagesArray := ResponseJson.Values['translation'] as TJSONObject;
+  LLanguagesArray := LResponseJson.Values['translation'] as TJSONObject;
   FToLanguages.Clear;
 
-  langInfo := TLanguageInfo.Create;
-  langInfo.LanguageName := 'auto';
-  langInfo.LanguageCode := 'auto';
-  FFromLanguages.Add(langInfo);
+  LLangInfo := TLanguageInfo.Create;
+  LLangInfo.LanguageName := 'auto';
+  LLangInfo.LanguageCode := 'auto';
+  FFromLanguages.Add(LLangInfo);
 
-  for I := 0 to LanguagesArray.Count - 1 do
+  for I := 0 to LLanguagesArray.Count - 1 do
   begin
-    LanguageObj := LanguagesArray.Pairs[i].JsonValue as TJSONObject;
-    LangCode := LanguagesArray.Pairs[i].JsonString.Value;
-    langInfo := TLanguageInfo.Create;
-    langInfo.LanguageName := LanguageObj.Values['name'].Value;
-    langInfo.LanguageCode := Langcode;
-    FToLanguages.Add(langInfo);
+    LLanguageObj := LLanguagesArray.Pairs[i].JsonValue as TJSONObject;
+    LLangCode := LLanguagesArray.Pairs[i].JsonString.Value;
+    LLangInfo := TLanguageInfo.Create;
+    LLangInfo.LanguageName := LLanguageObj.Values['name'].Value;
+    LLangInfo.LanguageCode := LLangCode;
+    FToLanguages.Add(LLangInfo);
   end;
   Result := FToLanguages;
 end;
 
 procedure TMicrosoftTranslate.GetAccessToken;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
 begin
-  RESTClient := TRESTClient.Create('https://api.cognitive.microsoft.com');
-  RESTRequest := TRESTRequest.Create(nil);
-  RESTResponse := TRESTResponse.Create(nil);
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
   try
-    RESTRequest.Method := TRESTRequestMethod.rmPOST;
-    RESTRequest.Resource := '/sts/v1.0/issueToken';
+    LRESTClient := TRESTClient.Create('https://api.cognitive.microsoft.com');
+    LRESTRequest := TRESTRequest.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
+    LRESTRequest.Method := TRESTRequestMethod.rmPOST;
+    LRESTRequest.Resource := '/sts/v1.0/issueToken';
 
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
-    RESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.Execute;
-    FAccessToken := TEncoding.UTF8.GetString(RESTResponse.RawBytes);
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.AddParameter('Ocp-Apim-Subscription-Key', FSubscriptionKey, TRESTRequestParameterKind.pkHTTPHEADER);
+    LRESTRequest.AddParameter('Content-Type', 'application/x-www-form-urlencoded', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Execute;
+    FAccessToken := TEncoding.UTF8.GetString(LRESTResponse.RawBytes);
     FExpiryTime := IncMinute(FExpiryTime, 8);
   finally
-    RESTResponse.Free;
-    RESTRequest.Free;
-    RESTClient.Free;
+    LRESTResponse.Free;
+    LRESTRequest.Free;
+    LRESTClient.Free;
   end;
 end;
 
 function TMicrosoftTranslate.Translate(const SourceText: string; const toLang: string; const fromLang: string): string;
 var
-  RequestBody: TJSONObject;
-  jsonArray : TJSONArray;
-  Translations: TJSONArray;
-  TranslationsArray: TJSONArray;
-  ApiVersion : string;
+  LRequestBody: TJSONObject;
+  LJsonArray : TJSONArray;
+  LTranslations: TJSONArray;
+  LTranslationsArray: TJSONArray;
+  LApiVersion : string;
 begin
   if SourceText.Trim.IsEmpty or toLang.Trim.IsEmpty then
     Exit('');
@@ -182,51 +185,52 @@ begin
   if (Now > FExpiryTime) then
     GetAccessToken;
 
-
-  ApiVersion := '3.0';
+  LApiVersion := '3.0';
   FRESTRequest.ResetToDefaults;
-
-  // Build the request body JSON using a TJSONObject
-  RequestBody := TJSONObject.Create;
+  LRequestBody := nil;
   try
-    RequestBody.AddPair('text', SourceText);
+  // Build the request body JSON using a TJSONObject
+  LRequestBody := TJSONObject.Create;
+    try
+      LRequestBody.AddPair('text', SourceText);
 
-    // Set the request body and execute the REST request
-   // FRESTRequest.AddParameter('application/json', RequestBody.ToJSON, TRESTRequestParameterKind.pkREQUESTBODY);
-   jsonArray := TJSONArray.Create(RequestBody);
-    FRESTRequest.AddBody(jsonArray.ToJSON, ctAPPLICATION_JSON);
-    // Set the target language and URL for the Microsoft Translate API
-    FRESTRequest.AddParameter('to', toLang, TRESTRequestParameterKind.pkQUERY);
-    FRESTRequest.AddParameter('api-version', ApiVersion, TRESTRequestParameterKind.pkQUERY);
-    FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    FRESTRequest.Method := rmPOST;
-    FRESTRequest.Resource := 'translate';
+      // Set the request body and execute the REST request
+     // FRESTRequest.AddParameter('application/json', RequestBody.ToJSON, TRESTRequestParameterKind.pkREQUESTBODY);
+      LJsonArray := TJSONArray.Create(LRequestBody);
+      FRESTRequest.AddBody(LJsonArray.ToJSON, ctAPPLICATION_JSON);
+      // Set the target language and URL for the Microsoft Translate API
+      FRESTRequest.AddParameter('to', toLang, TRESTRequestParameterKind.pkQUERY);
+      FRESTRequest.AddParameter('api-version', LApiVersion, TRESTRequestParameterKind.pkQUERY);
+      FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+      FRESTRequest.Method := rmPOST;
+      FRESTRequest.Resource := 'translate';
 
-    FRESTRequest.Execute;
+      FRESTRequest.Execute;
 
-    if FRESTResponse.StatusCode <> 200 then
-      Exit('');
+      if FRESTResponse.StatusCode <> 200 then
+        Exit('');
 
-    if FRESTResponse.ContentType <> 'application/json' then
-      Exit('');
+      if FRESTResponse.ContentType <> 'application/json' then
+        Exit('');
 
-    // Get the translations array from the REST response
-    Translations := FRESTResponse.JSONValue as TJSONArray;
-    if not Assigned(Translations) or (Translations.Count = 0) then
-      Exit('');
+      // Get the translations array from the REST response
+      LTranslations := FRESTResponse.JSONValue as TJSONArray;
+      if not Assigned(LTranslations) or (LTranslations.Count = 0) then
+        Exit('');
 
-    // Get the translated text from the first element of the translations array
-    TranslationsArray := Translations.Items[0].GetValue<TJSONArray>('translations');
-    if not Assigned(TranslationsArray) or (TranslationsArray.Count = 0) then
-      Exit('');
+      // Get the translated text from the first element of the translations array
+      LTranslationsArray := LTranslations.Items[0].GetValue<TJSONArray>('translations');
+      if not Assigned(LTranslationsArray) or (LTranslationsArray.Count = 0) then
+        Exit('');
 
-    Result := (TranslationsArray[0] as TJSONObject).GetValue('text').Value;
-  except
-    on E: Exception do
-      Result := '';
+      Result := (LTranslationsArray[0] as TJSONObject).GetValue('text').Value;
+    except
+      on E: Exception do
+        Result := '';
+    end;
+  finally
+    FreeAndNil(LRequestBody);
   end;
-
-  RequestBody.Free;
 end;
 end.
 

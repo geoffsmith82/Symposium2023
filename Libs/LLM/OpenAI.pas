@@ -19,7 +19,7 @@ type
   private
     procedure ListOpenAIModels(out AModelList: TStringList);
   public
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string);
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
     function Embeddings(const Texts: TArray<string>): TEmbeddings;
@@ -67,14 +67,18 @@ var
   LUsage: TJSONObject;
   LChoice: TJSONObject;
 begin
+  Result := Default(TChatResponse);
   Result.Content := '';
   Result.Completion_Tokens := 0;
   Result.Prompt_Tokens := 0;
   Result.Total_Tokens := 0;
-  LRESTClient := TRESTClient.Create(nil);
-  LRESTRequest := TRESTRequest.Create(nil);
-  LRESTResponse := TRESTResponse.Create(nil);
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
   try
+    LRESTClient := TRESTClient.Create(nil);
+    LRESTRequest := TRESTRequest.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
     LRESTClient.BaseURL := 'https://api.openai.com';
     LRESTClient.Accept := 'application/json';
     LRESTClient.AcceptCharset := 'UTF-8';
@@ -145,7 +149,7 @@ begin
   end;
 end;
 
-constructor TOpenAI.Create(APIKey: string);
+constructor TOpenAI.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
 end;
@@ -229,6 +233,7 @@ begin
   LRestClient := nil;
   LRestRequest := nil;
   LRestResponse := nil;
+  LJson := nil;
 
   try
     LRestClient := TRESTClient.Create(nil);
@@ -282,22 +287,22 @@ end;
 
 function TOpenAI.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  modelList : TStringList;
-  model : string;
-  modelObj : TBaseModelInfo;
+  LModelList : TStringList;
+  LModel : string;
+  LModelObj : TBaseModelInfo;
 begin
-  modelList := TStringList.Create;
+  LModelList := TStringList.Create;
   try
-    ListOpenAIModels(modelList);
+    ListOpenAIModels(LModelList);
     FModelInfo.Clear;
-    for model in modelList do
+    for LModel in LModelList do
     begin
-      modelObj := TBaseModelInfo.Create;
-      modelObj.modelName := model;
-      FModelInfo.Add(modelObj);
+      LModelObj := TBaseModelInfo.Create;
+      LModelObj.modelName := LModel;
+      FModelInfo.Add(LModelObj);
     end;
   finally
-    FreeandNil(modelList);
+    FreeandNil(LModelList);
   end;
   Result := FModelInfo;
 end;
@@ -312,8 +317,13 @@ var
   LBaseJSONObject: TJSONObject;
   i: Integer;
 begin
-  LRESTClient := TRESTClient.Create('https://api.openai.com');
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
+  LBaseJSONObject := nil;
+
   try
+    LRESTClient := TRESTClient.Create('https://api.openai.com');
     LRESTRequest := TRESTRequest.Create(nil);
     LRESTResponse := TRESTResponse.Create(nil);
     LRESTRequest.Client := LRESTClient;

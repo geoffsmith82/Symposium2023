@@ -43,98 +43,102 @@ end;
 
 function TAnthropic.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  JSONBody: TJSONObject;
-  Msg: TChatMessage;
-  JSONResponse: TJSONObject;
-  PromptText: string;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJSONBody: TJSONObject;
+  LMsg: TChatMessage;
+  LJSONResponse: TJSONObject;
+  LPromptText: string;
 begin
-  RESTClient := TRESTClient.Create('https://api.anthropic.com/v1/complete');
-  RESTRequest := TRESTRequest.Create(nil);
-  RESTResponse := TRESTResponse.Create(nil);
+  Result := Default(TChatResponse);
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
 
   try
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.Method := rmPOST;
+    LRESTClient := TRESTClient.Create('https://api.anthropic.com/v1/complete');
+    LRESTRequest := TRESTRequest.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.Method := rmPOST;
 
-    RESTRequest.Params.AddItem('anthropic-version', '2023-06-01', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.Params.AddItem('content-type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    RESTRequest.Params.AddItem('x-api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('anthropic-version', '2023-06-01', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('content-type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRESTRequest.Params.AddItem('x-api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    JSONBody := TJSONObject.Create;
+    LJSONBody := TJSONObject.Create;
     try
       // Add the chat settings to the JSON body...
-      JSONBody.AddPair('model', ChatConfig.model);
+      LJSONBody.AddPair('model', ChatConfig.model);
       // ... (add other chat settings properties here)
-      JSONBody.AddPair('max_tokens_to_sample', ChatConfig.max_tokens);
+      LJSONBody.AddPair('max_tokens_to_sample', ChatConfig.max_tokens);
 
       // Constructing the prompt text based on the messages list.
-      PromptText := '';
-      for Msg in AMessages do
+      LPromptText := '';
+      for LMsg in AMessages do
       begin
-        PromptText := PromptText + Chr(10)+ Chr(10) + Msg.Role + ': ' + Msg.Content;
+        LPromptText := LPromptText + Chr(10)+ Chr(10) + LMsg.Role + ': ' + LMsg.Content;
       end;
-      JSONBody.AddPair('prompt', PromptText);
+      LJSONBody.AddPair('prompt', LPromptText);
 
-      RESTRequest.AddBody(JSONBody.ToString, ctAPPLICATION_JSON);
+      LRESTRequest.AddBody(LJSONBody.ToString, ctAPPLICATION_JSON);
 
-      RESTRequest.Execute;
+      LRESTRequest.Execute;
 
       // Parse the response...
-      JSONResponse := TJSONObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
+      LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
       try
-        if Assigned(JSONResponse.GetValue('completion')) then
+        if Assigned(LJSONResponse.GetValue('completion')) then
         begin
-          Result.Content := JSONResponse.GetValue('completion').Value;
+          Result.Content := LJSONResponse.GetValue('completion').Value;
           // ... (parse other fields if necessary)
-          if Assigned(JSONResponse.GetValue('log_id')) then
-              Result.Log_Id := JSONResponse.GetValue('log_id').Value;
-          if Assigned(JSONResponse.GetValue('model')) then
-              Result.Model := JSONResponse.GetValue('model').Value;
+          if Assigned(LJSONResponse.GetValue('log_id')) then
+              Result.Log_Id := LJSONResponse.GetValue('log_id').Value;
+          if Assigned(LJSONResponse.GetValue('model')) then
+              Result.Model := LJSONResponse.GetValue('model').Value;
         end
-        else if Assigned(JSONResponse.GetValue('error')) then
+        else if Assigned(LJSONResponse.GetValue('error')) then
         begin
           raise EAnthropicError.Create(
-            JSONResponse.GetValue<TJSONObject>('error').GetValue('type').Value,
-            JSONResponse.GetValue<TJSONObject>('error').GetValue('message').Value
+            LJSONResponse.GetValue<TJSONObject>('error').GetValue('type').Value,
+            LJSONResponse.GetValue<TJSONObject>('error').GetValue('message').Value
           );
         end;
       finally
-        JSONResponse.Free;
+        LJSONResponse.Free;
       end;
 
     finally
-      JSONBody.Free;
+      LJSONBody.Free;
     end;
 
   finally
-    RESTRequest.Free;
-    RESTClient.Free;
-    RESTResponse.Free;
+    LRESTRequest.Free;
+    LRESTClient.Free;
+    LRESTResponse.Free;
   end;
 end;
 
 function TAnthropic.Completion(const AQuestion, AModel: string): string;
 var
-  ChatConfig: TChatSettings;
-  AMessages: TObjectList<TChatMessage>;
-  msg: TChatMessage;
+  LChatConfig: TChatSettings;
+  LMessages: TObjectList<TChatMessage>;
+  LMsg: TChatMessage;
 begin
-  ChatConfig.model := AModel;
-  AMessages := nil;
-  msg := nil;
+  LChatConfig.model := AModel;
+  LMessages := nil;
+  LMsg := nil;
   try
-    AMessages := TObjectList<TChatMessage>.Create;
-    msg := TChatMessage.Create;
-    msg.Role := 'Human';
-    msg.Content := AQuestion;
-    AMessages.Add(msg);
-    Result := ChatCompletion(ChatConfig, AMessages).Content;
+    LMessages := TObjectList<TChatMessage>.Create;
+    LMsg := TChatMessage.Create;
+    LMsg.Role := 'Human';
+    LMsg.Content := AQuestion;
+    LMessages.Add(LMsg);
+    Result := ChatCompletion(LChatConfig, LMessages).Content;
   finally
-    FreeAndNil(AMessages);
+    FreeAndNil(LMessages);
   end;
 end;
 
@@ -145,24 +149,24 @@ end;
 
 function TAnthropic.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  modelObj : TBaseModelInfo;
+  LModelObj : TBaseModelInfo;
 begin
   FModelInfo.Clear;
-  modelObj := TBaseModelInfo.Create;
-  modelObj.modelName := 'claude-instant-1';
-  FModelInfo.Add(modelObj);
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-instant-1';
+  FModelInfo.Add(LModelObj);
 
-  modelObj := TBaseModelInfo.Create;
-  modelObj.modelName := 'claude-instant-1.2';
-  FModelInfo.Add(modelObj);
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-instant-1.2';
+  FModelInfo.Add(LModelObj);
 
-  modelObj := TBaseModelInfo.Create;
-  modelObj.modelName := 'claude-2';
-  FModelInfo.Add(modelObj);
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-2';
+  FModelInfo.Add(LModelObj);
 
-  modelObj := TBaseModelInfo.Create;
-  modelObj.modelName := 'claude-2.0';
-  FModelInfo.Add(modelObj);
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-2.0';
+  FModelInfo.Add(LModelObj);
 
   Result := FModelInfo;
 end;

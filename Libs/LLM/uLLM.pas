@@ -71,7 +71,7 @@ type
     FModelInfo : TObjectList<TBaseModelInfo>;
     function GetModelInfo: TObjectList<TBaseModelInfo>; virtual; abstract;
   public
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string);
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
@@ -108,12 +108,12 @@ end;
 
 function TPrompt.ReplaceParameters: string;
 var
-  Param: TPair<string, string>;
+  LParam: TPair<string, string>;
 begin
   Result := FPromptText;
-  for Param in FParameters do
+  for LParam in FParameters do
   begin
-    Result := StringReplace(Result, '{' + Param.Key + '}', Param.Value, [rfReplaceAll, rfIgnoreCase]);
+    Result := StringReplace(Result, '{' + LParam.Key + '}', LParam.Value, [rfReplaceAll, rfIgnoreCase]);
   end;
 end;
 
@@ -124,7 +124,7 @@ end;
 
 { TBaseOpenAI }
 
-constructor TBaseLLM.Create(APIKey: string);
+constructor TBaseLLM.Create(const APIKey: string);
 begin
   FAPIKey := APIKey;
   FModelInfo := TObjectList<TBaseModelInfo>.Create;
@@ -133,6 +133,7 @@ end;
 destructor TBaseLLM.Destroy;
 begin
   FreeAndNil(ModelInfo);
+  inherited;
 end;
 
 

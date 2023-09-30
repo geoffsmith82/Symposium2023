@@ -52,91 +52,97 @@ implementation
 
 { TGooglePaLM }
 
-function TGooglePaLM.ChatCompletion(ChatConfig: TChatSettings;
-  AMessages: TObjectList<TChatMessage>): TChatResponse;
+function TGooglePaLM.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
-  RESTClient: TRESTClient;
-  RESTRequest: TRESTRequest;
-  RESTResponse: TRESTResponse;
-  Params: TJSONObject;
-  JSONCandidates: TJSONArray;
-  JSONCandidate: TJSONObject;
-  ErrorJSON: TJSONObject;
-  ErrorMsg: string;
-  ErrorCode: string;
-  ChatPrompt: TJSONArray;
-  Msgs : TJSONObject;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LParams: TJSONObject;
+  LJSONCandidates: TJSONArray;
+  LJSONCandidate: TJSONObject;
+  LErrorJSON: TJSONObject;
+  LErrorMsg: string;
+  LErrorCode: string;
+  LChatPrompt: TJSONArray;
+  LMsgs : TJSONObject;
   I: Integer;
-  ResponseJSON: TJSONObject;
-  msg : TJSONObject;
+  LResponseJSON: TJSONObject;
+  LMsg : TJSONObject;
 begin
-  // Build the chat prompt
-  ChatPrompt := TJSONArray.Create;
-  for I := 0 to AMessages.Count - 1 do
-  begin
-    msg := TJSONObject.Create;
-    msg.AddPair('author', AMessages[I].Role);
-    msg.AddPair('content', AMessages[I].Content);
-    ChatPrompt.Add(msg);
-  end;
-
+  Result := Default(TChatResponse);
+  LChatPrompt := nil;
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
+  LParams := nil;
   // Create REST client
-  RESTClient := TRESTClient.Create(nil);
   try
-    RESTClient.BaseURL := 'https://generativelanguage.googleapis.com';
+    // Build the chat prompt
+    LChatPrompt := TJSONArray.Create;
+    for I := 0 to AMessages.Count - 1 do
+    begin
+      LMsg := TJSONObject.Create;
+      LMsg.AddPair('author', AMessages[I].Role);
+      LMsg.AddPair('content', AMessages[I].Content);
+      LChatPrompt.Add(LMsg);
+    end;
 
-    RESTRequest := TRESTRequest.Create(nil);
-    RESTResponse := TRESTResponse.Create(nil);
-    RESTRequest.Client := RESTClient;
-    RESTRequest.Response := RESTResponse;
-    RESTRequest.Method := rmPOST;
-    RESTRequest.Resource := '/v1beta2/' + ChatConfig.model + ':generateMessage?key=' + FAPIKey;
+
+    LRESTClient := TRESTClient.Create(nil);
+    LRESTClient.BaseURL := 'https://generativelanguage.googleapis.com';
+
+    LRESTRequest := TRESTRequest.Create(nil);
+    LRESTResponse := TRESTResponse.Create(nil);
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Response := LRESTResponse;
+    LRESTRequest.Method := rmPOST;
+    LRESTRequest.Resource := '/v1beta2/' + ChatConfig.model + ':generateMessage?key=' + FAPIKey;
 
     // Populate request parameters
-    Params := TJSONObject.Create;
+    LParams := TJSONObject.Create;
 
-    Msgs := TJSONObject.Create;
+    LMsgs := TJSONObject.Create;
 
-    Msgs.AddPair('messages', ChatPrompt);
+    LMsgs.AddPair('messages', LChatPrompt);
 
-    Params.AddPair('prompt', Msgs);
+    LParams.AddPair('prompt', LMsgs);
     if (ChatConfig.temperature > 0.000001) then
-      Params.AddPair('temperature', ChatConfig.temperature);
+      LParams.AddPair('temperature', ChatConfig.temperature);
     if (ChatConfig.top_p > 0.000001) then
-    Params.AddPair('top_p', ChatConfig.top_p);
+    LParams.AddPair('top_p', ChatConfig.top_p);
     // etc
 
     // Set request body to JSON
-    RESTRequest.Body.ClearBody;
-    RESTRequest.AddBody(Params);
+    LRESTRequest.Body.ClearBody;
+    LRESTRequest.AddBody(LParams);
 
-    RESTRequest.Execute;
+    LRESTRequest.Execute;
 
     // Parse JSON response
-    if RESTRequest.Response.StatusCode = 200 then
+    if LRESTRequest.Response.StatusCode = 200 then
     begin
-      ResponseJSON := RESTRequest.Response.JSONValue as TJSONObject;
-      if Assigned(ResponseJSON.GetValue('candidates')) then
+      LResponseJSON := LRESTRequest.Response.JSONValue as TJSONObject;
+      if Assigned(LResponseJSON.GetValue('candidates')) then
       begin
-        JSONCandidates := ResponseJSON.GetValue('candidates') as TJSONArray;
-        JSONCandidate := JSONCandidates[0] as TJSONObject;
-        Result.Content := JSONCandidate.GetValue('content').Value;
+        LJSONCandidates := LResponseJSON.GetValue('candidates') as TJSONArray;
+        LJSONCandidate := LJSONCandidates[0] as TJSONObject;
+        Result.Content := LJSONCandidate.GetValue('content').Value;
       end;
     end
     else
     begin
       // Parse error message
-      ErrorJSON := (RESTResponse.JSONValue as TJSONObject).GetValue('error') as TJSONObject;
-      ErrorMsg := ErrorJSON.GetValue('message').Value;
-      ErrorCode := ErrorJSON.GetValue('code').Value;
+      LErrorJSON := (LRESTResponse.JSONValue as TJSONObject).GetValue('error') as TJSONObject;
+      LErrorMsg := LErrorJSON.GetValue('message').Value;
+      LErrorCode := LErrorJSON.GetValue('code').Value;
       // Raise exception
-      raise EGooglePaLMError.Create(ErrorCode, ErrorMsg);
+      raise EGooglePaLMError.Create(LErrorCode, LErrorMsg);
     end;
   finally
-    FreeAndNil(RESTResponse);
-    FreeAndNil(RESTClient);
-    FreeAndNil(RESTRequest);
-    FreeAndNil(Params);
+    FreeAndNil(LRESTResponse);
+    FreeAndNil(LRESTClient);
+    FreeAndNil(LRESTRequest);
+    FreeAndNil(LParams);
   end;
 end;
 
@@ -152,93 +158,93 @@ end;
 
 function TGooglePaLM.ParseModelsResponse(const AJsonStr: string): TArray<TGenerativeModelResponse>;
 var
-  JsonObj, ModelObj: TJSONObject;
-  ModelsArr: TJSONArray;
+  LJsonObj, LModelObj: TJSONObject;
+  LModelsArr: TJSONArray;
   I, J: Integer;
-  GenMethodsArr: TJSONArray;
+  LGenMethodsArr: TJSONArray;
 begin
-  JsonObj := TJSONObject.ParseJSONValue(AJsonStr) as TJSONObject;
+  LJsonObj := TJSONObject.ParseJSONValue(AJsonStr) as TJSONObject;
   try
-    ModelsArr := JsonObj.GetValue<TJSONArray>('models');
-    SetLength(Result, ModelsArr.Count);
+    LModelsArr := LJsonObj.GetValue<TJSONArray>('models');
+    SetLength(Result, LModelsArr.Count);
 
-    for I := 0 to ModelsArr.Count - 1 do
+    for I := 0 to LModelsArr.Count - 1 do
     begin
-      ModelObj := ModelsArr.Items[I] as TJSONObject;
+      LModelObj := LModelsArr.Items[I] as TJSONObject;
       with Result[I] do
       begin
-        name := ModelObj.GetValue<string>('name');
-        version := ModelObj.GetValue<string>('version');
-        displayName := ModelObj.GetValue<string>('displayName');
-        description := ModelObj.GetValue<string>('description');
-        inputTokenLimit := ModelObj.GetValue<Integer>('inputTokenLimit');
-        outputTokenLimit := ModelObj.GetValue<Integer>('outputTokenLimit');
+        name := LModelObj.GetValue<string>('name');
+        version := LModelObj.GetValue<string>('version');
+        displayName := LModelObj.GetValue<string>('displayName');
+        description := LModelObj.GetValue<string>('description');
+        inputTokenLimit := LModelObj.GetValue<Integer>('inputTokenLimit');
+        outputTokenLimit := LModelObj.GetValue<Integer>('outputTokenLimit');
 
-        if ModelObj.TryGetValue<TJSONArray>('supportedGenerationMethods', GenMethodsArr) then
+        if LModelObj.TryGetValue<TJSONArray>('supportedGenerationMethods', LGenMethodsArr) then
         begin
-          SetLength(supportedGenerationMethods, GenMethodsArr.Count);
-          for J := 0 to GenMethodsArr.Count - 1 do
-            supportedGenerationMethods[J] := GenMethodsArr.Items[J].Value;
+          SetLength(supportedGenerationMethods, LGenMethodsArr.Count);
+          for J := 0 to LGenMethodsArr.Count - 1 do
+            supportedGenerationMethods[J] := LGenMethodsArr.Items[J].Value;
         end;
-        if Assigned(ModelObj.GetValue('temperature')) then
-          temperature := ModelObj.GetValue<Double>('temperature');
-        if Assigned(ModelObj.GetValue('topP')) then
-          topP := ModelObj.GetValue<Double>('topP');
-        if Assigned(ModelObj.GetValue('topK')) then
-          topK := ModelObj.GetValue<Integer>('topK');
+        if Assigned(LModelObj.GetValue('temperature')) then
+          temperature := LModelObj.GetValue<Double>('temperature');
+        if Assigned(LModelObj.GetValue('topP')) then
+          topP := LModelObj.GetValue<Double>('topP');
+        if Assigned(LModelObj.GetValue('topK')) then
+          topK := LModelObj.GetValue<Integer>('topK');
       end;
     end;
   finally
-    JsonObj.Free;
+    LJsonObj.Free;
   end;
 end;
 
 
 function TGooglePaLM.GetGenerativeLanguageModels: string;
 var
-  RestClient: TRESTClient;
-  RestRequest: TRESTRequest;
-  RestResponse: TRESTResponse;
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
 begin
   Result := '';
-  RestClient := TRESTClient.Create(nil);
-  RestRequest := TRESTRequest.Create(nil);
-  RestResponse := TRESTResponse.Create(nil);
+  LRestClient := TRESTClient.Create(nil);
+  LRestRequest := TRESTRequest.Create(nil);
+  LRestResponse := TRESTResponse.Create(nil);
   try
-    RestClient.BaseURL := 'https://generativelanguage.googleapis.com';
-    RestRequest.Client := RestClient;
-    RestRequest.Response := RestResponse;
-    RestRequest.Resource := Format('/v1beta2/models?key=%s', [FAPIKey]);
-    RestRequest.Execute;
-    Result := RestResponse.Content;
+    LRestClient.BaseURL := 'https://generativelanguage.googleapis.com';
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Response := LRestResponse;
+    LRestRequest.Resource := Format('/v1beta2/models?key=%s', [FAPIKey]);
+    LRestRequest.Execute;
+    Result := LRestResponse.Content;
   finally
-    RestClient.Free;
-    RestRequest.Free;
-    RestResponse.Free;
+    LRestClient.Free;
+    LRestRequest.Free;
+    LRestResponse.Free;
   end;
 end;
 
 
 function TGooglePaLM.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
-  JsonResponse: string;
-  ParsedResponses: TArray<TGenerativeModelResponse>;
-  SingleResponse: TGenerativeModelResponse;
+  LJsonResponse: string;
+  LParsedResponses: TArray<TGenerativeModelResponse>;
+  LSingleResponse: TGenerativeModelResponse;
   i: Integer;
-  modelObj: TBaseModelInfo;
+  LModelObj: TBaseModelInfo;
 begin
   FModelInfo.Clear;
-  JsonResponse := GetGenerativeLanguageModels;
-  ParsedResponses := ParseModelsResponse(JsonResponse);
+  LJsonResponse := GetGenerativeLanguageModels;
+  LParsedResponses := ParseModelsResponse(LJsonResponse);
 
   // Example of accessing each model:
-  for i := 0 to Length(ParsedResponses) - 1 do
+  for i := 0 to Length(LParsedResponses) - 1 do
   begin
-    SingleResponse := ParsedResponses[i];
-    modelObj := TBaseModelInfo.Create;
+    LSingleResponse := LParsedResponses[i];
+    LModelObj := TBaseModelInfo.Create;
     // Now you can use fields of SingleResponse like SingleResponse.name, SingleResponse.version, etc.
-    modelObj.modelName := SingleResponse.name;
-    FModelInfo.Add(modelObj);
+    LModelObj.modelName := LSingleResponse.name;
+    FModelInfo.Add(LModelObj);
   end;
 
   Result := FModelInfo;

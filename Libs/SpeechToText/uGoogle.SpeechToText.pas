@@ -90,22 +90,22 @@ end;
 
 function TGoogleSpeechToText.Base64EncodedFile(const filename:string): string;
 var
-  fs : TFileStream;
-  mem : TStringStream;
+  Lfs : TFileStream;
+  LMem : TStringStream;
 begin
-  fs := nil;
-  mem := nil;
+  Lfs := nil;
+  LMem := nil;
   Result := '';
   try
-    fs := TFileStream.Create(filename, fmOpenRead);
-    mem := TStringStream.Create;
-    if TNetEncoding.Base64String.Encode(fs, mem) > 0 then
+    Lfs := TFileStream.Create(filename, fmOpenRead);
+    LMem := TStringStream.Create;
+    if TNetEncoding.Base64String.Encode(Lfs, LMem) > 0 then
     begin
-      Result := mem.DataString;
+      Result := LMem.DataString;
     end;
   finally
-    FreeAndNil(fs);
-    FreeAndNil(mem);
+    FreeAndNil(Lfs);
+    FreeAndNil(LMem);
   end;
 end;
 
@@ -121,29 +121,29 @@ end;
 
 function TGoogleSpeechToText.CreateRequestJSON(const FilePath, ModelName: string): TJSONObject;
 var
-  ConfigObj, AudioObj: TJSONObject;
-  ConfigPair, EncodingPair, SampleRatePair, LanguageCodePair, ModelPair, AudioPair, ContentPair: TJSONPair;
+  LConfigObj, LAudioObj: TJSONObject;
+  LConfigPair, LEncodingPair, LSampleRatePair, LLanguageCodePair, LModelPair, LAudioPair, LContentPair: TJSONPair;
 begin
   // Create the JSON objects and pairs
-  ConfigObj := TJSONObject.Create;
-    EncodingPair := TJSONPair.Create('encoding', 'FLAC');
- // SampleRatePair := TJSONPair.Create('sampleRateHertz', TJSONNumber.Create(22050));
-  LanguageCodePair := TJSONPair.Create('languageCode', 'en-US');
-  ModelPair := TJSONPair.Create('model', 'default');// ModelName);
-  ConfigObj.AddPair(EncodingPair);
-//  ConfigObj.AddPair(SampleRatePair);
-  ConfigObj.AddPair(LanguageCodePair);
-  ConfigObj.AddPair(ModelPair);
+  LConfigObj := TJSONObject.Create;
+  LEncodingPair := TJSONPair.Create('encoding', 'FLAC');
+ // LSampleRatePair := TJSONPair.Create('sampleRateHertz', TJSONNumber.Create(22050));
+  LLanguageCodePair := TJSONPair.Create('languageCode', 'en-US');
+  LModelPair := TJSONPair.Create('model', 'default');// ModelName);
+  LConfigObj.AddPair(LEncodingPair);
+//  ConfigObj.AddPair(LSampleRatePair);
+  LConfigObj.AddPair(LLanguageCodePair);
+  LConfigObj.AddPair(LModelPair);
 
-  AudioObj := TJSONObject.Create;
-  ContentPair := TJSONPair.Create('content', Base64EncodedFile(FilePath));
-  AudioObj.AddPair(ContentPair);
+  LAudioObj := TJSONObject.Create;
+  LContentPair := TJSONPair.Create('content', Base64EncodedFile(FilePath));
+  LAudioObj.AddPair(LContentPair);
 
   Result := TJSONObject.Create;
-  ConfigPair := TJSONPair.Create('config', ConfigObj);
-  AudioPair := TJSONPair.Create('audio', AudioObj);
-  Result.AddPair(ConfigPair);
-  Result.AddPair(AudioPair);
+  LConfigPair := TJSONPair.Create('config', LConfigObj);
+  LAudioPair := TJSONPair.Create('audio', LAudioObj);
+  Result.AddPair(LConfigPair);
+  Result.AddPair(LAudioPair);
 end;
 
 destructor TGoogleSpeechToText.Destroy;
@@ -156,11 +156,11 @@ end;
 
 function TGoogleSpeechToText.TranscribeAudio(const FilePath, ModelName: string): string;
 var
-  RestClient: TRESTClient;
-  Request: TRESTRequest;
-  Response: TRESTResponse;
-  jsonBody: TJSONObject;
-  googleResults : TTGoogleSpeechToTextResultsClass;
+  LRestClient: TRESTClient;
+  LRequest: TRESTRequest;
+  LResponse: TRESTResponse;
+  LJsonBody: TJSONObject;
+  LGoogleResults : TTGoogleSpeechToTextResultsClass;
 begin
   if not IsFileSupported(FilePath) then
   begin
@@ -171,34 +171,34 @@ begin
   // 1. Get authentication credentials
  // AccessToken := 'YOUR_ACCESS_TOKEN';
   // 2. Install a REST client library
-  RestClient := TRESTClient.Create('https://speech.googleapis.com');
+  LRestClient := TRESTClient.Create('https://speech.googleapis.com');
   // 3. Prepare the audio file
   // ...
   // 4. Send a POST request to the Speech-to-Text API
-  Request := TRESTRequest.Create(RestClient);
-  Request.Resource := '/v1/speech:recognize';
+  LRequest := TRESTRequest.Create(LRestClient);
+  LRequest.Resource := '/v1/speech:recognize';
   FOAuth2.RefreshAccessTokenIfRequired;
-  RestClient.Authenticator := FOAuth2;
+  LRestClient.Authenticator := FOAuth2;
 
-  Request.Method := rmPOST;
-  Request.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  jsonBody := CreateRequestJSON(FilePath, ModelName);
+  LRequest.Method := rmPOST;
+  LRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  LJsonBody := CreateRequestJSON(FilePath, ModelName);
   try
-    Request.AddBody(jsonBody);
+    LRequest.AddBody(LJsonBody);
     //AddBody('{"config": {"encoding": "FLAC", "sampleRateHertz": 16000, "languageCode": "en-US", "model": "' + ModelName + '"}, "audio": {"content": "' + Base64EncodedFile(FilePath) + '"}}', TRESTContentType.ctAPPLICATION_JSON);
   finally
-    FreeAndNil(jsonBody);
+    FreeAndNil(LJsonBody);
   end;
-  Response := TRESTResponse.Create(Request);
-  Request.Response := Response;
+  LResponse := TRESTResponse.Create(LRequest);
+  LRequest.Response := LResponse;
   try
-    Request.Execute;
-    googleResults := TTGoogleSpeechToTextResultsClass.FromJsonString(Response.Content);
-    Result := googleResults.results[0].alternatives[0].transcript;
+    LRequest.Execute;
+    LGoogleResults := TTGoogleSpeechToTextResultsClass.FromJsonString(LResponse.Content);
+    Result := LGoogleResults.results[0].alternatives[0].transcript;
   finally
-    Response.Free;
-    Request.Free;
-    RestClient.Free;
+    LResponse.Free;
+    LRequest.Free;
+    LRestClient.Free;
   end;
   // 5. Parse the response
   // ...

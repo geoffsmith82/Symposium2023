@@ -23,7 +23,7 @@ type
     FModelInfo : TObjectList<TImageModelInfo>;
     function GetModelInfo: TObjectList<TImageModelInfo>; virtual; abstract;
   public
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string);
     destructor Destroy; override;
     function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass; virtual; abstract;
     property ModelInfo: TObjectList<TImageModelInfo> read GetModelInfo;
@@ -37,7 +37,7 @@ uses
 
 { TBaseImageGeneration }
 
-constructor TBaseImageGeneration.Create(APIKey: string);
+constructor TBaseImageGeneration.Create(const APIKey: string);
 begin
   FAPIKey := APIKey;
   FModelInfo := TObjectList<TImageModelInfo>.Create;

@@ -102,126 +102,126 @@ end;
 
 function TGoogleSpeechService.GetVoices: TObjectList<TVoiceInfo>;
 var
-  googleVoiceList : TGoogleVoicesListClass;
-  googleVoice : TGoogleVoiceClass;
-  voice : TVoiceInfo;
+  LGoogleVoiceList : TGoogleVoicesListClass;
+  LGoogleVoice : TGoogleVoiceClass;
+  LVoice : TVoiceInfo;
 begin
   FVoicesInfo.Clear;
-  googleVoiceList := GetVoiceList;
+  LGoogleVoiceList := GetVoiceList;
   try
-    for googleVoice in googleVoiceList.voices do
+    for LGoogleVoice in LGoogleVoiceList.voices do
     begin
-      voice := TVoiceInfo.Create;
-      voice.VoiceName := googleVoice.name;
-      voice.VoiceId := googleVoice.name;
-      FVoicesInfo.Add(voice);
+      LVoice := TVoiceInfo.Create;
+      LVoice.VoiceName := LGoogleVoice.name;
+      LVoice.VoiceId := LGoogleVoice.name;
+      FVoicesInfo.Add(LVoice);
     end;
   finally
-    FreeAndNil(googleVoiceList);
+    FreeAndNil(LGoogleVoiceList);
   end;
   Result := FVoicesInfo;
 end;
 
 function TGoogleSpeechService.GetVoiceList: TGoogleVoicesListClass;
 var
-  RESTClient1: TRESTClient;
-  RESTRequest1: TRESTRequest;
-  RESTResponse1: TRESTResponse;
-  googleResponseString : TStringStream;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LGoogleResponseString : TStringStream;
 begin
-  RESTClient1 := TRESTClient.Create(nil);
-  RESTRequest1 := TRESTRequest.Create(RESTClient1);
-  RESTResponse1 := TRESTResponse.Create(RESTClient1);
+  LRESTClient := TRESTClient.Create(nil);
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   try
-    RESTClient1.BaseURL := 'https://texttospeech.googleapis.com';
-    RESTRequest1.Client := RESTClient1;
-    RESTRequest1.Method := rmGET;
-    RESTRequest1.Resource := '/v1/voices';
-    RESTRequest1.Response := RESTResponse1;
+    LRESTClient.BaseURL := 'https://texttospeech.googleapis.com';
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Method := rmGET;
+    LRESTRequest.Resource := '/v1/voices';
+    LRESTRequest.Response := LRESTResponse;
     FOAuth2.RefreshAccessTokenIfRequired;
-    RESTClient1.Authenticator := FOAuth2;
-    RESTRequest1.AddParameter('Content-Type', 'application/json',
+    LRESTClient.Authenticator := FOAuth2;
+    LRESTRequest.AddParameter('Content-Type', 'application/json',
       TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    RESTRequest1.Execute;
+    LRESTRequest.Execute;
 
-    googleResponseString := TStringStream.Create;
+    LGoogleResponseString := TStringStream.Create;
     try
-      googleResponseString.Write(RESTResponse1.RawBytes, Length(RESTResponse1.RawBytes));
-      Result := TGoogleVoicesListClass.FromJsonString(googleResponseString.DataString);
+      LGoogleResponseString.Write(LRESTResponse.RawBytes, Length(LRESTResponse.RawBytes));
+      Result := TGoogleVoicesListClass.FromJsonString(LGoogleResponseString.DataString);
     finally
-      FreeAndNil(googleResponseString);
+      FreeAndNil(LGoogleResponseString);
     end;
   finally
-    FreeAndNil(RESTRequest1);
-    FreeAndNil(RESTResponse1);
-    FreeAndNil(RESTClient1);
+    FreeAndNil(LRESTRequest);
+    FreeAndNil(LRESTResponse);
+    FreeAndNil(LRESTClient);
   end;
 end;
 
 function TGoogleSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;
 var
-  RESTClient1: TRESTClient;
-  RESTRequest1: TRESTRequest;
-  RESTResponse1: TRESTResponse;
-  JsonBody : TJSONObject;
-  JsonInput: TJSONObject;
-  JsonVoice: TJSONObject;
-  JsonAudioConfig: TJSONObject;
-  googleResponseString : TStringStream;
-  googleResponse : TGoogleTextToSpeechResponseClass;
-  audioBytes : TBytes;
+  LRESTClient: TRESTClient;
+  LRESTRequest: TRESTRequest;
+  LRESTResponse: TRESTResponse;
+  LJsonBody : TJSONObject;
+  LJsonInput: TJSONObject;
+  LJsonVoice: TJSONObject;
+  LJsonAudioConfig: TJSONObject;
+  LGoogleResponseString : TStringStream;
+  LGoogleResponse : TGoogleTextToSpeechResponseClass;
+  LAudioBytes : TBytes;
 begin
-  RESTClient1 := TRESTClient.Create(nil);
-  RESTRequest1 := TRESTRequest.Create(RESTClient1);
-  RESTResponse1 := TRESTResponse.Create(RESTClient1);
+  LRESTClient := TRESTClient.Create(nil);
+  LRESTRequest := TRESTRequest.Create(LRESTClient);
+  LRESTResponse := TRESTResponse.Create(LRESTClient);
   try
-    RESTClient1.BaseURL := 'https://texttospeech.googleapis.com/v1beta1/text:synthesize';
-    RESTRequest1.Client := RESTClient1;
-    RESTRequest1.Method := rmPOST;
-    RESTRequest1.Resource := '';
-    RESTRequest1.Response := RESTResponse1;
-    RESTClient1.Authenticator := FOAuth2;
+    LRESTClient.BaseURL := 'https://texttospeech.googleapis.com/v1beta1/text:synthesize';
+    LRESTRequest.Client := LRESTClient;
+    LRESTRequest.Method := rmPOST;
+    LRESTRequest.Resource := '';
+    LRESTRequest.Response := LRESTResponse;
+    LRESTClient.Authenticator := FOAuth2;
     FOAuth2.RefreshAccessTokenIfRequired;
-    RESTRequest1.AddParameter('Content-Type', 'application/json',
+    LRESTRequest.AddParameter('Content-Type', 'application/json',
       TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    JsonBody := nil;
-    JsonInput := nil;
-    JsonVoice := nil;
+    LJsonBody := nil;
+    LJsonInput := nil;
+    LJsonVoice := nil;
     try
-      JsonInput := TJSONObject.Create;
-      JsonVoice := TJSONObject.Create;
-      JsonAudioConfig := TJSONObject.Create;
-      JsonBody := TJSONObject.Create;
-      JsonBody.AddPair('input', JsonInput);
-      JsonBody.AddPair('voice', JsonVoice);
-      JsonBody.AddPair('audioConfig', JsonAudioConfig);
-      JsonInput.AddPair('text', Text);
-      JsonVoice.AddPair('languageCode', 'en-US');
-      JsonVoice.AddPair('name', 'en-US-Wavenet-C');
-      JsonAudioConfig.AddPair('audioEncoding', 'MP3');
-      RESTRequest1.AddBody(JsonBody.ToJSON, ctAPPLICATION_JSON);
+      LJsonInput := TJSONObject.Create;
+      LJsonVoice := TJSONObject.Create;
+      LJsonAudioConfig := TJSONObject.Create;
+      LJsonBody := TJSONObject.Create;
+      LJsonBody.AddPair('input', LJsonInput);
+      LJsonBody.AddPair('voice', LJsonVoice);
+      LJsonBody.AddPair('audioConfig', LJsonAudioConfig);
+      LJsonInput.AddPair('text', Text);
+      LJsonVoice.AddPair('languageCode', 'en-US');
+      LJsonVoice.AddPair('name', 'en-US-Wavenet-C');
+      LJsonAudioConfig.AddPair('audioEncoding', 'MP3');
+      LRESTRequest.AddBody(LJsonBody.ToJSON, ctAPPLICATION_JSON);
     finally
-      FreeAndNil(JsonBody);
+      FreeAndNil(LJsonBody);
     end;
-    RESTRequest1.Execute;
+    LRESTRequest.Execute;
     // Extract the audio data from the response and return it as a TMemoryStream
     Result := TMemoryStream.Create;
-    googleResponseString := TStringStream.Create;
+    LGoogleResponseString := TStringStream.Create;
     try
-      googleResponseString.Write(RESTResponse1.RawBytes, Length(RESTResponse1.RawBytes));
-      googleResponse := TGoogleTextToSpeechResponseClass.FromJsonString(googleResponseString.DataString);
-      audioBytes := TBase64Encoding.Base64.Decode(TEncoding.UTF8.GetBytes(googleResponse.audioContent));
+      LGoogleResponseString.Write(LRESTResponse.RawBytes, Length(LRESTResponse.RawBytes));
+      LGoogleResponse := TGoogleTextToSpeechResponseClass.FromJsonString(LGoogleResponseString.DataString);
+      LAudioBytes := TBase64Encoding.Base64.Decode(TEncoding.UTF8.GetBytes(LGoogleResponse.audioContent));
     finally
-      FreeAndNil(googleResponseString);
-      FreeAndNil(googleResponse);
+      FreeAndNil(LGoogleResponseString);
+      FreeAndNil(LGoogleResponse);
     end;
-    Result.Write(audioBytes, length(audiobytes));
+    Result.Write(LAudioBytes, length(LAudioBytes));
   finally
-    RESTRequest1.Free;
-    RESTResponse1.Free;
-    RESTClient1.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
+    LRESTClient.Free;
   end;
 end;
 
