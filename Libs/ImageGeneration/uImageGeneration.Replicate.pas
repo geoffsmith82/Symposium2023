@@ -93,12 +93,14 @@ type
 
   TImageGenerationReplicate = class(TBaseImageGeneration)
   private
+    FEndpoint : string;
     function DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
     function GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
     function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass; override;
+    constructor Create(const APIKey: string; const endpoint: string = 'https://api.replicate.com');
   end;
 
 implementation
@@ -126,6 +128,12 @@ end;
 
 { TImageGenerationReplicate }
 
+
+constructor TImageGenerationReplicate.Create(const APIKey, endpoint: string);
+begin
+  inherited Create(APIKey);
+  FEndPoint := endpoint;
+end;
 
 function TImageGenerationReplicate.DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
 var
@@ -187,7 +195,7 @@ begin
   if not Assigned(Prediction) then
     raise Exception.Create('Prediction object is not assigned');
 
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create(FEndpoint);
   try
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
@@ -318,7 +326,7 @@ begin
   if LVersion.IsEmpty then
     raise Exception.Create('Could not find model ' + modelVersion);
 
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create(FEndPoint);
   try
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
@@ -410,7 +418,7 @@ var
 begin
   FModelInfo.Clear;
 
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create(FEndpoint);
   try
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);

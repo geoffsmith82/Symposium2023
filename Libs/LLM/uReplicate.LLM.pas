@@ -41,6 +41,7 @@ type
 
   TReplicateLLM = class(TBaseLLM)
   private
+    FEndPoint: string;
     function DeserializePredictionInfo(const AJsonStr: string): TPredictionInfo;
     function GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
   protected
@@ -48,6 +49,7 @@ type
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    constructor Create(const APIKey: string; const endpoint: string = 'https://api.replicate.com');
   end;
 
 implementation
@@ -78,7 +80,7 @@ begin
   if not Assigned(Prediction) then
     raise Exception.Create('Prediction object is not assigned');
 
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create(FEndPoint);
   try
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
@@ -203,7 +205,7 @@ begin
   if LVersion.IsEmpty then
     raise Exception.Create('Could not find model ' + AModel);
   // Create and setup REST client, request and response
-  LRestClient := TRESTClient.Create('https://api.replicate.com');
+  LRestClient := TRESTClient.Create(FEndPoint);
   try
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
@@ -256,6 +258,12 @@ begin
   end;
 end;
 
+constructor TReplicateLLM.Create(const APIKey, endpoint: string);
+begin
+  inherited Create(APIKey);
+  FEndPoint := endpoint;
+end;
+
 function TReplicateLLM.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
   LRestClient: TRESTClient;
@@ -272,7 +280,7 @@ begin
   LRestRequest := nil;
   LRestResponse := nil;
   try
-    LRestClient := TRESTClient.Create('https://api.replicate.com');
+    LRestClient := TRESTClient.Create(FEndPoint);
     LRestRequest := TRESTRequest.Create(nil);
     LRestResponse := TRESTResponse.Create(nil);
     try
