@@ -116,6 +116,9 @@
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.pas"/>
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas"/>
         <DCCReference Include="..\Libs\ImageGeneration\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

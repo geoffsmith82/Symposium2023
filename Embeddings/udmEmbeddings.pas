@@ -22,6 +22,7 @@ uses
   FireDAC.VCLUI.Wait,
   FireDAC.Comp.Client,
   Data.DB,
+  uEmbeddings,
   uLLM
   ;
 

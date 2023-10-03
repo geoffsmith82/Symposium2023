@@ -35,6 +35,8 @@ uses
   uAnthropic,
   uGoogle.PaLM,
   uAzureGPT,
+  uEmbeddings.OpenAI,
+  uEmbeddings,
   uLLM
   ;
 
@@ -61,6 +63,7 @@ type
     procedure btnQueryClick(Sender: TObject);
   private
     FOpenAI : TOpenAI;
+    FEmbeddingOpenAI: TEmbeddingsOpenAI;
     function GetQuestionsArray: TArray<string>;
     function GetCompareQuestionsArray: TArray<string>;
     procedure DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);
@@ -117,7 +120,7 @@ var
   chatResponse : TChatResponse;
   sections : TArray<string>;
 begin
-  questionEmbedding := FOpenAI.Embeddings([Memo2.Lines.Text]);
+  questionEmbedding := FEmbeddingOpenAI.Embeddings([Memo2.Lines.Text]);
   prompt := TPrompt.Create(
                            '{question}' + sLineBreak + sLineBreak +
                            'CONTEXT' + sLineBreak +
@@ -177,7 +180,7 @@ begin
       end;
     end;
     SetLength(sections, j);
-    embeddings := FOpenAI.Embeddings(sections);
+    embeddings := FEmbeddingOpenAI.Embeddings(sections);
     json := TJSONObject.Create;
     json.AddPair('filename', 'inputText.txt');
     dmEmbeddings.AddDocument(embeddings, sections, 'inputText.txt', json);
@@ -234,9 +237,9 @@ var
   closestMatches : TArray<TArray<TEmbeddingMatch>>;
 begin
   questions := GetQuestionsArray;
-  embeddingsFromDB := FOpenAI.Embeddings(questions);
+  embeddingsFromDB := FEmbeddingOpenAI.Embeddings(questions);
   compareQuestions := GetCompareQuestionsArray;
-  compareQuestionEmbeddings := FOpenAI.Embeddings(compareQuestions);
+  compareQuestionEmbeddings := FEmbeddingOpenAI.Embeddings(compareQuestions);
   Memo1.Lines.Clear;
   SetLength(closestMatches, Length(compareQuestions));
   // Loop through each compare question
@@ -287,11 +290,13 @@ end;
 procedure TfrmEmbeddings.FormCreate(Sender: TObject);
 begin
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FEmbeddingOpenAI := TEmbeddingsOpenAI.Create(chatgpt_apikey);
 end;
 
 procedure TfrmEmbeddings.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FOpenAI);
+  FreeAndNil(FEmbeddingOpenAI);
 end;
 
 procedure TfrmEmbeddings.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);

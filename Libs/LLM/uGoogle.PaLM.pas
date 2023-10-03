@@ -44,7 +44,6 @@ type
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
-    function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
 
@@ -147,11 +146,6 @@ begin
 end;
 
 function TGooglePaLM.Completion(const AQuestion, AModel: string): string;
-begin
-  raise Exception.Create('Not Implemented Yet');
-end;
-
-function TGooglePaLM.Embeddings(const Texts: TArray<string>): TEmbeddings;
 begin
   raise Exception.Create('Not Implemented Yet');
 end;

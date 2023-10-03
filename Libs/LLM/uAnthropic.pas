@@ -28,7 +28,6 @@ type
   public
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
-    function Embeddings(const Texts: TArray<string>): TEmbeddings;
   end;
 
 implementation
@@ -140,11 +139,6 @@ begin
   finally
     FreeAndNil(LMessages);
   end;
-end;
-
-function TAnthropic.Embeddings(const Texts: TArray<string>): TEmbeddings;
-begin
-  raise Exception.Create('Not Available');
 end;
 
 function TAnthropic.GetModelInfo: TObjectList<TBaseModelInfo>;

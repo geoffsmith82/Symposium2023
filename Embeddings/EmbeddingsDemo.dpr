@@ -9,7 +9,10 @@ uses
   udmEmbeddings in 'udmEmbeddings.pas' {dmEmbeddings: TDataModule},
   uAnthropic in '..\Libs\LLM\uAnthropic.pas',
   uGoogle.PaLM in '..\Libs\LLM\uGoogle.PaLM.pas',
-  uAzureGPT in '..\Libs\LLM\uAzureGPT.pas';
+  uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
+  uEmbeddings in '..\Libs\Embeddings\uEmbeddings.pas',
+  uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
+  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas';
 
 {$R *.res}
 

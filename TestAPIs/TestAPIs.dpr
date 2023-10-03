@@ -41,7 +41,10 @@ uses
   uImageGeneration.Replicate in '..\Libs\ImageGeneration\uImageGeneration.Replicate.pas',
   uImageGeneration in '..\Libs\ImageGeneration\uImageGeneration.pas',
   uImageGeneration.OpenAI in '..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas',
-  uDALLe2.DTO in '..\Libs\ImageGeneration\uDALLe2.DTO.pas';
+  uDALLe2.DTO in '..\Libs\ImageGeneration\uDALLe2.DTO.pas',
+  uEmbeddings in '..\Libs\Embeddings\uEmbeddings.pas',
+  uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
+  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas';
 
 {$R *.res}
 

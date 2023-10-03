@@ -130,6 +130,9 @@
         <DCCReference Include="..\Libs\LLM\uAnthropic.pas"/>
         <DCCReference Include="..\Libs\LLM\uGoogle.PaLM.pas"/>
         <DCCReference Include="..\Libs\LLM\uAzureGPT.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
