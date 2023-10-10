@@ -52,6 +52,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [AssemblyAI](https://www.assemblyai.com/app) Voice Recognition
   - [DeepGram](https://deepgram.com/) Voice Recognition
   - [Rev.AI](https://www.rev.ai) Voice Recognition
+  - [Conqui-ai](https://github.com/coqui-ai/TTS) Run a variaty of text to speech models locally from a docker container
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.

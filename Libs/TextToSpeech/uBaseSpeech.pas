@@ -70,7 +70,7 @@ var
 begin
   LTicks := GetTickCount64;
   repeat
-  Application.ProcessMessages;
+    Application.ProcessMessages;
   until GetTickCount64 - LTicks > 200;
  // if MediaPlayer.Mode = mpStopped then
   if FStatus = ssPlayStopping then
@@ -102,11 +102,12 @@ begin
                  FreeAndNil(Stream);
                end;
 
-               TThread.Queue(nil, procedure ()
+               TThread.Synchronize(nil, procedure ()
                  begin
                    FMediaPlayer.OnNotify := MediaPlayerNotify;
                    FMediaPlayer.Notify := true;
-
+                   OutputDebugString(PChar('Filename:' + LFileName));
+                   FMediaPlayer.DeviceType := dtWaveAudio;
                    FMediaPlayer.FileName := LFileName;
                    FMediaPlayer.Open;
                    FStatus := ssPlayStarting;
@@ -120,7 +121,7 @@ begin
   FResourceKey := AResourceKey;
   FHost := AHost;
   FFormatExt := '.mp3';
-  FMediaPlayer := TMediaPlayer.Create(nil);
+  FMediaPlayer := TMediaPlayer.Create(Sender);
   FMediaPlayer.Parent := Sender;
   FMediaPlayer.Visible := False;
   FVoicesInfo := TObjectList<TVoiceInfo>.Create;
