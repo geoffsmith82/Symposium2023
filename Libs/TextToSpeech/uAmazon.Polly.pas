@@ -112,6 +112,9 @@ begin
     LRequest.Text := text;
     LRequest.OutputFormat := 'mp3';
     LRequest.VoiceId := VoiceName;
+    if VoiceName.IsEmpty then
+      Exception.Create('Missing Voice for Text to Speech');
+    
     LRequest.SetEngine('neural');
     LResponse := LPolly.SynthesizeSpeech(LRequest);
     Result := TMemoryStream.Create;
