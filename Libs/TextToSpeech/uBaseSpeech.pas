@@ -8,11 +8,14 @@ uses
   System.IOUtils,
   System.Threading,
   System.Generics.Collections,
-  Winapi.Windows,
+  System.Win.ComObj,
   Vcl.Dialogs,
   Vcl.Forms,
   Vcl.Controls,
-  Vcl.MPlayer;
+  Winapi.ActiveX,
+  Winapi.Windows,
+  DirectShow9
+  ;
 
 type
   TVoiceInfo = class
@@ -27,58 +30,69 @@ type
   strict protected
     FVoicesInfo : TObjectList<TVoiceInfo>;
     function GetVoices: TObjectList<TVoiceInfo>; virtual; abstract;
-  strict private
-    FMediaPlayer : TMediaPlayer;
   private
-    procedure MediaPlayerNotify(Sender: TObject);
+    procedure PlayStateChange(ASender: TObject; OldState, NewState: Integer);
+    procedure PlayMP3(const FileName: string);
   protected
     FFormatExt : string;
     FResourceKey: string;
     FApplicationName: string;
     FHost: string;
-    FStatus: TSpeechStatus;
   public
     OnFinishedPlaying:  TNotifyEvent;
     constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
     procedure PlayText(const text:string; const VoiceName: string = '');
-    function Mode: TMPModes;
   public
     property Voices: TObjectList<TVoiceInfo> read GetVoices;
   end;
 
 implementation
 
+uses ufrmVoiceRecognition;
+
 { TBaseSpeech }
 
 destructor TBaseTextToSpeech.Destroy;
 begin
   inherited;
-  FreeAndNil(FMediaPlayer);
   FreeAndNil(FVoicesInfo);
 end;
 
-function TBaseTextToSpeech.Mode: TMPModes;
-begin
-  Result := FMediaPlayer.Mode;
-end;
-
-procedure TBaseTextToSpeech.MediaPlayerNotify(Sender: TObject);
+procedure TBaseTextToSpeech.PlayMP3(const FileName: string);
 var
-  LTicks : UInt64;
+  GraphBuilder: IGraphBuilder;
+  MediaControl: IMediaControl;
+  MediaEventEx: IMediaEventEx;
+  EventCode: LongInt;
 begin
-  LTicks := GetTickCount64;
-  repeat
-    Application.ProcessMessages;
-  until GetTickCount64 - LTicks > 200;
- // if MediaPlayer.Mode = mpStopped then
-  if FStatus = ssPlayStopping then
+  CoInitialize(nil);
+  // Create the Filter Graph Manager
+  CoCreateInstance(CLSID_FilterGraph, nil, CLSCTX_INPROC_SERVER, IID_IGraphBuilder, GraphBuilder);
+
+  if GraphBuilder.RenderFile(PWideChar(WideString(FileName)), nil) = S_OK then
   begin
-    if Assigned(OnFinishedPlaying) then
-      OnFinishedPlaying(Sender);
+    // Get the IMediaControl interface
+    MediaControl := GraphBuilder as IMediaControl;
+
+    // Start playback
+    MediaControl.Run;
+
+    // Wait for completion using IMediaEventEx
+    MediaEventEx := GraphBuilder as IMediaEventEx;
+    MediaEventEx.WaitForCompletion(INFINITE, EventCode);
+
+    TThread.Queue(nil, procedure ()
+    begin
+      if Assigned(OnFinishedPlaying) then
+        OnFinishedPlaying(nil);
+          OutputDebugString(PChar('Played'));
+    end);
+
+    // Stop playback
+    MediaControl.Stop;
   end;
-  FStatus := ssPlayStopping;
 end;
 
 procedure TBaseTextToSpeech.PlayText(const text:string; const VoiceName: string = '');
@@ -101,18 +115,7 @@ begin
                finally
                  FreeAndNil(Stream);
                end;
-
-               TThread.Synchronize(nil, procedure ()
-                 begin
-                   FMediaPlayer.OnNotify := MediaPlayerNotify;
-                   FMediaPlayer.Notify := true;
-                   OutputDebugString(PChar('Filename:' + LFileName));
-                   FMediaPlayer.DeviceType := dtWaveAudio;
-                   FMediaPlayer.FileName := LFileName;
-                   FMediaPlayer.Open;
-                   FStatus := ssPlayStarting;
-                   FMediaPlayer.Play;
-                 end);
+               PlayMP3(LFileName);
              end).Start;
 end;
 
@@ -121,9 +124,6 @@ begin
   FResourceKey := AResourceKey;
   FHost := AHost;
   FFormatExt := '.mp3';
-  FMediaPlayer := TMediaPlayer.Create(Sender);
-  FMediaPlayer.Parent := Sender;
-  FMediaPlayer.Visible := False;
   FVoicesInfo := TObjectList<TVoiceInfo>.Create;
 end;
 
