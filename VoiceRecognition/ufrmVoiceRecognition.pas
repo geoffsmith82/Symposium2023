@@ -15,6 +15,7 @@ uses
   System.JSON,
   System.SyncObjs,
   System.Threading,
+  Winapi.ActiveX,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
   Vcl.Menus,
@@ -71,11 +72,8 @@ uses
   uRevAI.SpeechToText,
   uBaseSpeechRecognition,
   uEngineManager,
-  AdvUtil,
-  AdvObj,
-  BaseGrid,
-  AdvGrid,
-  DBAdvGrid
+  Vcl.WinXPanels,
+  BubbleText
   ;
 
 type
@@ -119,7 +117,6 @@ type
     DBText1: TDBText;
     NULLOut: TNULLOut;
     StatusBar: TStatusBar;
-    DBAdvGrid1: TDBAdvGrid;
     Panel1: TPanel;
     VirtualImage1: TVirtualImage;
     DBText2: TDBText;
@@ -129,6 +126,7 @@ type
     Model2: TMenuItem;
     gpt41: TMenuItem;
     miRevAI: TMenuItem;
+    ScrollBox1: TScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
@@ -138,9 +136,7 @@ type
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
     procedure btnNewChatSessionClick(Sender: TObject);
-    procedure FormResize(Sender: TObject);
     procedure tblSessionsAfterScroll(DataSet: TDataSet);
-    procedure DBCtrlGrid1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
     procedure btnDeleteSessionClick(Sender: TObject);
     procedure Model2Click(Sender: TObject);
@@ -168,6 +164,8 @@ type
       AChatMessages: TObjectList<TChatMessage>;
       AOnMessageResults: TOnChatMessageMessageResults);
     procedure OnFinishedPlaying(Sender: TObject);
+    function AddMessage(user:string; msg: string): TBubbleText;
+    function LastHeight: Integer;
   public
     { Public declarations }
     procedure ShowListening;
@@ -242,9 +240,58 @@ begin
   VirtualImage1.Update;
 end;
 
-procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
+function TfrmVoiceRecognition.LastHeight: Integer;
 begin
-  DBAdvGrid1.AutoSizeRows(True, 4);
+   Result := 9999;
+end;
+
+function TfrmVoiceRecognition.AddMessage(user:string; msg: string): TBubbleText;
+var
+  bubble : TBubbleText;
+begin
+  bubble := TBubbleText.Create(ScrollBox1);
+  bubble.Parent := ScrollBox1;
+  bubble.Text := msg;
+  bubble.Visible := True;
+  if user = 'User' then
+    bubble.BubbleType := btUser
+  else
+    bubble.BubbleType := btOther;
+  bubble.Text := msg;
+  bubble.Top := LastHeight;
+  bubble.Align := alTop;
+
+  Result := bubble;
+end;
+
+
+procedure TfrmVoiceRecognition.tblSessionsAfterScroll(DataSet: TDataSet);
+var
+  I: Integer;
+  b : TBubbleText;
+begin
+   if ScrollBox1.ComponentCount > 0 then
+   begin
+     for I := ScrollBox1.ComponentCount - 1 downto 0 do
+     begin
+       b := ScrollBox1.Components[i]  as TBubbleText;
+       FreeAndNil(b);
+     end;
+   end;
+
+  if not tblConversation.Active then Exit;
+  try
+    tblConversation.Last;
+    repeat
+      AddMessage(tblConversation.FieldByName('User').AsString, tblConversation.FieldByName('Message').AsString);
+      tblConversation.Prior;
+    until tblConversation.Bof;
+  finally
+    b := ScrollBox1.Components[0]  as TBubbleText;
+    ScrollBox1.ClientHeight := b.Top + b.Height + 10;
+    ScrollBox1.Visible := True;
+    ScrollBox1.ScrollInView(b);
+  end;
 end;
 
 procedure TfrmVoiceRecognition.LoadAudioInputsMenu;
@@ -331,7 +378,6 @@ begin
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
   LoadAudioInputsMenu;
-  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
@@ -341,12 +387,6 @@ begin
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
   FreeAndNil(FOpenAI);
-end;
-
-procedure TfrmVoiceRecognition.FormResize(Sender: TObject);
-begin
-  DBAdvGrid1.ColWidths[0] := 150;
-  DBAdvGrid1.ColWidths[1] := DBAdvGrid1.ClientWidth - 150;
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);
@@ -361,8 +401,6 @@ procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TObject);
 begin
   mmoQuestions.Lines.Add('Disconnected');
   FConnected := False;
-  if not FShouldBeListening then
-    StopListening;
 end;
 
 procedure TfrmVoiceRecognition.AsyncSendChatMessagesToOpenAI(ASessionID: Int64; AChatMessages: TObjectList<TChatMessage>; AOnMessageResults: TOnChatMessageMessageResults);
@@ -390,10 +428,11 @@ begin
                    end);
                  FreeAndNil(AChatMessages);
                end);
-  task.Start;
 end;
 
 procedure TfrmVoiceRecognition.OnHandleChatResponse(SessionID: Int64 ;ChatResponse: TChatResponse);
+var
+  bubble : TBubbleText;
 begin
   tblConversation.Append;
   try
@@ -402,7 +441,6 @@ begin
     tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
     tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
     tblConversation.Post;
-    DBAdvGrid1.AutoSizeRows(True, 4);
   except
     on e : Exception do
     begin
@@ -411,9 +449,11 @@ begin
   end;
   NULLOut.Stop(False);
   FStatus := TRecognitionStatus.rsSpeaking;
+  bubble := AddMessage('Assistant', ChatResponse.Content);
+  ScrollBox1.ScrollInView(bubble);
   ShowSpeaking;
   FTextToSpeechEngines.ActiveEngine.OnFinishedPlaying := OnFinishedPlaying;
-  FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content);
+  FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content, 'Olivia');
 end;
 
 procedure TfrmVoiceRecognition.OnFinishedPlaying(Sender: TObject);
@@ -454,7 +494,8 @@ begin
   finally
     tblConversation.EnableControls;
   end;
-  DBAdvGrid1.AutoSizeRows(True, 4);
+    AddMessage('User', question);
+
   tblConversation.DisableControls;
   try
     tblConversation.First;
@@ -551,11 +592,6 @@ end;
 procedure TfrmVoiceRecognition.btnStopClick(Sender: TObject);
 begin
   StopListening;
-end;
-
-procedure TfrmVoiceRecognition.DBCtrlGrid1Click(Sender: TObject);
-begin
-  DBAdvGrid1.AutoSizeRows(True, 4);
 end;
 
 procedure TfrmVoiceRecognition.miExitClick(Sender: TObject);

@@ -35,6 +35,7 @@ uses
   uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
   uLLM in '..\Libs\LLM\uLLM.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
+  BubbleText in '..\Libs\Bubble\BubbleText.pas',
   uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas';
 
 {$R *.res}

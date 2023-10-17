@@ -90,7 +90,6 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [Open-Assistant](https://open-assistant.io/)
 
 ### External Libraries required to build projects
- - [TMS Grid](https://www.tmssoftware.com/site/dbadvgrd.asp) TMS Software TDBAdvGrid... You can use the trail version to get the demo to work.
  - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
  - [newac](https://github.com/geoffsmith82/newac) New Audio Components
  - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11
