@@ -70,8 +70,6 @@ uses
 type
   TRecognitionStatus = (rsListening, rsThinking, rsSpeaking , rsStopped);
   TfrmVoiceRecognition = class(TForm)
-    mmoQuestions: TMemo;
-    mmoAnswers: TMemo;
     mmMainMenu: TMainMenu;
     miFile: TMenuItem;
     New1: TMenuItem;
@@ -418,16 +416,15 @@ end;
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
 begin
   StopListening;
+  FreeAndNil(FAudio);
   FreeAndNil(FSettings);
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
   FreeAndNil(FOpenAI);
-  FreeAndNil(FAudio);
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);
 begin
-  mmoQuestions.Lines.Add('Connected');
   FConnected := True;
   if FShouldBeListening then
     ShowListening;
@@ -435,7 +432,6 @@ end;
 
 procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TObject);
 begin
-  mmoQuestions.Lines.Add('Disconnected');
   FConnected := False;
 end;
 
