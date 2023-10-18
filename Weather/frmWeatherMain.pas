@@ -139,7 +139,6 @@ begin
     FreeAndNil(memStream);
     product := nil;
   end;
-
 end;
 
 end.

@@ -72,6 +72,7 @@ uses
   uRevAI.SpeechToText,
   uBaseSpeechRecognition,
   uEngineManager,
+  uAudioRecorder,
   Vcl.WinXPanels,
   BubbleText
   ;
@@ -128,10 +129,10 @@ type
     miRevAI: TMenuItem;
     ScrollBox1: TScrollBox;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure SelectSpeechRecognitionClick(Sender: TObject);
@@ -149,6 +150,7 @@ type
     FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
     task : ITask;
+    FAudio : TAudioRecorder;
     FStatus : TRecognitionStatus;
     FOpenAI : TOpenAI;
 
@@ -166,6 +168,7 @@ type
     procedure OnFinishedPlaying(Sender: TObject);
     function AddMessage(user:string; msg: string): TBubbleText;
     function LastHeight: Integer;
+    procedure OnAudioData(Sender: TObject; Data: TMemoryStream);
   public
     { Public declarations }
     procedure ShowListening;
@@ -215,7 +218,8 @@ begin
   FShouldBeListening := True;
   FStatus := TRecognitionStatus.rsListening;
   FSpeechRecognitionEngines.ActiveEngine.Resume;
-  NULLOut.Run;
+  FAudio.Start;
+ // NULLOut.Run;
   ShowListening;
 end;
 
@@ -224,7 +228,8 @@ begin
   FShouldBeListening := False;
   FSpeechRecognitionEngines.ActiveEngine.Finish;
   VirtualImage1.ImageIndex := -1;
-  NULLOut.Stop(False);
+  FAudio.Stop;
+//  NULLOut.Stop(False);
 end;
 
 procedure TfrmVoiceRecognition.ShowListening;
@@ -299,10 +304,23 @@ var
   lAudioInput: Integer;
   i: Integer;
   mi: TMenuItem;
+  devices : TAudioDevices;
 begin
   miAudioInput.Clear;
   lAudioInput := FSettings.ReadInteger('Audio', 'Input', 0);
-  for i := 0 to DXAudioIn.DeviceCount - 1 do
+  devices := FAudio.GetAvailableDevices;
+  for i := 0 to Length(devices) - 1 do
+  begin
+    mi := TMenuItem.Create(nil);
+    mi.Caption := devices[i].DeviceName;
+    mi.Tag := i;
+    if lAudioInput = i then
+    begin
+      mi.Checked := True;
+      FAudio.SelectDevice(i);
+    end;
+
+{  for i := 0 to DXAudioIn.DeviceCount - 1 do
   begin
     mi := TMenuItem.Create(nil);
     mi.Caption := DXAudioIn.DeviceName[i];
@@ -311,7 +329,7 @@ begin
     begin
       mi.Checked := True;
       DXAudioIn.DeviceNumber := i;
-    end;
+    end;   }
     mi.GroupIndex := 10;
     mi.RadioItem := True;
     mi.AutoCheck := True;
@@ -364,6 +382,12 @@ begin
   FSpeechRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 
+procedure TfrmVoiceRecognition.OnAudioData(Sender: TObject; Data: TMemoryStream);
+begin
+  Data.Position := 0;
+  FSpeechRecognitionEngines.ActiveEngine.Add(Data);
+end;
+
 procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
 begin
   FConnected := False;
@@ -371,6 +395,8 @@ begin
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FAudio := TAudioRecorder.Create;
+  FAudio.OnAudioData := OnAudioData;
 
   tblSessions.Active := True;
   tblConversation.Active := True;
@@ -387,6 +413,7 @@ begin
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
   FreeAndNil(FOpenAI);
+  FreeAndNil(FAudio);
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);

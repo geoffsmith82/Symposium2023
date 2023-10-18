@@ -36,6 +36,7 @@ uses
   uLLM in '..\Libs\LLM\uLLM.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
   BubbleText in '..\Libs\Bubble\BubbleText.pas',
+  uAudioRecorder in '..\Libs\SpeechToText\uAudioRecorder.pas',
   uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas';
 
 {$R *.res}

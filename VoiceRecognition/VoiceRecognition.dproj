@@ -152,6 +152,7 @@
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <DCCReference Include="..\Libs\Bubble\BubbleText.pas"/>
+        <DCCReference Include="..\Libs\SpeechToText\uAudioRecorder.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uRevAI.SpeechToText.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

@@ -31,7 +31,6 @@ type
     FVoicesInfo : TObjectList<TVoiceInfo>;
     function GetVoices: TObjectList<TVoiceInfo>; virtual; abstract;
   private
-    procedure PlayStateChange(ASender: TObject; OldState, NewState: Integer);
     procedure PlayMP3(const FileName: string);
   protected
     FFormatExt : string;
