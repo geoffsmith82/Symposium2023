@@ -18,15 +18,20 @@ uses
 type
   TBubbleType = (btUser, btOther, btSystem);
 
-  TBubbleText = class(TCustomTransparentControl)
+  TBubbleText = class;
+
+  TNotifyBubbleEvent = procedure(Sender: TObject; Bubble: TBubbleText) of object;
+
+  TBubbleText = class(TCustomControl)
   private
     FSelected: Boolean;
     FPrimaryKey: Int64;
     FEdit: TRichEdit;  // Using TRichEdit instead of TLabel
+    FOnSelected: TNotifyBubbleEvent;
     FBubbleType: TBubbleType;
     FBackgroundColor: TColor;
     FPadding: TPadding;
-    FRect: TRect;
+    FRectForBubble: TRect;
     procedure SetText(const Value: string);
     function GetText: string;
     procedure SetBubbleType(const Value: TBubbleType);
@@ -42,8 +47,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure DoSelected; virtual;
   published
     property Selected: Boolean read FSelected write SetSelected;
+    property OnSelected: TNotifyBubbleEvent read FOnSelected write FOnSelected;
     property PrimaryKey: Int64 read FPrimaryKey write FPrimaryKey;
     property Text: string read GetText write SetText;
     property BubbleType: TBubbleType read FBubbleType write SetBubbleType default btUser;
@@ -112,6 +119,7 @@ end;
 destructor TBubbleText.Destroy;
 begin
   FreeAndNil(FEdit);
+  FreeAndNil(FPadding);
   inherited;
 end;
 
@@ -120,26 +128,26 @@ begin
   case FBubbleType of
     btUser:
       begin
-        FRect := Rect(FPadding.Left, FPadding.Top, Trunc(Width * 0.75) - FPadding.Right, Height - FPadding.Bottom);
-        FEdit.Left := FPadding.Left + 5;
+        FRectForBubble := Rect(FPadding.Left, FPadding.Top, Trunc(Width * 0.75) - FPadding.Right, Height - FPadding.Bottom);
+        FEdit.Left := FPadding.Left + 15;
         FEdit.Top := FPadding.Top;
-        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 10;
+        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 30;
         FEdit.Height := Height - FPadding.Bottom;
       end;
     btOther:
       begin
-        FRect := Rect(Trunc(Width * 0.25) + FPadding.Left, FPadding.Top, Width - FPadding.Right, Height - FPadding.Bottom);
-        FEdit.Left := Trunc(Width * 0.25) + FPadding.Left + 5;
+        FRectForBubble := Rect(Trunc(Width * 0.25) + FPadding.Left, FPadding.Top, Width - FPadding.Right, Height - FPadding.Bottom);
+        FEdit.Left := Trunc(Width * 0.25) + FPadding.Left + 15;
         FEdit.Top := FPadding.Top;
-        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 10;
+        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 30;
         FEdit.Height := Height - FPadding.Bottom;
       end;
     btSystem:
       begin
-        FRect := Rect(Trunc(Width * 0.25) + FPadding.Left, FPadding.Top, Width - FPadding.Right, Height - FPadding.Bottom);
-        FEdit.Left := Trunc(Width * 0.25) + FPadding.Left + 5;
+        FRectForBubble := Rect(Trunc(Width * 0.25) + FPadding.Left, FPadding.Top, Width - FPadding.Right, Height - FPadding.Bottom);
+        FEdit.Left := Trunc(Width * 0.25) + FPadding.Left + 15;
         FEdit.Top := FPadding.Top;
-        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 10;
+        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 30;
         FEdit.Height := Height - FPadding.Bottom;
       end;
   end;
@@ -156,20 +164,21 @@ const
 begin
   inherited;
 
-  Canvas.Pen.Color := clBlack;
-  Canvas.Brush.Color := FBackgroundColor;
-
-  // Drawing the rounded rectangle as the bubble shape
-  Canvas.RoundRect(FRect, 15, 15);
-
   if FSelected then
   begin
     // Highlight the control with a rectangle
     Canvas.Pen.Color := clHighlight;  // Change this to your desired highlight color
     Canvas.Pen.Width := SelectionBorder;
-    Canvas.Brush.Style := bsClear;  // Ensure only the border is drawn
+    Canvas.Brush.Style := bsBDiagonal;  // Ensure only the border is drawn
     Canvas.Rectangle(0, 0, Width, Height);
   end;
+
+  Canvas.Pen.Color := clBlack;
+  Canvas.Brush.Style := bsSolid;
+  Canvas.Brush.Color := FBackgroundColor;
+
+  // Drawing the rounded rectangle as the bubble shape
+  Canvas.RoundRect(FRectForBubble, 15, 15);
 end;
 
 procedure TBubbleText.SetPadding(const Value: TPadding);
@@ -192,7 +201,16 @@ begin
   begin
     FSelected := Value;
     Invalidate;  // Trigger a repaint to reflect selection change
+
+    if FSelected then
+      DoSelected;  // Call the event when selected
   end;
+end;
+
+procedure TBubbleText.DoSelected;
+begin
+  if Assigned(FOnSelected) then
+    FOnSelected(Self, Self);
 end;
 
 procedure TBubbleText.Resize;
@@ -273,7 +291,6 @@ begin
   FEdit.Text := Value;
   ResizeBubble;
   AlignBubbleBasedOnUserType;
-
   Invalidate;
 end;
 

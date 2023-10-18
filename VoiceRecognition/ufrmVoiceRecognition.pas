@@ -156,6 +156,7 @@ type
     function AddMessage(const user:string; const msg: string): TBubbleText;
     function LastHeight: Integer;
     procedure OnAudioData(Sender: TObject; Data: TMemoryStream);
+    procedure OnSelected(Sender: TObject; Bubble: TBubbleText);
   public
     { Public declarations }
     procedure ShowListening;
@@ -230,6 +231,22 @@ begin
   VirtualImage1.Update;
 end;
 
+procedure TfrmVoiceRecognition.OnSelected(Sender: TObject; Bubble: TBubbleText);
+var
+  i : Integer;
+begin
+   for i := 0 to sbMessagesView.ComponentCount - 1 do
+   begin
+     if sbMessagesView.Components[i] is TBubbleText then
+     begin
+       if sbMessagesView.Components[i] <> Bubble then
+       begin
+         (sbMessagesView.Components[i] as TBubbleText).Selected := False;
+       end;
+     end;
+   end;
+end;
+
 function TfrmVoiceRecognition.LastHeight: Integer;
 var
   i: Integer;
@@ -261,6 +278,7 @@ begin
   bubble.Text := msg;
   bubble.Top := LastHeight;
   bubble.Align := alTop;
+  bubble.OnSelected := OnSelected;
 
   Result := bubble;
 end;
