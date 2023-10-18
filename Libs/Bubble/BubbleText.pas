@@ -16,10 +16,12 @@ uses
   ;
 
 type
-  TBubbleType = (btUser, btOther);
+  TBubbleType = (btUser, btOther, btSystem);
 
   TBubbleText = class(TCustomTransparentControl)
   private
+    FSelected: Boolean;
+    FPrimaryKey: Int64;
     FEdit: TRichEdit;  // Using TRichEdit instead of TLabel
     FBubbleType: TBubbleType;
     FBackgroundColor: TColor;
@@ -31,14 +33,18 @@ type
     procedure ResizeBubble;
     procedure SetBackgroundColor(const Value: TColor);
     procedure SetPadding(const Value: TPadding);
-    procedure AlignBubleBasedOnUserType;
+    procedure AlignBubbleBasedOnUserType;
+    procedure SetSelected(const Value: Boolean);
   protected
     procedure Paint; override;
     procedure Resize; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   published
+    property Selected: Boolean read FSelected write SetSelected;
+    property PrimaryKey: Int64 read FPrimaryKey write FPrimaryKey;
     property Text: string read GetText write SetText;
     property BubbleType: TBubbleType read FBubbleType write SetBubbleType default btUser;
     property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
@@ -86,10 +92,13 @@ begin
   FEdit.Transparent := True;
 
   FBubbleType := btUser;  // Default type
+  FPrimaryKey := -1;
 
   // Default background color based on BubbleType
   if FBubbleType = btUser then
     FBackgroundColor := clSkyBlue
+  else if FBubbleType = btSystem then
+    FBackgroundColor := clRed
   else
     FBackgroundColor := clSilver;
 
@@ -106,7 +115,7 @@ begin
   inherited;
 end;
 
-procedure TBubbleText.AlignBubleBasedOnUserType;
+procedure TBubbleText.AlignBubbleBasedOnUserType;
 begin
   case FBubbleType of
     btUser:
@@ -125,6 +134,14 @@ begin
         FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 10;
         FEdit.Height := Height - FPadding.Bottom;
       end;
+    btSystem:
+      begin
+        FRect := Rect(Trunc(Width * 0.25) + FPadding.Left, FPadding.Top, Width - FPadding.Right, Height - FPadding.Bottom);
+        FEdit.Left := Trunc(Width * 0.25) + FPadding.Left + 5;
+        FEdit.Top := FPadding.Top;
+        FEdit.Width := Trunc(Width * 0.75) - FPadding.Right - 10;
+        FEdit.Height := Height - FPadding.Bottom;
+      end;
   end;
 end;
 
@@ -134,6 +151,8 @@ begin
 end;
 
 procedure TBubbleText.Paint;
+const
+  SelectionBorder = 2;  // Adjust the thickness as needed
 begin
   inherited;
 
@@ -142,6 +161,15 @@ begin
 
   // Drawing the rounded rectangle as the bubble shape
   Canvas.RoundRect(FRect, 15, 15);
+
+  if FSelected then
+  begin
+    // Highlight the control with a rectangle
+    Canvas.Pen.Color := clHighlight;  // Change this to your desired highlight color
+    Canvas.Pen.Width := SelectionBorder;
+    Canvas.Brush.Style := bsClear;  // Ensure only the border is drawn
+    Canvas.Rectangle(0, 0, Width, Height);
+  end;
 end;
 
 procedure TBubbleText.SetPadding(const Value: TPadding);
@@ -151,11 +179,26 @@ begin
   Invalidate;
 end;
 
+procedure TBubbleText.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+  if Button = mbLeft then
+    Selected := not Selected;
+end;
+
+procedure TBubbleText.SetSelected(const Value: Boolean);
+begin
+  if FSelected <> Value then
+  begin
+    FSelected := Value;
+    Invalidate;  // Trigger a repaint to reflect selection change
+  end;
+end;
 
 procedure TBubbleText.Resize;
 begin
   inherited;
-  AlignBubleBasedOnUserType;
+  AlignBubbleBasedOnUserType;
   Invalidate;  // Redraw on resize
 end;
 
@@ -173,11 +216,13 @@ begin
   if FBubbleType <> Value then
   begin
     FBubbleType := Value;
-    AlignBubleBasedOnUserType;
+    AlignBubbleBasedOnUserType;
 
     // Set the default colors based on the BubbleType
     if FBubbleType = btUser then
       BackgroundColor := clSkyBlue
+    else if FBubbleType = btSystem then
+      BackgroundColor := clRed
     else
       BackgroundColor := clSilver;
 
@@ -227,7 +272,7 @@ procedure TBubbleText.SetText(const Value: string);
 begin
   FEdit.Text := Value;
   ResizeBubble;
-  AlignBubleBasedOnUserType;
+  AlignBubbleBasedOnUserType;
 
   Invalidate;
 end;

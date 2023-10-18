@@ -6,6 +6,7 @@ uses
   Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
+  System.Math,
   System.Variants,
   System.Classes,
   System.Generics.Collections,
@@ -113,7 +114,7 @@ type
     Model2: TMenuItem;
     gpt41: TMenuItem;
     miRevAI: TMenuItem;
-    ScrollBox1: TScrollBox;
+    sbMessagesView: TScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnStartClick(Sender: TObject);
@@ -127,6 +128,7 @@ type
     procedure btnDeleteSessionClick(Sender: TObject);
     procedure Model2Click(Sender: TObject);
     procedure btnDeleteMessageClick(Sender: TObject);
+    procedure sbMessagesViewMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -134,7 +136,7 @@ type
     FShouldBeListening : Boolean;
     FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
     FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
-    task : ITask;
+    FTask : ITask;
     FAudio : TAudioRecorder;
     FStatus : TRecognitionStatus;
     FOpenAI : TOpenAI;
@@ -151,7 +153,7 @@ type
       AChatMessages: TObjectList<TChatMessage>;
       AOnMessageResults: TOnChatMessageMessageResults);
     procedure OnFinishedPlaying(Sender: TObject);
-    function AddMessage(user:string; msg: string): TBubbleText;
+    function AddMessage(const user:string; const msg: string): TBubbleText;
     function LastHeight: Integer;
     procedure OnAudioData(Sender: TObject; Data: TMemoryStream);
   public
@@ -229,20 +231,31 @@ begin
 end;
 
 function TfrmVoiceRecognition.LastHeight: Integer;
+var
+  i: Integer;
 begin
-   Result := 9999;
+   Result := 0;
+   for i := 0 to sbMessagesView.ComponentCount - 1 do
+   begin
+     if sbMessagesView.Components[i] is TBubbleText then
+     begin
+       Result := max(Result, (sbMessagesView.Components[i] as TBubbleText).Top + (sbMessagesView.Components[i] as TBubbleText).Height + 10);
+     end;
+   end;
 end;
 
-function TfrmVoiceRecognition.AddMessage(user:string; msg: string): TBubbleText;
+function TfrmVoiceRecognition.AddMessage(const user:string; const msg: string): TBubbleText;
 var
   bubble : TBubbleText;
 begin
-  bubble := TBubbleText.Create(ScrollBox1);
-  bubble.Parent := ScrollBox1;
+  bubble := TBubbleText.Create(sbMessagesView);
+  bubble.Parent := sbMessagesView;
   bubble.Text := msg;
   bubble.Visible := True;
   if user = 'User' then
     bubble.BubbleType := btUser
+  else if user = 'System' then
+    bubble.BubbleType := btSystem
   else
     bubble.BubbleType := btOther;
   bubble.Text := msg;
@@ -258,28 +271,31 @@ var
   I: Integer;
   b : TBubbleText;
 begin
-   if ScrollBox1.ComponentCount > 0 then
-   begin
-     for I := ScrollBox1.ComponentCount - 1 downto 0 do
-     begin
-       b := ScrollBox1.Components[i]  as TBubbleText;
-       FreeAndNil(b);
-     end;
-   end;
-
-  if not tblConversation.Active then Exit;
+  sbMessagesView.DisableAlign;
   try
+    if sbMessagesView.ComponentCount > 0 then
+    begin
+      for I := sbMessagesView.ComponentCount - 1 downto 0 do
+      begin
+         b := sbMessagesView.Components[i]  as TBubbleText;
+         FreeAndNil(b);
+      end;
+    end;
+    b := nil;
+    if not tblConversation.Active then Exit;
     tblConversation.First;
     repeat
       b := AddMessage(tblConversation.FieldByName('User').AsString, tblConversation.FieldByName('Message').AsString);
+      b.PrimaryKey := tblConversation.FieldByName('ConversationID').AsLargeInt;
       tblConversation.Next;
     until tblConversation.Eof;
   finally
+    sbMessagesView.EnableAlign;
     if Assigned(b) then
     begin
-      ScrollBox1.ClientHeight := b.Top + b.Height + 10;
-      ScrollBox1.Visible := True;
-      ScrollBox1.ScrollInView(b);
+      sbMessagesView.ClientHeight := b.Top + b.Height + 10;
+      sbMessagesView.Visible := True;
+      sbMessagesView.ScrollInView(b);
     end;
   end;
 end;
@@ -378,6 +394,7 @@ begin
   SetupTextToSpeechEngines;
   SetupSpeechRecognitionEngines;
   LoadAudioInputsMenu;
+  tblSessionsAfterScroll(tblSessions);
 end;
 
 procedure TfrmVoiceRecognition.FormDestroy(Sender: TObject);
@@ -415,7 +432,7 @@ begin
   end;
   FStatus := TRecognitionStatus.rsThinking;
   ShowThinking;
-  task := TTask.Run(procedure ()
+  FTask := TTask.Run(procedure ()
                var
                  ChatResponse: TChatResponse;
                begin
@@ -434,7 +451,9 @@ end;
 procedure TfrmVoiceRecognition.OnHandleChatResponse(SessionID: Int64 ;ChatResponse: TChatResponse);
 var
   bubble : TBubbleText;
+  KeyId : Int64;
 begin
+  KeyId := -1;
   tblConversation.Append;
   try
     tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
@@ -442,6 +461,7 @@ begin
     tblConversation.FieldByName('Message').AsString := ChatResponse.Content;
     tblConversation.FieldByName('TokenCount').AsInteger := ChatResponse.Completion_Tokens;
     tblConversation.Post;
+    KeyId := tblConversation.FieldByName('ConversationID').AsLargeInt;
   except
     on e : Exception do
     begin
@@ -451,7 +471,8 @@ begin
   StopListening;
   FStatus := TRecognitionStatus.rsSpeaking;
   bubble := AddMessage('Assistant', ChatResponse.Content);
-  ScrollBox1.ScrollInView(bubble);
+  bubble.PrimaryKey := KeyId;
+  sbMessagesView.ScrollInView(bubble);
   ShowSpeaking;
   FTextToSpeechEngines.ActiveEngine.OnFinishedPlaying := OnFinishedPlaying;
   FTextToSpeechEngines.ActiveEngine.PlayText(ChatResponse.Content, 'Olivia');
@@ -470,6 +491,8 @@ var
   ChatMessages: TObjectList<TChatMessage>;
   chat : TChatMessage;
   SessionID : Int64;
+  KeyID: Int64;
+  bubble : TBubbleText;
 begin
   question := Text;
   if Text.IsEmpty then
@@ -492,10 +515,13 @@ begin
     tblConversation.FieldByName('Message').AsString := question;
     tblConversation.FieldByName('SessionID').AsLargeInt := SessionID;
     tblConversation.Post;
+    KeyId := tblConversation.FieldByName('ConversationID').AsLargeInt;
+
   finally
     tblConversation.EnableControls;
   end;
-    AddMessage('User', question);
+  bubble := AddMessage('User', question);
+  bubble.PrimaryKey := KeyId;
 
   tblConversation.DisableControls;
   try
@@ -596,6 +622,18 @@ end;
 procedure TfrmVoiceRecognition.New1Click(Sender: TObject);
 begin
   frmNewChatSession.ShowModal;
+  tblSessionsAfterScroll(tblSessions);
+end;
+
+procedure TfrmVoiceRecognition.sbMessagesViewMouseWheel(Sender: TObject; Shift:
+    TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  if WheelDelta > 0 then
+    sbMessagesView.VertScrollBar.Position := sbMessagesView.VertScrollBar.Position - 60
+  else
+    sbMessagesView.VertScrollBar.Position := sbMessagesView.VertScrollBar.Position + 60;
+
+  Handled := True;
 end;
 
 end.

@@ -162,7 +162,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
       ExplicitLeft = 25
     end
   end
-  object ScrollBox1: TScrollBox
+  object sbMessagesView: TScrollBox
     Left = 152
     Top = 41
     Width = 548
@@ -173,6 +173,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 6
+    OnMouseWheel = sbMessagesViewMouseWheel
     ExplicitWidth = 544
     ExplicitHeight = 351
   end
