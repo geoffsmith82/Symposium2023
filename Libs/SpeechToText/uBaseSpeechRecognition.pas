@@ -50,7 +50,6 @@ type
     property OnHandleSpeechRecognitionCompletion: TOnHandleMessage read GetOnHandleMessage write SetOnHandleMessage;
     property OnConnect: TOnConnect read GetOnConnect write SetOnConnect;
     property OnDisconnect: TOnConnect read GetOnDisconnect write SetOnDisconnect;
-
   end;
 
 implementation

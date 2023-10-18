@@ -48,16 +48,6 @@ uses
   FireDAC.Comp.Client,
   FireDAC.Phys.MSAcc,
   FireDAC.Phys.MSAccDef,
-  ACS_Classes,
-  ACS_DXAudio,
-  ACS_Misc,
-  ACS_Streams,
-  ACS_LAME,
-  ACS_FLAC,
-  ACS_WinMedia,
-  ACS_smpeg,
-  ACS_Wave,
-  NewACIndicators,
   uLLM,
   OpenAI,
   uAzureGPT,
@@ -73,15 +63,12 @@ uses
   uBaseSpeechRecognition,
   uEngineManager,
   uAudioRecorder,
-  Vcl.WinXPanels,
   BubbleText
   ;
 
 type
   TRecognitionStatus = (rsListening, rsThinking, rsSpeaking , rsStopped);
   TfrmVoiceRecognition = class(TForm)
-    DXAudioIn: TDXAudioIn;
-    AudioProcessor: TAudioProcessor;
     mmoQuestions: TMemo;
     mmoAnswers: TMemo;
     mmMainMenu: TMainMenu;
@@ -116,7 +103,6 @@ type
     btnStart: TButton;
     btnStop: TButton;
     DBText1: TDBText;
-    NULLOut: TNULLOut;
     StatusBar: TStatusBar;
     Panel1: TPanel;
     VirtualImage1: TVirtualImage;
@@ -130,7 +116,6 @@ type
     ScrollBox1: TScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
     procedure btnStartClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
@@ -219,7 +204,6 @@ begin
   FStatus := TRecognitionStatus.rsListening;
   FSpeechRecognitionEngines.ActiveEngine.Resume;
   FAudio.Start;
- // NULLOut.Run;
   ShowListening;
 end;
 
@@ -229,7 +213,6 @@ begin
   FSpeechRecognitionEngines.ActiveEngine.Finish;
   VirtualImage1.ImageIndex := -1;
   FAudio.Stop;
-//  NULLOut.Stop(False);
 end;
 
 procedure TfrmVoiceRecognition.ShowListening;
@@ -286,16 +269,18 @@ begin
 
   if not tblConversation.Active then Exit;
   try
-    tblConversation.Last;
+    tblConversation.First;
     repeat
-      AddMessage(tblConversation.FieldByName('User').AsString, tblConversation.FieldByName('Message').AsString);
-      tblConversation.Prior;
-    until tblConversation.Bof;
+      b := AddMessage(tblConversation.FieldByName('User').AsString, tblConversation.FieldByName('Message').AsString);
+      tblConversation.Next;
+    until tblConversation.Eof;
   finally
-    b := ScrollBox1.Components[0]  as TBubbleText;
-    ScrollBox1.ClientHeight := b.Top + b.Height + 10;
-    ScrollBox1.Visible := True;
-    ScrollBox1.ScrollInView(b);
+    if Assigned(b) then
+    begin
+      ScrollBox1.ClientHeight := b.Top + b.Height + 10;
+      ScrollBox1.Visible := True;
+      ScrollBox1.ScrollInView(b);
+    end;
   end;
 end;
 
@@ -319,17 +304,6 @@ begin
       mi.Checked := True;
       FAudio.SelectDevice(i);
     end;
-
-{  for i := 0 to DXAudioIn.DeviceCount - 1 do
-  begin
-    mi := TMenuItem.Create(nil);
-    mi.Caption := DXAudioIn.DeviceName[i];
-    mi.Tag := i;
-    if lAudioInput = i then
-    begin
-      mi.Checked := True;
-      DXAudioIn.DeviceNumber := i;
-    end;   }
     mi.GroupIndex := 10;
     mi.RadioItem := True;
     mi.AutoCheck := True;
@@ -474,7 +448,7 @@ begin
       tblConversation.Cancel;
     end;
   end;
-  NULLOut.Stop(False);
+  StopListening;
   FStatus := TRecognitionStatus.rsSpeaking;
   bubble := AddMessage('Assistant', ChatResponse.Content);
   ScrollBox1.ScrollInView(bubble);
@@ -539,22 +513,6 @@ begin
   finally
     tblConversation.EnableControls;
   end;
-end;
-
-
-procedure TfrmVoiceRecognition.AudioProcessorGetData(Sender: TComponent; var Buffer: Pointer; var Bytes: Cardinal);
-var
-  mem : TMemoryStream;
-begin
-  TAudioProcessor(Sender).Input.GetData(Buffer, Bytes);
-
-  mem := TMemoryStream.Create;
-  mem.WriteData(Buffer, Bytes);
-  mem.Position := 0;
-
-  FSpeechRecognitionEngines.ActiveEngine.Add(mem);
-
-  OutputDebugString(PChar('Len ' + Bytes.ToString));
 end;
 
 procedure TfrmVoiceRecognition.btnDeleteMessageClick(Sender: TObject);

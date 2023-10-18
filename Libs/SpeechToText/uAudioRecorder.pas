@@ -44,7 +44,6 @@ implementation
 procedure WaveInCallback(hwi: HWAVEIN; uMsg: UINT; dwInstance, dwParam1, dwParam2: DWORD); stdcall;
 var
   Recorder: TAudioRecorder;
-  Stream: TMemoryStream;
 begin
   if uMsg = WIM_DATA then
   begin

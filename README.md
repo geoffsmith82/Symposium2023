@@ -91,7 +91,6 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 ### External Libraries required to build projects
  - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
- - [newac](https://github.com/geoffsmith82/newac) New Audio Components
  - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11
 
 ### Tools used to create example projects

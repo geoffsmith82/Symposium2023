@@ -176,26 +176,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     ExplicitWidth = 544
     ExplicitHeight = 351
   end
-  object DXAudioIn: TDXAudioIn
-    Latency = 100
-    SamplesToRead = -1
-    DeviceNumber = 0
-    InBitsPerSample = 16
-    InChannels = 1
-    InSampleRate = 16000
-    RecTime = -1
-    EchoRecording = False
-    FramesInBuffer = 16000
-    PollingInterval = 100
-    Left = 56
-    Top = 168
-  end
-  object AudioProcessor: TAudioProcessor
-    Input = DXAudioIn
-    OnGetData = AudioProcessorGetData
-    Left = 336
-    Top = 304
-  end
   object mmMainMenu: TMainMenu
     Left = 488
     Top = 336
@@ -1178,10 +1158,5 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     DataSet = tblConversation
     Left = 144
     Top = 368
-  end
-  object NULLOut: TNULLOut
-    Input = AudioProcessor
-    Left = 400
-    Top = 336
   end
 end
