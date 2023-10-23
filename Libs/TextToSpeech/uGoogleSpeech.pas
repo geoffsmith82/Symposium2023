@@ -172,10 +172,16 @@ var
   LGoogleResponse : TGoogleTextToSpeechResponseClass;
   LAudioBytes : TBytes;
 begin
-  LRESTClient := TRESTClient.Create(nil);
-  LRESTRequest := TRESTRequest.Create(LRESTClient);
-  LRESTResponse := TRESTResponse.Create(LRESTClient);
+  LRESTClient := nil;
+  LRESTRequest := nil;
+  LRESTResponse := nil;
+  LJsonBody := nil;
+  LJsonInput := nil;
+  LJsonVoice := nil;
   try
+    LRESTClient := TRESTClient.Create(nil);
+    LRESTRequest := TRESTRequest.Create(LRESTClient);
+    LRESTResponse := TRESTResponse.Create(LRESTClient);
     LRESTClient.BaseURL := 'https://texttospeech.googleapis.com/v1beta1/text:synthesize';
     LRESTRequest.Client := LRESTClient;
     LRESTRequest.Method := rmPOST;
@@ -186,9 +192,6 @@ begin
     LRESTRequest.AddParameter('Content-Type', 'application/json',
       TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 
-    LJsonBody := nil;
-    LJsonInput := nil;
-    LJsonVoice := nil;
     try
       LJsonInput := TJSONObject.Create;
       LJsonVoice := TJSONObject.Create;
@@ -219,9 +222,9 @@ begin
     end;
     Result.Write(LAudioBytes, length(LAudioBytes));
   finally
-    LRESTRequest.Free;
-    LRESTResponse.Free;
-    LRESTClient.Free;
+    FreeAndNil(LRESTRequest);
+    FreeAndNil(LRESTResponse);
+    FreeAndNil(LRESTClient);
   end;
 end;
 

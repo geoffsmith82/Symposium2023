@@ -14,20 +14,6 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 13
-  object mmoQuestions: TMemo
-    Left = 248
-    Top = 8
-    Width = 433
-    Height = 151
-    TabOrder = 0
-  end
-  object mmoAnswers: TMemo
-    Left = 248
-    Top = 173
-    Width = 433
-    Height = 137
-    TabOrder = 1
-  end
   object DBCtrlGrid1: TDBCtrlGrid
     Left = 0
     Top = 41
@@ -39,7 +25,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     DataSource = dsSessions
     PanelHeight = 50
     PanelWidth = 135
-    TabOrder = 2
+    TabOrder = 0
     RowCount = 7
     SelectedColor = clHighlight
     ExplicitHeight = 351
@@ -71,7 +57,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Width = 800
     Height = 41
     Align = alTop
-    TabOrder = 3
+    TabOrder = 1
     ExplicitWidth = 796
     object btnNewChatSession: TButton
       Left = 1
@@ -143,7 +129,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Width = 100
     Height = 352
     Align = alRight
-    TabOrder = 5
+    TabOrder = 3
     ExplicitLeft = 696
     ExplicitHeight = 351
     DesignSize = (
@@ -172,7 +158,7 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     Align = alClient
     DoubleBuffered = True
     ParentDoubleBuffered = False
-    TabOrder = 6
+    TabOrder = 4
     OnMouseWheel = sbMessagesViewMouseWheel
     ExplicitWidth = 544
     ExplicitHeight = 351

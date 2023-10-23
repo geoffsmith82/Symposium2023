@@ -38,6 +38,7 @@ type
     procedure Resume; override;
     procedure Finish; override;
     constructor Create(const AResourceKey: string);
+    destructor Destroy; override;
   end;
 
 implementation
@@ -178,6 +179,17 @@ constructor TDeepGramRecognition.Create(const AResourceKey: string);
 begin
   inherited Create(AResourceKey, '');
   FSendThread := TDeepGramSendThread.Create(True, AResourceKey);
+end;
+
+destructor TDeepGramRecognition.Destroy;
+var
+  x : TExitStream;
+begin
+  x := TExitStream.Create;
+  FSendThread.Add(x);
+  FSendThread.Terminate;
+  FSendThread.WaitFor;
+  inherited;
 end;
 
 procedure TDeepGramRecognition.Finish;

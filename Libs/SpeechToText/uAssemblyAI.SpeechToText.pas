@@ -207,7 +207,11 @@ begin
 end;
 
 destructor TAssemblyAiRecognition.Destroy;
+var
+  x : TExitStream;
 begin
+  x := TExitStream.Create;
+  FSendThread.Add(x);
   FSendThread.Terminate;
   FSendThread.WaitFor;
   FreeAndNil(FSendThread);
