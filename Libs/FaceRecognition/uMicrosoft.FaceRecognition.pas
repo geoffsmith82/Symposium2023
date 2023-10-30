@@ -14,23 +14,20 @@ uses
 
 type
   TMicrosoftFaceRecognition = class(TBaseFaceRecognition)
-  strict private
-    FAPIKey : string;
   public
     function DetectFacesFromURL(imageUrl: string): string; override;
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
-    constructor Create(const APIKey: string);
+    constructor Create(const APIKey: string; const AHost: string);
   end;
 
 implementation
 
 { TMicrosoftFaceRecognition }
 
-constructor TMicrosoftFaceRecognition.Create(const APIKey: string);
+constructor TMicrosoftFaceRecognition.Create(const APIKey: string; const AHost: string);
 begin
-  inherited Create(APIKey, '');
-  FAPIKey := APIKey;
+  inherited Create(APIKey, AHost);
 end;
 
 function TMicrosoftFaceRecognition.DetectFacesFromFile(imageFilename: string): string;
@@ -63,7 +60,7 @@ begin
     restResponse := TRESTResponse.Create(nil);
     // Construct the API endpoint URL
   //  url := 'https://<your region>.api.cognitive.microsoft.com/face/v1.0/detect';
-    serviceUrl := 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect';
+    serviceUrl := FHost;
     uri := TURI.Create(serviceUrl);
     uri.AddParameter('returnFaceId', 'false');
     uri.AddParameter('returnFaceLandmarks', 'true');
@@ -81,7 +78,7 @@ begin
     restRequest.Response := restResponse;
 
     // Set the necessary REST request headers
-    restRequest.Params.AddHeader('Ocp-Apim-Subscription-Key', FAPIKey);
+    restRequest.Params.AddHeader('Ocp-Apim-Subscription-Key', FResourceKey);
 
     // Execute the REST request and get the response
     restRequest.Execute;
@@ -120,7 +117,7 @@ begin
     restResponse := TRESTResponse.Create(nil);
     // Construct the API endpoint URL
   //  url := 'https://<your region>.api.cognitive.microsoft.com/face/v1.0/detect';
-    serviceUrl := 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect';
+    serviceUrl := FHost;//'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect';
     uri := TURI.Create(serviceUrl);
     uri.AddParameter('returnFaceId', 'false');
     uri.AddParameter('returnFaceLandmarks', 'true');
@@ -142,7 +139,7 @@ begin
     restRequest.Response := restResponse;
 
     // Set the necessary REST request headers
-    restRequest.Params.AddHeader('Ocp-Apim-Subscription-Key', FAPIKey);
+    restRequest.Params.AddHeader('Ocp-Apim-Subscription-Key', FResourceKey);
 
     // Execute the REST request and get the response
     restRequest.Execute;

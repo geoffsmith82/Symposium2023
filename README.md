@@ -1,6 +1,8 @@
 # Symposium 2023 Artificial Intelligence and ChatGPT
 Source code and Documentation for my [ADUG](https://www.adug.org.au) Symposium Talk presented on the 28th of April 2023. I have since added to and enhanced the code to further demonstrate capabilities of AI.
 
+The goal of this project is to enable delphi users to be able to use AI technology in their applications.  There are many different types of AI and thousands of different models.  This project is working on creating generalized interfaces to the different types of AI models and make them easily accessible.
+
 Artificial intelligence (AI) is an interdisciplinary field that combines computer science, mathematics, and cognitive psychology to create intelligent systems capable of performing complex tasks. Its rapid advancements have led to a wide array of applications demonstrating AI's versatility.
 
 Language translation is one such application, where AI-powered tools efficiently translate between languages, simplifying tasks like translating software programs for global audiences. AI also excels in human-like conversations, with interactive applications that understand and respond to human language naturally. Voice recognition and real-time speech-to-text allow conversion and seamless voice-based interactions, making AI-driven applications more accessible and user-friendly.
@@ -53,6 +55,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [DeepGram](https://deepgram.com/) Voice Recognition
   - [Rev.AI](https://www.rev.ai) Voice Recognition
   - [Conqui-ai](https://github.com/coqui-ai/TTS) Run a variaty of text to speech models locally from a docker container
+  - [CodeProject-Ai](https://www.codeproject.com/AI/) Local Face Detection.
 	
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  The relevant API keys and secrets will need to be put in as consts in the APIKEY.INC file.

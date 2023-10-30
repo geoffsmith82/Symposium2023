@@ -23,7 +23,6 @@ uses
 type
   TGoogleFaceRecognition = class(TBaseFaceRecognition)
   strict private
-    function Base64EncodedFile(const filename:string): string;
     function Base64EncodedStream(stream: TStream): string;
   strict private
     FOAuth2 : TEnhancedOAuth2Authenticator;
@@ -39,7 +38,7 @@ type
     function DetectFacesFromStream(imageStream: TStream): string; override;
     function DetectFacesFromFile(imageFilename: string): string; override;
     procedure Authenticate;
-    constructor Create(const AClientID, AClientSecret: string; AHost: string; ASettings : TIniFile);
+    constructor Create(const AClientID, AClientSecret: string; const AHost: string; ASettings : TIniFile);
   end;
 
 implementation
@@ -48,7 +47,7 @@ implementation
 
 { TGoogleFaceRecognition }
 
-constructor TGoogleFaceRecognition.Create(const AClientID, AClientSecret: string; AHost: string; ASettings : TIniFile);
+constructor TGoogleFaceRecognition.Create(const AClientID, AClientSecret: string; const AHost: string; ASettings : TIniFile);
 begin
   inherited Create(AClientID, AHost);
   FSecretKey := AClientSecret;
@@ -88,27 +87,6 @@ procedure TGoogleFaceRecognition.Authenticate;
 begin
   FHTTPServer.Active := True;
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
-end;
-
-function TGoogleFaceRecognition.Base64EncodedFile(const filename:string):string;
-var
-  fs : TFileStream;
-  mem : TStringStream;
-begin
-  fs := nil;
-  mem := nil;
-  Result := '';
-  try
-    fs := TFileStream.Create(filename, fmOpenRead);
-    mem := TStringStream.Create;
-    if TNetEncoding.Base64.Encode(fs, mem) > 0 then
-    begin
-      Result := mem.DataString;
-    end;
-  finally
-    FreeAndNil(fs);
-    FreeAndNil(mem)
-  end;
 end;
 
 function TGoogleFaceRecognition.Base64EncodedStream(stream: TStream):string;

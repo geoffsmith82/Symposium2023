@@ -21,6 +21,7 @@ uses
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uGoogle.FaceRecognition in '..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
+  uCodeProject.FaceRecognition in '..\Libs\FaceRecognition\uCodeProject.FaceRecognition.pas',
   uMicrosoft.FaceRecognition.DTO in '..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.DTO.pas';
 
 {$R *.res}

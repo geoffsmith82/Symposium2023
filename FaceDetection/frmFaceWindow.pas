@@ -29,6 +29,7 @@ uses
   uMicrosoft.FaceRecognition,
   uMicrosoft.FaceRecognition.DTO,
   uGoogle.FaceRecognition,
+  uCodeProject.FaceRecognition,
   uEngineManager
   ;
 
@@ -62,6 +63,7 @@ type
     miGoogleLogin: TMenuItem;
     JvFilenameEdit1: TJvFilenameEdit;
     btnDetectFacesFromLocalFile: TButton;
+    miCodeProject: TMenuItem;
     procedure btnDetectFacesClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -74,6 +76,7 @@ type
     FSettings : TIniFile;
     FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition>;
     procedure DownloadAndLoadImage(const AUrl: string; AImage: TImage);
+    procedure OnCodeProjectSelected(Sender: TObject);
     procedure OnMicrosoftSelected(Sender: TObject);
     procedure OnGoogleSelected(Sender: TObject);
     procedure DrawBoxAroundFace(AImage: TImage; ARect: TRect);
@@ -324,14 +327,19 @@ begin
   FFaceRecognitionEngines.ActiveMenuItem.Checked := True;
 end;
 
+procedure TfrmFaceDetection.OnCodeProjectSelected(Sender: TObject);
+begin
+//  miGoogleMenu.Visible := False;
+end;
+
 procedure TfrmFaceDetection.OnMicrosoftSelected(Sender: TObject);
 begin
-  miGoogleMenu.Visible := False;
+//  miGoogleMenu.Visible := False;
 end;
 
 procedure TfrmFaceDetection.OnGoogleSelected(Sender: TObject);
 begin
-  miGoogleMenu.Visible := True;
+//  miGoogleMenu.Visible := True;
 end;
 
 procedure TfrmFaceDetection.FormCreate(Sender: TObject);
@@ -341,7 +349,10 @@ begin
   FFaceRecognitionEngines:= TEngineManager<TBaseFaceRecognition>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
 
-  engine := TMicrosoftFaceRecognition.Create(ms_face_key);
+
+  engine := TCodeProjectFaceRecognition.Create('http://172.27.95.87:32168');
+  FFaceRecognitionEngines.RegisterEngine(engine, miCodeProject, OnCodeProjectSelected);
+  engine := TMicrosoftFaceRecognition.Create(ms_face_key, 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect');
   FFaceRecognitionEngines.RegisterEngine(engine, miMicrosoft, OnMicrosoftSelected);
   engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '', FSettings);
   FFaceRecognitionEngines.RegisterEngine(engine, miGoogle, OnGoogleSelected);

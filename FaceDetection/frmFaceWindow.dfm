@@ -163,6 +163,12 @@ object frmFaceDetection: TfrmFaceDetection
         RadioItem = True
         OnClick = miSelectEngineClick
       end
+      object miCodeProject: TMenuItem
+        Caption = 'Code Project'
+        GroupIndex = 10
+        RadioItem = True
+        OnClick = miSelectEngineClick
+      end
     end
     object miGoogleMenu: TMenuItem
       Caption = 'Google'

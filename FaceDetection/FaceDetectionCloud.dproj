@@ -110,6 +110,7 @@
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\FaceRecognition\uGoogle.FaceRecognition.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
+        <DCCReference Include="..\Libs\FaceRecognition\uCodeProject.FaceRecognition.pas"/>
         <DCCReference Include="..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.DTO.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
