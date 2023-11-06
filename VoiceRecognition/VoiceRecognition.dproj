@@ -136,6 +136,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>

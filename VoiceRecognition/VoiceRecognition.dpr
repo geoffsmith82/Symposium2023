@@ -22,6 +22,7 @@ uses
   uMicrosoft.Cognitive.REST in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas',
   uGoogleSpeech in '..\Libs\TextToSpeech\uGoogleSpeech.pas',
   uGoogleSpeech.DTO in '..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas',
+  uOpenAI.TextToSpeech in '..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas',
   uElevenLabs.Voices.DTO in '..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas',
   uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
   uBaseSpeech in '..\Libs\TextToSpeech\uBaseSpeech.pas',

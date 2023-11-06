@@ -68,7 +68,8 @@ uses
   ;
 
 type
-  TRecognitionStatus = (rsListening, rsThinking, rsSpeaking , rsStopped);
+  TRecognitionStatus = (rsListening, rsThinking, rsSpeaking, rsStopped);
+
   TfrmVoiceRecognition = class(TForm)
     mmMainMenu: TMainMenu;
     miFile: TMenuItem;
@@ -113,6 +114,7 @@ type
     gpt41: TMenuItem;
     miRevAI: TMenuItem;
     sbMessagesView: TScrollBox;
+    miOpenAiTextToSpeech: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnStartClick(Sender: TObject);
@@ -171,7 +173,9 @@ implementation
 
 {$R *.dfm}
 
-uses ufrmChatSession;
+uses ufrmChatSession,
+  uOpenAI.TextToSpeech
+  ;
 
 {$I ..\Libs\apikey.inc}
 
@@ -352,6 +356,8 @@ begin
   FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, chatgpt_apikey), miOpenAiTextToSpeech);
+
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedTextToSpeechEngine', 'TWindowsSpeechService');
   FTextToSpeechEngines.SelectEngine(lSpeechEngine);

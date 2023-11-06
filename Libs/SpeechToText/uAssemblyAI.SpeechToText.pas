@@ -30,6 +30,7 @@ type
     procedure SetupWebSocket;
   public
     procedure WriteData(data: string); override;
+    procedure WriteDataStream(m: TStream); override;
     procedure Execute; override;
     constructor Create(CreateSuspended: Boolean; const assemblyai_key: string); reintroduce;
     destructor Destroy; override;
@@ -53,6 +54,11 @@ procedure TAssemblyAiSendThread.WriteData(data: string);
 begin
   if Assigned(FWebSocket) then
     FWebSocket.WSSendText(nil, data);
+end;
+
+procedure TAssemblyAiSendThread.WriteDataStream(m: TStream);
+begin
+  raise EProgrammerNotFound.Create('WriteDataStream not used');
 end;
 
 procedure TAssemblyAiSendThread.WSOnConnected(Sender: TObject);
