@@ -17,7 +17,7 @@ type
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
-    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string = 'DALLE-2'): TGeneratedImagesClass; override;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string = 'dall-e-2'): TGeneratedImagesClass; override;
   end;
 
 implementation
@@ -49,6 +49,7 @@ begin
     try
       LJson.AddPair('prompt', TJSONString.Create(prompt));
       LJson.AddPair('n', TJSONNumber.Create(n));
+      LJson.AddPair('model', modelVersion);
       case size of
         DALLE256: LJson.AddPair('size', '256x256');
         DALLE512: LJson.AddPair('size', '512x512');
@@ -77,8 +78,13 @@ var
 begin
   FModelInfo.Clear;
   LModel := TImageModelInfo.Create;
-  LModel.ModelName := 'DALLE-2';
-  LModel.Version := 'DALLE-2';
+  LModel.ModelName := 'dall-e-3';
+  LModel.Version := 'dall-e-3';
+  FModelInfo.Add(LModel);
+
+  LModel := TImageModelInfo.Create;
+  LModel.ModelName := 'dall-e-2';
+  LModel.Version := 'dall-e-2';
   FModelInfo.Add(LModel);
   Result := FModelInfo;
 end;

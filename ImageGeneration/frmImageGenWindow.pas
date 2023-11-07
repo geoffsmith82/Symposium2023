@@ -52,6 +52,7 @@ type
     miSaveImage: TMenuItem;
     SaveDialog: TSaveDialog;
     ImagesFlowPanel: TFlowPanel;
+    miDALLE3: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnExecuteClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
@@ -94,6 +95,7 @@ var
   size : TDALLESize;
   images : TGeneratedImagesClass;
   i : Integer;
+  model : string;
 begin
   if cboSize.Text = '256x256' then
   begin
@@ -112,7 +114,12 @@ begin
     size := DALLE1024;
   end;
 
-  images := FOpenAI.Generate(mmoImagePrompt.Lines.Text, seImageCount.Value, size);
+  if miDALLE2.Checked then
+    model := 'dall-e-2'
+  else if miDALLE3.Checked then      
+    model := 'dall-e-3';
+
+  images := FOpenAI.Generate(mmoImagePrompt.Lines.Text, seImageCount.Value, size, model);
   try
     for i := 0 to length(images.data) - 1 do
     begin
