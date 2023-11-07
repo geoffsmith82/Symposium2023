@@ -1,15 +1,20 @@
-unit LanguageCodes;
+unit uTranslate.LanguageCodes;
 
 interface
+
 function GetLanguageNameFromCode(const LanguageCode: string): string;
+
 implementation
+
 uses
   SysUtils;
+
 type
   TLanguageInfo = record
     Code: string;
     Name: string;
   end;
+
 const
   LanguageList: array[0..111] of TLanguageInfo = (
     (Code: 'af'; Name: 'Afrikaans'),
@@ -125,6 +130,7 @@ const
     (Code: 'yo'; Name: 'Yoruba'),
     (Code: 'zu'; Name: 'Zulu')
   );
+
 function GetLanguageNameFromCode(const LanguageCode: string): string;
 var
   I: Integer;

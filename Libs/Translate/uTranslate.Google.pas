@@ -1,4 +1,4 @@
-unit uGoogle.Translate;
+unit uTranslate.Google;
 
 interface
 
@@ -17,7 +17,7 @@ uses
   IdCustomHTTPServer,
   IdHTTPHeaderInfo,
   IdContext,
-  uBaseTranslate
+  uTranslate
   ;
 
 type
@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  LanguageCodes
+  uTranslate.LanguageCodes
   ;
 
 procedure TGoogleTranslate.Authenticate;

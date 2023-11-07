@@ -15,8 +15,8 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   IniFiles,
-  uCoqui.TTS,
-  uGoogleSpeech
+  uTTS.GoogleSpeech,
+  uTTS.Coqui
   ;
 
 type
@@ -51,23 +51,23 @@ implementation
 {$R *.dfm}
 
 uses
-  uElevenLabs.REST,
-  uAmazon.Polly,
   uTTS,
-  uOpenAI.TextToSpeech,
-  uWindows.Engine,
-  LanguageCodes,
-  uBaseTranslate,
-  uMicrosoft.Cognitive.REST,
-  uMicrosoft.Translate,
-  uAmazon.Translate,
-  OpenAI,
-  uAzureGPT,
-  uGoogle.PaLM,
-  uAnthropic,
-  uHuggingFace.LLM,
-  uReplicate.LLM,
+  uTTS.ElevenLabs,
+  uTTS.Amazon.Polly,
+  uTTS.OpenAI,
+  uTTS.Windows.Engine,
+  uTTS.Microsoft.Cognitive,
+  uTranslate,
+  uTranslate.LanguageCodes,
+  uTranslate.Microsoft,
+  uTranslate.Amazon,
   uLLM,
+  uLLM.OpenAI,
+  uLLM.Azure,
+  uLLM.Google.PaLM,
+  uLLM.Anthropic,
+  uLLM.HuggingFace,
+  uLLM.Replicate,
   uDALLe2.DTO,
   uImageGeneration,
   uImageGeneration.Replicate

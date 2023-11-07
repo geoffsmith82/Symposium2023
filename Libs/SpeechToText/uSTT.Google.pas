@@ -1,8 +1,8 @@
-unit uGoogle.SpeechToText;
+unit uSTT.Google;
 
 interface
 
-uses uBaseSpeechToText,
+uses uSTT,
   System.Classes,
   System.SysUtils,
   System.JSON,
@@ -18,7 +18,7 @@ uses uBaseSpeechToText,
   IdCustomHTTPServer,
   IdHTTPHeaderInfo,
   IdContext,
-  uGoogle.SpeechToText.DTO
+  uSTT.Google.DTO
   ;
 
 type

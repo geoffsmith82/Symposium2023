@@ -1,4 +1,4 @@
-unit uMicrosoft.Translate;
+unit uTranslate.Microsoft;
 
 interface
 uses
@@ -9,7 +9,7 @@ uses
   REST.Types,
   REST.Client,
   REST.Response.Adapter,
-  uBaseTranslate
+  uTranslate
   ;
 type
   TMicrosoftTranslate = class(TBaseTranslate)

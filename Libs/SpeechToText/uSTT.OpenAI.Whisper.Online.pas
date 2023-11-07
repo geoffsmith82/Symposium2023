@@ -1,4 +1,4 @@
-unit uOpenAI.Whisper.Online.SpeechToText;
+unit uSTT.OpenAI.Whisper.Online;
 
 interface
 
@@ -9,7 +9,7 @@ uses
   System.Net.HttpClientComponent,
   System.Net.Mime,
   System.IOUtils,
-  uBaseSpeechToText;
+  uSTT;
 
 type
   TOpenAiWhisperOnline = class(TBaseSpeechToText)

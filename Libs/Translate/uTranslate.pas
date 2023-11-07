@@ -1,4 +1,4 @@
-unit uBaseTranslate;
+unit uTranslate;
 
 interface
 

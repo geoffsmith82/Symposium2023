@@ -1,4 +1,4 @@
-unit uAmazon.Translate;
+unit uTranslate.Amazon;
 
 interface
 
@@ -12,7 +12,7 @@ uses
   REST.Response.Adapter,
   AWS.Translate,
   AWS.Core,
-  uBaseTranslate
+  uTranslate
   ;
 
 type

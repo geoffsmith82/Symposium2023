@@ -1,4 +1,4 @@
-unit uAmazon.SpeechToText;
+unit uSTT.Amazon;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   System.SysUtils,
   System.Classes,
   Vcl.Controls,
-  uBaseSpeechToText
+  uSTT
   ;
 
 type
@@ -64,7 +64,32 @@ var
   stream : TFileStream;
   key : string;
 begin
+  options := TAWSOptions.Create;
+  options.AccessKeyId := FAccessKey;
+  options.SecretAccessKey := FSecretKey;
+  options.Region := FRegion;
+  transcribeClient := TTranscribeClient.Create(options);
+  s3Client := TS3Client.Create(options);
+  stream := nil;
+  try
+    stream := TFileStream.Create(FilePath, fmOpenRead);
+    putObject := TS3PutObjectRequest.Create(FBucket, Key, stream);
+    putObjectResponse := s3Client.PutObject(putObject);
+//    getObject := TS3GetObjectRequest.Create(FBucket, Key);
+//    getObjectResponse := s3Client.GetObject(getObject);
+//    s3Client.
 
+    media := TTranscribeMedia.Transcribe('s3uri');
+    request := TTranscribeStartTranscriptionJobRequest.Create('Job', media);
+    response := transcribeClient.StartTranscriptionJob(request);
+
+    response2 := transcribeClient.GetTranscriptionJob('Job');
+
+ //   response2.TranscriptionJob.Transcript.TranscriptFileUri
+
+  finally
+    FreeAndNil(transcribeClient);
+  end;
 end;
 
 end.

@@ -89,15 +89,15 @@
         <DCCReference Include="frmTranslation.pas">
             <Form>frmMainTranslationWindow</Form>
         </DCCReference>
-        <DCCReference Include="..\Libs\Translate\uAmazon.Translate.pas"/>
-        <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
-        <DCCReference Include="..\Libs\Translate\uGoogle.Translate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Amazon.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Google.pas"/>
         <DCCReference Include="uTranslatedfn.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="uOutputChangedLanguageTokens.pas"/>
-        <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Microsoft.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
-        <DCCReference Include="..\Libs\Translate\LanguageCodes.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.LanguageCodes.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
         <BuildConfiguration Include="Base">

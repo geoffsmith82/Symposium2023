@@ -109,7 +109,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Windows.Engine.pas"/>
-        <DCCReference Include="..\Libs\LLM\OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
         <BuildConfiguration Include="Base">

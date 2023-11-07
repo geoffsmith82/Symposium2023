@@ -99,11 +99,11 @@
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.GoogleSpeech.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas"/>
-        <DCCReference Include="..\Libs\Translate\uMicrosoft.Translate.pas"/>
-        <DCCReference Include="..\Libs\Translate\uGoogle.Translate.pas"/>
-        <DCCReference Include="..\Libs\Translate\uBaseTranslate.pas"/>
-        <DCCReference Include="..\Libs\Translate\uAmazon.Translate.pas"/>
-        <DCCReference Include="..\Libs\Translate\LanguageCodes.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Microsoft.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Google.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.Amazon.pas"/>
+        <DCCReference Include="..\Libs\Translate\uTranslate.LanguageCodes.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Azure.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>

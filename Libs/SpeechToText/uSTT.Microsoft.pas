@@ -1,9 +1,9 @@
-unit uMicrosoft.SpeechToText;
+unit uSTT.Microsoft;
 
 interface
 
 uses
-  uBaseSpeechToText,
+  uSTT,
   System.Classes,
   REST.Client,
   REST.Types,

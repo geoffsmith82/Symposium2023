@@ -16,11 +16,11 @@ uses
   Vcl.Dialogs,
   Vcl.Menus,
   Vcl.StdCtrls,
-  uBaseSpeechToText,
-  uGoogle.SpeechToText,
-  uAmazon.SpeechToText,
-  uMicrosoft.SpeechToText,
-  uOpenAI.Whisper.Online.SpeechToText,
+  uSTT,
+  uSTT.Google,
+  uSTT.Amazon,
+  uSTT.Microsoft,
+  uSTT.OpenAI.Whisper.Online,
   uEngineManager
   ;
 

@@ -50,14 +50,14 @@ uses
   FireDAC.Phys.MSAcc,
   FireDAC.Phys.MSAccDef,
   uLLM,
-  OpenAI,
-  uAzureGPT,
-  uBaseSpeech,
-  uMicrosoft.Cognitive.REST,
-  uElevenLabs.REST,
-  uGoogleSpeech,
-  uAmazon.Polly,
-  uWindows.Engine,
+  uLLM.OpenAI,
+  uLLM.Azure,
+  uTTS,
+  uTTS.Microsoft.Cognitive,
+  uTTS.ElevenLabs,
+  uTTS.GoogleSpeech,
+  uTTS.Amazon.Polly,
+  uTTS.Windows.Engine,
   uAssemblyAI.SpeechToText,
   uDeepGram.SpeechToText,
   uRevAI.SpeechToText,
@@ -174,7 +174,7 @@ implementation
 {$R *.dfm}
 
 uses ufrmChatSession,
-  uOpenAI.TextToSpeech
+  uTTS.OpenAI
   ;
 
 {$I ..\Libs\apikey.inc}

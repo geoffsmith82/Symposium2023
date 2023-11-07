@@ -16,15 +16,15 @@ uses
   {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTranslation in 'frmTranslation.pas' {frmMainTranslationWindow},
-  uAmazon.Translate in '..\Libs\Translate\uAmazon.Translate.pas',
-  uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
-  uGoogle.Translate in '..\Libs\Translate\uGoogle.Translate.pas',
+  uTranslate.Amazon in '..\Libs\Translate\uTranslate.Amazon.pas',
+  uTranslate in '..\Libs\Translate\uTranslate.pas',
+  uTranslate.Google in '..\Libs\Translate\uTranslate.Google.pas',
   uTranslatedfn in 'uTranslatedfn.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uOutputChangedLanguageTokens in 'uOutputChangedLanguageTokens.pas',
-  uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas',
+  uTranslate.Microsoft in '..\Libs\Translate\uTranslate.Microsoft.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
-  LanguageCodes in '..\Libs\Translate\LanguageCodes.pas',
+  uTranslate.LanguageCodes in '..\Libs\Translate\uTranslate.LanguageCodes.pas',
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   uLLM in '..\Libs\LLM\uLLM.pas';
 
