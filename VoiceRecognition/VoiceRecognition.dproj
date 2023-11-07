@@ -139,7 +139,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas"/>

@@ -91,7 +91,7 @@
             <Form>frmTestApiWindow</Form>
         </DCCReference>
         <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas"/>
@@ -119,6 +119,8 @@
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.pas"/>
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.OpenAI.pas"/>
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uCoqui.TTS.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

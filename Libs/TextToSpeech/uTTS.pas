@@ -1,4 +1,4 @@
-unit uBaseSpeech;
+unit uTTS;
 
 interface
 
@@ -48,8 +48,6 @@ type
   end;
 
 implementation
-
-uses ufrmVoiceRecognition;
 
 { TBaseSpeech }
 

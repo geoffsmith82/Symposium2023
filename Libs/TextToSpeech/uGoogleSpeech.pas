@@ -17,7 +17,7 @@ uses
   System.Net.URLClient,
   System.NetEncoding,
   System.JSON,
-  uBaseSpeech,
+  uTTS,
   uGoogleSpeech.DTO,
   System.IniFiles
   ;

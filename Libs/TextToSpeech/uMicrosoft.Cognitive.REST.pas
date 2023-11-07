@@ -9,7 +9,7 @@ uses
   Vcl.Controls,
   REST.Client,
   REST.Types,
-  uBaseSpeech,
+  uTTS,
   uMicrosoft.Cognitive.Voices.DTO;
 
 type

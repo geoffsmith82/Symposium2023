@@ -101,7 +101,7 @@
         <DCCReference Include="uXMLBOMPrecis.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uBaseSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas"/>

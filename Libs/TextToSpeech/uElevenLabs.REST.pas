@@ -10,7 +10,7 @@ uses
   System.Generics.Collections,
   System.Classes,
   System.JSON,
-  uBaseSpeech
+  uTTS
   ;
 
 type

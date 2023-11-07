@@ -10,7 +10,7 @@ uses
   Vcl.Controls,
   REST.Client,
   REST.Types,
-  uBaseSpeech
+  uTTS
   ;
 
 
@@ -42,22 +42,27 @@ begin
   voice.VoiceId := 'alloy';
   FVoicesInfo.Add(voice);
 
+  voice := TVoiceInfo.Create;
   voice.VoiceName := 'Echo';
   voice.VoiceId := 'echo';
   FVoicesInfo.Add(voice);
 
+  voice := TVoiceInfo.Create;
   voice.VoiceName := 'Fable';
   voice.VoiceId := 'fable';
   FVoicesInfo.Add(voice);
 
+  voice := TVoiceInfo.Create;
   voice.VoiceName := 'Onyx';
   voice.VoiceId := 'onyx';
   FVoicesInfo.Add(voice);
 
+  voice := TVoiceInfo.Create;
   voice.VoiceName := 'Nova';
   voice.VoiceId := 'nova';
   FVoicesInfo.Add(voice);
 
+  voice := TVoiceInfo.Create;
   voice.VoiceName := 'Shimmer';
   voice.VoiceId := 'shimmer';
   FVoicesInfo.Add(voice);

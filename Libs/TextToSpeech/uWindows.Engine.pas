@@ -11,7 +11,7 @@ uses
   Winapi.ActiveX,
   Vcl.Controls,
   System.Variants,
-  uBaseSpeech,
+  uTTS,
   SpeechLib_TLB
   ;
 

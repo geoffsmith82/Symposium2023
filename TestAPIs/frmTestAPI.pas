@@ -15,6 +15,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   IniFiles,
+  uCoqui.TTS,
   uGoogleSpeech
   ;
 
@@ -33,6 +34,7 @@ type
     { Private declarations }
     FSettings : TIniFile;
     Fgooglespeech : TGoogleSpeechService;
+    FConqui : TCoquiTTSService;
   public
     { Public declarations }
   end;
@@ -49,7 +51,8 @@ implementation
 uses
   uElevenLabs.REST,
   uAmazon.Polly,
-  uBaseSpeech,
+  uTTS,
+  uOpenAI.TextToSpeech,
   uWindows.Engine,
   LanguageCodes,
   uBaseTranslate,
@@ -73,6 +76,7 @@ uses
 procedure TfrmTestApiWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(Fgooglespeech);
+  FreeAndNil(FConqui);
   FreeAndNil(FSettings);
 end;
 
@@ -89,6 +93,8 @@ var
   voice : TVoiceInfo;
   mswindows : TWindowsSpeechService;
   msvoice : TMicrosoftCognitiveService;
+  conqui : TCoquiTTSService;
+  openAIVoice : TOpenAITextToSpeech;
   msTranslate : TMicrosoftTranslate;
   amazonEngine : TAmazonTranslate;
   lang : TLanguageInfo;
@@ -106,6 +112,7 @@ var
   answer : string;
   imgs : TGeneratedImagesClass;
   i : Integer;
+  ticks : DWORD64;
 begin
   Memo1.Lines.Add('======== Model OpenAI');
   openAI := TOpenAI.Create(chatgpt_apikey);
@@ -223,6 +230,17 @@ begin
     FreeAndNil(polly);
   end;
 
+  openAIVoice := TOpenAITextToSpeech.Create(Self, chatgpt_apikey);
+  try
+    for voice in openAIVoice.Voices do
+    begin
+      Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    end;
+  finally
+    FreeAndNil(openAIVoice);
+  end;
+
+
   Memo1.Lines.Add('======== Windows Voices');
   mswindows := TWindowsSpeechService.Create(Self);
   try
@@ -301,8 +319,23 @@ var
   voice : TVoiceInfo;
   mswindows : TWindowsSpeechService;
   msvoice : TMicrosoftCognitiveService;
+  openAIVoice : TOpenAITextToSpeech;
   ticks : UInt64;
 begin
+  Memo1.Lines.Add('======== OpenAI Voices');
+  openAIVoice := TOpenAITextToSpeech.Create(Self, chatgpt_apikey);
+  try
+    voice := openAIVoice.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    openAIVoice.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(openAIVoice);
+  end;
+
 
   Memo1.Lines.Add('======== ElevenLabs Voices');
   elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);

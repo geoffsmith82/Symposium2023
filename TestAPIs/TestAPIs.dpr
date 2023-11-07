@@ -17,7 +17,7 @@ uses
   Vcl.Forms,
   frmTestAPI in 'frmTestAPI.pas' {frmTestApiWindow},
   uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
-  uBaseSpeech in '..\Libs\TextToSpeech\uBaseSpeech.pas',
+  uTTS in '..\Libs\TextToSpeech\uTTS.pas',
   uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
   uGoogleSpeech in '..\Libs\TextToSpeech\uGoogleSpeech.pas',
   uMicrosoft.Cognitive.REST in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas',
@@ -44,7 +44,9 @@ uses
   uDALLe2.DTO in '..\Libs\ImageGeneration\uDALLe2.DTO.pas',
   uEmbeddings in '..\Libs\Embeddings\uEmbeddings.pas',
   uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
-  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas';
+  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas',
+  uCoqui.TTS in '..\Libs\TextToSpeech\uCoqui.TTS.pas',
+  uOpenAI.TextToSpeech in '..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas';
 
 {$R *.res}
 

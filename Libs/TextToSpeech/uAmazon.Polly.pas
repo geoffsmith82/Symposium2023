@@ -14,7 +14,7 @@ uses
   System.Net.HttpClient,
   System.NetEncoding,
   System.Hash,
-  uBaseSpeech
+  uTTS
 {$IFNDEF NOPOLLY}
   ,AWS.Polly,  // need to install AWS SDK For Delphi Preview
   AWS.Core    // Need Delphi Enterprise 11 or above and install from

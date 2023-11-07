@@ -25,7 +25,7 @@ uses
   uOpenAI.TextToSpeech in '..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas',
   uElevenLabs.Voices.DTO in '..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas',
   uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
-  uBaseSpeech in '..\Libs\TextToSpeech\uBaseSpeech.pas',
+  uTTS in '..\Libs\TextToSpeech\uTTS.pas',
   uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
   uAssemblyAI.SpeechToText in '..\Libs\SpeechToText\uAssemblyAI.SpeechToText.pas',

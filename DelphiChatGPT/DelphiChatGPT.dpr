@@ -18,7 +18,7 @@ uses
   UChatGPT in 'UChatGPT.pas' {Form1},
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
   uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
-  uBaseSpeech in '..\Libs\TextToSpeech\uBaseSpeech.pas',
+  uTTS in '..\Libs\TextToSpeech\uTTS.pas',
   uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
   uElevenLabs.Voices.DTO in '..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas',
   uGoogleSpeech.DTO in '..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas',
