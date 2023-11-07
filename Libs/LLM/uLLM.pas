@@ -16,6 +16,7 @@ type
   TChatResponse = record
     Content : string;
     Completion_Tokens : Cardinal;
+    Finish_Reason: string;
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
     Log_Id : string;
@@ -26,6 +27,8 @@ type
      model : string;
      temperature : Double;
      top_p : Double;
+     seed : Integer;
+     json_mode : Boolean;
      n : Integer;
      stop : string;
      max_tokens : Integer;

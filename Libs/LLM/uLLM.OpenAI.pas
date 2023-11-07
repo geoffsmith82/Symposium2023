@@ -37,6 +37,7 @@ var
   LJSONBody: TJSONObject;
   LJSONMessages: TJSONArray;
   LJSONMsg : TJSONObject;
+  LJSONReponseFormat : TJSONObject;
   LMessage: TChatMessage;
   LJSONResponse: TJSONObject;
   LChoices: TJSONArray;
@@ -87,6 +88,14 @@ begin
         LJSONBody.AddPair('user', ChatConfig.user);
       if ChatConfig.n > 0 then
         LJSONBody.AddPair('n', ChatConfig.n);
+      if ChatConfig.seed > 0 then
+        LJSONBody.AddPair('seed', ChatConfig.seed);
+      if ChatConfig.json_mode then
+      begin
+        LJSONReponseFormat := TJSONObject.Create;
+        LJSONReponseFormat.AddPair('type', 'json_object');
+        LJSONBody.AddPair('response_format', LJSONReponseFormat);
+      end;
 
       LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
       LRESTRequest.Execute;
@@ -107,13 +116,32 @@ begin
           LUsage.TryGetValue('total_tokens', Result.Total_Tokens);
           LChoice := LChoices.Items[0] as TJSONObject;
           Result.Content := LChoice.GetValue('message').GetValue<string>('content');
+          Result.Finish_Reason := LChoice.GetValue('finish_reason').Value;
         finally
           FreeAndNil(LJSONResponse);
         end;
       end
       else
       begin
-        raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
+        // Parse the error message
+        LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
+        if Assigned(LJSONResponse) then
+        try
+          if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
+          begin
+            raise Exception.CreateFmt(
+              'Error: %s - %s. Param: %s',
+              [LJSONMsg.GetValue<string>('type'),
+               LJSONMsg.GetValue<string>('message'),
+               LJSONMsg.GetValue<string>('param')])
+          end
+          else
+            raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
+        finally
+          FreeAndNil(LJSONResponse);
+        end
+        else
+          raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
       end;
     finally
       FreeAndNil(LJSONBody);
