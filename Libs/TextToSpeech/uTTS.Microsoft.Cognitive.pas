@@ -10,7 +10,7 @@ uses
   REST.Client,
   REST.Types,
   uTTS,
-  uMicrosoft.Cognitive.Voices.DTO;
+  uTTS.Microsoft.Cognitive.Voices.DTO;
 
 type
   TMicrosoftCognitiveService = class(TBaseTextToSpeech)

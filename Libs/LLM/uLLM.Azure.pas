@@ -1,4 +1,4 @@
-unit uAzureGPT;
+unit uLLM.Azure;
 
 interface
 uses

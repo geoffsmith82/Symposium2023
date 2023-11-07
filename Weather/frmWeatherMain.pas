@@ -17,8 +17,8 @@ uses
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
   uLLM,
-  OpenAI,
-  uElevenLabs.REST
+  uLLM.OpenAI,
+  uTTS.ElevenLabs
   ;
 
 type

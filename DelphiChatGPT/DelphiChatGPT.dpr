@@ -26,13 +26,13 @@ uses
   uTTS.Microsoft.Cognitive in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.pas',
   uTTS.Microsoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas',
   uTTS.Windows.Engine in '..\Libs\TextToSpeech\uTTS.Windows.Engine.pas',
-  OpenAI in '..\Libs\LLM\OpenAI.pas',
+  uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
-  uAzureGPT in '..\Libs\LLM\uAzureGPT.pas',
+  uLLM.Azure in '..\Libs\LLM\uLLM.Azure.pas',
   uLLM in '..\Libs\LLM\uLLM.pas',
-  uAnthropic in '..\Libs\LLM\uAnthropic.pas',
-  uReplicate.LLM in '..\Libs\LLM\uReplicate.LLM.pas';
+  uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
+  uLLM.Replicate in '..\Libs\LLM\uLLM.Replicate.pas';
 
 {$R *.res}
 

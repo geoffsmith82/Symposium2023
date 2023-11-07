@@ -20,14 +20,14 @@ uses
   Vcl.Menus,
   System.IOUtils,
   uLLM,
-  OpenAI,
-  uAzureGPT,
-  uElevenLabs.REST,
-  uMicrosoft.Cognitive.REST,
-  uAmazon.Polly,
-  uGoogleSpeech,
-  uWindows.Engine,
-  uBaseSpeech,
+  uLLM.OpenAI,
+  uLLM.Azure,
+  uTTS.ElevenLabs,
+  uTTS.Microsoft.Cognitive,
+  uTTS.Amazon.Polly,
+  uTTS.GoogleSpeech,
+  uTTS.Windows.Engine,
+  uTTS,
   uEngineManager
   ;
 

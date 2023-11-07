@@ -1,4 +1,4 @@
-unit uHuggingFace.LLM;
+unit uLLM.HuggingFace;
 
 interface
 

@@ -18,7 +18,7 @@ uses
   System.NetEncoding,
   System.JSON,
   uTTS,
-  uGoogleSpeech.DTO,
+  uTTS.GoogleSpeech.DTO,
   System.IniFiles
   ;
 

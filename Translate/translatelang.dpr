@@ -25,7 +25,7 @@ uses
   uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas',
   uEngineManager in '..\Libs\uEngineManager.pas',
   LanguageCodes in '..\Libs\Translate\LanguageCodes.pas',
-  OpenAI in '..\Libs\LLM\OpenAI.pas',
+  uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   uLLM in '..\Libs\LLM\uLLM.pas';
 
 {$R *.res}

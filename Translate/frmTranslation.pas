@@ -26,7 +26,7 @@ uses
   uMicrosoft.Translate,
   uTranslatedfn,
   uOutputChangedLanguageTokens,
-  OpenAI
+  uLLM.OpenAI
   ;
 
 type

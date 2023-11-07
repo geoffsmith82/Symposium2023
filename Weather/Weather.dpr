@@ -28,7 +28,7 @@ uses
   uTTS.Microsoft.Cognitive in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.pas',
   uTTS.Microsoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas',
   uTTS.Windows.Engine in '..\Libs\TextToSpeech\uTTS.Windows.Engine.pas',
-  OpenAI in '..\Libs\LLM\OpenAI.pas',
+  uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uLLM in '..\Libs\LLM\uLLM.pas';
 
