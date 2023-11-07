@@ -117,6 +117,8 @@ begin
           LChoice := LChoices.Items[0] as TJSONObject;
           Result.Content := LChoice.GetValue('message').GetValue<string>('content');
           Result.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+          if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
+            Result.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
         finally
           FreeAndNil(LJSONResponse);
         end;

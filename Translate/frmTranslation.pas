@@ -19,11 +19,11 @@ uses
   Vcl.StdCtrls,
   Xml.Win.msxmldom,
   XMLDoc,
-  uBaseTranslate,
+  uTranslate,
   uEngineManager,
-  uAmazon.Translate,
-  uGoogle.Translate,
-  uMicrosoft.Translate,
+  uTranslate.Amazon,
+  uTranslate.Google,
+  uTranslate.Microsoft,
   uTranslatedfn,
   uOutputChangedLanguageTokens,
   uLLM.OpenAI
@@ -93,7 +93,7 @@ implementation
 {$R *.dfm}
 
 uses
-  LanguageCodes;
+  uTranslate.LanguageCodes;
 
 {$i ..\Libs\apikey.inc}
 

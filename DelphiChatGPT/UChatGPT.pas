@@ -22,12 +22,12 @@ uses
   uLLM,
   uLLM.OpenAI,
   uLLM.Azure,
+  uTTS,
   uTTS.ElevenLabs,
   uTTS.Microsoft.Cognitive,
   uTTS.Amazon.Polly,
   uTTS.GoogleSpeech,
   uTTS.Windows.Engine,
-  uTTS,
   uEngineManager
   ;
 
@@ -160,7 +160,7 @@ begin
     msgs := TObjectList<TChatMessage>.Create;
     msg := TChatMessage.Create;
     msg.Role := 'System';
-    msg.Content := 'The following is part of a church service. Output the first sentence of the actual sermon that follows the songs, not the talking in between though';
+    msg.Content := 'You are a helpful assistant';
     msgs.Add(msg);
 
     msg := TChatMessage.Create;
@@ -172,6 +172,7 @@ begin
     config.model := SelectedModel;
     config.n := 1;
     config.max_tokens := 6200;
+    config.json_mode := False;
     mmoOutput.Lines.Text := FOpenAI.ChatCompletion(Config, msgs).Content;
     Update;
     if chkSpeak.Checked then

@@ -17,6 +17,7 @@ type
     Content : string;
     Completion_Tokens : Cardinal;
     Finish_Reason: string;
+    System_Fingerprint: string;
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
     Log_Id : string;

@@ -16,14 +16,14 @@ uses
   {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTranscribeAudio in 'frmTranscribeAudio.pas' {VoiceRecognitionForm},
-  uBaseSpeechToText in '..\Libs\SpeechToText\uBaseSpeechToText.pas',
-  uMicrosoft.SpeechToText in '..\Libs\SpeechToText\uMicrosoft.SpeechToText.pas',
-  uOpenAI.Whisper.Online.SpeechToText in '..\Libs\SpeechToText\uOpenAI.Whisper.Online.SpeechToText.pas',
-  uGoogle.SpeechToText in '..\Libs\SpeechToText\uGoogle.SpeechToText.pas',
-  uAmazon.SpeechToText in '..\Libs\SpeechToText\uAmazon.SpeechToText.pas',
+  uSTT in '..\Libs\SpeechToText\uSTT.pas',
+  uSTT.Microsoft in '..\Libs\SpeechToText\uSTT.Microsoft.pas',
+  uSTT.OpenAI.Whisper.Online in '..\Libs\SpeechToText\uSTT.OpenAI.Whisper.Online.pas',
+  uSTT.Google in '..\Libs\SpeechToText\uSTT.Google.pas',
+  uSTT.Amazon in '..\Libs\SpeechToText\uSTT.Amazon.pas',
+  uSTT.Google.DTO in '..\Libs\SpeechToText\uSTT.Google.DTO.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  uEngineManager in '..\Libs\uEngineManager.pas',
-  uGoogle.SpeechToText.DTO in '..\Libs\SpeechToText\uGoogle.SpeechToText.DTO.pas';
+  uEngineManager in '..\Libs\uEngineManager.pas';
 
 {$R *.res}
 
