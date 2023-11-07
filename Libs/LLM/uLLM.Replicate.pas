@@ -16,6 +16,7 @@ type
     cancel: string;
     get: string;
   end;
+
   TPredictionInfo = class
   private
     FId: string;

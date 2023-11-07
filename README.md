@@ -41,7 +41,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	read back to you.
 	![image](./VoiceRecognition/screenshot-hal9000.png)
   - [Image generation](./ImageGeneration)
-    - generate an image using text that you provide using OpenAI's DALLE-2 API.
+    - generate an image using text that you provide using OpenAI's DALLE-2 and DALLE-3 API.
 ### Providers Used/Available
   - Google - Text to Speech, LLM, Translate
   - Microsoft Azure - Text to Speech, GPT, Translate
@@ -50,7 +50,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
-  - [OpenAI](https://platform.openai.com) 
+  - [OpenAI](https://platform.openai.com) Text to Speech, Whisper Voice Recognition, DALLE-2, DALLE-3 Image Generation, GPT4 LLM
   - [AssemblyAI](https://www.assemblyai.com/app) Voice Recognition
   - [DeepGram](https://deepgram.com/) Voice Recognition
   - [Rev.AI](https://www.rev.ai) Voice Recognition
@@ -94,7 +94,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 ### External Libraries required to build projects
  - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
- - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11
+ - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11 (Requires Enterprise or Above) - Required to support AWS API's.
 
 ### Tools used to create example projects
  - https://github.com/PKGeorgiev/Delphi-JsonToDelphiClass
