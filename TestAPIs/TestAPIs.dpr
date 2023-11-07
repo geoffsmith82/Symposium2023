@@ -16,15 +16,15 @@ uses
   {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTestAPI in 'frmTestAPI.pas' {frmTestApiWindow},
-  uAmazon.Polly in '..\Libs\TextToSpeech\uAmazon.Polly.pas',
+  uTTS.Amazon.Polly in '..\Libs\TextToSpeech\uTTS.Amazon.Polly.pas',
   uTTS in '..\Libs\TextToSpeech\uTTS.pas',
-  uElevenLabs.REST in '..\Libs\TextToSpeech\uElevenLabs.REST.pas',
-  uGoogleSpeech in '..\Libs\TextToSpeech\uGoogleSpeech.pas',
-  uMicrosoft.Cognitive.REST in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas',
-  uWindows.Engine in '..\Libs\TextToSpeech\uWindows.Engine.pas',
+  uTTS.ElevenLabs in '..\Libs\TextToSpeech\uTTS.ElevenLabs.pas',
+  uTTS.GoogleSpeech in '..\Libs\TextToSpeech\uTTS.GoogleSpeech.pas',
+  uTTS.Microsoft.Cognitive in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.pas',
+  uTTS.Windows.Engine in '..\Libs\TextToSpeech\uTTS.Windows.Engine.pas',
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
-  uGoogleSpeech.DTO in '..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas',
-  uMicrosoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas',
+  uTTS.GoogleSpeech.DTO in '..\Libs\TextToSpeech\uTTS.GoogleSpeech.DTO.pas',
+  uTTS.Microsoft.Cognitive.Voices.DTO in '..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas',
   uMicrosoft.Translate in '..\Libs\Translate\uMicrosoft.Translate.pas',
   uGoogle.Translate in '..\Libs\Translate\uGoogle.Translate.pas',
   uBaseTranslate in '..\Libs\Translate\uBaseTranslate.pas',
@@ -45,8 +45,8 @@ uses
   uEmbeddings in '..\Libs\Embeddings\uEmbeddings.pas',
   uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
   uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas',
-  uCoqui.TTS in '..\Libs\TextToSpeech\uCoqui.TTS.pas',
-  uOpenAI.TextToSpeech in '..\Libs\TextToSpeech\uOpenAI.TextToSpeech.pas';
+  uTTS.Coqui in '..\Libs\TextToSpeech\uTTS.Coqui.pas',
+  uTTS.OpenAI in '..\Libs\TextToSpeech\uTTS.OpenAI.pas';
 
 {$R *.res}
 

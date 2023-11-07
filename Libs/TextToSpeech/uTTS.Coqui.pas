@@ -1,4 +1,4 @@
-unit uCoqui.TTS;
+unit uTTS.Coqui;
 
 interface
 

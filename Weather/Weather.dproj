@@ -100,15 +100,15 @@
         </DCCReference>
         <DCCReference Include="uXMLBOMPrecis.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uAmazon.Polly.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.Amazon.Polly.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.REST.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.ElevenLabs.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uElevenLabs.Voices.DTO.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.DTO.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uGoogleSpeech.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.REST.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uMicrosoft.Cognitive.Voices.DTO.pas"/>
-        <DCCReference Include="..\Libs\TextToSpeech\uWindows.Engine.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.GoogleSpeech.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.GoogleSpeech.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.Microsoft.Cognitive.Voices.DTO.pas"/>
+        <DCCReference Include="..\Libs\TextToSpeech\uTTS.Windows.Engine.pas"/>
         <DCCReference Include="..\Libs\LLM\OpenAI.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>

@@ -25,11 +25,13 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
+    Button4: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -401,6 +403,19 @@ begin
   repeat
     Application.ProcessMessages;
   until (GetTickCount64 - ticks) > 10000;
+end;
+
+procedure TfrmTestApiWindow.Button4Click(Sender: TObject);
+var
+  voice : TVoiceInfo;
+begin
+  Memo1.Lines.Add('======== Conqui Polly Voices');
+  FConqui := TCoquiTTSService.Create(Self, 'key', 'http://172.24.24.116:5002');
+  for voice in FConqui.Voices do
+  begin
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+  end;
+  FConqui.PlayText('How Long is a piece of string?', '');
 end;
 
 end.
