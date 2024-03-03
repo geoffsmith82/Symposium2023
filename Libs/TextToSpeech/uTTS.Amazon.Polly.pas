@@ -6,42 +6,43 @@ uses
   System.Classes,
   System.SysUtils,
   System.JSON,
-  Vcl.Controls,
-  Data.Cloud.AmazonAPI,
-  Data.Cloud.CloudAPI,
   System.Generics.Collections,
   System.Net.URLClient,
   System.Net.HttpClient,
   System.NetEncoding,
   System.Hash,
+  Vcl.Controls,
+  Data.Cloud.AmazonAPI,
+  Data.Cloud.CloudAPI,
+  AWS.Polly,
+  AWS.Runtime.ClientConfig,
+  AWS.Runtime.Credentials,
+  AWS.RegionEndpoints,
+  AWS.RegionEndpoint,
   uTTS
-{$IFNDEF NOPOLLY}
-  ,AWS.Polly,  // need to install AWS SDK For Delphi Preview
-  AWS.Core    // Need Delphi Enterprise 11 or above and install from
-{$ENDIF}              // GetIt
   ;
 
 type
   TAmazonPollyService = class(TBaseTextToSpeech)
   private
-    FAccountName : string;
-    FAccountKey: string;
-    FRegion: string;
+    FAccessKey : string;
+    FSecretKey: string;
+    FRegion: IRegionEndpointEx;
   protected
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
-    constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string);
+    constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: IRegionEndpointEx);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
   end;
 
 implementation
 
-constructor TAmazonPollyService.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string);
+constructor TAmazonPollyService.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: IRegionEndpointEx);
 begin
   inherited Create(Sender, '', '');
-  FAccountName := AccountName;
-  FAccountKey := AccountKey;
+  FAccessKey := AccountName;
+  FSecretKey := AccountKey;
   FRegion := Region;
 end;
 
@@ -51,64 +52,56 @@ begin
 end;
 
 function TAmazonPollyService.GetVoices: TObjectList<TVoiceInfo>;
-{$IFNDEF NOPOLLY}
 var
-  LPolly : TPollyClient;
-  LRequest : IPollyDescribeVoicesRequest;
-  LResponse : IPollyDescribeVoicesResponse;
-  LOptions : IAWSOptions;
-  LPollyVoice : IPollyVoice;
+  LPolly : TAmazonPollyClient;
+  LRequest : IDescribeVoicesRequest;
+  LResponse : IDescribeVoicesResponse;
+  LConfig : IClientConfig;
+  LCredentials : IAWSCredentials;
+  LPollyVoice : TVoice;
   i : Integer;
   LVoice : TVoiceInfo;
-{$ENDIF}
 begin
   FVoicesInfo.Clear;
-{$IFNDEF NOPOLLY}
-  LOptions := TAWSOptions.Create;
-  LOptions.AccessKeyId := FAccountName;
-  LOptions.SecretAccessKey := FAccountKey;
-  LOptions.Region := FRegion;
-  LPolly := TPollyClient.Create(LOptions);
+  LCredentials := TBasicAWSCredentials.Create(FAccessKey, FSecretKey);
+  LConfig := TAmazonPollyConfig.Create;
+  LConfig.RegionEndpoint := FRegion;
+
+  LPolly := TAmazonPollyClient.Create(LCredentials, LConfig);
   try
-    LRequest := TPollyDescribeVoicesRequest.Create;
+    LRequest := TDescribeVoicesRequest.Create;
     LResponse := LPolly.DescribeVoices(LRequest);
     for i  := 0 to LResponse.Voices.Count - 1 do
     begin
       LPollyVoice := LResponse.Voices[i];
       LVoice := TVoiceInfo.Create;
       LVoice.VoiceName := LPollyVoice.Name;
-      LVoice.VoiceId := LPollyVoice.Id;
-      LVoice.VoiceGender := LPollyVoice.Gender;
+      LVoice.VoiceId := LPollyVoice.Id.Value;
+      LVoice.VoiceGender := LPollyVoice.Gender.Value;
       FVoicesInfo.Add(LVoice);
     end;
   finally
     LResponse := nil;
     FreeAndNil(LPolly);
   end;
-{$ENDIF}
-{$IFDEF NOPOLLY}
-  raise Exception.Create('Polly Not Available/Not Compiled in');
-{$ENDIF}
   Result := FVoicesInfo;
 end;
 
 function TAmazonPollyService.TextToSpeech(text, VoiceName: string): TMemoryStream;
-{$IFNDEF NOPOLLY}
 var
-  LPolly : TPollyClient;
-  LRequest : IPollySynthesizeSpeechRequest;
-  LResponse : IPollySynthesizeSpeechResponse;
-  LOptions : IAWSOptions;
-{$ENDIF}
+  LPolly : TAmazonPollyClient;
+  LRequest : ISynthesizeSpeechRequest;
+  LResponse : ISynthesizeSpeechResponse;
+  LConfig : IClientConfig;
+  LCredentials : IAWSCredentials;
 begin
-{$IFNDEF NOPOLLY}
-  LOptions := TAWSOptions.Create;
-  LOptions.AccessKeyId := FAccountName;
-  LOptions.SecretAccessKey := FAccountKey;
-  LOptions.Region := FRegion;
-  LPolly := TPollyClient.Create(LOptions);
+  LCredentials := TBasicAWSCredentials.Create(FAccessKey, FSecretKey);
+  LConfig := TAmazonPollyConfig.Create;
+  LConfig.RegionEndpoint := FRegion;
+
+  LPolly := TAmazonPollyClient.Create(LCredentials, LConfig);
   try
-    LRequest := TPollySynthesizeSpeechRequest.Create;
+    LRequest := TSynthesizeSpeechRequest.Create;
     LRequest.Text := text;
     LRequest.OutputFormat := 'mp3';
     LRequest.VoiceId := VoiceName;
@@ -122,10 +115,6 @@ begin
   finally
     FreeAndNil(LPolly);
   end;
-{$ENDIF}
-{$IFDEF NOPOLLY}
-  raise Exception.Create('Polly Not Available/Not Compiled in');
-{$ENDIF}
 end;
 
 end.

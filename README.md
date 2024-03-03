@@ -94,7 +94,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 ### External Libraries required to build projects
  - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
- - AWS SDK For Delphi (Preview) in GetIt Package Manager in Delphi 11 (Requires Enterprise or Above) - Required to support AWS API's.
+ - [landgraf-dev/aws-sdk-delphi] (https://github.com/landgraf-dev/aws-sdk-delphi) AWS SDK
 
 ### Tools used to create example projects
  - https://github.com/PKGeorgiev/Delphi-JsonToDelphiClass
