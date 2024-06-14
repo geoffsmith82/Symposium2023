@@ -65,11 +65,11 @@ type
     procedure miTextDavinci003Click(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
-    FSpeedToTextEngine : TEngineManager<TBaseTextToSpeech>;
+    FTextToSpeechEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
-    FOpenAI : TOpenAI;
-    FModels : TStringList;
+    FOpenAI : TBaseLLM;
     function SelectedModel: string;
     { Private declarations }
   public
@@ -91,24 +91,25 @@ var
   i: Integer;
   currentModel : string;
 begin
-  FSpeedToTextEngine := TEngineManager<TBaseTextToSpeech>.Create;
+  FTextToSpeechEngine := TEngineManager<TBaseTextToSpeech>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
 
-  FSpeedToTextEngine.RegisterEngine(
+
+  FTextToSpeechEngine.RegisterEngine(
      TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
-  FSpeedToTextEngine.RegisterEngine(
+  FTextToSpeechEngine.RegisterEngine(
      TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
-  FSpeedToTextEngine.RegisterEngine(
+  FTextToSpeechEngine.RegisterEngine(
      TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
-  FSpeedToTextEngine.RegisterEngine(
+  FTextToSpeechEngine.RegisterEngine(
      TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
-  FSpeedToTextEngine.RegisterEngine(
+  FTextToSpeechEngine.RegisterEngine(
      TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'TWindowsSpeechService');
-  FSpeedToTextEngine.SelectEngine(lSpeechEngine);
-  FSpeedToTextEngine.ActiveMenuItem.Checked := True;
+  FTextToSpeechEngine.SelectEngine(lSpeechEngine);
+  FTextToSpeechEngine.ActiveMenuItem.Checked := True;
   currentModel := FSettings.ReadString('ChatGPT', 'Model', 'text-davinci-003').Replace('&', '');
   for i := 0 to miModelMenu.Count - 1 do
   begin
@@ -122,7 +123,7 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FSpeedToTextEngine);
+  FreeAndNil(FTextToSpeechEngine);
   FreeAndNil(FSettings);
   FreeAndNil(FOpenAI);
 end;
@@ -142,9 +143,9 @@ end;
 
 procedure TForm1.SelectSpeechEngine(Sender: TObject);
 begin
-  FSpeedToTextEngine.SelectEngine(Sender as TMenuItem);
+  FTextToSpeechEngine.SelectEngine(Sender as TMenuItem);
   (Sender as TMenuItem).Checked := True;
-  FSettings.WriteString('Speech', 'SelectedEngine', FSpeedToTextEngine.ActiveEngine.ClassName);
+  FSettings.WriteString('Speech', 'SelectedEngine', FTextToSpeechEngine.ActiveEngine.ClassName);
 end;
 
 procedure TForm1.btnAskTheMachineClick(Sender: TObject);
@@ -177,7 +178,7 @@ begin
     Update;
     if chkSpeak.Checked then
     begin
-      FSpeedToTextEngine.ActiveEngine.PlayText(mmoOutput.Lines.Text);
+      FTextToSpeechEngine.ActiveEngine.PlayText(mmoOutput.Lines.Text);
     end;
   finally
     Screen.Cursor := OldCursor;
@@ -186,7 +187,7 @@ end;
 
 procedure TForm1.btnGoogleAuthClick(Sender: TObject);
 begin
-  (FSpeedToTextEngine.ActiveEngine as TGoogleSpeechService).Authenticate;
+  (FTextToSpeechEngine.ActiveEngine as TGoogleSpeechService).Authenticate;
 end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);

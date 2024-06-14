@@ -95,9 +95,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <DCC_UnitSearchPath>D:\Programming\components\newac\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\Polly\Base;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Transform;..\Libs\aws-sdk-delphi\Source\Core;..\Libs\aws-sdk-delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>

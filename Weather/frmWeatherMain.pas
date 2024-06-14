@@ -18,7 +18,8 @@ uses
   Vcl.ExtCtrls,
   uLLM,
   uLLM.OpenAI,
-  uTTS.ElevenLabs
+  uTTS.ElevenLabs,
+  uTTS.Amazon.Polly
   ;
 
 type
@@ -35,6 +36,7 @@ type
   private
     { Private declarations }
     FElevenLabsVoiceService : TElevenLabsService;
+    FAmazon : TAmazonPollyService;
     FOpenAI : TOpenAI;
   public
     { Public declarations }
@@ -64,6 +66,7 @@ end;
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
   FElevenLabsVoiceService := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  FAmazon := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, 'ap-southeast-2');
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
 end;
 
@@ -130,7 +133,8 @@ begin
                 end;
                 mmWeatherAnswer.Text := answer.Content;
                 // The second parameter needs to be the voice id for the voice you want to use.
-                FElevenLabsVoiceService.PlayText(mmWeatherAnswer.Text, '7ikeV0TLG4sgVpT58eeU');
+                //FElevenLabsVoiceService.PlayText(mmWeatherAnswer.Text, '7ikeV0TLG4sgVpT58eeU');
+                FAmazon.PlayText(mmWeatherAnswer.Text, 'Olivia');
             end);
          aTask.Start;
       end;
