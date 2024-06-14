@@ -72,6 +72,9 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Core;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Transform;..\Libs\aws-sdk-delphi\Source\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_DebugInformation>0</DCC_DebugInformation>
