@@ -26,6 +26,7 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -416,6 +417,39 @@ begin
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
   end;
   FConqui.PlayText('How Long is a piece of string?', '');
+end;
+
+procedure TfrmTestApiWindow.Button5Click(Sender: TObject);
+var
+  openAIVision : TOpenAI;
+  config : TChatSettings;
+  AMessages: TObjectList<TChatMessage>;
+  MessageVision : TChatVisionMessage;
+  response: TChatResponse;
+begin
+  openAIVision := TOpenAI.Create(chatgpt_apikey);
+  try
+    config.model := 'gpt-4o';
+    config.json_mode := False;
+    AMessages := TObjectList<TChatMessage>.Create;
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'system';
+    MessageVision.Content := 'You are a useful assistant';
+    AMessages.Add(MessageVision);
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'user';
+    MessageVision.Content := 'Describe the following image';
+    MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    AMessages.Add(MessageVision);
+
+
+    response := openAIVision.ChatCompletion(Config, AMessages);
+    Memo1.Lines.Add(response.Content);
+  finally
+    FreeAndNil(openAIVision);
+  end;
+
+
 end;
 
 end.

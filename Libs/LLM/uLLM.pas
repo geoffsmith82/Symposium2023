@@ -4,6 +4,8 @@ interface
 
 uses
   System.SysUtils,
+  System.Classes,
+  System.JSON,
   System.Generics.Collections
   ;
 
@@ -11,7 +13,25 @@ type
   TChatMessage = class
     Role: string;
     Content: string;
+    function AsJSON: TJSONObject; virtual;
   end;
+
+  TChatVisionMessage = class(TChatMessage)
+  private
+    FImageURLs : TStringList;
+  public
+    MessageType: string;
+    procedure AddImageURL(const Url: string);
+    procedure AddImageFile(const Filename: string; const mimeType: string);
+    procedure AddImageStream(stream: TStream; const mimeType: string);
+    constructor Create;
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  published
+    property ImageURLs: TStringList read FImageURLs;
+  end;
+
+
 
   TChatResponse = record
     Content : string;
@@ -83,6 +103,10 @@ type
 
 implementation
 
+uses
+  netencoding
+  ;
+
 { TPrompt }
 
 constructor TPrompt.Create(const APromptText: string);
@@ -120,7 +144,7 @@ end;
 
 procedure TPrompt.SetParameter(const Key: string; const Value: string);
 begin
-    FParameters.AddOrSetValue(Key, Value);
+  FParameters.AddOrSetValue(Key, Value);
 end;
 
 { TBaseOpenAI }
@@ -137,5 +161,101 @@ begin
   inherited;
 end;
 
+
+{ TChatVisionMessage }
+
+procedure TChatVisionMessage.AddImageFile(const filename: string; const mimeType: string);
+var
+  fs : TFileStream;
+begin
+  fs := nil;
+  try
+    fs := TFileStream.Create(filename, fmOpenRead);
+    AddImageStream(fs, mimeType);
+  finally
+    FreeAndNil(fs);
+  end;
+end;
+
+procedure TChatVisionMessage.AddImageStream(stream: TStream; const mimeType: string);
+var
+  ds : TStringStream;
+begin
+  ds := TStringStream.Create;
+  try
+    TNetEncoding.Base64String.Encode(stream, ds);
+    FImageURLs.Add('data:' + mimeType + ';base64,' + ds.DataString);
+  finally
+    FreeAndNil(ds);
+  end;
+end;
+
+procedure TChatVisionMessage.AddImageURL(const Url: string);
+begin
+  FImageURLs.Add(Url);
+end;
+
+function TChatVisionMessage.AsJSON: TJSONObject;
+var
+  LJSONMsg : TJSONObject;
+  LJSONSubMsgArray : TJSONArray;
+  LJSONSubTextMsg : TJSONObject;
+  LJSONSubImageMsg : TJSONObject;
+  LJSONImageURLData : TJSONObject;
+  i: Integer;
+begin
+  LJSONMsg := TJSONObject.Create;
+  LJSONMsg.AddPair('role', Role.ToLower);
+  if FImageURLs.Count = 0 then
+  begin
+    LJSONMsg.AddPair('content', Content);
+  end
+  else
+  begin
+    LJSONSubMsgArray := TJSONArray.Create;
+    // Add text part of msg
+    LJSONSubTextMsg := TJSONObject.Create;
+    LJSONSubTextMsg.AddPair('type', 'text');
+    LJSONSubTextMsg.AddPair('text', Content);
+    LJSONSubMsgArray.Add(LJSONSubTextMsg);
+    // Add images part of msg
+    for i := 0 to FImageURLs.Count - 1 do
+    begin
+      LJSONSubImageMsg := TJSONObject.Create;
+      LJSONSubImageMsg.AddPair('type', 'image_url');
+      LJSONImageURLData := TJSONObject.Create;
+      LJSONImageURLData.AddPair('url', FImageURLs[i]);
+      LJSONSubImageMsg.AddPair('image_url', LJSONImageURLData);
+      LJSONSubMsgArray.Add(LJSONSubImageMsg);
+    end;
+
+    LJSONMsg.AddPair('content', LJSONSubMsgArray);
+  end;
+
+  Result := LJSONMsg;
+end;
+
+constructor TChatVisionMessage.Create;
+begin
+  FImageURLs := TStringList.Create;
+end;
+
+destructor TChatVisionMessage.Destroy;
+begin
+  FreeAndNil(FImageURLs);
+  inherited;
+end;
+
+{ TChatMessage }
+
+function TChatMessage.AsJSON: TJSONObject;
+var
+  LJSONMsg : TJSONObject;
+begin
+  LJSONMsg := TJSONObject.Create;
+  LJSONMsg.AddPair('role', Role.ToLower);
+  LJSONMsg.AddPair('content', Content);
+  Result := LJSONMsg;
+end;
 
 end.

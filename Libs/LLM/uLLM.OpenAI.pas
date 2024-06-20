@@ -37,12 +37,15 @@ var
   LJSONBody: TJSONObject;
   LJSONMessages: TJSONArray;
   LJSONMsg : TJSONObject;
+  LJSONContent: TJSONObject;
+  LJSONContentArray: TJSONArray;
   LJSONReponseFormat : TJSONObject;
   LMessage: TChatMessage;
   LJSONResponse: TJSONObject;
   LChoices: TJSONArray;
   LUsage: TJSONObject;
   LChoice: TJSONObject;
+  i: Integer;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -71,10 +74,7 @@ begin
     try
       for LMessage in AMessages do
       begin
-        LJSONMsg := TJSONObject.Create;
-        LJSONMsg.AddPair('role', LMessage.Role.ToLower);
-        LJSONMsg.AddPair('content', LMessage.Content);
-        LJSONMessages.AddElement(LJSONMsg);
+        LJSONMessages.AddElement(LMessage.AsJSON);
       end;
 
       if ChatConfig.model.IsEmpty then
