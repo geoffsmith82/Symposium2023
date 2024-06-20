@@ -146,20 +146,17 @@ var
   LModelObj : TBaseModelInfo;
 begin
   FModelInfo.Clear;
+
   LModelObj := TBaseModelInfo.Create;
-  LModelObj.modelName := 'claude-instant-1';
+  LModelObj.modelName := 'claude-3-opus-20240229';
   FModelInfo.Add(LModelObj);
 
   LModelObj := TBaseModelInfo.Create;
-  LModelObj.modelName := 'claude-instant-1.2';
+  LModelObj.modelName := 'claude-3-sonnet-20240229';
   FModelInfo.Add(LModelObj);
 
   LModelObj := TBaseModelInfo.Create;
-  LModelObj.modelName := 'claude-2';
-  FModelInfo.Add(LModelObj);
-
-  LModelObj := TBaseModelInfo.Create;
-  LModelObj.modelName := 'claude-2.0';
+  LModelObj.modelName := 'claude-3-haiku-20240307';
   FModelInfo.Add(LModelObj);
 
   Result := FModelInfo;
