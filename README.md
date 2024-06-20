@@ -47,8 +47,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
 ### Providers Used/Available
   - Google - Text to Speech, LLM, Translate
   - Microsoft Azure - Text to Speech, GPT, Translate
-  - Amazon - Text to Speech, Translate
-  - [Anthropic](https://www.anthropic.com) claude-2 and claude-instant-1 support one of largest context windows currently available
+  - Amazon - [Text to Speech](https://aws.amazon.com/polly/), [Translate](https://aws.amazon.com/translate/)
+  - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-sonnet and claude-3-haiku, supportting one of largest context windows currently available (200k tokens)
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
