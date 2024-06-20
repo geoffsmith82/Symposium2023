@@ -17,6 +17,10 @@ uses
   CodeExtractor in 'CodeExtractor.pas',
   udmPersonalAlarms in 'udmPersonalAlarms.pas' {dmPersonalAlarms: TDataModule},
   Controller.Personal.DataObjects in 'Controller.Personal.DataObjects.pas',
+  Controller.Weather in 'Controller.Weather.pas',
+  Controller.Weather.DataObjects in 'Controller.Weather.DataObjects.pas',
+  udmWeather in '..\Weather\udmWeather.pas' {dmWeather: TDataModule},
+  uXMLBOMPrecis in '..\Weather\uXMLBOMPrecis.pas',
   udmDiff in 'udmDiff.pas' {dmDiff: TDataModule};
 
 {$R *.res}

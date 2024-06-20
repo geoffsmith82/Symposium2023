@@ -46,7 +46,8 @@ uses
   System.IOUtils,
   MVCFramework.Commons,
   Controller.Personal,
-  Controller.Project
+  Controller.Project,
+  Controller.Weather
   ;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
@@ -85,6 +86,7 @@ begin
     end);
   FMVC.AddController(TPersonalController);
   FMVC.AddController(TProjectManagementController);
+  FMVC.AddController(TWeatherController);
 end;
 
 procedure TWebModule1.WebModule1DefaultHandlerAction(Sender: TObject;

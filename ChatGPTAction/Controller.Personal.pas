@@ -60,9 +60,9 @@ uses
 
 procedure TPersonalController.GetCurrentTime;
 var
-  TimeObject : TCurrentTimeObjbect;
+  TimeObject : TCurrentTimeObject;
 begin
-  TimeObject := TCurrentTimeObjbect.Create;
+  TimeObject := TCurrentTimeObject.Create;
   try
     TimeObject.CurrentTime := DateToISO8601(Now.NowUTC, True);
     Render(TimeObject, False);

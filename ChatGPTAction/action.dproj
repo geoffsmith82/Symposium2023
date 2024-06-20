@@ -156,6 +156,14 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="Controller.Weather.pas"/>
+        <DCCReference Include="Controller.Weather.DataObjects.pas"/>
+        <DCCReference Include="..\Weather\udmWeather.pas">
+            <Form>dmWeather</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Weather\uXMLBOMPrecis.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

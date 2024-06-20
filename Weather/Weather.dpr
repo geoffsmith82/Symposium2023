@@ -38,6 +38,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmWeatherWindow, frmWeatherWindow);
-  Application.CreateForm(TdmWeather, dmWeather);
   Application.Run;
 end.
+

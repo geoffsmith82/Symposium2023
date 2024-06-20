@@ -1,6 +1,8 @@
 object dmWeather: TdmWeather
-  Height = 1500
-  Width = 2000
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  Height = 242
+  Width = 593
   object IdFTP1: TIdFTP
     Host = 'ftp.bom.gov.au'
     Passive = True

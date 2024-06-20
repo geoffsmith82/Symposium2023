@@ -19,7 +19,8 @@ uses
   uLLM,
   uLLM.OpenAI,
   uTTS.ElevenLabs,
-  uTTS.Amazon.Polly
+  uTTS.Amazon.Polly,
+  udmWeather
   ;
 
 type
@@ -38,6 +39,7 @@ type
     FElevenLabsVoiceService : TElevenLabsService;
     FAmazon : TAmazonPollyService;
     FOpenAI : TOpenAI;
+    FdmWeather : TdmWeather;
   public
     { Public declarations }
   end;
@@ -50,7 +52,6 @@ implementation
 {$R *.dfm}
 
 uses
-  udmWeather,
   uXMLBOMPrecis,
   System.IOUtils
   ;
@@ -61,6 +62,7 @@ procedure TfrmWeatherWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FElevenLabsVoiceService);
   FreeAndNil(FOpenAI);
+  FreeAndNil(FdmWeather);
 end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
@@ -68,17 +70,19 @@ begin
   FElevenLabsVoiceService := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
   FAmazon := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, 'ap-southeast-2');
   FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FdmWeather := TdmWeather.Create(nil);
 end;
 
 procedure TfrmWeatherWindow.btnLatestForcastClick(Sender: TObject);
 var
-  memStream : TStringStream;
-  product : IXMLProductType;
+  product : IXMLAreaType;
   i: Integer;
   question : string;
   forcastInfo : string;
   model : string;
   chatConfig : TChatSettings;
+  location : string;
+  state : string;
 begin
   question := 'Using the xml I provide below, generate some text that includes the forcast of weather.  ' +
     ' Start with variations on "now time for the weather". ' +
@@ -92,24 +96,17 @@ begin
   else
     model := 'gpt-3.5-turbo';
 
-
-  dmWeather.IdFTP1.Connect;
-  memStream := TStringStream.Create;
+  location := 'Bendigo';
+  state := 'Victoria';
   try
-    dmWeather.IdFTP1.Get('/anon/gen/fwo/IDV10753.xml', memStream, False);
-    dmWeather.XMLDocument1.LoadFromStream(memStream);
-    product := Getproduct(dmWeather.XMLDocument1);
-    for i := 0 to product.Forecast.Count - 1 do
-    begin
-      if product.Forecast[i].Description = 'Bendigo' then
-      begin
+    product := FdmWeather.GetBomForecast(location, state);
         var aTask: ITask :=  TTask.Create (procedure ()
             var
               answer : TChatResponse;
               chatMessage : TChatMessage;
               chatMessages : TObjectList<TChatMessage>;
             begin
-                forcastInfo := product.Forecast[i].XML;
+                forcastInfo := product.XML;
                 mmoWeatherQuestion.Lines.Add(question);
                 mmoWeatherQuestion.Lines.Add('');
                 mmoWeatherQuestion.Lines.Add(forcastInfo);
@@ -137,11 +134,8 @@ begin
                 FAmazon.PlayText(mmWeatherAnswer.Text, 'Olivia');
             end);
          aTask.Start;
-      end;
-    end;
   finally
-    FreeAndNil(memStream);
-    product := nil;
+
   end;
 end;
 

@@ -16,7 +16,7 @@ uses
 
 
 type
-  TCurrentTimeObjbect = class
+  TCurrentTimeObject = class
   private
     FCurrentTime: string;
 
