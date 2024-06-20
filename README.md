@@ -1,5 +1,5 @@
 # Symposium 2023 Artificial Intelligence and ChatGPT
-Source code and Documentation for my [ADUG](https://www.adug.org.au) Symposium Talk presented on the 28th of April 2023. I have since added to and enhanced the code to further demonstrate capabilities of AI.
+Source code and Documentation for my [ADUG](https://www.adug.org.au) [Symposium Talk presented on the 28th of April 2023](https://www.youtube.com/watch?v=7HNiOMcHBW8). I have since added to and enhanced the code to further demonstrate capabilities of AI.
 
 The goal of this project is to enable delphi users to be able to use AI technology in their applications.  There are many different types of AI and thousands of different models.  This project is working on creating generalized interfaces to the different types of AI models and make them easily accessible.
 
@@ -95,8 +95,9 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [Open-Assistant](https://open-assistant.io/)
 
 ### External Libraries required to build projects
- - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi.
- - [landgraf-dev/aws-sdk-delphi] (https://github.com/landgraf-dev/aws-sdk-delphi) AWS SDK
+ - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi. - For Voice recognition
+ - [landgraf-dev/aws-sdk-delphi](https://github.com/landgraf-dev/aws-sdk-delphi) AWS SDK
+ - [DelphiMVCFramework](https://github.com/danieleteti/delphimvcframework) for ChatGPTAction 
 
 ### Tools used to create example projects
  - https://github.com/PKGeorgiev/Delphi-JsonToDelphiClass
