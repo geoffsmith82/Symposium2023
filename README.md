@@ -20,6 +20,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
 ## Presentation Slides
   - [AI and ChatGPT](./Documentation/AI%20and%20ChatGPT.pptx)
 ## Example programs
+  - [ChatGPTAction](./ChatGPTAction) 
+    - Simple Server app that can be added to a ChatGPT GPT action to allow your computer to write delphi code.
   - [EmbeddingsDemo](./EmbeddingsDemo)
 	- Simple demo showing how Embeddings work
   - [Translate](./Translate)
