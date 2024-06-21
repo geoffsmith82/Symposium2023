@@ -152,6 +152,10 @@ begin
   FModelInfo.Add(LModelObj);
 
   LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-3-5-sonnet-20240620';
+  FModelInfo.Add(LModelObj);
+
+  LModelObj := TBaseModelInfo.Create;
   LModelObj.modelName := 'claude-3-sonnet-20240229';
   FModelInfo.Add(LModelObj);
 
