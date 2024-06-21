@@ -4,8 +4,8 @@ uses
   {$IFDEF EurekaLog}
   EMemLeaks,
   EResLeaks,
-  EDebugExports,
   EDebugJCL,
+  EDebugExports,
   EFixSafeCallException,
   EMapWin32,
   EAppVCL,
@@ -38,6 +38,7 @@ uses
   uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
   uLLM.Replicate in '..\Libs\LLM\uLLM.Replicate.pas',
   uLLM.HuggingFace in '..\Libs\LLM\uLLM.HuggingFace.pas',
+  uLLM.Groq in '..\Libs\LLM\uLLM.Groq.pas',
   uImageGeneration.Replicate in '..\Libs\ImageGeneration\uImageGeneration.Replicate.pas',
   uImageGeneration in '..\Libs\ImageGeneration\uImageGeneration.pas',
   uImageGeneration.OpenAI in '..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas',
@@ -56,4 +57,3 @@ begin
   Application.CreateForm(TfrmTestApiWindow, frmTestApiWindow);
   Application.Run;
 end.
-

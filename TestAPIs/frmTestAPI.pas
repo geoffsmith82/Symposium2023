@@ -61,6 +61,7 @@ type
     procedure TestAmazonPolly;
     procedure TestWindowsVoice;
     procedure TestHunggingFaceLLM;
+    procedure TestGroqLLM;
     procedure ListGroqModels;
   public
     { Public declarations }
@@ -215,7 +216,7 @@ end;
 
 procedure TfrmTestApiWindow.Button6Click(Sender: TObject);
 begin
-  ListGroqModels;
+  TestGroqLLM;
 end;
 
 procedure TfrmTestApiWindow.ListOpenAIModels;
@@ -348,6 +349,42 @@ begin
     until (GetTickCount64 - ticks) > 10000;
   finally
     FreeAndNil(elevenlabs);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestGroqLLM;
+var
+  groq: TGroqLLM;
+  modelObj: TBaseModelInfo;
+  answer: string;
+  settings: TChatSettings;
+  messages: TObjectList<TChatMessage>;
+  msg : TChatMessage;
+begin
+  Memo1.Lines.Add('======== Model Groq');
+  messages := nil;
+  groq := nil;
+
+  try
+    groq := TGroqLLM.Create(groq_apikey);
+    for modelObj in groq.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+    settings.model := 'mixtral-8x7b-32768';
+    settings.json_mode := False;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'How long is a piece of string';
+    messages.Add(msg);
+
+
+    answer := groq.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(groq);
+    FreeAndNil(messages);
   end;
 end;
 
