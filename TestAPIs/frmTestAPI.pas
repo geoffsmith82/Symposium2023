@@ -15,6 +15,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   IniFiles,
+  uAttributes,
   uTTS.GoogleSpeech,
   uTTS.Coqui
   ;
@@ -28,6 +29,7 @@ type
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
+    Button7: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -36,6 +38,7 @@ type
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -65,6 +68,7 @@ type
     procedure ListGroqModels;
   public
     { Public declarations }
+    procedure GetWeather([ParamDescription('State of the location')] state: string; [ParamDescription('Location for the weather forecast')] location: string);
   end;
 
 var
@@ -217,6 +221,40 @@ end;
 procedure TfrmTestApiWindow.Button6Click(Sender: TObject);
 begin
   TestGroqLLM;
+end;
+
+procedure TfrmTestApiWindow.GetWeather(state: string; location: string);
+begin
+  ShowMessage('GetWeather for ' + location + ', ' + state);
+end;
+
+
+procedure TfrmTestApiWindow.Button7Click(Sender: TObject);
+var
+  openAI : TOpenAI;
+  messages : TObjectList<TChatMessage>;
+  msg : TChatMessage;
+  settings : TChatSettings;
+  answer : string;
+begin
+  openAI := TOpenAI.Create(chatgpt_apikey);
+  try
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self, 'Get the weather forecast');
+
+    settings.model := 'gpt-4o';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    answer := openAI.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(openAI);
+  end;
 end;
 
 procedure TfrmTestApiWindow.ListOpenAIModels;

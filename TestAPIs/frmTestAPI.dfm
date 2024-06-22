@@ -74,6 +74,28 @@ object frmTestApiWindow: TfrmTestApiWindow
     Caption = 'Test GPT Vision'
     TabOrder = 5
     OnClick = Button5Click
-    ExplicitTop = 106
+  end
+  object Button6: TButton
+    Left = 0
+    Top = 125
+    Width = 628
+    Height = 25
+    Align = alTop
+    Caption = 'Button6'
+    TabOrder = 6
+    OnClick = Button6Click
+  end
+  object Button7: TButton
+    Left = 0
+    Top = 150
+    Width = 628
+    Height = 25
+    Align = alTop
+    Caption = 'Button7'
+    TabOrder = 7
+    OnClick = Button7Click
+    ExplicitLeft = 240
+    ExplicitTop = 160
+    ExplicitWidth = 75
   end
 end

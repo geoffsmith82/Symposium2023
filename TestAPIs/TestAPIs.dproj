@@ -112,6 +112,7 @@
         <DCCReference Include="..\Libs\LLM\uLLM.Anthropic.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Replicate.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.HuggingFace.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Groq.pas"/>
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.Replicate.pas"/>
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.pas"/>
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas"/>
