@@ -19,6 +19,7 @@ type
     FFunctionDescriptions: TObjectList<TFunctionDescription>;
     procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string);
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
+    function GetJSONTypeFromRTTI(AType: TRttiType): string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -87,6 +88,7 @@ var
   Attr: TCustomAttribute;
   ParamDesc: string;
   ParamObj: TJSONObject;
+  ParamType: string;
 begin
   Properties := TJSONObject.Create;
   RequiredArray := TJSONArray.Create;
@@ -102,8 +104,10 @@ begin
       end;
     end;
 
+    ParamType := GetJSONTypeFromRTTI(Param.ParamType);
+
     ParamObj := TJSONObject.Create;
-    ParamObj.AddPair('type', 'string'); // Adjust type based on your needs
+    ParamObj.AddPair('type', ParamType);
     ParamObj.AddPair('description', ParamDesc);
     Properties.AddPair(Param.Name, ParamObj);
 
@@ -117,6 +121,30 @@ begin
   Params.AddPair('required', RequiredArray);
   Result := Params;
 end;
+
+function TFunctionRegistry.GetJSONTypeFromRTTI(AType: TRttiType): string;
+begin
+  case AType.TypeKind of
+    tkInteger, tkInt64:
+      Result := 'integer';
+    tkFloat:
+      if AType.Handle = TypeInfo(TDateTime) then
+        Result := 'string' // JSON Schema does not have a date type, use string
+      else
+        Result := 'number';
+    tkChar, tkWChar, tkString, tkLString, tkUString, tkWString:
+      Result := 'string';
+    tkEnumeration:
+      if AType.Handle = TypeInfo(Boolean) then
+        Result := 'boolean'
+      else
+        Result := 'string'; // Handle other enumerations as strings for now
+    else
+      Result := 'string'; // Default to string for any other type
+  end;
+end;
+
+
 
 procedure TFunctionRegistry.InvokeFunction(const JSONStr: string);
 var

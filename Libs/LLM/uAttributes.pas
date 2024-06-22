@@ -18,6 +18,7 @@ implementation
 
 constructor ParamDescriptionAttribute.Create(const ADescription: string);
 begin
+  inherited Create;
   FDescription := ADescription;
 end;
 

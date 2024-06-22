@@ -68,7 +68,7 @@ type
     procedure ListGroqModels;
   public
     { Public declarations }
-    procedure GetWeather([ParamDescription('State of the location')] state: string; [ParamDescription('Location for the weather forecast')] location: string);
+    procedure GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string);
   end;
 
 var
@@ -119,12 +119,8 @@ begin
 end;
 
 procedure TfrmTestApiWindow.Button1Click(Sender: TObject);
-var
-  i : Integer;
-  ticks : DWORD64;
 begin
   ListOpenAIModels;
-
   ListReplicateImageGenerators;
   TestHunggingFaceLLM;
   ListAzureLLMModels;
@@ -138,7 +134,6 @@ begin
   ListGoogleVoices;
   ListMicrosoftTranslateLanguages;
   ListAmazonTranslationLanguages;
-
 end;
 
 procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
@@ -223,7 +218,7 @@ begin
   TestGroqLLM;
 end;
 
-procedure TfrmTestApiWindow.GetWeather(state: string; location: string);
+procedure TfrmTestApiWindow.GetWeather(const state: string; const location: string);
 begin
   ShowMessage('GetWeather for ' + location + ', ' + state);
 end;
