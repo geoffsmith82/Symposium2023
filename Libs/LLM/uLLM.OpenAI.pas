@@ -149,12 +149,11 @@ var
   LChoices: TJSONArray;
   LChoice: TJSONObject;
   LUsage: TJSONObject;
+  LMessageJSON: TJSONObject;
   ToolCallsArray: TJSONArray;
   ToolValue : TJSONValue;
   ToolCall: TJSONObject;
   FunctionCallObj: TJSONObject;
-  FunctionName: string;
-  FunctionArgs: string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
   if Assigned(LJSONResponse.GetValue('model')) then
@@ -168,24 +167,22 @@ begin
   LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
-  AResponse.Content := LChoice.GetValue('message').GetValue<string>('content');
+  LMessageJSON := LChoice.GetValue('message') as TJSONObject;
+  AResponse.Content := LMessageJSON.GetValue<string>('content');
   AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
 
   // Handle function calls
-  if Assigned(LChoice.GetValue('message')) then
+  if Assigned(LMessageJSON) then
   begin
-    ToolCallsArray := LChoice.GetValue<TJSONArray>('tool_calls');
+    ToolCallsArray := LMessageJSON.GetValue<TJSONArray>('tool_calls');
     if Assigned(ToolCallsArray) then
     begin
       for ToolValue in ToolCallsArray do
       begin
         ToolCall := ToolValue as TJSONObject;
         FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
-        FunctionName := FunctionCallObj.GetValue<string>('name');
-        FunctionArgs := FunctionCallObj.GetValue<string>('arguments');
-
         // Invoke the function with the arguments
-        Functions.InvokeFunction(FunctionArgs);
+        Functions.InvokeFunction(FunctionCallObj.ToJSON);
       end;
     end;
   end;

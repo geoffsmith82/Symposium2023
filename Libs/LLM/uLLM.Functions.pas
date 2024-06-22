@@ -23,7 +23,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure RegisterFunction(const Func: Pointer; const Instance: TObject; const Description: string);
+    procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
     procedure InvokeFunction(const JSONStr: string);
     function GetAvailableFunctionsJSON: string;
   end;
@@ -50,13 +50,15 @@ begin
   inherited;
 end;
 
-procedure TFunctionRegistry.RegisterFunction(const Func: Pointer; const Instance: TObject; const Description: string);
+procedure TFunctionRegistry.RegisterFunction(const Func: Pointer; const Instance: TObject);
 var
   Method: TMethod;
   Context: TRttiContext;
   Typ: TRttiType;
   MethodRtti: TRttiMethod;
   Parameters: TJSONObject;
+  FunctionDescription: string;
+  Attr: TCustomAttribute;
 begin
   Method.Code := Func;
   Method.Data := Instance;
@@ -68,9 +70,20 @@ begin
     begin
       if MethodRtti.CodeAddress = Func then
       begin
+        // Get the function description from the attribute
+        FunctionDescription := '';
+        for Attr in MethodRtti.GetAttributes do
+        begin
+          if Attr is FunctionDescriptionAttribute then
+          begin
+            FunctionDescription := FunctionDescriptionAttribute(Attr).Description;
+            Break;
+          end;
+        end;
+
         FMethods.Add(MethodRtti.Name, Method);
         Parameters := GenerateParameterJSON(MethodRtti);
-        FFunctionDescriptions.Add(TFunctionDescription.Create(MethodRtti.Name, Description, Parameters));
+        FFunctionDescriptions.Add(TFunctionDescription.Create(MethodRtti.Name, FunctionDescription, Parameters));
         Break;
       end;
     end;
@@ -143,8 +156,6 @@ begin
       Result := 'string'; // Default to string for any other type
   end;
 end;
-
-
 
 procedure TFunctionRegistry.InvokeFunction(const JSONStr: string);
 var
@@ -228,8 +239,8 @@ function TFunctionRegistry.GetAvailableFunctionsJSON: string;
 var
   ToolsArray: TJSONArray;
   FuncDesc: TFunctionDescription;
+  FunctionJSON: TJSONObject;
   ToolObject: TJSONObject;
-  FunctionObject: TJSONObject;
 begin
   ToolsArray := TJSONArray.Create;
   try
@@ -238,17 +249,18 @@ begin
       ToolObject := TJSONObject.Create;
       ToolObject.AddPair('name', FuncDesc.Name);
       ToolObject.AddPair('description', FuncDesc.Description);
-      FunctionObject := TJSONObject.Create;
-      FunctionObject.AddPair('type', 'function');
       ToolObject.AddPair('parameters', FuncDesc.Parameters);
-      FunctionObject.AddPair('function', ToolObject);
-      ToolsArray.AddElement(FunctionObject);
-    end;
-    Result := TJSONObject.Create(TJSONPair.Create('tools', ToolsArray)).ToJSON;
+      FunctionJSON := TJSONObject.Create;
+      FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
+      FunctionJSON.AddPair('function', ToolObject);
 
+      ToolsArray.AddElement(FunctionJSON);
+    end;
+    Result := TJSONObject.Create(TJSONPair.Create('tools', ToolsArray)).ToString;
   finally
     ToolsArray.Free;
   end;
 end;
 
 end.
+

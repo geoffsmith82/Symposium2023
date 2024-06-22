@@ -68,6 +68,7 @@ type
     procedure ListGroqModels;
   public
     { Public declarations }
+    [FunctionDescription('Get the weather forecast')]
     procedure GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string);
   end;
 
@@ -234,7 +235,7 @@ var
 begin
   openAI := TOpenAI.Create(chatgpt_apikey);
   try
-    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self, 'Get the weather forecast');
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
 
     settings.model := 'gpt-4o';
     settings.json_mode := False;
@@ -242,7 +243,7 @@ begin
     messages := TObjectList<TChatMessage>.Create;
     msg := TChatMessage.Create;
     msg.Role := 'user';
-    msg.Content := 'What is the weather for Bendigo?';
+    msg.Content := 'What is the weather for Bendigo, Victoria?';
     messages.Add(msg);
     answer := openAI.ChatCompletion(settings, messages).Content;
     Memo1.Lines.Add('Answer : ' + answer);

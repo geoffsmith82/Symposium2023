@@ -47,7 +47,9 @@ uses
   uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
   uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas',
   uTTS.Coqui in '..\Libs\TextToSpeech\uTTS.Coqui.pas',
-  uTTS.OpenAI in '..\Libs\TextToSpeech\uTTS.OpenAI.pas';
+  uTTS.OpenAI in '..\Libs\TextToSpeech\uTTS.OpenAI.pas',
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
+  uAttributes in '..\Libs\LLM\uAttributes.pas';
 
 {$R *.res}
 

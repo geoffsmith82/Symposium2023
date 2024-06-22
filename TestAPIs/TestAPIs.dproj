@@ -122,6 +122,8 @@
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Coqui.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
