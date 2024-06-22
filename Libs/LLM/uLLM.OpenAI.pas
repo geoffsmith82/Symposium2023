@@ -20,6 +20,10 @@ type
   private
     FFunctions : TFunctionRegistry;
     procedure ListOpenAIModels(out AModelList: TStringList);
+    procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
+    procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
+    procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse);
+    procedure HandleErrorResponse(AResponse: TRESTResponse);
   public
     constructor Create(const APIKey: string);
     destructor Destroy; override;
@@ -37,158 +41,182 @@ var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
   LRESTResponse: TRESTResponse;
-  LJSONBody: TJSONObject;
-  LJSONMessages: TJSONArray;
-  LJSONMsg: TJSONObject;
-  LJSONReponseFormat: TJSONObject;
-  LMessage: TChatMessage;
   LJSONResponse: TJSONObject;
-  LChoices: TJSONArray;
-  LUsage: TJSONObject;
-  LChoice: TJSONObject;
-  LJSONMessage: TJSONObject;
-  LFunctionCall: TJSONObject;
-  ToolCallsArray: TJSONArray;
-  ToolCall: TJSONObject;
-  FunctionCallObj: TJSONObject;
-  FunctionName: string;
-  FunctionArgs: string;
-  FunctionResultJSON: string;
-  LAvailableFunctions: string;
-  LJSONFunctions: TJSONObject;
-  ToolValue : TJSONValue;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
   Result.Completion_Tokens := 0;
   Result.Prompt_Tokens := 0;
   Result.Total_Tokens := 0;
-  LRESTClient := nil;
-  LRESTRequest := nil;
-  LRESTResponse := nil;
+
+  CreateRESTClientAndRequest(LRESTClient, LRESTRequest, LRESTResponse);
+
   try
-    LRESTClient := TRESTClient.Create(nil);
-    LRESTRequest := TRESTRequest.Create(nil);
-    LRESTResponse := TRESTResponse.Create(nil);
-    LRESTClient.BaseURL := 'https://api.openai.com';
-    LRESTClient.Accept := 'application/json';
-    LRESTClient.AcceptCharset := 'UTF-8';
-    LRESTRequest.Client := LRESTClient;
-    LRESTRequest.Response := LRESTResponse;
-    LRESTRequest.Method := TRESTRequestMethod.rmPOST;
-    LRESTRequest.Timeout := 80000; // Set the timeout as needed
-    LRESTRequest.Resource := '/v1/chat/completions';
-    LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    LRESTRequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    LJSONBody := TJSONObject.Create;
-    LJSONMessages := TJSONArray.Create;
-    try
-      for LMessage in AMessages do
-      begin
-        LJSONMessages.AddElement(LMessage.AsJSON);
+    BuildJSONRequestBody(LRESTRequest, ChatConfig, AMessages);
+
+    LRESTRequest.Execute;
+
+    if LRESTResponse.StatusCode = 200 then
+    begin
+      LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
+      try
+        ProcessResponse(LJSONResponse, Result);
+      finally
+        LJSONResponse.Free;
       end;
-
-      if ChatConfig.model.IsEmpty then
-        ChatConfig.model := 'gpt-3.5-turbo';
-
-      LJSONBody.AddPair('model', ChatConfig.model);
-      LJSONBody.AddPair('messages', LJSONMessages);
-      if ChatConfig.max_tokens > 0 then
-        LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
-      if ChatConfig.user.Length > 0 then
-        LJSONBody.AddPair('user', ChatConfig.user);
-      if ChatConfig.n > 0 then
-        LJSONBody.AddPair('n', ChatConfig.n);
-      if ChatConfig.seed > 0 then
-        LJSONBody.AddPair('seed', ChatConfig.seed);
-      if ChatConfig.json_mode then
-      begin
-        LJSONReponseFormat := TJSONObject.Create;
-        LJSONReponseFormat.AddPair('type', 'json_object');
-        LJSONBody.AddPair('response_format', LJSONReponseFormat);
-      end;
-
-      // Include available functions in the request
-      LAvailableFunctions := Functions.GetAvailableFunctionsJSON;
-      LJSONFunctions := TJSONObject.ParseJSONValue(LAvailableFunctions) as TJSONObject;
-      LJSONBody.AddPair('tools', LJSONFunctions.GetValue<TJSONArray>('tools'));
-      LJSONBody.AddPair('tool_choice', 'auto');
-
-      LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
-      LRESTRequest.Execute;
-      if LRESTResponse.StatusCode = 200 then
-      begin
-        LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
-        try
-          LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
-          if Assigned(LJSONResponse.GetValue('model')) then
-            Result.Model := LJSONResponse.GetValue('model').Value;
-
-          if Assigned(LJSONResponse.GetValue('id')) then
-            Result.Log_Id := LJSONResponse.GetValue('id').Value;
-
-          LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
-          LUsage.TryGetValue('completion_tokens', Result.Completion_Tokens);
-          LUsage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
-          LUsage.TryGetValue('total_tokens', Result.Total_Tokens);
-          LChoice := LChoices.Items[0] as TJSONObject;
-          LJSONMessage := LChoice.GetValue('message') as TJSONObject;
-          Result.Content := LJSONMessage.GetValue<string>('content');
-          Result.Finish_Reason := LChoice.GetValue('finish_reason').Value;
-          // Handle function calls
-          if Assigned(LJSONMessage) then
-          begin
-            if LJSONMessage.TryGetValue<TJSONArray>('tool_calls', ToolCallsArray) then
-            begin
-              for ToolValue in ToolCallsArray do
-              begin
-                ToolCall := ToolValue as TJSONObject;
-                FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
-                FunctionName := FunctionCallObj.GetValue<string>('name');
-                FunctionArgs := FunctionCallObj.GetValue<string>('arguments');
-
-                // Invoke the function with the arguments
-                Functions.InvokeFunction(FunctionCallObj.ToJSON);
-              end;
-            end;
-          end;
-
-          if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
-            Result.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
-        finally
-          FreeAndNil(LJSONResponse);
-        end;
-      end
-      else
-      begin
-        // Parse the error message
-        LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
-        if Assigned(LJSONResponse) then
-        try
-          if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
-          begin
-            raise Exception.CreateFmt(
-              'Error: %s - %s. Param: %s',
-              [LJSONMsg.GetValue<string>('type'),
-               LJSONMsg.GetValue<string>('message'),
-               LJSONMsg.GetValue<string>('param')])
-          end
-          else
-            raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
-        finally
-          FreeAndNil(LJSONResponse);
-        end
-        else
-          raise Exception.CreateFmt('Error: %d - %s', [LRESTResponse.StatusCode, LRESTResponse.StatusText]);
-      end;
-    finally
-      FreeAndNil(LJSONBody);
+    end
+    else
+    begin
+      HandleErrorResponse(LRESTResponse);
     end;
   finally
-    FreeAndNil(LRESTClient);
-    FreeAndNil(LRESTRequest);
-    FreeAndNil(LRESTResponse);
+    LRESTClient.Free;
+    LRESTRequest.Free;
+    LRESTResponse.Free;
   end;
+end;
+
+procedure TOpenAI.CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
+begin
+  AClient := TRESTClient.Create(nil);
+  ARequest := TRESTRequest.Create(nil);
+  AResponse := TRESTResponse.Create(nil);
+
+  AClient.BaseURL := 'https://api.openai.com';
+  AClient.Accept := 'application/json';
+  AClient.AcceptCharset := 'UTF-8';
+
+  ARequest.Client := AClient;
+  ARequest.Response := AResponse;
+  ARequest.Method := TRESTRequestMethod.rmPOST;
+  ARequest.Timeout := 80000; // Set the timeout as needed
+  ARequest.Resource := '/v1/chat/completions';
+  ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
+procedure TOpenAI.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
+var
+  LJSONBody: TJSONObject;
+  LJSONMessages: TJSONArray;
+  LJSONMessage: TJSONObject;
+  LMessage: TChatMessage;
+  LJSONFunctions: TJSONObject;
+  LAvailableFunctions: string;
+begin
+  LJSONBody := TJSONObject.Create;
+  LJSONMessages := TJSONArray.Create;
+  try
+    for LMessage in AMessages do
+    begin
+      LJSONMessages.AddElement(LMessage.AsJSON);
+    end;
+
+    if ChatConfig.model.IsEmpty then
+      ChatConfig.model := 'gpt-3.5-turbo';
+
+    LJSONBody.AddPair('model', ChatConfig.model);
+    LJSONBody.AddPair('messages', LJSONMessages);
+    if ChatConfig.max_tokens > 0 then
+      LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
+    if ChatConfig.user.Length > 0 then
+      LJSONBody.AddPair('user', ChatConfig.user);
+    if ChatConfig.n > 0 then
+      LJSONBody.AddPair('n', ChatConfig.n);
+    if ChatConfig.seed > 0 then
+      LJSONBody.AddPair('seed', ChatConfig.seed);
+    if ChatConfig.json_mode then
+    begin
+      LJSONMessage := TJSONObject.Create;
+      LJSONMessage.AddPair('type', 'json_object');
+      LJSONBody.AddPair('response_format', LJSONMessage);
+    end;
+
+    // Include available functions in the request
+    LAvailableFunctions := Functions.GetAvailableFunctionsJSON;
+    LJSONFunctions := TJSONObject.ParseJSONValue(LAvailableFunctions) as TJSONObject;
+    LJSONBody.AddPair('tools', LJSONFunctions.GetValue<TJSONArray>('tools'));
+    LJSONBody.AddPair('tool_choice', 'auto');
+
+    ARequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
+  finally
+    LJSONBody.Free;
+  end;
+end;
+
+procedure TOpenAI.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse);
+var
+  LChoices: TJSONArray;
+  LChoice: TJSONObject;
+  LUsage: TJSONObject;
+  ToolCallsArray: TJSONArray;
+  ToolValue : TJSONValue;
+  ToolCall: TJSONObject;
+  FunctionCallObj: TJSONObject;
+  FunctionName: string;
+  FunctionArgs: string;
+begin
+  LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
+  if Assigned(LJSONResponse.GetValue('model')) then
+    AResponse.Model := LJSONResponse.GetValue('model').Value;
+
+  if Assigned(LJSONResponse.GetValue('id')) then
+    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+
+  LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
+  LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
+  LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
+  LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
+  LChoice := LChoices.Items[0] as TJSONObject;
+  AResponse.Content := LChoice.GetValue('message').GetValue<string>('content');
+  AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+
+  // Handle function calls
+  if Assigned(LChoice.GetValue('message')) then
+  begin
+    ToolCallsArray := LChoice.GetValue<TJSONArray>('tool_calls');
+    if Assigned(ToolCallsArray) then
+    begin
+      for ToolValue in ToolCallsArray do
+      begin
+        ToolCall := ToolValue as TJSONObject;
+        FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
+        FunctionName := FunctionCallObj.GetValue<string>('name');
+        FunctionArgs := FunctionCallObj.GetValue<string>('arguments');
+
+        // Invoke the function with the arguments
+        Functions.InvokeFunction(FunctionArgs);
+      end;
+    end;
+  end;
+
+  if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
+    AResponse.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
+end;
+
+procedure TOpenAI.HandleErrorResponse(AResponse: TRESTResponse);
+var
+  LJSONResponse: TJSONObject;
+  LJSONMsg: TJSONObject;
+begin
+  LJSONResponse := TJSONObject.ParseJSONValue(AResponse.Content) as TJSONObject;
+  if Assigned(LJSONResponse) then
+  try
+    if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
+    begin
+      raise Exception.CreateFmt(
+        'Error: %s - %s. Param: %s',
+        [LJSONMsg.GetValue<string>('type'),
+         LJSONMsg.GetValue<string>('message'),
+         LJSONMsg.GetValue<string>('param')])
+    end
+    else
+      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+  finally
+    LJSONResponse.Free;
+  end
+  else
+    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
 end;
 
 constructor TOpenAI.Create(const APIKey: string);
