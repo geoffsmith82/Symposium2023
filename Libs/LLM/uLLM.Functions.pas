@@ -24,7 +24,6 @@ type
     destructor Destroy; override;
     procedure RegisterFunction(const Func: Pointer; const Instance: TObject; const Description: string);
     procedure InvokeFunction(const JSONStr: string);
-    function GenerateGPT4oJSON(const FunctionName: string; const Args: array of const): string;
     function GetAvailableFunctionsJSON: string;
   end;
 
@@ -127,7 +126,7 @@ var
 begin
   JSONObject := TJSONObject.ParseJSONValue(JSONStr) as TJSONObject;
   try
-    FunctionName := JSONObject.GetValue<string>('function');
+    FunctionName := JSONObject.GetValue<string>('name');
     if FMethods.TryGetValue(FunctionName, Method) then
     begin
       InvokeFunctionFromJSON(Method, JSONStr);
@@ -142,20 +141,23 @@ end;
 procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string);
 var
   JSONObject: TJSONObject;
-  ArgsArray: TJSONArray;
+  ArgsObject: TJSONObject;
   Context: TRttiContext;
   MethodType: TRttiMethod;
   Params: TArray<TRttiParameter>;
   Args: TArray<TValue>;
+  ParamValue: TJSONValue;
+  ParamStr: string;
   I: Integer;
 begin
   JSONObject := TJSONObject.ParseJSONValue(JSONStr) as TJSONObject;
   try
-    ArgsArray := JSONObject.GetValue<TJSONArray>('args');
+    ParamStr := JSONObject.GetValue<string>('arguments');
+    ArgsObject := TJSONObject.ParseJSONValue(ParamStr) as TJSONObject;
 
     Context := TRttiContext.Create;
     try
-      MethodType := Context.GetType(TObject(Method.Data).ClassType).GetMethod(JSONObject.GetValue<string>('function'));
+      MethodType := Context.GetType(TObject(Method.Data).ClassType).GetMethod(JSONObject.GetValue<string>('name'));
 
       if Assigned(MethodType) then
       begin
@@ -164,16 +166,18 @@ begin
 
         for I := 0 to High(Params) do
         begin
+          ParamValue := ArgsObject.GetValue(Params[I].Name);
+
           case Params[I].ParamType.TypeKind of
-            tkInteger: Args[I] := ArgsArray.Items[I].AsType<Integer>;
-            tkString, tkLString, tkUString, tkWString: Args[I] := ArgsArray.Items[I].Value;
-            tkFloat: Args[I] := ArgsArray.Items[I].AsType<Double>;
+            tkInteger: Args[I] := StrToInt(ParamValue.Value);
+            tkString, tkLString, tkUString, tkWString: Args[I] := ParamValue.Value;
+            tkFloat: Args[I] := StrToFloat(ParamValue.Value);
             tkEnumeration:
               if Params[I].ParamType.Handle = TypeInfo(Boolean) then
-                Args[I] := ArgsArray.Items[I].AsType<Boolean>
+                Args[I] := SameText(ParamValue.Value, 'true')
               else
                 raise Exception.Create('Unsupported enumeration type');
-            tkClass: Args[I] := TObject(ArgsArray.Items[I].Value.ToInteger);
+            tkClass: Args[I] := TObject(StrToInt(ParamValue.Value));
             // Add more cases for other types as needed
           else
             raise Exception.Create('Unsupported parameter type');
@@ -187,45 +191,6 @@ begin
     finally
       Context.Free;
     end;
-  finally
-    JSONObject.Free;
-  end;
-end;
-
-function TFunctionRegistry.GenerateGPT4oJSON(const FunctionName: string; const Args: array of const): string;
-var
-  JSONObject: TJSONObject;
-  JSONArray: TJSONArray;
-  I: Integer;
-begin
-  JSONObject := TJSONObject.Create;
-  try
-    JSONObject.AddPair('function', FunctionName);
-
-    JSONArray := TJSONArray.Create;
-    for I := Low(Args) to High(Args) do
-    begin
-      case Args[I].VType of
-        vtInteger: JSONArray.AddElement(TJSONNumber.Create(Args[I].VInteger));
-        vtString: JSONArray.AddElement(TJSONString.Create(Args[I].VString^));
-        vtAnsiString: JSONArray.AddElement(TJSONString.Create(string(Args[I].VAnsiString)));
-        vtBoolean: JSONArray.AddElement(TJSONBool.Create(Args[I].VBoolean));
-        vtExtended: JSONArray.AddElement(TJSONNumber.Create(Args[I].VExtended^));
-        vtWideString: JSONArray.AddElement(TJSONString.Create(WideString(Args[I].VWideString)));
-        vtObject: JSONArray.AddElement(TJSONNumber.Create(IntPtr(Args[I].VObject)));
-        vtChar: JSONArray.AddElement(TJSONString.Create(string(Args[I].VChar)));
-        vtWideChar: JSONArray.AddElement(TJSONString.Create(string(Args[I].VWideChar)));
-        vtPChar: JSONArray.AddElement(TJSONString.Create(string(Args[I].VPChar)));
-        vtPWideChar: JSONArray.AddElement(TJSONString.Create(string(Args[I].VPWideChar)));
-        vtUnicodeString: JSONArray.AddElement(TJSONString.Create(UnicodeString(Args[I].VUnicodeString)));
-        // Add more cases for other types as needed
-      else
-        raise Exception.Create('Unsupported argument type');
-      end;
-    end;
-    JSONObject.AddPair('args', JSONArray);
-
-    Result := JSONObject.ToString;
   finally
     JSONObject.Free;
   end;

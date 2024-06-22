@@ -39,19 +39,24 @@ var
   LRESTResponse: TRESTResponse;
   LJSONBody: TJSONObject;
   LJSONMessages: TJSONArray;
-  LJSONMsg : TJSONObject;
-  LJSONReponseFormat : TJSONObject;
+  LJSONMsg: TJSONObject;
+  LJSONReponseFormat: TJSONObject;
   LMessage: TChatMessage;
   LJSONResponse: TJSONObject;
   LChoices: TJSONArray;
   LUsage: TJSONObject;
   LChoice: TJSONObject;
+  LJSONMessage: TJSONObject;
   LFunctionCall: TJSONObject;
+  ToolCallsArray: TJSONArray;
+  ToolCall: TJSONObject;
+  FunctionCallObj: TJSONObject;
   FunctionName: string;
-  FunctionArgs: TJSONArray;
+  FunctionArgs: string;
   FunctionResultJSON: string;
   LAvailableFunctions: string;
   LJSONFunctions: TJSONObject;
+  ToolValue : TJSONValue;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -127,24 +132,25 @@ begin
           LUsage.TryGetValue('prompt_tokens', Result.Prompt_Tokens);
           LUsage.TryGetValue('total_tokens', Result.Total_Tokens);
           LChoice := LChoices.Items[0] as TJSONObject;
-          Result.Content := LChoice.GetValue('message').GetValue<string>('content');
+          LJSONMessage := LChoice.GetValue('message') as TJSONObject;
+          Result.Content := LJSONMessage.GetValue<string>('content');
           Result.Finish_Reason := LChoice.GetValue('finish_reason').Value;
-
-          // Handle function call
-          if Assigned(LChoice.GetValue('function_call')) then
+          // Handle function calls
+          if Assigned(LJSONMessage) then
           begin
-            LFunctionCall := LChoice.GetValue<TJSONObject>('function_call');
-            FunctionName := LFunctionCall.GetValue<string>('name');
-            FunctionArgs := LFunctionCall.GetValue<TJSONArray>('arguments');
+            if LJSONMessage.TryGetValue<TJSONArray>('tool_calls', ToolCallsArray) then
+            begin
+              for ToolValue in ToolCallsArray do
+              begin
+                ToolCall := ToolValue as TJSONObject;
+                FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
+                FunctionName := FunctionCallObj.GetValue<string>('name');
+                FunctionArgs := FunctionCallObj.GetValue<string>('arguments');
 
-            // Generate function call JSON
-            FunctionResultJSON := Functions.GenerateGPT4oJSON(FunctionName, [FunctionArgs]);
-
-            // Invoke function
-            Functions.InvokeFunction(FunctionResultJSON);
-
-            // Handle function result if needed
-            // Result.Content := <function result content>;
+                // Invoke the function with the arguments
+                Functions.InvokeFunction(FunctionCallObj.ToJSON);
+              end;
+            end;
           end;
 
           if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
