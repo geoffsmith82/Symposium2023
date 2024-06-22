@@ -9,7 +9,8 @@ uses
   System.Generics.Collections,
   REST.Client,
   REST.Types,
-  uLLM
+  uLLM,
+  uLLM.Functions
   ;
 
 type
@@ -17,17 +18,19 @@ type
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   private
+    FFunctions : TFunctionRegistry;
     procedure ListOpenAIModels(out AModelList: TStringList);
   public
     constructor Create(const APIKey: string);
+    destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    property Functions: TFunctionRegistry read FFunctions write FFunctions;
   end;
 
 
 
 implementation
-
 
 function TOpenAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
@@ -37,15 +40,18 @@ var
   LJSONBody: TJSONObject;
   LJSONMessages: TJSONArray;
   LJSONMsg : TJSONObject;
-  LJSONContent: TJSONObject;
-  LJSONContentArray: TJSONArray;
   LJSONReponseFormat : TJSONObject;
   LMessage: TChatMessage;
   LJSONResponse: TJSONObject;
   LChoices: TJSONArray;
   LUsage: TJSONObject;
   LChoice: TJSONObject;
-  i: Integer;
+  LFunctionCall: TJSONObject;
+  FunctionName: string;
+  FunctionArgs: TJSONArray;
+  FunctionResultJSON: string;
+  LAvailableFunctions: string;
+  LJSONFunctions: TJSONObject;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -97,6 +103,12 @@ begin
         LJSONBody.AddPair('response_format', LJSONReponseFormat);
       end;
 
+      // Include available functions in the request
+      LAvailableFunctions := Functions.GetAvailableFunctionsJSON;
+      LJSONFunctions := TJSONObject.ParseJSONValue(LAvailableFunctions) as TJSONObject;
+      LJSONBody.AddPair('tools', LJSONFunctions.GetValue<TJSONArray>('tools'));
+      LJSONBody.AddPair('tool_choice', 'auto');
+
       LRESTRequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
       LRESTRequest.Execute;
       if LRESTResponse.StatusCode = 200 then
@@ -117,6 +129,24 @@ begin
           LChoice := LChoices.Items[0] as TJSONObject;
           Result.Content := LChoice.GetValue('message').GetValue<string>('content');
           Result.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+
+          // Handle function call
+          if Assigned(LChoice.GetValue('function_call')) then
+          begin
+            LFunctionCall := LChoice.GetValue<TJSONObject>('function_call');
+            FunctionName := LFunctionCall.GetValue<string>('name');
+            FunctionArgs := LFunctionCall.GetValue<TJSONArray>('arguments');
+
+            // Generate function call JSON
+            FunctionResultJSON := Functions.GenerateGPT4oJSON(FunctionName, [FunctionArgs]);
+
+            // Invoke function
+            Functions.InvokeFunction(FunctionResultJSON);
+
+            // Handle function result if needed
+            // Result.Content := <function result content>;
+          end;
+
           if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
             Result.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
         finally
@@ -158,6 +188,13 @@ end;
 constructor TOpenAI.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
+  FFunctions := TFunctionRegistry.Create;
+end;
+
+destructor TOpenAI.Destroy;
+begin
+  FreeAndNil(FFunctions);
+  inherited;
 end;
 
 function TOpenAI.Completion(const AQuestion: string; const AModel: string): string;
