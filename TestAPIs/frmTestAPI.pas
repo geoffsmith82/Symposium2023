@@ -9,11 +9,15 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  System.Rtti,
+  System.TypInfo,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Menus,
   IniFiles,
   uAttributes,
   uTTS.GoogleSpeech,
@@ -21,30 +25,30 @@ uses
   ;
 
 type
+  TTestProcedure = record
+    Method: TRttiMethod;
+    Instance: TObject;
+  end;
+
   TfrmTestApiWindow = class(TForm)
     Memo1: TMemo;
-    Button1: TButton;
+    MainMenu: TMainMenu;
+    File1: TMenuItem;
+    Exit1: TMenuItem;
+    TestMenuItem: TMenuItem;
     Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    Button6: TButton;
-    Button7: TButton;
-    Button8: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
+    procedure Exit1Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
     Fgooglespeech : TGoogleSpeechService;
+    FProcedures : TList<TTestProcedure>;
+    procedure MenuItemClick(Sender: TObject);
+  public
+    { Public declarations }
     procedure ListOpenAIModels;
     procedure ListReplicateImageGenerators;
     procedure ListReplicateLLM;
@@ -65,13 +69,19 @@ type
     procedure TestConquiVoices;
     procedure TestAmazonPolly;
     procedure TestWindowsVoice;
+    procedure TestMicrosoftVoices;
+    procedure TestGoogleVoices;
+    procedure TestOpenAIVision;
+    procedure TestAnthropicClaudeVision;
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
     procedure ListGroqModels;
-  public
-    { Public declarations }
+
+    procedure TestOpenAIFunctionCalling;
+
     [FunctionDescription('Get the weather forecast')]
     function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
+    procedure FindProcedures;
   end;
 
 var
@@ -109,87 +119,82 @@ uses
 
 {$I ..\Libs\apikey.inc}
 
-procedure TfrmTestApiWindow.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(Fgooglespeech);
-  FreeAndNil(FSettings);
-end;
-
-procedure TfrmTestApiWindow.FormCreate(Sender: TObject);
-begin
-  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  Fgooglespeech := TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
-end;
-
-procedure TfrmTestApiWindow.Button1Click(Sender: TObject);
-begin
-  ListOpenAIModels;
-  ListReplicateImageGenerators;
-  TestHunggingFaceLLM;
-  ListAzureLLMModels;
-  ListGoogleLLMModels;
-  ListAnthropicModels;
-  ListElevenLabsVoices;
-  ListAmazonVoices;
-  ListOpenAIVoices;
-  ListWindowsVoices;
-  ListMicrosoftVoices;
-  ListGoogleVoices;
-  ListMicrosoftTranslateLanguages;
-  ListAmazonTranslationLanguages;
-end;
-
-procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
-begin
-  Fgooglespeech.Authenticate;
-end;
-
-procedure TfrmTestApiWindow.Button3Click(Sender: TObject);
+procedure TfrmTestApiWindow.FindProcedures;
 var
-  voice : TVoiceInfo;
-  msvoice : TMicrosoftCognitiveService;
-  ticks : UInt64;
+  ctx: TRttiContext;
+  typ: TRttiType;
+  method: TRttiMethod;
+  procedureRec: TTestProcedure;
+  menuItem: TMenuItem;
 begin
-  TestOpenAITTS;
-  TestElevenLabsTTS;
-  TestAmazonPolly;
-  TestWindowsVoice;
-
-  Memo1.Lines.Add('======== Microsoft Voices');
-  msvoice := TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
+  ctx := TRttiContext.Create;
   try
-    voice := msvoice.Voices[1];
-    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
-    msvoice.PlayText('Hello from voice ' + voice.VoiceName,voice.VoiceId);
-    ticks := GetTickCount64;
-    repeat
-      Application.ProcessMessages;
-    until (GetTickCount64 - ticks) > 10000;
+    typ := ctx.GetType(Self.ClassType);
+
+    for method in typ.GetMethods do
+    begin
+      if (method.Visibility = mvPublic) and
+         (Length(method.GetParameters) = 0) and
+         (method.Parent = typ) and
+         (method.Name <> 'FindProcedures') and
+         (method.Name <> 'MenuItemClick') then
+      begin
+        procedureRec.Method := method;
+        procedureRec.Instance := Self;
+
+        FProcedures.Add(procedureRec);
+
+        menuItem := TMenuItem.Create(Self);
+        menuItem.Caption := method.Name;
+        menuItem.Tag := FProcedures.Count - 1;
+        menuItem.OnClick := MenuItemClick;
+        TestMenuItem.Add(menuItem);
+      end;
+    end;
   finally
-    FreeAndNil(msvoice);
+    ctx.Free;
   end;
-
-  Memo1.Lines.Add('======== Google Voices');
-  voice := Fgooglespeech.Voices[1];
-  Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
-  Fgooglespeech.PlayText('Hello from voice ' + voice.VoiceName,voice.VoiceId);
-  ticks := GetTickCount64;
-  repeat
-    Application.ProcessMessages;
-  until (GetTickCount64 - ticks) > 10000;
 end;
 
-procedure TfrmTestApiWindow.Button4Click(Sender: TObject);
-begin
-  TestConquiVoices;
-end;
-
-procedure TfrmTestApiWindow.Button5Click(Sender: TObject);
+procedure TfrmTestApiWindow.TestAnthropicClaudeVision;
 var
-  openAIVision : TOpenAI;
-  config : TChatSettings;
-  AMessages: TObjectList<TChatMessage>;
-  MessageVision : TChatVisionMessage;
+  anthropic: TAnthropic;
+  Local_modelObj: TBaseModelInfo;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TClaudeVisionMessage;
+  answer: string;
+begin
+  Memo1.Lines.Add('======== Model Anthropic');
+  anthropic := TAnthropic.Create(Claude_APIKey);
+  try
+    for Local_modelObj in anthropic.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+    settings.json_mode := False;
+    settings.model := 'claude-3-5-sonnet-20240620';
+    settings.max_tokens := 1024;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TClaudeVisionMessage.Create;
+    msg.Role := 'user';
+    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    msg.Content := 'Describe the following image';
+    messages.Add(msg);
+    answer := anthropic.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer: ' + answer);
+  finally
+    FreeAndNil(anthropic);
+    FreeAndNil(messages);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestOpenAIVision;
+var
+  openAIVision: TOpenAI;
+  config: TChatSettings;
+  AMessages: System.Generics.Collections.TObjectList<TChatMessage>;
+  MessageVision: TChatVisionMessage;
   response: TChatResponse;
 begin
   openAIVision := TOpenAI.Create(chatgpt_apikey);
@@ -206,8 +211,6 @@ begin
     MessageVision.Content := 'Describe the following image';
     MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
     AMessages.Add(MessageVision);
-
-
     response := openAIVision.ChatCompletion(Config, AMessages);
     Memo1.Lines.Add(response.Content);
   finally
@@ -216,31 +219,54 @@ begin
   end;
 end;
 
-procedure TfrmTestApiWindow.Button6Click(Sender: TObject);
-begin
-  TestGroqLLM;
-end;
-
-function TfrmTestApiWindow.GetWeather(const state: string; const location: string): string;
-begin
-  ShowMessage('GetWeather for ' + location + ', ' + state);
-  Result := 'The Temperature is 28 degrees';
-end;
-
-
-procedure TfrmTestApiWindow.Button7Click(Sender: TObject);
+procedure TfrmTestApiWindow.TestGoogleVoices;
 var
-  openAI : TOpenAI;
-  messages : TObjectList<TChatMessage>;
-  msg : TChatMessage;
-  settings : TChatSettings;
-  answer : string;
+  voice: TVoiceInfo;
+  ticks: UInt64;
+begin
+  Memo1.Lines.Add('======== Google Voices');
+  voice := Fgooglespeech.Voices[1];
+  Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+  Fgooglespeech.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+  ticks := GetTickCount64;
+  repeat
+    Application.ProcessMessages;
+  until (GetTickCount64 - ticks) > 10000;
+end;
+
+procedure TfrmTestApiWindow.TestMicrosoftVoices;
+var
+  voice: TVoiceInfo;
+  ticks: UInt64;
+  msvoice: TMicrosoftCognitiveService;
+begin
+  Memo1.Lines.Add('======== Microsoft Voices');
+  msvoice := TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com');
+  try
+    voice := msvoice.Voices[1];
+    Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
+    msvoice.PlayText('Hello from voice ' + voice.VoiceName, voice.VoiceId);
+    ticks := GetTickCount64;
+    repeat
+      Application.ProcessMessages;
+    until (GetTickCount64 - ticks) > 10000;
+  finally
+    FreeAndNil(msvoice);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestOpenAIFunctionCalling;
+var
+  openAI: TOpenAI;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
   chatAnswer: TChatResponse;
+  answer: string;
 begin
   openAI := TOpenAI.Create(chatgpt_apikey);
   try
     openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
-
     settings.model := 'gpt-4o';
     settings.json_mode := False;
     settings.max_tokens := 4096;
@@ -258,41 +284,58 @@ begin
   end;
 end;
 
-procedure TfrmTestApiWindow.Button8Click(Sender: TObject);
-var
-  anthropic: TAnthropic;
-  Local_modelObj: TBaseModelInfo;
-  messages : TObjectList<TChatMessage>;
-  msg : TClaudeVisionMessage;
-  settings : TChatSettings;
-  answer : string;
-  chatAnswer: TChatResponse;
+
+procedure TfrmTestApiWindow.FormDestroy(Sender: TObject);
 begin
-  Memo1.Lines.Add('======== Model Anthropic');
-  anthropic := TAnthropic.Create(Claude_APIKey);
-  try
-    for Local_modelObj in anthropic.ModelInfo do
+  FreeAndNil(Fgooglespeech);
+  FreeAndNil(FSettings);
+  FreeAndNil(FProcedures);
+end;
+
+
+procedure TfrmTestApiWindow.MenuItemClick(Sender: TObject);
+var
+  index: Integer;
+  procedureRec: TTestProcedure;
+begin
+  if Sender is TMenuItem then
+  begin
+    index := TMenuItem(Sender).Tag;
+    if (index >= 0) and (index < FProcedures.Count) then
     begin
-      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+      procedureRec := FProcedures[index];
+      Memo1.Lines.Add('+====' + TMenuItem(Sender).Caption);
+      procedureRec.Method.Invoke(procedureRec.Instance, []);
+      Memo1.Lines.Add('-====' + TMenuItem(Sender).Caption);
+      Memo1.Lines.Add('');
     end;
-    settings.json_mode := False;
-    settings.model := 'claude-3-5-sonnet-20240620';
-    settings.max_tokens := 1024;
-    messages := TObjectList<TChatMessage>.Create;
-    msg := TClaudeVisionMessage.Create;
-    msg.Role := 'user';
-    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
-    msg.Content := 'Describe the following image';
-
-    messages.Add(msg);
-
-    answer := anthropic.ChatCompletion(settings, messages).Content;
-    Memo1.Lines.Add('Answer: ' + answer);
-
-  finally
-    FreeAndNil(anthropic);
-    FreeAndNil(messages);
   end;
+end;
+
+procedure TfrmTestApiWindow.FormCreate(Sender: TObject);
+begin
+  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  Fgooglespeech := TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
+  FProcedures := TList<TTestProcedure>.Create;
+
+  FindProcedures;
+end;
+
+procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
+begin
+  Fgooglespeech.Authenticate;
+end;
+
+function TfrmTestApiWindow.GetWeather(const state: string; const location: string): string;
+begin
+  ShowMessage('GetWeather for ' + location + ', ' + state);
+  Result := 'The Temperature is 28 degrees';
+end;
+
+
+procedure TfrmTestApiWindow.Exit1Click(Sender: TObject);
+begin
+  Application.Terminate;
 end;
 
 procedure TfrmTestApiWindow.ListOpenAIModels;

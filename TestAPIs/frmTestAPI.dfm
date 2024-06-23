@@ -3,110 +3,51 @@ object frmTestApiWindow: TfrmTestApiWindow
   Top = 0
   Caption = 'frmTestApiWindow'
   ClientHeight = 442
-  ClientWidth = 628
+  ClientWidth = 745
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
   object Memo1: TMemo
     Left = 0
-    Top = 125
-    Width = 628
-    Height = 317
+    Top = 0
+    Width = 745
+    Height = 442
     Align = alClient
     Lines.Strings = (
       'Memo1')
     TabOrder = 0
-    ExplicitTop = 100
-    ExplicitHeight = 342
-  end
-  object Button1: TButton
-    Left = 0
-    Top = 0
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Button1'
-    TabOrder = 1
-    OnClick = Button1Click
+    ExplicitTop = 150
+    ExplicitWidth = 628
+    ExplicitHeight = 292
   end
   object Button2: TButton
-    Left = 0
-    Top = 25
-    Width = 628
+    Left = 135
+    Top = 0
+    Width = 114
     Height = 25
-    Align = alTop
     Caption = 'Authenticate'
-    TabOrder = 2
+    TabOrder = 1
     OnClick = Button2Click
   end
-  object Button3: TButton
-    Left = 0
-    Top = 50
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Button3'
-    TabOrder = 3
-    OnClick = Button3Click
-  end
-  object Button4: TButton
-    Left = 0
-    Top = 75
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Button4'
-    TabOrder = 4
-    OnClick = Button4Click
-  end
-  object Button5: TButton
-    Left = 0
-    Top = 100
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Test GPT Vision'
-    TabOrder = 5
-    OnClick = Button5Click
-  end
-  object Button6: TButton
-    Left = 0
-    Top = 125
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Test Groq'
-    TabOrder = 6
-    OnClick = Button6Click
-  end
-  object Button7: TButton
-    Left = 0
-    Top = 150
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Test OpenAI function calling'
-    TabOrder = 7
-    OnClick = Button7Click
-    ExplicitTop = 156
-  end
-  object Button8: TButton
-    Left = 0
-    Top = 175
-    Width = 628
-    Height = 25
-    Align = alTop
-    Caption = 'Test Claude Vision'
-    TabOrder = 8
-    OnClick = Button8Click
-    ExplicitLeft = 264
-    ExplicitTop = 216
-    ExplicitWidth = 75
+  object MainMenu: TMainMenu
+    Left = 456
+    Top = 264
+    object File1: TMenuItem
+      Caption = '&File'
+      object Exit1: TMenuItem
+        Caption = 'E&xit'
+        OnClick = Exit1Click
+      end
+    end
+    object TestMenuItem: TMenuItem
+      Caption = 'Tests'
+    end
   end
 end
