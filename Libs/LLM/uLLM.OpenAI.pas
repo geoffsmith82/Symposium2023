@@ -59,12 +59,8 @@ begin
 
     if LRESTResponse.StatusCode = 200 then
     begin
-      LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
-      try
-        ProcessResponse(LJSONResponse, Result, FunctionReturnValue);
-      finally
-        LJSONResponse.Free;
-      end;
+      LJSONResponse := LRESTResponse.JSONValue as TJSONObject;
+      ProcessResponse(LJSONResponse, Result, FunctionReturnValue);
     end
     else
     begin
@@ -102,7 +98,7 @@ var
   LJSONMessages: TJSONArray;
   LJSONMessage: TJSONObject;
   LMessage: TChatMessage;
-  LJSONFunctions: TJSONObject;
+  LJSONFunctions: TJSONArray;
   LAvailableFunctions: string;
 begin
   LJSONBody := TJSONObject.Create;
@@ -134,9 +130,8 @@ begin
     end;
 
     // Include available functions in the request
-    LAvailableFunctions := Functions.GetAvailableFunctionsJSON;
-    LJSONFunctions := TJSONObject.ParseJSONValue(LAvailableFunctions) as TJSONObject;
-    LJSONBody.AddPair('tools', LJSONFunctions.GetValue<TJSONArray>('tools'));
+    LJSONFunctions := Functions.GetAvailableFunctionsJSON;
+    LJSONBody.AddPair('tools', LJSONFunctions);
     LJSONBody.AddPair('tool_choice', 'auto');
 
     ARequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);

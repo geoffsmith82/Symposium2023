@@ -233,6 +233,7 @@ var
   msg : TChatMessage;
   settings : TChatSettings;
   answer : string;
+  chatAnswer: TChatResponse;
 begin
   openAI := TOpenAI.Create(chatgpt_apikey);
   try
@@ -244,9 +245,10 @@ begin
     messages := TObjectList<TChatMessage>.Create;
     msg := TChatMessage.Create;
     msg.Role := 'user';
-    msg.Content := 'What is the weather for Bendigo, Victoria?';
+    msg.Content := 'What is the weather for Bendigo?';
     messages.Add(msg);
-    answer := openAI.ChatCompletion(settings, messages).Content;
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
     Memo1.Lines.Add('Answer : ' + answer);
   finally
     FreeAndNil(messages);
