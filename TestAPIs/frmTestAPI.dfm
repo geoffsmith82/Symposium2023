@@ -91,11 +91,9 @@ object frmTestApiWindow: TfrmTestApiWindow
     Width = 628
     Height = 25
     Align = alTop
-    Caption = 'Button7'
+    Caption = 'Test OpenAI function calling'
     TabOrder = 7
     OnClick = Button7Click
-    ExplicitLeft = 240
-    ExplicitTop = 160
-    ExplicitWidth = 75
+    ExplicitTop = 156
   end
 end

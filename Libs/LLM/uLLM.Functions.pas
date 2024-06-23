@@ -3,11 +3,19 @@ unit uLLM.Functions;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, System.Rtti, System.TypInfo, System.Generics.Collections, uAttributes;
+  System.SysUtils,
+  System.Classes,
+  System.JSON,
+  System.Rtti,
+  System.TypInfo,
+  System.Generics.Collections,
+  uAttributes
+  ;
 
 type
   TFunctionDescription = class
     Name: string;
+    Method: TMethod;
     Description: string;
     Parameters: TJSONObject;
     constructor Create(const AName, ADescription: string; const AParameters: TJSONObject);
@@ -15,8 +23,7 @@ type
 
   TFunctionRegistry = class
   private
-    FMethods: TDictionary<string, TMethod>;
-    FFunctionDescriptions: TObjectList<TFunctionDescription>;
+    FMethods: TDictionary<string, TFunctionDescription>;
     procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
@@ -39,14 +46,12 @@ end;
 
 constructor TFunctionRegistry.Create;
 begin
-  FMethods := TDictionary<string, TMethod>.Create;
-  FFunctionDescriptions := TObjectList<TFunctionDescription>.Create;
+  FMethods := TDictionary<string, TFunctionDescription>.Create;
 end;
 
 destructor TFunctionRegistry.Destroy;
 begin
   FMethods.Free;
-  FFunctionDescriptions.Free;
   inherited;
 end;
 
@@ -59,6 +64,7 @@ var
   Parameters: TJSONObject;
   FunctionDescription: string;
   Attr: TCustomAttribute;
+  functionInfo: TFunctionDescription;
 begin
   Method.Code := Func;
   Method.Data := Instance;
@@ -80,10 +86,10 @@ begin
             Break;
           end;
         end;
-
-        FMethods.Add(MethodRtti.Name, Method);
         Parameters := GenerateParameterJSON(MethodRtti);
-        FFunctionDescriptions.Add(TFunctionDescription.Create(MethodRtti.Name, FunctionDescription, Parameters));
+        functionInfo := TFunctionDescription.Create(MethodRtti.Name, FunctionDescription, Parameters);
+        functionInfo.Method := Method;
+        FMethods.Add(MethodRtti.Name, functionInfo);
         Break;
       end;
     end;
@@ -160,12 +166,12 @@ end;
 procedure TFunctionRegistry.InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
 var
   FunctionName: string;
-  Method: TMethod;
+  Method: TFunctionDescription;
 begin
   FunctionName := JSONObject.GetValue<string>('name');
   if FMethods.TryGetValue(FunctionName, Method) then
   begin
-    InvokeFunctionFromJSON(Method, JSONObject, ReturnValue);
+    InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
   end
   else
     raise Exception.Create('Function not registered');
@@ -237,10 +243,14 @@ var
   FunctionJSON: TJSONObject;
   ToolObject: TJSONObject;
   AvailableFunctions: TJSONObject;
+  functionArray : TArray<string>;
+  functionName: string;
 begin
   ToolsArray := TJSONArray.Create;
-  for FuncDesc in FFunctionDescriptions do
+  functionArray := FMethods.Keys.ToArray;
+  for functionName in functionArray do
   begin
+    FuncDesc := FMethods[functionName];
     ToolObject := TJSONObject.Create;
     ToolObject.AddPair('name', FuncDesc.Name);
     ToolObject.AddPair('description', FuncDesc.Description);
