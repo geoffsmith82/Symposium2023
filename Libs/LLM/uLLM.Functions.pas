@@ -17,14 +17,14 @@ type
   private
     FMethods: TDictionary<string, TMethod>;
     FFunctionDescriptions: TObjectList<TFunctionDescription>;
-    procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string);
+    procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string; out ReturnValue: string);
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
   public
     constructor Create;
     destructor Destroy; override;
     procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
-    procedure InvokeFunction(const JSONStr: string);
+    procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
     function GetAvailableFunctionsJSON: string;
   end;
 
@@ -157,27 +157,21 @@ begin
   end;
 end;
 
-procedure TFunctionRegistry.InvokeFunction(const JSONStr: string);
+procedure TFunctionRegistry.InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
 var
-  JSONObject: TJSONObject;
   FunctionName: string;
   Method: TMethod;
 begin
-  JSONObject := TJSONObject.ParseJSONValue(JSONStr) as TJSONObject;
-  try
-    FunctionName := JSONObject.GetValue<string>('name');
-    if FMethods.TryGetValue(FunctionName, Method) then
-    begin
-      InvokeFunctionFromJSON(Method, JSONStr);
-    end
-    else
-      raise Exception.Create('Function not registered');
-  finally
-    JSONObject.Free;
-  end;
+  FunctionName := JSONObject.GetValue<string>('name');
+  if FMethods.TryGetValue(FunctionName, Method) then
+  begin
+    InvokeFunctionFromJSON(Method, JSONObject.ToJSON, ReturnValue);
+  end
+  else
+    raise Exception.Create('Function not registered');
 end;
 
-procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string);
+procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONStr: string; out ReturnValue: string);
 var
   JSONObject: TJSONObject;
   ArgsObject: TJSONObject;
@@ -188,6 +182,7 @@ var
   ParamValue: TJSONValue;
   ParamStr: string;
   I: Integer;
+  ResultValue: TValue;
 begin
   JSONObject := TJSONObject.ParseJSONValue(JSONStr) as TJSONObject;
   try
@@ -223,7 +218,11 @@ begin
           end;
         end;
 
-        MethodType.Invoke(TObject(Method.Data), Args);
+        ResultValue := MethodType.Invoke(TObject(Method.Data), Args);
+        if ResultValue.Kind = tkUString then
+          ReturnValue := ResultValue.AsString
+        else
+          ReturnValue := '';
       end
       else
         raise Exception.Create('Method not found');
@@ -235,12 +234,14 @@ begin
   end;
 end;
 
+
 function TFunctionRegistry.GetAvailableFunctionsJSON: string;
 var
   ToolsArray: TJSONArray;
   FuncDesc: TFunctionDescription;
   FunctionJSON: TJSONObject;
   ToolObject: TJSONObject;
+  AvailableFunctions: TJSONObject;
 begin
   ToolsArray := TJSONArray.Create;
   try
@@ -256,9 +257,11 @@ begin
 
       ToolsArray.AddElement(FunctionJSON);
     end;
-    Result := TJSONObject.Create(TJSONPair.Create('tools', ToolsArray)).ToString;
+    AvailableFunctions := TJSONObject.Create;
+    AvailableFunctions.AddPair('tools', ToolsArray);
+    Result := AvailableFunctions.ToJSON;
   finally
-    ToolsArray.Free;
+    FreeAndNil(AvailableFunctions);
   end;
 end;
 

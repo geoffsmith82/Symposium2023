@@ -69,7 +69,7 @@ type
   public
     { Public declarations }
     [FunctionDescription('Get the weather forecast')]
-    procedure GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string);
+    function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
   end;
 
 var
@@ -219,9 +219,10 @@ begin
   TestGroqLLM;
 end;
 
-procedure TfrmTestApiWindow.GetWeather(const state: string; const location: string);
+function TfrmTestApiWindow.GetWeather(const state: string; const location: string): string;
 begin
   ShowMessage('GetWeather for ' + location + ', ' + state);
+  Result := 'The Temperature is 28 degrees';
 end;
 
 

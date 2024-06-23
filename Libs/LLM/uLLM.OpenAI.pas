@@ -22,7 +22,7 @@ type
     procedure ListOpenAIModels(out AModelList: TStringList);
     procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
-    procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse);
+    procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string);
     procedure HandleErrorResponse(AResponse: TRESTResponse);
   public
     constructor Create(const APIKey: string);
@@ -42,6 +42,7 @@ var
   LRESTRequest: TRESTRequest;
   LRESTResponse: TRESTResponse;
   LJSONResponse: TJSONObject;
+  FunctionReturnValue: string;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -60,7 +61,7 @@ begin
     begin
       LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
       try
-        ProcessResponse(LJSONResponse, Result);
+        ProcessResponse(LJSONResponse, Result, FunctionReturnValue);
       finally
         LJSONResponse.Free;
       end;
@@ -144,7 +145,7 @@ begin
   end;
 end;
 
-procedure TOpenAI.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse);
+procedure TOpenAI.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string);
 var
   LChoices: TJSONArray;
   LChoice: TJSONObject;
@@ -182,7 +183,7 @@ begin
         ToolCall := ToolValue as TJSONObject;
         FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
         // Invoke the function with the arguments
-        Functions.InvokeFunction(FunctionCallObj.ToJSON);
+        Functions.InvokeFunction(FunctionCallObj, FunctionReturnValue);
       end;
     end;
   end;
