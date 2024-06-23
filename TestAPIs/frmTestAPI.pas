@@ -286,7 +286,8 @@ begin
 
     messages.Add(msg);
 
-    anthropic.ChatCompletion(settings, messages);
+    answer := anthropic.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer: ' + answer);
 
   finally
     FreeAndNil(anthropic);

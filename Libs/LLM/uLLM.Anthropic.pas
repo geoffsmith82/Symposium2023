@@ -48,6 +48,7 @@ var
   LRESTResponse: TRESTResponse;
   LJSONBody: TJSONObject;
   LMsg: TChatMessage;
+  LJSONContentArray : TJSONArray;
   LJSONResponse: TJSONObject;
   LJSONMsgArr : TJSONArray;
   LJSONMsg : TJSONObject;
@@ -92,14 +93,15 @@ begin
       LRESTRequest.Execute;
 
       // Parse the response...
-      LJSONResponse := TJSONObject.ParseJSONValue(LRESTResponse.Content) as TJSONObject;
+      LJSONResponse := LRESTResponse.JSONValue as TJSONObject;
       try
-        if Assigned(LJSONResponse.GetValue('completion')) then
+        if Assigned(LJSONResponse.GetValue('content')) then
         begin
-          Result.Content := LJSONResponse.GetValue('completion').Value;
+          LJSONContentArray := LJSONResponse.GetValue('content') as TJSONArray;
+          Result.Content := (LJSONContentArray.Items[0] as TJSONObject).GetValue('text').Value;
           // ... (parse other fields if necessary)
-          if Assigned(LJSONResponse.GetValue('log_id')) then
-              Result.Log_Id := LJSONResponse.GetValue('log_id').Value;
+          if Assigned(LJSONResponse.GetValue('id')) then
+              Result.Log_Id := LJSONResponse.GetValue('id').Value;
           if Assigned(LJSONResponse.GetValue('model')) then
               Result.Model := LJSONResponse.GetValue('model').Value;
         end
@@ -111,7 +113,7 @@ begin
           );
         end;
       finally
-        LJSONResponse.Free;
+      //  LJSONResponse.Free;
       end;
 
     finally
