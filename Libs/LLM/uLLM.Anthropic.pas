@@ -9,6 +9,7 @@ uses
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
+  windows,
   uLLM
   ;
 
@@ -48,7 +49,8 @@ var
   LJSONBody: TJSONObject;
   LMsg: TChatMessage;
   LJSONResponse: TJSONObject;
-  LPromptText: string;
+  LJSONMsgArr : TJSONArray;
+  LJSONMsg : TJSONObject;
 begin
   Result := Default(TChatResponse);
   LRESTClient := nil;
@@ -56,7 +58,7 @@ begin
   LRESTResponse := nil;
 
   try
-    LRESTClient := TRESTClient.Create('https://api.anthropic.com/v1/complete');
+    LRESTClient := TRESTClient.Create('https://api.anthropic.com/v1/messages');
     LRESTRequest := TRESTRequest.Create(nil);
     LRESTResponse := TRESTResponse.Create(nil);
     LRESTRequest.Client := LRESTClient;
@@ -72,17 +74,20 @@ begin
       // Add the chat settings to the JSON body...
       LJSONBody.AddPair('model', ChatConfig.model);
       // ... (add other chat settings properties here)
-      LJSONBody.AddPair('max_tokens_to_sample', ChatConfig.max_tokens);
-
+      LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
+      LJSONMsgArr := TJSONArray.Create;
       // Constructing the prompt text based on the messages list.
-      LPromptText := '';
       for LMsg in AMessages do
       begin
-        LPromptText := LPromptText + Chr(10)+ Chr(10) + LMsg.Role + ': ' + LMsg.Content;
+        LJSONMsgArr.AddElement(LMsg.AsJSON);
+        OutputDebugString(PChar(LMsg.AsJSON));
       end;
-      LJSONBody.AddPair('prompt', LPromptText);
 
-      LRESTRequest.AddBody(LJSONBody.ToString, ctAPPLICATION_JSON);
+      LJSONBody.AddPair('messages', LJSONMsgArr);
+
+      OutputDebugString(PChar(LJSONBody.ToJSON));
+
+      LRESTRequest.AddBody(LJSONBody, TRESTObjectOwnership.ooApp);
 
       LRESTRequest.Execute;
 

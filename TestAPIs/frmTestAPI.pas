@@ -30,6 +30,7 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -39,6 +40,7 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -253,6 +255,42 @@ begin
   finally
     FreeAndNil(messages);
     FreeAndNil(openAI);
+  end;
+end;
+
+procedure TfrmTestApiWindow.Button8Click(Sender: TObject);
+var
+  anthropic: TAnthropic;
+  Local_modelObj: TBaseModelInfo;
+  messages : TObjectList<TChatMessage>;
+  msg : TClaudeVisionMessage;
+  settings : TChatSettings;
+  answer : string;
+  chatAnswer: TChatResponse;
+begin
+  Memo1.Lines.Add('======== Model Anthropic');
+  anthropic := TAnthropic.Create(Claude_APIKey);
+  try
+    for Local_modelObj in anthropic.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+    settings.json_mode := False;
+    settings.model := 'claude-3-5-sonnet-20240620';
+    settings.max_tokens := 1024;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TClaudeVisionMessage.Create;
+    msg.Role := 'user';
+    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    msg.Content := 'Describe the following image';
+
+    messages.Add(msg);
+
+    anthropic.ChatCompletion(settings, messages);
+
+  finally
+    FreeAndNil(anthropic);
+    FreeAndNil(messages);
   end;
 end;
 

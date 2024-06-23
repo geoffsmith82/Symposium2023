@@ -81,7 +81,7 @@ object frmTestApiWindow: TfrmTestApiWindow
     Width = 628
     Height = 25
     Align = alTop
-    Caption = 'Button6'
+    Caption = 'Test Groq'
     TabOrder = 6
     OnClick = Button6Click
   end
@@ -95,5 +95,18 @@ object frmTestApiWindow: TfrmTestApiWindow
     TabOrder = 7
     OnClick = Button7Click
     ExplicitTop = 156
+  end
+  object Button8: TButton
+    Left = 0
+    Top = 175
+    Width = 628
+    Height = 25
+    Align = alTop
+    Caption = 'Test Claude Vision'
+    TabOrder = 8
+    OnClick = Button8Click
+    ExplicitLeft = 264
+    ExplicitTop = 216
+    ExplicitWidth = 75
   end
 end

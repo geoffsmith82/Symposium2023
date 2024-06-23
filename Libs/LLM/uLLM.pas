@@ -16,9 +16,15 @@ type
     function AsJSON: TJSONObject; virtual;
   end;
 
+  TChatAttachment = class
+    mimeType : string;
+    data: string;
+    url: string;
+  end;
+
   TChatVisionMessage = class(TChatMessage)
   private
-    FImageURLs : TStringList;
+    FImageURLs : TObjectList<TChatAttachment>;
   public
     MessageType: string;
     procedure AddImageURL(const Url: string);
@@ -28,9 +34,19 @@ type
     destructor Destroy; override;
     function AsJSON: TJSONObject; override;
   published
-    property ImageURLs: TStringList read FImageURLs;
+    property Attachments: TObjectList<TChatAttachment> read FImageURLs;
   end;
 
+  TClaudeVisionMessage = class(TChatVisionMessage)
+    function AsJSON: TJSONObject; override;
+  end;
+
+  TChatToolCall = record
+    Id : String;
+    &Type : string;
+    FunctionCall: string;
+    Arguments: string;
+  end;
 
 
   TChatResponse = record
@@ -40,6 +56,7 @@ type
     System_Fingerprint: string;
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
+    Tool_Calls : TArray<TChatToolCall>;
     Log_Id : string;
     Model : string;
   end;
@@ -180,19 +197,30 @@ end;
 procedure TChatVisionMessage.AddImageStream(stream: TStream; const mimeType: string);
 var
   ds : TStringStream;
+  attachment: TChatAttachment;
 begin
   ds := TStringStream.Create;
   try
     TNetEncoding.Base64String.Encode(stream, ds);
-    FImageURLs.Add('data:' + mimeType + ';base64,' + ds.DataString);
+    attachment := TChatAttachment.Create;
+    attachment.mimeType := mimeType;
+    attachment.url := '';
+    attachment.data := ds.DataString;
+    FImageURLs.Add(attachment);
   finally
     FreeAndNil(ds);
   end;
 end;
 
 procedure TChatVisionMessage.AddImageURL(const Url: string);
+var
+  attachment: TChatAttachment;
 begin
-  FImageURLs.Add(Url);
+  attachment := TChatAttachment.Create;
+  attachment.mimeType := '';
+  attachment.data := '';
+  attachment.url := Url;
+  FImageURLs.Add(attachment);
 end;
 
 function TChatVisionMessage.AsJSON: TJSONObject;
@@ -203,6 +231,7 @@ var
   LJSONSubImageMsg : TJSONObject;
   LJSONImageURLData : TJSONObject;
   i: Integer;
+  urlData : string;
 begin
   LJSONMsg := TJSONObject.Create;
   LJSONMsg.AddPair('role', Role.ToLower);
@@ -224,7 +253,14 @@ begin
       LJSONSubImageMsg := TJSONObject.Create;
       LJSONSubImageMsg.AddPair('type', 'image_url');
       LJSONImageURLData := TJSONObject.Create;
-      LJSONImageURLData.AddPair('url', FImageURLs[i]);
+      if not FImageURLs[i].url.IsEmpty then
+        LJSONImageURLData.AddPair('url', FImageURLs[i].url)
+      else
+      begin
+        urlData := 'data:' + FImageURLs[i].mimeType + ';base64,' + FImageURLs[i].data;
+        LJSONImageURLData.AddPair('url', urlData);
+      end;
+
       LJSONSubImageMsg.AddPair('image_url', LJSONImageURLData);
       LJSONSubMsgArray.Add(LJSONSubImageMsg);
     end;
@@ -237,7 +273,7 @@ end;
 
 constructor TChatVisionMessage.Create;
 begin
-  FImageURLs := TStringList.Create;
+  FImageURLs := TObjectList<TChatAttachment>.Create;
 end;
 
 destructor TChatVisionMessage.Destroy;
@@ -256,6 +292,47 @@ begin
   LJSONMsg.AddPair('role', Role.ToLower);
   LJSONMsg.AddPair('content', Content);
   Result := LJSONMsg;
+end;
+
+{ TClaudeVisionMessage }
+
+function TClaudeVisionMessage.AsJSON: TJSONObject;
+var
+  msg : TJSONObject;
+  source: TJSONObject;
+  contentObj: TJSONObject;
+  contentArr: TJSONArray;
+  I: Integer;
+begin
+  msg := TJSONObject.Create;
+  if FImageURLs.Count = 0 then
+  begin
+    msg.AddPair('role', Role);
+    msg.AddPair('content', content);
+  end
+  else
+  begin
+    contentArr := TJSONArray.Create;
+    for I := 0 to FImageURLs.Count -1 do
+    begin
+      contentObj:= TJSONObject.Create;
+      contentObj.AddPair('type', 'image');
+      source := TJSONObject.Create;
+      source.AddPair('type', 'base64');
+      source.AddPair('media_type', FImageURLs[i].mimeType);
+      source.AddPair('data', FImageURLs[i].data);
+      contentObj.AddPair('source', source);
+      contentArr.AddElement(contentObj);
+    end;
+    contentObj:= TJSONObject.Create;
+    contentObj.AddPair('type', 'text');
+    contentObj.AddPair('text', content);
+    contentArr.AddElement(contentObj);
+    msg.AddPair('role', 'user');
+    msg.AddPair('content', contentArr);
+  end;
+
+  Result := msg;
 end;
 
 end.
