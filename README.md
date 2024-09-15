@@ -1,4 +1,4 @@
-# Symposium 2023 Artificial Intelligence and ChatGPT
+# Artificial Intelligence and ChatGPT
 Source code and Documentation for my [ADUG](https://www.adug.org.au) [Symposium Talk presented on the 28th of April 2023](https://www.youtube.com/watch?v=7HNiOMcHBW8). I have since added to and enhanced the code to further demonstrate capabilities of AI.
 
 The goal of this project is to enable delphi users to be able to use AI technology in their applications.  There are many different types of AI and thousands of different models.  This project is working on creating generalized interfaces to the different types of AI models and make them easily accessible.
@@ -11,13 +11,18 @@ In creative and artistic domains, AI can generate images based on textual descri
 
 AI's ability to analyze and process data, and generate comprehensive reports highlights its value in various domains. Furthermore, AI-powered tools can transcribe audio files into written text, making transcription tasks more efficient and accurate.
 
-The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. I have worked on creating generic API's so that different providers can be swapped in or out to experiment or for any other reason.
+The example programs below is an attempt to demonstrate the capabilities available to Delphi programmers today. I have worked on creating generic API's so that different providers can be swapped in or out to:
+- experiment
+- follow the current leading AI model
+- make it easy to change based on price
+- avoid vendor lockin
+- or for any other reason.
 
 ## ChatGPT Prompts  
 
 [Some Example GPT Prompts](./Documentation/Prompts.md) 
 
-## Presentation Slides
+## Presentation Slides from Original 2023 ADUG Symposium
   - [AI and ChatGPT](./Documentation/AI%20and%20ChatGPT.pptx)
 ## Example programs
   - [ChatGPTAction](./ChatGPTAction) 
@@ -44,11 +49,15 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	![image](./VoiceRecognition/screenshot-hal9000.png)
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide using OpenAI's DALLE-2 and DALLE-3 API.
+	
+### Questions / Need Help?	
+   Create an issue and I will respond to it.
+	
 ### Providers Used/Available
   - Google - Text to Speech, LLM, Translate
   - Microsoft Azure - Text to Speech, GPT, Translate
   - Amazon - [Text to Speech](https://aws.amazon.com/polly/), [Translate](https://aws.amazon.com/translate/)
-  - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-sonnet and claude-3-haiku, supportting one of largest context windows currently available (200k tokens)
+  - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-sonnet and claude-3-haiku, supporting one of largest context windows currently available (200k tokens)
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
