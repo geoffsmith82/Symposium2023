@@ -130,7 +130,7 @@ begin
       AuthCode := '';
     end;
   finally
-    LClient.DisposeOf;
+    LClient.Free;
   end;
 end;
 
@@ -202,7 +202,7 @@ begin
     if (AccessToken <> '') then
       AuthCode := '';
   finally
-    LClient.DisposeOf;
+    LClient.Free;
   end;
 
 end;
