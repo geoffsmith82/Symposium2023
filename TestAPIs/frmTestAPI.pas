@@ -76,6 +76,7 @@ type
     procedure TestAnthropicClaudeVision;
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
+    procedure TestGroqVisionLLM;
     procedure ListGroqModels;
     procedure TestGrokLLM;
 
@@ -541,6 +542,42 @@ begin
     msg.Content := 'How long is a piece of string';
     messages.Add(msg);
 
+
+    answer := groq.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(groq);
+    FreeAndNil(messages);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestGroqVisionLLM;
+var
+  groq: TGroqLLM;
+  modelObj: TBaseModelInfo;
+  answer: string;
+  settings: TChatSettings;
+  messages: TObjectList<TChatMessage>;
+  MessageVision : TChatVisionMessage;
+begin
+  Memo1.Lines.Add('======== Model Groq');
+  messages := nil;
+  groq := nil;
+
+  try
+    groq := TGroqLLM.Create(groq_apikey);
+    for modelObj in groq.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+    settings.model := 'llama-3.2-90b-vision-preview';
+    settings.json_mode := False;
+    messages := TObjectList<TChatMessage>.Create;
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'user';
+    MessageVision.Content := 'Describe the farm scene in the photo';
+    MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    messages.Add(MessageVision);
 
     answer := groq.ChatCompletion(settings, messages).Content;
     Memo1.Lines.Add('Answer : ' + answer);
