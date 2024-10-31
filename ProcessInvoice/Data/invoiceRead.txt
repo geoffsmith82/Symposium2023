@@ -1,0 +1,27 @@
+From this pdf, extract out the details below and return as a json string.  Do not include any extra comments.  You MUST use the following json format as output. 
+
+  {
+      "project": "Web Dev",
+      "invoice_number": "2-2-1",
+      "date": "7/08/2020",
+      "due_date": "13/07/2020",
+      "email": "asdfasd@somedomain.com",
+      "grand_total": 500.00,
+      "tax" : 10.00,
+      "line_items": [
+          {
+              "service" : "design",  
+              "description": "Document initial setup of EC2 VM. Start setup of SVN docker container.",
+              "qty": 3.00,
+              "price": 70.00,
+              "total": 210.00
+          },
+          {
+              "service" : "dev"
+              "description": "Finish scripting SVN, document SVN setup and start on Mercurial setup.",
+              "qty": 4.00,
+              "price": 70.00,
+              "total": 280.00
+          }
+      ]
+  }

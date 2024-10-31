@@ -1,0 +1,135 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Base>True</Base>
+        <AppType>Application</AppType>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>ProcessInvoice.dpr</MainSource>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <ProjectGuid>{0BC7D229-00F9-486A-9FDE-E94DDA52B4AC}</ProjectGuid>
+        <ProjectName Condition="'$(ProjectName)'==''">ProcessInvoice</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
+        <TargetedPlatforms>1</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base>true</Base>
+        <CfgParent>Base</CfgParent>
+        <Base_Win64>true</Base_Win64>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>FMXfrLanguageTurkish28;FMXfrLanguageHungarian28;vclwinx;DataSnapServer;fcxpTee28;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;fcxc28;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;fqbFD28;dbxcds;vcledge;frxe28;frLanguageSpanish28;frLanguageSwedish28;frLanguageSwiss28;FmxTeeUI;frxFD28;FMXfrLanguageDanish28;DBXFirebirdDriver;fsDB28;FMXfrxe28;frxADO28;FireDACSqliteDriver;DbxClientDriver;FMXfrLanguageSwedish28;frLanguageDutch28;frLanguageDanish28;soapmidas;TeeUI;dbexpress;Python;fcx28;frxDBX28;FMXfrLanguageGerman28;fqb28;inet;frLanguageLithuanian28;P4DEnvironmentProject;PythonVcl;vcltouch;FMXfcxpd28;frLanguageRussian28;frGraphicsLibrary28;FireDACDBXDriver;FMXfrLanguageRomanian28;fmxdae;CustomIPTransport;FireDACMSSQLDriver;FMXfrLanguageBrazil228;OverbyteIcsD110Run;frFDDataLibrary28;IndySystem;frLanguageFarsi28;FMXfrLanguageFrench28;frLanguageSlovak28;frLanguageChinese28;frxQueryBuilder28;FMXfrxADO28;FMXfrLanguageLatvian28;frxIntIOIndy28;frLanguageHebrew28;fqbADO28;FMXfrxCDS28;vclFireDAC;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;frLanguageArabic28;DOSCommandDR;fqbDBX28;FMXfsTee28;frCoreLibrary28;bindcompdbx;frLanguageCatalon28;frxHTML28;rtl;FireDACMySQLDriver;frLanguageBrazil28;FMXfrLanguageSwiss28;FMXfcxcd28;FMXfrLanguageArabic28;DBXSqliteDriver;TMSVCLUIPackPkgExDXE14;frxDBXQueryBuilder28;frLanguageRomanian28;VirtualTreesDR;FMXfrLanguageItalian28;DBXSybaseASEDriver;FMXfrLanguageSpanish28;FMXfrLanguageBrazil128;FMXfrLanguageCzech28;vclimg;DataSnapFireDAC;FMXfcxed28;inetdbxpress;FireDAC;TMSVCLUIPackPkgXlsDXE14;xmlrtl;frLanguageItalian28;P4DEnvironment;frxPDF28;FMXfrxDB28;FMXfsDB28;frLanguageCroatian28;dsnap;FireDACDb2Driver;fsADO28;DBXOracleDriver;FMXfrxFD28;DBXInformixDriver;FMXfsADO28;fmxobj;bindcompvclsmp;DataSnapNativeClient;FMXfrLanguageTaiwan28;DatasnapConnectorsFreePascal;FMXfrLanguagePolish28;frLanguageUkrainian28;emshosting;frADODataLibrary28;FireDACCommonDriver;RadiantShapesFmx_Design;IndyIPClient;frxTee28;FMXfrLanguageLithuanian28;bindcompvclwinx;frLanguageBrazil128;FMXfcxpTeed28;emsedge;bindcompfmx;frLanguageFrench28;FMXfrLanguageCatalon28;TMSVCLUIPackPkgDXE14;inetdb;frxSM28;FireDACASADriver;pkfindfile;frLanguageLatvian28;Tee;vclactnband;frxIntIO28;fmxFireDAC;FMXfrx28;FireDACInfxDriver;frLanguageJapanese28;DBXMySQLDriver;frLanguageSerbian28;VclSmp;FMXfrLanguageRussian28;DataSnapCommon;AWSSDK;fmxase;FMXfrLanguageSlovene28;frx28;FMXfrLanguageHebrew28;DBXOdbcDriver;fsFD28;dbrtl;FMXfrLanguageCroatian28;FireDACOracleDriver;Skia.Package.FMX;FMXfrLanguageSerbian28;TeeDB;FMXfrLanguageIndonesian28;FireDACMSAccDriver;FMXfrLanguageBulgarian28;AbbreviaVCLD;DataSnapIndy10ServerTransport;frLanguagePortuguese28;frLanguageBulgarian28;DataSnapConnectors;frLanguagePolish28;vcldsnap;DBXInterBaseDriver;frxDB28;FireDACMongoDBDriver;frLocalizationLibrary28;FMXfrLanguageBrazil28;FMXfrLanguageGreek28;FMXfcxd28;RadiantShapesFmx;FireDACTDataDriver;FMXfrLocalizationLibrary28;frLanguageTaiwan28;Skia.Package.VCL;vcldb;frLanguageGerman28;SynEditDR;fs28;frLanguageIndonesian28;FMXfrxTee28;bindcomp;FMXfrLanguageSlovak28;IndyCore;RESTBackendComponents;fsTee28;frLanguageBrazil228;FMXfrCoreLibrary28;frxADOQueryBuilder28;AWSSDKFMX;FMXfs28;fcxp28;FireDACADSDriver;AWSSDKVCL;frLanguageHungarian28;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;FMXfrLanguageFarsi28;FMXfrLanguageDutch28;FMXfrLanguageChinese28;FMXfrLanguageUkrainian28;FMXfrLanguagePortuguese28;DBXDb2Driver;frxcs28;FMXfrLanguageJapanese28;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;frLanguageSlovene28;tethering;frxFDQueryBuilder28;frLanguageTurkish28;bindcompvcl;frLanguageCzech28;fcxe28;frLanguageGreek28;CloudService;DBXSybaseASADriver;FMXfrxDBX28;FMXTee;PythonFmx;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>ProcessInvoice</SanitizedProjectName>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>FMXfrLanguageTurkish28;FMXfrLanguageHungarian28;vclwinx;DataSnapServer;fcxpTee28;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;OpenOfficeComponent_install;fcxc28;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;fqbFD28;dbxcds;vcledge;frxe28;frLanguageSpanish28;frLanguageSwedish28;frLanguageSwiss28;FmxTeeUI;frxFD28;FMXfrLanguageDanish28;DBXFirebirdDriver;SMImportD11;fsDB28;FMXfrxe28;frxADO28;FireDACSqliteDriver;DbxClientDriver;FMXfrLanguageSwedish28;frLanguageDutch28;frLanguageDanish28;soapmidas;TeeUI;dbexpress;Python;fcx28;frxDBX28;FMXfrLanguageGerman28;fqb28;inet;frLanguageLithuanian28;P4DEnvironmentProject;PythonVcl;vcltouch;FMXfcxpd28;frLanguageRussian28;frGraphicsLibrary28;FireDACDBXDriver;FMXfrLanguageRomanian28;fmxdae;CustomIPTransport;FireDACMSSQLDriver;FMXfrLanguageBrazil228;OverbyteIcsD110Run;frFDDataLibrary28;IndySystem;frLanguageFarsi28;FMXfrLanguageFrench28;frLanguageSlovak28;frLanguageChinese28;frxQueryBuilder28;FMXfrxADO28;FMXfrLanguageLatvian28;frxIntIOIndy28;frLanguageHebrew28;fqbADO28;FMXfrxCDS28;vclFireDAC;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;GridViewDR;frLanguageArabic28;DOSCommandDR;fqbDBX28;FMXfsTee28;frCoreLibrary28;bindcompdbx;frLanguageCatalon28;frxHTML28;rtl;FireDACMySQLDriver;frLanguageBrazil28;FMXfrLanguageSwiss28;FMXfcxcd28;FMXfrLanguageArabic28;DBXSqliteDriver;TMSVCLUIPackPkgExDXE14;frxDBXQueryBuilder28;frLanguageRomanian28;VirtualTreesDR;FMXfrLanguageItalian28;DBXSybaseASEDriver;FMXfrLanguageSpanish28;FMXfrLanguageBrazil128;FMXfrLanguageCzech28;vclimg;DataSnapFireDAC;FMXfcxed28;inetdbxpress;FireDAC;TMSVCLUIPackPkgXlsDXE14;MQTTComponents;xmlrtl;frLanguageItalian28;P4DEnvironment;frxPDF28;FMXfrxDB28;FMXfsDB28;frLanguageCroatian28;dsnap;NewAC_XE10;FireDACDb2Driver;fsADO28;DBXOracleDriver;FMXfrxFD28;DBXInformixDriver;FMXfsADO28;fmxobj;bindcompvclsmp;DataSnapNativeClient;FMXfrLanguageTaiwan28;DatasnapConnectorsFreePascal;FMXfrLanguagePolish28;frLanguageUkrainian28;FixInsight_11;emshosting;frADODataLibrary28;FireDACCommonDriver;RadiantShapesFmx_Design;IndyIPClient;frxTee28;FMXfrLanguageLithuanian28;bindcompvclwinx;frLanguageBrazil128;FMXfcxpTeed28;emsedge;bindcompfmx;frLanguageFrench28;FMXfrLanguageCatalon28;TMSVCLUIPackPkgDXE14;inetdb;frxSM28;FireDACASADriver;pkfindfile;frLanguageLatvian28;Tee;vclactnband;frxIntIO28;fmxFireDAC;FMXfrx28;FireDACInfxDriver;frLanguageJapanese28;DBXMySQLDriver;frLanguageSerbian28;VclSmp;FMXfrLanguageRussian28;DataSnapCommon;AWSSDK;PipesRunTime;EurekaLogCore;fmxase;FMXfrLanguageSlovene28;frx28;FMXfrLanguageHebrew28;DBXOdbcDriver;fsFD28;dbrtl;FMXfrLanguageCroatian28;FireDACOracleDriver;Skia.Package.FMX;FMXfrLanguageSerbian28;TeeDB;FMXfrLanguageIndonesian28;FireDACMSAccDriver;Bubble;FMXfrLanguageBulgarian28;AbbreviaVCLD;DataSnapIndy10ServerTransport;frLanguagePortuguese28;frLanguageBulgarian28;DataSnapConnectors;frLanguagePolish28;vcldsnap;DBXInterBaseDriver;frxDB28;FireDACMongoDBDriver;frLocalizationLibrary28;FMXfrLanguageBrazil28;FMXfrLanguageGreek28;FMXfcxd28;RadiantShapesFmx;FireDACTDataDriver;FMXfrLocalizationLibrary28;frLanguageTaiwan28;Skia.Package.VCL;vcldb;frLanguageGerman28;SynEditDR;fs28;frLanguageIndonesian28;FMXfrxTee28;bindcomp;FMXfrLanguageSlovak28;IndyCore;RESTBackendComponents;fsTee28;frLanguageBrazil228;FMXfrCoreLibrary28;frxADOQueryBuilder28;AWSSDKFMX;FMXfs28;fcxp28;FireDACADSDriver;AWSSDKVCL;frLanguageHungarian28;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;TMSVCLUIPackPkgWizDXE14;FMXfrLanguageFarsi28;FMXfrLanguageDutch28;FMXfrLanguageChinese28;FMXfrLanguageUkrainian28;FMXfrLanguagePortuguese28;DBXDb2Driver;frxcs28;FMXfrLanguageJapanese28;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;frLanguageSlovene28;tethering;frxFDQueryBuilder28;frLanguageTurkish28;bindcompvcl;frLanguageCzech28;fcxe28;frLanguageGreek28;CloudService;DBXSybaseASADriver;FMXfrxDBX28;FMXTee;PythonFmx;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="Unit2.pas">
+            <Form>Form2</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.Assistants.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">ProcessInvoice.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

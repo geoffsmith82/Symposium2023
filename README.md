@@ -49,6 +49,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	![image](./VoiceRecognition/screenshot-hal9000.png)
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide using OpenAI's DALLE-2 and DALLE-3 API.
+  - [ProcessInvoice](./ProcessInvoice)
+    - from a pdf invoice extract out the important details and format as a machine readable JSON string
 	
 ### Questions / Need Help?	
    Create an issue and I will respond to it.
