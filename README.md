@@ -51,6 +51,9 @@ The example programs below is an attempt to demonstrate the capabilities availab
     - generate an image using text that you provide using OpenAI's DALLE-2 and DALLE-3 API.
   - [ProcessInvoice](./ProcessInvoice)
     - from a pdf invoice extract out the important details and format as a machine readable JSON string
+  - [TestAPIs](./TestAPIs)
+	- A project to test out the different API's and the functionality of the API's
+	
 	
 ### Questions / Need Help?	
    Create an issue and I will respond to it.
