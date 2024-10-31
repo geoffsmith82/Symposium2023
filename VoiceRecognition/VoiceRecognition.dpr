@@ -1,19 +1,6 @@
 program VoiceRecognition;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugExports,
-  EDebugJCL,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   ufrmVoiceRecognition in 'ufrmVoiceRecognition.pas' {frmVoiceRecognition},
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
@@ -38,7 +25,9 @@ uses
   uEngineManager in '..\Libs\uEngineManager.pas',
   BubbleText in '..\Libs\Bubble\BubbleText.pas',
   uAudioRecorder in '..\Libs\SpeechToText\uAudioRecorder.pas',
-  uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas';
+  uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas',
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas';
 
 {$R *.res}
 

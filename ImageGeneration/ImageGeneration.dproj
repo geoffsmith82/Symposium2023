@@ -7,7 +7,8 @@
         <MainSource>ImageGeneration.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{6DE37279-BBE3-4056-9B8A-2E56A4947F52}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">ImageGeneration</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">

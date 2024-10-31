@@ -1,19 +1,6 @@
 program Weather;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugExports,
-  EDebugJCL,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmWeatherMain in 'frmWeatherMain.pas' {frmWeatherWindow},
   udmWeather in 'udmWeather.pas' {dmWeather: TDataModule},
@@ -30,7 +17,9 @@ uses
   uTTS.Windows.Engine in '..\Libs\TextToSpeech\uTTS.Windows.Engine.pas',
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  uLLM in '..\Libs\LLM\uLLM.pas';
+  uLLM in '..\Libs\LLM\uLLM.pas',
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas';
 
 {$R *.res}
 

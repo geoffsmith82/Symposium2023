@@ -7,7 +7,8 @@
         <MainSource>VoiceRecognition.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{788372B7-6581-4900-839D-CE94054C03BB}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">VoiceRecognition</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -154,6 +155,8 @@
         <DCCReference Include="..\Libs\Bubble\BubbleText.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uAudioRecorder.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uRevAI.SpeechToText.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

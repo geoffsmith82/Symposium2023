@@ -7,7 +7,8 @@
         <MainSource>Weather.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{A040E6B4-3687-407B-AA40-EE0225E77825}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">Weather</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -112,6 +113,8 @@
         <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

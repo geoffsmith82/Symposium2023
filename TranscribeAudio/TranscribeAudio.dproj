@@ -7,7 +7,8 @@
         <MainSource>TranscribeAudio.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{37A0250C-C31B-4179-B85A-92783373B9DB}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">TranscribeAudio</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>2</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">

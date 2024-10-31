@@ -7,7 +7,8 @@
         <MainSource>TranslateLang.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{88647B7F-FAC7-4CCF-81D8-07A5D8729623}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">translatelang</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -103,6 +104,8 @@
         <DCCReference Include="..\Libs\Translate\uTranslate.LanguageCodes.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

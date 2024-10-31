@@ -7,7 +7,8 @@
         <MainSource>TestAPIs.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{E7E39868-D5D4-4725-94E0-9A056BC86666}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">TestAPIs</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -43,7 +44,7 @@
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>TestAPIs</SanitizedProjectName>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_Define>EUREKALOG_VER7;EUREKALOG;$(DCC_Define)</DCC_Define>
+        <DCC_Define>EUREKALOG;$(DCC_Define)</DCC_Define>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_MapFile>3</DCC_MapFile>
@@ -73,6 +74,9 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_UnitSearchPath>Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Core;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Polly\Custom;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Model;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Transform;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Biz;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Polly\Base;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Translate\Base;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Model;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Transform;Z:\Programming\ADUG\Symposium2023\Libs\aws-sdk-delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_DebugInformation>0</DCC_DebugInformation>
@@ -124,6 +128,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.OpenAI.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.Assistants.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -144,6 +149,7 @@
                 <Source>
                     <Source Name="MainSource">TestAPIs.dpr</Source>
                 </Source>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">True</Platform>

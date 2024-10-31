@@ -53,10 +53,6 @@ type
     miTextCurie0011: TMenuItem;
     miTextBabbage001: TMenuItem;
     miTextAda0011: TMenuItem;
-    Button1: TButton;
-    gpt41: TMenuItem;
-    gpt432k1: TMenuItem;
-    gpt35turbo16k1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnAskTheMachineClick(Sender: TObject);
     procedure btnGoogleAuthClick(Sender: TObject);
@@ -65,7 +61,6 @@ type
     procedure miTextDavinci003Click(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
     FTextToSpeechEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
@@ -100,8 +95,8 @@ begin
      TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
      TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
-  FTextToSpeechEngine.RegisterEngine(
-     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
+//  FTextToSpeechEngine.RegisterEngine(
+//     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
   FTextToSpeechEngine.RegisterEngine(
      TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
@@ -192,7 +187,7 @@ end;
 
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);
 begin
-  FSpeedToTextEngine.ActiveEngine.PlayText(mmoPrompt.Lines.Text);
+  FTextToSpeechEngine.ActiveEngine.PlayText(mmoPrompt.Lines.Text);
 end;
 
 procedure TForm1.miExitClick(Sender: TObject);

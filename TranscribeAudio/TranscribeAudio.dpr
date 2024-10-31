@@ -1,19 +1,6 @@
 program TranscribeAudio;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugExports,
-  EDebugJCL,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTranscribeAudio in 'frmTranscribeAudio.pas' {VoiceRecognitionForm},
   uSTT in '..\Libs\SpeechToText\uSTT.pas',

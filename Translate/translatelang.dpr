@@ -1,19 +1,6 @@
 program TranslateLang;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugExports,
-  EDebugJCL,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTranslation in 'frmTranslation.pas' {frmMainTranslationWindow},
   uTranslate.Amazon in '..\Libs\Translate\uTranslate.Amazon.pas',
@@ -26,7 +13,9 @@ uses
   uEngineManager in '..\Libs\uEngineManager.pas',
   uTranslate.LanguageCodes in '..\Libs\Translate\uTranslate.LanguageCodes.pas',
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
-  uLLM in '..\Libs\LLM\uLLM.pas';
+  uLLM in '..\Libs\LLM\uLLM.pas',
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
+  uAttributes in '..\Libs\LLM\uAttributes.pas';
 
 {$R *.res}
 

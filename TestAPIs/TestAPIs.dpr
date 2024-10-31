@@ -1,19 +1,6 @@
 program TestAPIs;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugJCL,
-  EDebugExports,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmTestAPI in 'frmTestAPI.pas' {frmTestApiWindow},
   uTTS.Amazon.Polly in '..\Libs\TextToSpeech\uTTS.Amazon.Polly.pas',
@@ -49,7 +36,8 @@ uses
   uTTS.Coqui in '..\Libs\TextToSpeech\uTTS.Coqui.pas',
   uTTS.OpenAI in '..\Libs\TextToSpeech\uTTS.OpenAI.pas',
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
-  uAttributes in '..\Libs\LLM\uAttributes.pas';
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  uLLM.OpenAI.Assistants in '..\Libs\LLM\uLLM.OpenAI.Assistants.pas';
 
 {$R *.res}
 
@@ -59,3 +47,4 @@ begin
   Application.CreateForm(TfrmTestApiWindow, frmTestApiWindow);
   Application.Run;
 end.
+

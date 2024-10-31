@@ -7,7 +7,8 @@
         <MainSource>EmbeddingsDemo.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{671E8F2C-9B5A-4AE6-BA3C-8344C7FE1A98}</ProjectGuid>
-        <ProjectVersion>19.5</ProjectVersion>
+        <ProjectName Condition="'$(ProjectName)'==''">EmbeddingsDemo</ProjectName>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -133,6 +134,8 @@
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.pas"/>
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.OpenAI.pas"/>
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

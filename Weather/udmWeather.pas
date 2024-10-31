@@ -52,7 +52,6 @@ end;
 function TdmWeather.GetBomForecast(location: string; state: string): IXMLAreaType;
 var
   memStream : TMemoryStream;
-  forcast : IXMLForecastType;
   i : Integer;
   product : IXMLProductType;
 begin

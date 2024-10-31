@@ -12,7 +12,9 @@ uses
   uLLM.Azure in '..\Libs\LLM\uLLM.Azure.pas',
   uEmbeddings in '..\Libs\Embeddings\uEmbeddings.pas',
   uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
-  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas';
+  uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas',
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas';
 
 {$R *.res}
 

@@ -21,6 +21,7 @@ uses
   IniFiles,
   uAttributes,
   uTTS.GoogleSpeech,
+  uLLM.OpenAI.Assistants,
   uTTS.Coqui
   ;
 
