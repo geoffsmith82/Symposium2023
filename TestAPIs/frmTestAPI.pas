@@ -77,6 +77,7 @@ type
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
     procedure ListGroqModels;
+    procedure TestGrokLLM;
 
     procedure TestOpenAIFunctionCalling;
 
@@ -113,6 +114,7 @@ uses
   uLLM.HuggingFace,
   uLLM.Replicate,
   uLLM.Groq,
+  uLLM.X.Ai,
   uDALLe2.DTO,
   uImageGeneration,
   uImageGeneration.Replicate
@@ -469,6 +471,46 @@ begin
     until (GetTickCount64 - ticks) > 10000;
   finally
     FreeAndNil(elevenlabs);
+  end;
+end;
+
+
+procedure TfrmTestApiWindow.TestGrokLLM;
+var
+  grok: TXGrokAI;
+  modelObj: TBaseModelInfo;
+  answer: string;
+  settings: TChatSettings;
+  messages: TObjectList<TChatMessage>;
+  msg : TChatMessage;
+begin
+  Memo1.Lines.Add('======== Model X.AI Grok');
+  messages := nil;
+  grok := nil;
+
+  try
+    grok := TXGrokAI.Create(X_AI);
+    for modelObj in grok.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+    settings.model := 'grok-beta';
+    settings.json_mode := False;
+
+
+
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'How long is a piece of string';
+    messages.Add(msg);
+
+
+    answer := grok.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(grok);
+    FreeAndNil(messages);
   end;
 end;
 

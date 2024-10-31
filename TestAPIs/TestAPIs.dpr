@@ -37,6 +37,7 @@ uses
   uTTS.OpenAI in '..\Libs\TextToSpeech\uTTS.OpenAI.pas',
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas',
+  uLLM.X.Ai in '..\Libs\LLM\uLLM.X.Ai.pas',
   uLLM.OpenAI.Assistants in '..\Libs\LLM\uLLM.OpenAI.Assistants.pas';
 
 {$R *.res}

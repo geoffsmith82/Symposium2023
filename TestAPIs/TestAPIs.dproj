@@ -128,6 +128,7 @@
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.OpenAI.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.X.Ai.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.Assistants.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
