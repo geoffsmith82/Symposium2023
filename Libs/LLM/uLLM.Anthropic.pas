@@ -51,7 +51,6 @@ var
   LJSONContentArray : TJSONArray;
   LJSONResponse: TJSONObject;
   LJSONMsgArr : TJSONArray;
-  LJSONMsg : TJSONObject;
 begin
   Result := Default(TChatResponse);
   LRESTClient := nil;
@@ -155,6 +154,10 @@ begin
   FModelInfo.Clear;
 
   LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-3-5-opus-20241022';
+  FModelInfo.Add(LModelObj);
+
+  LModelObj := TBaseModelInfo.Create;
   LModelObj.modelName := 'claude-3-opus-20240229';
   FModelInfo.Add(LModelObj);
 
@@ -168,6 +171,14 @@ begin
 
   LModelObj := TBaseModelInfo.Create;
   LModelObj.modelName := 'claude-3-haiku-20240307';
+  FModelInfo.Add(LModelObj);
+
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-2.1';
+  FModelInfo.Add(LModelObj);
+
+  LModelObj := TBaseModelInfo.Create;
+  LModelObj.modelName := 'claude-2.0';
   FModelInfo.Add(LModelObj);
 
   Result := FModelInfo;
