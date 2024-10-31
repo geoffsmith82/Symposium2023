@@ -22,6 +22,7 @@ type
     url: string;
   end;
 
+{$M+}
   TChatVisionMessage = class(TChatMessage)
   private
     FImageURLs : TObjectList<TChatAttachment>;
@@ -36,6 +37,7 @@ type
   published
     property Attachments: TObjectList<TChatAttachment> read FImageURLs;
   end;
+{$M-}
 
   TClaudeVisionMessage = class(TChatVisionMessage)
     function AsJSON: TJSONObject; override;
@@ -103,6 +105,7 @@ type
     version: string;
   end;
 
+{$M+}
   TBaseLLM = class abstract
   protected
     FAPIKey : string;
@@ -116,7 +119,7 @@ type
   published
     property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
   end;
-
+{$M-}
 
 implementation
 

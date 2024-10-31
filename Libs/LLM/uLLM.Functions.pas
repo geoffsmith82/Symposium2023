@@ -242,7 +242,6 @@ var
   FuncDesc: TFunctionDescription;
   FunctionJSON: TJSONObject;
   ToolObject: TJSONObject;
-  AvailableFunctions: TJSONObject;
   functionArray : TArray<string>;
   functionName: string;
 begin

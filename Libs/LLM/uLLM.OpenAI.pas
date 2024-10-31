@@ -99,7 +99,6 @@ var
   LJSONMessage: TJSONObject;
   LMessage: TChatMessage;
   LJSONFunctions: TJSONArray;
-  LAvailableFunctions: string;
 begin
   LJSONBody := TJSONObject.Create;
   LJSONMessages := TJSONArray.Create;
