@@ -33,6 +33,7 @@ type
     procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
     function GetAvailableFunctionsJSON: TJSONArray;
+    function Count: Integer;
   end;
 
 implementation
@@ -42,6 +43,11 @@ begin
   Name := AName;
   Description := ADescription;
   Parameters := AParameters;
+end;
+
+function TFunctionRegistry.Count: Integer;
+begin
+  Result := FMethods.Count;
 end;
 
 constructor TFunctionRegistry.Create;

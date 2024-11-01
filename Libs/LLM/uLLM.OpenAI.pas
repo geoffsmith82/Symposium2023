@@ -129,9 +129,12 @@ begin
     end;
 
     // Include available functions in the request
-    LJSONFunctions := Functions.GetAvailableFunctionsJSON;
-    LJSONBody.AddPair('tools', LJSONFunctions);
-    LJSONBody.AddPair('tool_choice', 'auto');
+    if Functions.Count > 0 then
+    begin
+      LJSONFunctions := Functions.GetAvailableFunctionsJSON;
+      LJSONBody.AddPair('tools', LJSONFunctions);
+      LJSONBody.AddPair('tool_choice', 'auto');
+    end;
 
     ARequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
   finally
@@ -169,8 +172,7 @@ begin
   // Handle function calls
   if Assigned(LMessageJSON) then
   begin
-    ToolCallsArray := LMessageJSON.GetValue<TJSONArray>('tool_calls');
-    if Assigned(ToolCallsArray) then
+    if LMessageJSON.TryGetValue<TJSONArray>('tool_calls', ToolCallsArray) then
     begin
       for ToolValue in ToolCallsArray do
       begin
