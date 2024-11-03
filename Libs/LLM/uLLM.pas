@@ -395,8 +395,6 @@ begin
 end;
 
 constructor TFunctionCallMessage.Create(function_call_json: TJSONArray);
-var
-  content : TJSONObject;
 begin
   FJSON := TJSONObject.Create;
   FJSON.AddPair('tool_calls', function_call_json.Clone as TJSONArray);

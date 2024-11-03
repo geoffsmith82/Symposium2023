@@ -22,7 +22,8 @@ uses
   uAttributes,
   uTTS.GoogleSpeech,
   uLLM.OpenAI.Assistants,
-  uTTS.Coqui
+  uTTS.Coqui,
+  ApiKeyStore
   ;
 
 type
@@ -81,6 +82,8 @@ type
     procedure TestGrokLLM;
 
     procedure TestOpenAIFunctionCalling;
+
+    procedure TestAPIKeyStore;
 
     [FunctionDescription('Get the weather forecast')]
     function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
@@ -195,6 +198,21 @@ begin
   finally
     FreeAndNil(anthropic);
     FreeAndNil(messages);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestAPIKeyStore;
+var
+  KeyStore: TApiKeyStore;
+begin
+  KeyStore := TApiKeyStore.GetInstance;
+  try
+    KeyStore.SaveApiKey('chatgpt_apikey', chatgpt_apikey); // Store API key
+    KeyStore.SaveApiKey('X_AI', X_AI);
+    KeyStore.SaveApiKey('groq_apikey', groq_apikey);
+    ShowMessage(KeyStore.LoadApiKey('chatgpt_apikey')); // Retrieve API key
+  finally
+    FreeAndNil(KeyStore);
   end;
 end;
 

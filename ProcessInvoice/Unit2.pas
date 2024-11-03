@@ -31,9 +31,7 @@ type
   private
     { Private declarations }
     FAssistant : TOpenAIAssistant;
-    FFileID : string;
     FThreadID : string;
-    FRunID : string;
     FIniFile : TIniFile;
     function ExtractInvoiceInfo(const PDFFileName: string): string;
     function DataFilename(filename: string): string;
