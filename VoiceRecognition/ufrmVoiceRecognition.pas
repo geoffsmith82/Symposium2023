@@ -179,8 +179,6 @@ uses ufrmChatSession,
   uTTS.OpenAI
   ;
 
-{$I ..\Libs\apikey.inc}
-
 procedure TfrmVoiceRecognition.SelectSpeechEngine(Sender: TObject);
 begin
   FTextToSpeechEngines.SelectEngine(Sender as TMenuItem);
@@ -353,10 +351,11 @@ procedure TfrmVoiceRecognition.SetupTextToSpeechEngines;
 var
   lSpeechEngine: string;
 begin
-  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
+//  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey')), miOpenAiTextToSpeech);
 
 

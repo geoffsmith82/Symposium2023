@@ -32,15 +32,7 @@ type
   TfrmImageGenerator = class(TForm)
     mmMainMenu: TMainMenu;
     miFile: TMenuItem;
-    New1: TMenuItem;
-    Open1: TMenuItem;
-    Save1: TMenuItem;
-    SaveAs1: TMenuItem;
-    Print1: TMenuItem;
-    PrintSetup1: TMenuItem;
     miExit: TMenuItem;
-    N1: TMenuItem;
-    N2: TMenuItem;
     miGenerator: TMenuItem;
     miDALLE2: TMenuItem;
     mmoImagePrompt: TMemo;

@@ -160,7 +160,7 @@ begin
   googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
   FTranslateEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
-  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, AWSRegion);
+  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion'));
   FTranslateEngines.RegisterEngine(amazonEngine, miAmazonTranslate, HandleMicrosoftEngineSelected);
 
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');

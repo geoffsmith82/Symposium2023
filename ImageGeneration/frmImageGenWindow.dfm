@@ -1,64 +1,87 @@
 object frmImageGenerator: TfrmImageGenerator
   Left = 0
   Top = 0
+  Margins.Left = 8
+  Margins.Top = 8
+  Margins.Right = 8
+  Margins.Bottom = 8
   Caption = 'Image Generator'
-  ClientHeight = 442
-  ClientWidth = 628
+  ClientHeight = 1105
+  ClientWidth = 1570
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -30
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  PixelsPerInch = 240
   DesignSize = (
-    628
-    442)
-  TextHeight = 15
+    1570
+    1105)
+  TextHeight = 41
   object Label1: TLabel
-    Left = 24
-    Top = 3
-    Width = 76
-    Height = 15
+    Left = 60
+    Top = 8
+    Width = 190
+    Height = 41
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Caption = 'Image Prompt'
   end
   object mmoImagePrompt: TMemo
-    Left = 16
-    Top = 24
-    Width = 481
-    Height = 89
+    Left = 40
+    Top = 60
+    Width = 1203
+    Height = 223
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     TabOrder = 0
   end
   object btnExecute: TButton
-    Left = 496
-    Top = 23
-    Width = 75
-    Height = 25
+    Left = 1272
+    Top = 58
+    Width = 188
+    Height = 62
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Anchors = [akTop, akRight]
     Caption = 'Execute'
     TabOrder = 1
     OnClick = btnExecuteClick
-    ExplicitLeft = 492
   end
   object seImageCount: TSpinEdit
-    Left = 512
-    Top = 54
-    Width = 59
-    Height = 24
+    Left = 1312
+    Top = 135
+    Width = 148
+    Height = 52
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Anchors = [akTop, akRight]
     MaxValue = 0
     MinValue = 0
     TabOrder = 2
     Value = 1
-    ExplicitLeft = 508
   end
   object cboSize: TComboBox
-    Left = 479
-    Top = 84
-    Width = 92
-    Height = 23
+    Left = 1230
+    Top = 210
+    Width = 230
+    Height = 49
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Style = csDropDownList
     Anchors = [akTop, akRight]
     ItemIndex = 2
@@ -68,31 +91,32 @@ object frmImageGenerator: TfrmImageGenerator
       '256x256'
       '512x512'
       '1024x1024')
-    ExplicitLeft = 475
   end
   object ScrollBox1: TScrollBox
-    Left = 16
-    Top = 128
-    Width = 569
-    Height = 289
-    VertScrollBar.Range = 2000
+    Left = 40
+    Top = 320
+    Width = 1455
+    Height = 723
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    VertScrollBar.Range = 5000
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoScroll = False
     TabOrder = 4
-    ExplicitWidth = 565
-    ExplicitHeight = 288
     object ImagesFlowPanel: TFlowPanel
       Left = 0
       Top = 0
-      Width = 548
-      Height = 2000
+      Width = 1408
+      Height = 5000
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alTop
       Caption = 'ImagesFlowPanel'
       TabOrder = 0
-      ExplicitLeft = 48
-      ExplicitTop = 48
-      ExplicitWidth = 185
-      ExplicitHeight = 41
     end
   end
   object mmMainMenu: TMainMenu
@@ -100,30 +124,6 @@ object frmImageGenerator: TfrmImageGenerator
     Top = 120
     object miFile: TMenuItem
       Caption = '&File'
-      object New1: TMenuItem
-        Caption = '&New'
-      end
-      object Open1: TMenuItem
-        Caption = '&Open...'
-      end
-      object Save1: TMenuItem
-        Caption = '&Save'
-      end
-      object SaveAs1: TMenuItem
-        Caption = 'Save &As...'
-      end
-      object N2: TMenuItem
-        Caption = '-'
-      end
-      object Print1: TMenuItem
-        Caption = '&Print...'
-      end
-      object PrintSetup1: TMenuItem
-        Caption = 'P&rint Setup...'
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
       object miExit: TMenuItem
         Caption = 'E&xit'
         OnClick = miExitClick

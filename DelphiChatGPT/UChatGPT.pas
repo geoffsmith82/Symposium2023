@@ -84,8 +84,6 @@ implementation
 
 {$R *.dfm}
 
-{$I ..\Libs\apikey.inc}
-
 procedure TForm1.FormCreate(Sender: TObject);
 var
   lSpeechEngine: string;
@@ -103,11 +101,11 @@ begin
   FTextToSpeechEngine.RegisterEngine(
      TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
 //  FTextToSpeechEngine.RegisterEngine(
-//     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
+//     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);//'ADUG Demo', '');
   FTextToSpeechEngine.RegisterEngine(
      TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
-     TGoogleSpeechService.Create(Self, google_clientid,  FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+     TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'),  FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'TWindowsSpeechService');
   FTextToSpeechEngine.SelectEngine(lSpeechEngine);
