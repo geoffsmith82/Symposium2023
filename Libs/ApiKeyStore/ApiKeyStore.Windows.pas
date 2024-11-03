@@ -16,6 +16,10 @@ type
   public
     procedure SaveApiKey(const Name, ApiKey: string); override;
     function LoadApiKey(const Name: string): string; override;
+
+    // Saves an Setting with a specified name
+    procedure SaveSetting(const Name, Value: string); override;
+    function LoadSetting(const Name: string): string; override;
   end;
 
 implementation
@@ -46,6 +50,8 @@ function CryptUnprotectData(pDataIn: PDATA_BLOB; ppszDataDescr: PLPWSTR;
   pDataOut: PDATA_BLOB): BOOL; stdcall; external 'Crypt32.dll';
 
 { TWindowsApiKeyStore }
+
+
 
 function TWindowsApiKeyStore.ProtectData(const Data: TBytes): TBytes;
 var
@@ -108,6 +114,61 @@ begin
   finally
     JsonData.Free;
   end;
+end;
+
+procedure TWindowsApiKeyStore.SaveSetting(const Name, Value: string);
+var
+  JsonData: TJSONObject;
+  FileName: string;
+  data : string;
+begin
+  FileName := TPath.Combine(TPath.GetDocumentsPath, 'ApiKeys.json');
+  data := TFile.ReadAllText(FileName);
+  JsonData := TJSONObject.ParseJSONValue(data) as TJSONObject;
+  try
+    if Value.Length > 0 then
+    begin
+      JsonData.RemovePair(Name);
+      JsonData.AddPair(Name, Value);
+    end
+    else
+    begin
+      JsonData.RemovePair(Name);
+    end;
+    TFile.WriteAllText(FileName, JsonData.ToJSON);
+  finally
+    JsonData.Free;
+  end;
+end;
+
+function TWindowsApiKeyStore.LoadSetting(const Name: string): string;
+var
+  JsonData: TJSONObject;
+  base64Data : string;
+  FileName: string;
+begin
+  Result := '';
+  if Name.IsEmpty then
+  begin
+    Exit;
+  end;
+
+  FileName := TPath.Combine(TPath.GetDocumentsPath, 'ApiKeys.json');
+  if TFile.Exists(FileName) then
+  begin
+    JsonData := TJSONObject.Create;
+    try
+      JsonData.Parse(BytesOf(TFile.ReadAllText(FileName)), 0);
+      if JsonData.TryGetValue(Name, base64Data) then
+      begin
+        Result := base64Data;
+      end;
+    finally
+      JsonData.Free;
+    end;
+  end
+  else
+    raise Exception.CreateFmt('Setting for "%s" not found.', [Name]);
 end;
 
 function TWindowsApiKeyStore.LoadApiKey(const Name: string): string;

@@ -21,6 +21,13 @@ type
     // Loads an API key by name
     function LoadApiKey(const Name: string): string; virtual; abstract;
 
+    // Saves an Setting with a specified name
+    procedure SaveSetting(const Name, Value: string); virtual; abstract;
+
+    // Loads an Setting by name
+    function LoadSetting(const Name: string): string; virtual; abstract;
+
+
     // Singleton instance access
     class function GetInstance: TApiKeyStore;
   end;
