@@ -86,8 +86,6 @@ implementation
 uses
   frmApiKeyStore;
 
-{$I ..\Libs\apikey.inc}
-
 procedure TVoiceRecognitionForm.FormCreate(Sender: TObject);
 var
   engine : string;
@@ -101,13 +99,13 @@ begin
 
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
 
-  googleEngine := TGoogleSpeechToText.Create(google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings);
+  googleEngine := TGoogleSpeechToText.Create(FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
   FSpeechToTextEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
   microsoftEngine := TMicrosoftSpeechToText.Create('', '', '');
   FSpeechToTextEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
 
-  amazonEngine := TAmazonSpeechToText.Create(nil, AWSAccessKey, AWSSecretKey, AWSRegion, 'bucket');
+  amazonEngine := TAmazonSpeechToText.Create(nil, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), FApiKeyStore.LoadSetting('AWSRegion'), 'bucket');
   FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon, HandleAmazonEngineSelected);
 
   whisperOnlineEngine := TOpenAiWhisperOnline.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'), '', '');
@@ -122,7 +120,6 @@ procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
   FreeAndNil(FSpeechToTextEngines);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TVoiceRecognitionForm.GoogleAuthenticate1Click(Sender: TObject);

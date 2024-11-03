@@ -65,6 +65,7 @@ uses
   uEngineManager,
   uAudioRecorder,
   ApiKeyStore,
+  frmApiKeyStore,
   BubbleText
   ;
 
@@ -116,6 +117,8 @@ type
     miRevAI: TMenuItem;
     sbMessagesView: TScrollBox;
     miOpenAiTextToSpeech: TMenuItem;
+    miSetup: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnStartClick(Sender: TObject);
@@ -130,6 +133,7 @@ type
     procedure Model2Click(Sender: TObject);
     procedure btnDeleteMessageClick(Sender: TObject);
     procedure sbMessagesViewMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -353,7 +357,7 @@ var
 begin
   FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
-//  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);
+//  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey')), miOpenAiTextToSpeech);
@@ -440,6 +444,18 @@ end;
 procedure TfrmVoiceRecognition.OnHandleDisconnect(Connection: TObject);
 begin
   FConnected := False;
+end;
+
+procedure TfrmVoiceRecognition.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
 end;
 
 procedure TfrmVoiceRecognition.AsyncSendChatMessagesToOpenAI(ASessionID: Int64; AChatMessages: TObjectList<TChatMessage>; AOnMessageResults: TOnChatMessageMessageResults);

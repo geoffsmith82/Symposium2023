@@ -270,6 +270,13 @@ object frmVoiceRecognition: TfrmVoiceRecognition
         OnClick = Model2Click
       end
     end
+    object miSetup: TMenuItem
+      Caption = 'Setup'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
   end
   object ImageCollection: TImageCollection
     Images = <

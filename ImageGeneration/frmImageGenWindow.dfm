@@ -145,6 +145,13 @@ object frmImageGenerator: TfrmImageGenerator
         RadioItem = True
       end
     end
+    object miSetup: TMenuItem
+      Caption = 'Setup'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
   end
   object pmPopupMenu: TPopupMenu
     Left = 368

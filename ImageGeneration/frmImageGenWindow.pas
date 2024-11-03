@@ -46,12 +46,15 @@ type
     SaveDialog: TSaveDialog;
     ImagesFlowPanel: TFlowPanel;
     miDALLE3: TMenuItem;
+    miSetup: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnExecuteClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure Image1ContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure miSaveImageClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FImageList : TObjectList<TImage>;
@@ -68,6 +71,10 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  frmApiKeyStore
+  ;
 
 procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
@@ -157,6 +164,18 @@ begin
     end;
   finally
     FreeAndNil(images);
+  end;
+end;
+
+procedure TfrmImageGenerator.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
   end;
 end;
 
