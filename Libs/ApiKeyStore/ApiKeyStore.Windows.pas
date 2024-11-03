@@ -95,7 +95,8 @@ begin
   JsonData := TJSONObject.ParseJSONValue(data) as TJSONObject;
   try
     EncryptedData := ProtectData(TEncoding.UTF8.GetBytes(ApiKey));
-    JsonData.AddPair(Name, TNetEncoding.Base64.EncodeBytesToString(EncryptedData));
+    JsonData.RemovePair(Name);
+    JsonData.AddPair(Name, TNetEncoding.Base64String.EncodeBytesToString(EncryptedData));
     TFile.WriteAllText(FileName, JsonData.ToJSON);
   finally
     JsonData.Free;
@@ -106,17 +107,22 @@ function TWindowsApiKeyStore.LoadApiKey(const Name: string): string;
 var
   JsonData: TJSONObject;
   EncryptedData, DecryptedData: TBytes;
+  base64Data : string;
   FileName: string;
 begin
+  Result := '';
   FileName := TPath.Combine(TPath.GetDocumentsPath, 'ApiKeys.json');
   if TFile.Exists(FileName) then
   begin
     JsonData := TJSONObject.Create;
     try
       JsonData.Parse(BytesOf(TFile.ReadAllText(FileName)), 0);
-      EncryptedData := TNetEncoding.Base64.DecodeStringToBytes(JsonData.GetValue(Name).Value);
-      DecryptedData := UnprotectData(EncryptedData);
-      Result := TEncoding.UTF8.GetString(DecryptedData);
+      if JsonData.TryGetValue(Name, base64Data) then
+      begin
+        EncryptedData := TNetEncoding.Base64String.DecodeStringToBytes(base64Data);
+        DecryptedData := UnprotectData(EncryptedData);
+        Result := TEncoding.UTF8.GetString(DecryptedData);
+      end;
     finally
       JsonData.Free;
     end;

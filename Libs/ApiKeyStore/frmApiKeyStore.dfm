@@ -17,6 +17,7 @@ object frmApiKeyStores: TfrmApiKeyStores
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 240
   TextHeight = 41
   object StringGrid: TStringGrid
@@ -31,6 +32,7 @@ object frmApiKeyStores: TfrmApiKeyStores
     ColCount = 2
     DefaultColWidth = 160
     DefaultRowHeight = 60
+    RowCount = 9
     TabOrder = 0
   end
   object btnClose: TButton

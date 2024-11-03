@@ -13,7 +13,9 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.Grids,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls,
+  ApiKeyStore
+  ;
 
 type
   TfrmApiKeyStores = class(TForm)
@@ -21,8 +23,10 @@ type
     btnClose: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
+    FApiKeyStore : TApiKeyStore;
   public
     { Public declarations }
   end;
@@ -31,12 +35,16 @@ implementation
 
 {$R *.dfm}
 
+
+
 procedure TfrmApiKeyStores.btnCloseClick(Sender: TObject);
 begin
   Close;
 end;
 
 procedure TfrmApiKeyStores.FormCreate(Sender: TObject);
+var
+  i: Integer;
 begin
   StringGrid.Cells[0, 0] := 'Name';
   StringGrid.Cells[1, 0] := 'Key';
@@ -51,7 +59,20 @@ begin
   StringGrid.Cells[0, 5] := 'revai_key';
   StringGrid.Cells[0, 6] := 'assemblyai_key';
   StringGrid.Cells[0, 7] := 'deepgram_key';
+  StringGrid.Cells[0, 8] := 'HuggingFace_APIKey';
+  FApiKeyStore := TApiKeyStore.GetInstance;
 
+  for i := 1 to StringGrid.RowCount - 1 do
+  begin
+    StringGrid.Cells[1, i] :=  FApiKeyStore.LoadApiKey(StringGrid.Cells[0, i]);
+  end;
+
+
+end;
+
+procedure TfrmApiKeyStores.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FApiKeyStore);
 end;
 
 end.
