@@ -77,8 +77,6 @@ implementation
 
 {$R *.dfm}
 
-{$I ..\Libs\apikey.inc}
-
 procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
   FImageList := TObjectList<TImage>.Create;

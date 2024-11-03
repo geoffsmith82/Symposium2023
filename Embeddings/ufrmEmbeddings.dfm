@@ -75,4 +75,22 @@ object frmEmbeddings: TfrmEmbeddings
     TabOrder = 6
     OnClick = btnQueryClick
   end
+  object MainMenu: TMainMenu
+    Left = 1340
+    Top = 120
+    object miFile: TMenuItem
+      Caption = '&File'
+      object miExit: TMenuItem
+        Caption = 'E&xit'
+        OnClick = miExitClick
+      end
+    end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
+  end
 end

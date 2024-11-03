@@ -24,7 +24,6 @@ type
     btnCancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure StringGridDrawCell(Sender: TObject; ACol, ARow: LongInt;
       Rect: TRect; State: TGridDrawState);
     procedure StringGridSelectCell(Sender: TObject; ACol, ARow: LongInt;
@@ -80,6 +79,8 @@ begin
   StringGrid.ColWidths[0] := 300;
   StringGrid.ColWidths[1] := StringGrid.Width - StringGrid.ColWidths[0];
 
+  StringGrid.RowCount := 12;
+
   StringGrid.Cells[0, 1] := 'chatgpt_apikey';
   StringGrid.Cells[0, 2] := 'X_AI';
   StringGrid.Cells[0, 3] := 'groq_apikey';
@@ -88,6 +89,11 @@ begin
   StringGrid.Cells[0, 6] := 'assemblyai_key';
   StringGrid.Cells[0, 7] := 'deepgram_key';
   StringGrid.Cells[0, 8] := 'HuggingFace_APIKey';
+  StringGrid.Cells[0, 9] := 'ms_cognative_service_resource_key';
+  StringGrid.Cells[0,10] := 'AWSAccessKey';
+  StringGrid.Cells[0,11] := 'AWSSecretKey';
+
+
   FApiKeyStore := TApiKeyStore.GetInstance;
 
   for i := 1 to StringGrid.RowCount - 1 do
@@ -100,11 +106,6 @@ begin
   for i := 0 to High(FModifiedRows) do
     FModifiedRows[i] := False;
 
-end;
-
-procedure TfrmApiKeyStores.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(FApiKeyStore);
 end;
 
 function TfrmApiKeyStores.MaskAPIKey(const APIKey: string): string;
@@ -157,9 +158,11 @@ var
   CellText, DisplayText: string;
 begin
   CellText := StringGrid.Cells[ACol, ARow];
+  if (ARow = 0) or (ACol = 0) then
+    Exit;
 
   // Check if we are in the APIKey column and not editing
-  if (ACol = 1) and (not StringGrid.EditorMode) then
+  if not StringGrid.EditorMode then
   begin
     // Use MaskAPIKey function to get the masked version of the API key
     DisplayText := MaskAPIKey(CellText);
@@ -167,12 +170,6 @@ begin
     // Draw the masked text
     StringGrid.Canvas.FillRect(Rect);
     StringGrid.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, DisplayText);
-  end
-  else
-  begin
-    // Draw cell text normally for non-APIKey cells or when editing
-//    StringGrid.Canvas.FillRect(Rect);
-//    StringGrid.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, CellText);
   end;
 end;
 

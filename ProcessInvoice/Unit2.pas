@@ -18,7 +18,9 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  Vcl.Menus,
   ApiKeyStore,
+  frmApiKeyStore,
   uLLM.OpenAI.Assistants
   ;
 
@@ -26,9 +28,16 @@ type
   TForm2 = class(TForm)
     Memo1: TMemo;
     Button7: TButton;
+    MainMenu: TMainMenu;
+    miFile: TMenuItem;
+    miExit: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FAssistant : TOpenAIAssistant;
@@ -47,8 +56,6 @@ var
 implementation
 
 {$R *.dfm}
-
-{$I ..\Libs\apikey.inc}
 
 procedure TForm2.Button7Click(Sender: TObject);
 var
@@ -69,6 +76,23 @@ begin
   Result := TPath.Combine(Result, filename);
 
   Result := TPath.GetFullPath(Result);
+end;
+
+procedure TForm2.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
+end;
+
+procedure TForm2.miExitClick(Sender: TObject);
+begin
+  Application.Terminate;
 end;
 
 function TForm2.ExtractInvoiceInfo(const PDFFileName: string): string;

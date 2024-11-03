@@ -67,8 +67,6 @@ uses
   System.IOUtils
   ;
 
-{$I ..\Libs\apikey.inc}
-
 procedure TfrmWeatherWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FElevenLabsVoiceService);
@@ -98,7 +96,7 @@ procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
   FApiKeyStore := TApiKeyStore.GetInstance;
   FElevenLabsVoiceService := TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
-  FAmazon := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, 'ap-southeast-2');
+  FAmazon := TAmazonPollyService.Create(Self, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), 'ap-southeast-2');
   FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   FdmWeather := TdmWeather.Create(nil);
 end;

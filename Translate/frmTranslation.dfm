@@ -59,10 +59,10 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
     TabOrder = 4
     OnClick = Button2Click
   end
-  object MainMenu1: TMainMenu
+  object MainMenu: TMainMenu
     Left = 84
     Top = 56
-    object File1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
         Caption = '&New'
@@ -88,9 +88,9 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
       object N1: TMenuItem
         Caption = '-'
       end
-      object Exit1: TMenuItem
+      object miExit: TMenuItem
         Caption = 'E&xit'
-        OnClick = Exit1Click
+        OnClick = miExitClick
       end
     end
     object miTranslationEngine: TMenuItem
@@ -128,6 +128,13 @@ object frmMainTranslationWindow: TfrmMainTranslationWindow
       end
       object Logout1: TMenuItem
         Caption = 'Logout'
+      end
+    end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
       end
     end
   end

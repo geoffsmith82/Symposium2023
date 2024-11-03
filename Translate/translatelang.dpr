@@ -15,7 +15,10 @@ uses
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
   uLLM in '..\Libs\LLM\uLLM.pas',
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
-  uAttributes in '..\Libs\LLM\uAttributes.pas';
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
 

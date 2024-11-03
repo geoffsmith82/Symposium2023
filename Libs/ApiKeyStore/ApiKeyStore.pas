@@ -11,6 +11,7 @@ type
     class var FInstance: TApiKeyStore;
     constructor Create; virtual;
     destructor Destroy; override;
+    class destructor Destroy;
   public
 
 
@@ -43,6 +44,11 @@ end;
 destructor TApiKeyStore.Destroy;
 begin
   inherited Destroy;
+end;
+
+class destructor TApiKeyStore.Destroy;
+begin
+  FreeAndNil(FInstance);
 end;
 
 class function TApiKeyStore.GetInstance: TApiKeyStore;

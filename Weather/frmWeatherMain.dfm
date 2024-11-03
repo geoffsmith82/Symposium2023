@@ -1,23 +1,33 @@
 object frmWeatherWindow: TfrmWeatherWindow
   Left = 0
   Top = 0
+  Margins.Left = 8
+  Margins.Top = 8
+  Margins.Right = 8
+  Margins.Bottom = 8
   Caption = 'Bendigo Weather'
-  ClientHeight = 441
-  ClientWidth = 521
+  ClientHeight = 1103
+  ClientWidth = 1303
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -30
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  TextHeight = 15
+  PixelsPerInch = 240
+  TextHeight = 41
   object GridPanel1: TGridPanel
     Left = 0
     Top = 0
-    Width = 521
-    Height = 441
+    Width = 1303
+    Height = 1103
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Align = alClient
     Caption = 'GridPanel1'
     ColumnCollection = <
@@ -57,22 +67,28 @@ object frmWeatherWindow: TfrmWeatherWindow
         SizeStyle = ssAuto
       end>
     TabOrder = 0
-    ExplicitWidth = 517
-    ExplicitHeight = 440
     object mmoWeatherQuestion: TMemo
       Left = 1
-      Top = 60
-      Width = 519
-      Height = 211
+      Top = 149
+      Width = 1301
+      Height = 530
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 0
     end
     object mmWeatherAnswer: TMemo
       Left = 1
-      Top = 271
-      Width = 519
-      Height = 169
+      Top = 679
+      Width = 1301
+      Height = 423
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 1
@@ -80,30 +96,41 @@ object frmWeatherWindow: TfrmWeatherWindow
     object Panel1: TPanel
       Left = 1
       Top = 1
-      Width = 519
-      Height = 59
+      Width = 1301
+      Height = 148
+      Margins.Left = 8
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 8
       Align = alClient
       Caption = 'Panel1'
       TabOrder = 2
-      ExplicitTop = -5
       DesignSize = (
-        519
-        59)
+        1301
+        148)
       object btnLatestForcast: TButton
-        Left = 116
-        Top = 6
-        Width = 249
-        Height = 43
+        Left = 291
+        Top = 15
+        Width = 623
+        Height = 108
+        Margins.Left = 8
+        Margins.Top = 8
+        Margins.Right = 8
+        Margins.Bottom = 8
         Anchors = []
         Caption = 'Latest Forcast'
         TabOrder = 0
         OnClick = btnLatestForcastClick
       end
       object chkUseGPT4: TCheckBox
-        Left = 380
-        Top = 19
-        Width = 97
-        Height = 17
+        Left = 952
+        Top = 48
+        Width = 243
+        Height = 42
+        Margins.Left = 8
+        Margins.Top = 8
+        Margins.Right = 8
+        Margins.Bottom = 8
         Anchors = []
         Caption = 'Use GPT4'
         TabOrder = 1

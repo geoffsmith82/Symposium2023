@@ -16,6 +16,7 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  Vcl.Menus,
   uGoogleCustomSearch,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
@@ -36,9 +37,10 @@ uses
   uLLM.Anthropic,
   uLLM.Google.PaLM,
   uLLM.Azure,
-  uEmbeddings.OpenAI,
+  uLLM,
   uEmbeddings,
-  uLLM
+  uEmbeddings.OpenAI,
+  frmApiKeyStore
   ;
 
 type
@@ -56,12 +58,19 @@ type
     Button2: TButton;
     Memo2: TMemo;
     btnQuery: TButton;
+    MainMenu: TMainMenu;
+    miFile: TMenuItem;
+    miExit: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure btnGoogleSearchClick(Sender: TObject);
     procedure btnEmbeddingsClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure btnQueryClick(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     FOpenAI : TOpenAI;
     FApiKeyStore : TApiKeyStore;
@@ -217,6 +226,18 @@ begin
     // add more questions here ...
   );
 end;
+procedure TfrmEmbeddings.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores);
+  end;
+end;
+
 function TfrmEmbeddings.GetCompareQuestionsArray: TArray<string>;
 begin
   Result := TArray<string>.Create(
@@ -316,6 +337,11 @@ begin
     end;
   end;
   Memo1.Lines.Add('---');
+end;
+
+procedure TfrmEmbeddings.miExitClick(Sender: TObject);
+begin
+  Application.Terminate;
 end;
 
 end.

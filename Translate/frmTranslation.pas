@@ -19,6 +19,7 @@ uses
   Vcl.StdCtrls,
   Xml.Win.msxmldom,
   XMLDoc,
+  ApiKeyStore,
   uTranslate,
   uEngineManager,
   uTranslate.Amazon,
@@ -37,15 +38,15 @@ type
 
 
   TfrmMainTranslationWindow = class(TForm)
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
+    MainMenu: TMainMenu;
+    miFile: TMenuItem;
     New1: TMenuItem;
     Open1: TMenuItem;
     Save1: TMenuItem;
     SaveAs1: TMenuItem;
     Print1: TMenuItem;
     PrintSetup1: TMenuItem;
-    Exit1: TMenuItem;
+    miExit: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
     miTranslationEngine: TMenuItem;
@@ -62,19 +63,23 @@ type
     Button2: TButton;
     miGoogleMenu: TMenuItem;
     Logout1: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure btnTranslateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
     procedure miSelectEngineClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure miGoogleAuthenticateClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure miSelectSourceLanguageClick(Sender: TObject);
     procedure miSelectDestinationLanguageClick(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FTranslateEngines: TEngineManager<TBaseTranslate>;
+    FApiKeyStore : TApiKeyStore;
     FSettings : TIniFile;
     fromLanguageCode : string;
     toLanguageCode : string;
@@ -93,6 +98,7 @@ implementation
 {$R *.dfm}
 
 uses
+  frmApiKeyStore,
   uTranslate.LanguageCodes;
 
 {$i ..\Libs\apikey.inc}
@@ -106,6 +112,7 @@ procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
   FreeAndNil(FTranslateEngines);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmMainTranslationWindow.miGoogleAuthenticateClick(Sender: TObject);
@@ -143,10 +150,11 @@ var
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
   FTranslateEngines := TEngineManager<TBaseTranslate>.Create;
+  FApiKeyStore := TApiKeyStore.GetInstance;
   FSettings := TIniFile.Create(filename);
   toLanguageCode := FSettings.ReadString('Settings', 'ToLanguageCode', 'en');
 
-  microsoftEngine := TMicrosoftTranslate.Create(ms_translate_key,'https://api.cognitive.microsofttranslator.com/');
+  microsoftEngine := TMicrosoftTranslate.Create(FApiKeyStore.LoadApiKey('ms_translate_key'), 'https://api.cognitive.microsofttranslator.com/');
   FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
 
   googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
@@ -269,7 +277,19 @@ begin
   end;
 end;
 
-procedure TfrmMainTranslationWindow.Exit1Click(Sender: TObject);
+procedure TfrmMainTranslationWindow.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
+end;
+
+procedure TfrmMainTranslationWindow.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
 end;
