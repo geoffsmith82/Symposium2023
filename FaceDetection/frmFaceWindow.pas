@@ -30,7 +30,8 @@ uses
   uMicrosoft.FaceRecognition.DTO,
   uGoogle.FaceRecognition,
   uCodeProject.FaceRecognition,
-  uEngineManager
+  uEngineManager,
+  ApiKeyStore
   ;
 
 type
@@ -64,6 +65,8 @@ type
     JvFilenameEdit1: TJvFilenameEdit;
     btnDetectFacesFromLocalFile: TButton;
     miCodeProject: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure btnDetectFacesClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -71,9 +74,11 @@ type
     procedure miSelectEngineClick(Sender: TObject);
     procedure miGoogleLoginClick(Sender: TObject);
     procedure btnDetectFacesFromLocalFileClick(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
+    FApiKeyStore : TApiKeyStore;
     FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition>;
     procedure DownloadAndLoadImage(const AUrl: string; AImage: TImage);
     procedure OnCodeProjectSelected(Sender: TObject);
@@ -94,7 +99,9 @@ implementation
 
 {$R *.dfm}
 
-{$I ..\LIBS\APIKEY.INC}
+uses
+  frmApiKeyStore
+  ;
 
 procedure TfrmFaceDetection.btnDetectFacesFromLocalFileClick(Sender: TObject);
 var
@@ -311,6 +318,18 @@ begin
   FreeAndNil(FSettings);
 end;
 
+procedure TfrmFaceDetection.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
+end;
+
 procedure TfrmFaceDetection.miExitClick(Sender: TObject);
 begin
   Application.Terminate;
@@ -348,13 +367,13 @@ var
 begin
   FFaceRecognitionEngines:= TEngineManager<TBaseFaceRecognition>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-
+  FApiKeyStore := TApiKeyStore.GetInstance;
 
   engine := TCodeProjectFaceRecognition.Create('http://172.27.95.87:32168');
   FFaceRecognitionEngines.RegisterEngine(engine, miCodeProject, OnCodeProjectSelected);
-  engine := TMicrosoftFaceRecognition.Create(ms_face_key, 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect');
+  engine := TMicrosoftFaceRecognition.Create(FApiKeyStore.LoadApiKey('ms_face_key'), 'https://adugfaces.cognitiveservices.azure.com/face/v1.0/detect');
   FFaceRecognitionEngines.RegisterEngine(engine, miMicrosoft, OnMicrosoftSelected);
-  engine := TGoogleFaceRecognition.Create(google_clientid, google_clientsecret, '', FSettings);
+  engine := TGoogleFaceRecognition.Create(FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), '', FSettings);
   FFaceRecognitionEngines.RegisterEngine(engine, miGoogle, OnGoogleSelected);
   edtImageURL.Text := 'https://andergrovess.eq.edu.au/HomePagePictures/slide-01.jpg';
 end;

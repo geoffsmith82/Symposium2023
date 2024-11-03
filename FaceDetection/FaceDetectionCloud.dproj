@@ -112,6 +112,11 @@
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
         <DCCReference Include="..\Libs\FaceRecognition\uCodeProject.FaceRecognition.pas"/>
         <DCCReference Include="..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.DTO.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
+            <Form>frmApiKeyStores</Form>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

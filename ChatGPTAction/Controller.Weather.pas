@@ -44,7 +44,7 @@ begin
   Context.Request.SegmentParam('location', location);
   weather := TdmWeather.Create(nil);
   try
-    data := weather.Getproduct(location, state);
+    data := weather.GetBomForecast(location, state);
     responseData := TCurrentWeatherResponseObject.Create;
     responseData.report := data.XML;
     Render(responseData, False);

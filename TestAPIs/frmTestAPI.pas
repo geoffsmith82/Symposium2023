@@ -134,8 +134,6 @@ uses
   frmApiKeyStore
   ;
 
-{$I ..\Libs\apikey.inc}
-
 procedure TfrmTestApiWindow.FindProcedures;
 var
   ctx: TRttiContext;

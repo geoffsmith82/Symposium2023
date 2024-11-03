@@ -177,5 +177,12 @@ object frmFaceDetection: TfrmFaceDetection
         OnClick = miGoogleLoginClick
       end
     end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
   end
 end
