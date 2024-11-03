@@ -136,6 +136,12 @@
         <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas"/>
         <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
+            <Form>frmApiKeyStores</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

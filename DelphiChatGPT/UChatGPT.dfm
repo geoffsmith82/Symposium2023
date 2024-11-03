@@ -439,5 +439,12 @@ object Form1: TForm1
         OnClick = miTextDavinci003Click
       end
     end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
   end
 end

@@ -110,4 +110,21 @@ object frmWeatherWindow: TfrmWeatherWindow
       end
     end
   end
+  object MainMenu: TMainMenu
+    Left = 680
+    Top = 400
+    object miFile: TMenuItem
+      Caption = '&File'
+      object miExit: TMenuItem
+        Caption = 'Exit'
+      end
+    end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
+  end
 end

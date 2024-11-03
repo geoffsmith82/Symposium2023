@@ -31,6 +31,7 @@ uses
   FireDAC.VCLUI.Wait,
   Data.DB,
   FireDAC.Comp.Client,
+  ApiKeyStore,
   uLLM.OpenAI,
   uLLM.Anthropic,
   uLLM.Google.PaLM,
@@ -63,6 +64,7 @@ type
     procedure btnQueryClick(Sender: TObject);
   private
     FOpenAI : TOpenAI;
+    FApiKeyStore : TApiKeyStore;
     FEmbeddingOpenAI: TEmbeddingsOpenAI;
     function GetQuestionsArray: TArray<string>;
     function GetCompareQuestionsArray: TArray<string>;
@@ -289,14 +291,16 @@ end;
 
 procedure TfrmEmbeddings.FormCreate(Sender: TObject);
 begin
-  FOpenAI := TOpenAI.Create(chatgpt_apikey);
-  FEmbeddingOpenAI := TEmbeddingsOpenAI.Create(chatgpt_apikey);
+  FApiKeyStore := TApiKeyStore.GetInstance;
+  FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
+  FEmbeddingOpenAI := TEmbeddingsOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
 end;
 
 procedure TfrmEmbeddings.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FOpenAI);
   FreeAndNil(FEmbeddingOpenAI);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmEmbeddings.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);

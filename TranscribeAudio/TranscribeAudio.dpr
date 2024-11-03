@@ -10,7 +10,10 @@ uses
   uSTT.Amazon in '..\Libs\SpeechToText\uSTT.Amazon.pas',
   uSTT.Google.DTO in '..\Libs\SpeechToText\uSTT.Google.DTO.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
-  uEngineManager in '..\Libs\uEngineManager.pas';
+  uEngineManager in '..\Libs\uEngineManager.pas',
+  ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
 

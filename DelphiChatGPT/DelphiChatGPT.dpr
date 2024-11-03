@@ -22,7 +22,10 @@ uses
   uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
   uLLM.Replicate in '..\Libs\LLM\uLLM.Replicate.pas',
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
-  uAttributes in '..\Libs\LLM\uAttributes.pas';
+  uAttributes in '..\Libs\LLM\uAttributes.pas',
+  ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
 

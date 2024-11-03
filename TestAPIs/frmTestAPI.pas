@@ -49,6 +49,7 @@ type
   private
     { Private declarations }
     FSettings : TIniFile;
+    FKeyStore: TApiKeyStore;
     Fgooglespeech : TGoogleSpeechService;
     FProcedures : TList<TTestProcedure>;
     procedure MenuItemClick(Sender: TObject);
@@ -182,7 +183,7 @@ var
   answer: string;
 begin
   Memo1.Lines.Add('======== Model Anthropic');
-  anthropic := TAnthropic.Create(Claude_APIKey);
+  anthropic := TAnthropic.Create(FKeyStore.LoadApiKey('Claude_APIKey'));
   try
     for Local_modelObj in anthropic.ModelInfo do
     begin
@@ -228,7 +229,7 @@ var
   MessageVision: TChatVisionMessage;
   response: TChatResponse;
 begin
-  openAIVision := TOpenAI.Create(chatgpt_apikey);
+  openAIVision := TOpenAI.Create(FKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     config.model := 'gpt-4o';
     config.json_mode := False;
@@ -295,7 +296,7 @@ var
   chatAnswer: TChatResponse;
   answer: string;
 begin
-  openAI := TOpenAI.Create(chatgpt_apikey);
+  openAI := TOpenAI.Create(FKeyStore.LoadApiKey('chatgpt_apikey'));
   settings := Default(TChatSettings);
   try
     openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
@@ -347,6 +348,7 @@ begin
   FreeAndNil(Fgooglespeech);
   FreeAndNil(FSettings);
   FreeAndNil(FProcedures);
+  FreeAndNil(FKeyStore);
 end;
 
 
@@ -374,7 +376,7 @@ begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   Fgooglespeech := TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings);
   FProcedures := TList<TTestProcedure>.Create;
-
+  FKeyStore := TApiKeyStore.GetInstance;
   FindProcedures;
 end;
 
@@ -427,7 +429,7 @@ var
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Model OpenAI');
-  openAI := TOpenAI.Create(chatgpt_apikey);
+  openAI := TOpenAI.Create(FKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     for Local_modelObj in openAI.ModelInfo do
     begin
@@ -444,7 +446,7 @@ var
   modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Model Groq');
-  groqLLM := TGroqLLM.Create(groq_apikey);
+  groqLLM := TGroqLLM.Create(FKeyStore.LoadApiKey('groq_apikey'));
   try
     for modelObj in groqLLM.ModelInfo do
     begin
@@ -464,7 +466,7 @@ var
   answer : string;
 begin
   Memo1.Lines.Add('======== Model Replicate LLM');
-  replicate := TReplicateLLM.Create(Replicate_APIKey);
+  replicate := TReplicateLLM.Create(FKeyStore.LoadApiKey('Replicate_APIKey'));
   try
     for modelObj in replicate.ModelInfo do
     begin
@@ -484,7 +486,7 @@ var
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Microsoft OpenAI');
-  microsoftOpenAI := TMicrosoftOpenAI.Create(AzureAPIKey, AzureOpenAIEndpoint);
+  microsoftOpenAI := TMicrosoftOpenAI.Create(FKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint);
   try
     for Local_modelObj in microsoftOpenAI.ModelInfo do
     begin
@@ -501,7 +503,7 @@ var
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Model Google');
-  palm := TGooglePaLM.Create(google_makersuite);
+  palm := TGooglePaLM.Create(FKeyStore.LoadApiKey('google_makersuite'));
   try
     for Local_modelObj in palm.ModelInfo do
     begin
@@ -519,7 +521,7 @@ var
   ticks: DWORD;
 begin
   Memo1.Lines.Add('======== OpenAI Voices');
-  openAIVoice := TOpenAITextToSpeech.Create(Self, chatgpt_apikey);
+  openAIVoice := TOpenAITextToSpeech.Create(Self, FKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     voice := openAIVoice.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -540,7 +542,7 @@ var
   ticks: UInt64;
 begin
   Memo1.Lines.Add('======== ElevenLabs Voices');
-  elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  elevenlabs := TElevenLabsService.Create(Self, FKeyStore.LoadApiKey('ElevenLabsAPIKey'));
   try
     voice := elevenlabs.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -569,7 +571,7 @@ begin
   grok := nil;
 
   try
-    grok := TXGrokAI.Create(X_AI);
+    grok := TXGrokAI.Create(FKeyStore.LoadApiKey('X_AI'));
     for modelObj in grok.ModelInfo do
     begin
       Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
@@ -608,7 +610,7 @@ begin
   groq := nil;
 
   try
-    groq := TGroqLLM.Create(groq_apikey);
+    groq := TGroqLLM.Create(FKeyStore.LoadApiKey('groq_apikey'));
     for modelObj in groq.ModelInfo do
     begin
       Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
@@ -644,7 +646,7 @@ begin
   groq := nil;
 
   try
-    groq := TGroqLLM.Create(groq_apikey);
+    groq := TGroqLLM.Create(FKeyStore.LoadApiKey('groq_apikey'));
     for modelObj in groq.ModelInfo do
     begin
       Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
@@ -689,7 +691,7 @@ var
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Model Anthropic');
-  anthropic := TAnthropic.Create(Claude_APIKey);
+  anthropic := TAnthropic.Create(FKeyStore.LoadApiKey('Claude_APIKey'));
   try
     for Local_modelObj in anthropic.ModelInfo do
     begin
@@ -706,7 +708,7 @@ var
   Local_voice: TVoiceInfo;
 begin
   Memo1.Lines.Add('======== ElevenLabs Voices');
-  elevenlabs := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  elevenlabs := TElevenLabsService.Create(Self, FKeyStore.LoadApiKey('ElevenLabsAPIKey'));
   try
     for Local_voice in elevenlabs.Voices do
     begin
@@ -827,7 +829,7 @@ begin
   //      FreeAndNil(imgs);
   //    end;
   Memo1.Lines.Add('======== Model HuggingFace');
-  huggingFace := THuggingFaceLLM.Create(HuggingFace_APIKey);
+  huggingFace := THuggingFaceLLM.Create(FKeyStore.LoadApiKey('HuggingFace_APIKey'));
   try
     for modelObj in huggingFace.ModelInfo do
     begin
@@ -902,7 +904,7 @@ var
   openAIVoice: TOpenAITextToSpeech;
   voice: TVoiceInfo;
 begin
-  openAIVoice := TOpenAITextToSpeech.Create(Self, chatgpt_apikey);
+  openAIVoice := TOpenAITextToSpeech.Create(Self, FKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     for voice in openAIVoice.Voices do
     begin
@@ -919,7 +921,7 @@ var
   modelImg: TImageModelInfo;
 begin
   Memo1.Lines.Add('======== Model Replicate ImageGen');
-  imageGenReplicate := TImageGenerationReplicate.Create(Replicate_APIKey);
+  imageGenReplicate := TImageGenerationReplicate.Create(FKeyStore.LoadApiKey('Replicate_APIKey'));
   try
     for modelImg in imageGenReplicate.ModelInfo do
     begin

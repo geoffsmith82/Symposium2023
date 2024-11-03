@@ -28,6 +28,8 @@ uses
   uTTS.Amazon.Polly,
   uTTS.GoogleSpeech,
   uTTS.Windows.Engine,
+  frmApiKeyStore,
+  ApiKeyStore,
   uEngineManager
   ;
 
@@ -53,6 +55,8 @@ type
     miTextCurie0011: TMenuItem;
     miTextBabbage001: TMenuItem;
     miTextAda0011: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnAskTheMachineClick(Sender: TObject);
     procedure btnGoogleAuthClick(Sender: TObject);
@@ -61,9 +65,11 @@ type
     procedure miTextDavinci003Click(Sender: TObject);
     procedure SelectSpeechEngine(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     FTextToSpeechEngine : TEngineManager<TBaseTextToSpeech>;
     FSettings : TIniFile;
+    FApiKeyStore : TApiKeyStore;
     FOpenAI : TBaseLLM;
     function SelectedModel: string;
     { Private declarations }
@@ -86,21 +92,22 @@ var
   i: Integer;
   currentModel : string;
 begin
+  FApiKeyStore := TApiKeyStore.GetInstance;
   FTextToSpeechEngine := TEngineManager<TBaseTextToSpeech>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
 
 
   FTextToSpeechEngine.RegisterEngine(
-     TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+     TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
-     TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
+     TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
 //  FTextToSpeechEngine.RegisterEngine(
 //     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);//'ADUG Demo', '');
   FTextToSpeechEngine.RegisterEngine(
      TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
-     TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret,'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+     TGoogleSpeechService.Create(Self, google_clientid,  FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'TWindowsSpeechService');
   FTextToSpeechEngine.SelectEngine(lSpeechEngine);
@@ -188,6 +195,18 @@ end;
 procedure TForm1.btnSpeakQuestionClick(Sender: TObject);
 begin
   FTextToSpeechEngine.ActiveEngine.PlayText(mmoPrompt.Lines.Text);
+end;
+
+procedure TForm1.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
 end;
 
 procedure TForm1.miExitClick(Sender: TObject);

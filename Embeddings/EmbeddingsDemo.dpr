@@ -14,7 +14,10 @@ uses
   uEmbeddings.OpenAI in '..\Libs\Embeddings\uEmbeddings.OpenAI.pas',
   uEmbeddings.Microsoft.OpenAI in '..\Libs\Embeddings\uEmbeddings.Microsoft.OpenAI.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas',
-  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas';
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
+  ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
 

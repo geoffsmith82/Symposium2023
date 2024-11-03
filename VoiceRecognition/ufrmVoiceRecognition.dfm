@@ -258,11 +258,11 @@ object frmVoiceRecognition: TfrmVoiceRecognition
     object Model1: TMenuItem
       Caption = 'Model'
       object Model2: TMenuItem
-        Caption = 'gpt-3.5-turbo'
+        Caption = 'gpt-4o-mini'
         OnClick = Model2Click
       end
       object gpt41: TMenuItem
-        Caption = 'gpt-4'
+        Caption = 'gpt-4o'
         OnClick = Model2Click
       end
     end
@@ -1109,10 +1109,9 @@ object frmVoiceRecognition: TfrmVoiceRecognition
   object FDConnection: TFDConnection
     Params.Strings = (
       
-        'Database=D:\Programming\ADUG\Symposium2023\VoiceRecognition\chat' +
+        'Database=z:\Programming\ADUG\Symposium2023\VoiceRecognition\chat' +
         's.mdb'
       'DriverID=MSAcc')
-    Connected = True
     LoginPrompt = False
     Left = 720
     Top = 232

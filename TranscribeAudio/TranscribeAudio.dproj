@@ -98,6 +98,12 @@
         <DCCReference Include="..\Libs\SpeechToText\uSTT.Google.DTO.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\uEngineManager.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
+            <Form>frmApiKeyStores</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

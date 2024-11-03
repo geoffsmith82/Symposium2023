@@ -18,6 +18,7 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.StdCtrls,
+  ApiKeyStore,
   uLLM.OpenAI.Assistants
   ;
 
@@ -33,6 +34,7 @@ type
     FAssistant : TOpenAIAssistant;
     FThreadID : string;
     FIniFile : TIniFile;
+    FApiKeyStore : TApiKeyStore;
     function ExtractInvoiceInfo(const PDFFileName: string): string;
     function DataFilename(filename: string): string;
   public
@@ -118,12 +120,14 @@ procedure TForm2.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FAssistant);
   FreeAndNil(FIniFile);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TForm2.FormCreate(Sender: TObject);
 begin
   FIniFile := TIniFile.Create(DataFilename('invoice.ini'));
-  FAssistant := TOpenAIAssistant.Create(chatgpt_apikey);
+  FApiKeyStore := TApiKeyStore.GetInstance;
+  FAssistant := TOpenAIAssistant.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   Memo1.Clear;
 end;
 

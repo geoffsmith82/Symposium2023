@@ -22,6 +22,7 @@ uses
   System.Net.URLClient,
   System.Net.HttpClient,
   System.Net.HttpClientComponent,
+  ApiKeyStore,
   uImageGeneration.OpenAI,
   uImageGeneration,
   uDALLe2.DTO
@@ -63,6 +64,7 @@ type
     { Private declarations }
     FImageList : TObjectList<TImage>;
     FCurrentImage : TImage;
+    FApiKeyStore : TApiKeyStore;
     FOpenAI : TImageGenerationOpenAI;
   public
     { Public declarations }
@@ -80,7 +82,8 @@ implementation
 procedure TfrmImageGenerator.FormCreate(Sender: TObject);
 begin
   FImageList := TObjectList<TImage>.Create;
-  FOpenAI := TImageGenerationOpenAI.Create(chatgpt_apikey);
+  FApiKeyStore := TApiKeyStore.GetInstance;
+  FOpenAI := TImageGenerationOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   FCurrentImage := nil;
 end;
 
@@ -88,6 +91,7 @@ procedure TfrmImageGenerator.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FImageList);
   FreeAndNil(FOpenAI);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);

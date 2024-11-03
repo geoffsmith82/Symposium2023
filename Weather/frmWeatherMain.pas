@@ -16,10 +16,12 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
+  Vcl.Menus,
   uLLM,
   uLLM.OpenAI,
   uTTS.ElevenLabs,
   uTTS.Amazon.Polly,
+  ApiKeyStore,
   udmWeather
   ;
 
@@ -31,15 +33,22 @@ type
     Panel1: TPanel;
     btnLatestForcast: TButton;
     chkUseGPT4: TCheckBox;
+    MainMenu: TMainMenu;
+    miFile: TMenuItem;
+    miExit: TMenuItem;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnLatestForcastClick(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FElevenLabsVoiceService : TElevenLabsService;
     FAmazon : TAmazonPollyService;
     FOpenAI : TOpenAI;
     FdmWeather : TdmWeather;
+    FApiKeyStore : TApiKeyStore;
   public
     { Public declarations }
   end;
@@ -53,6 +62,7 @@ implementation
 
 uses
   uXMLBOMPrecis,
+  frmApiKeyStore,
   System.IOUtils
   ;
 
@@ -63,13 +73,27 @@ begin
   FreeAndNil(FElevenLabsVoiceService);
   FreeAndNil(FOpenAI);
   FreeAndNil(FdmWeather);
+  FreeAndNil(FAmazon);
+end;
+
+procedure TfrmWeatherWindow.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
 end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);
 begin
-  FElevenLabsVoiceService := TElevenLabsService.Create(Self, ElevenLabsAPIKey);
+  FApiKeyStore := TApiKeyStore.GetInstance;
+  FElevenLabsVoiceService := TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
   FAmazon := TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretKey, 'ap-southeast-2');
-  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   FdmWeather := TdmWeather.Create(nil);
 end;
 
@@ -92,7 +116,7 @@ begin
     ' Include the names of the days based on the date of the start time local. Do it in the style of Jane Bunn' + System.sLineBreak + System.sLineBreak;
 
   if chkUseGPT4.Checked then
-    model := 'gpt-4'
+    model := 'gpt-4o'
   else
     model := 'gpt-3.5-turbo';
 

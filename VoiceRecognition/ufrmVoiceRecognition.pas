@@ -5,6 +5,7 @@ interface
 uses
   Winapi.Windows,
   Winapi.Messages,
+  Winapi.ActiveX,
   System.SysUtils,
   System.Math,
   System.Variants,
@@ -16,7 +17,6 @@ uses
   System.JSON,
   System.SyncObjs,
   System.Threading,
-  Winapi.ActiveX,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
   Vcl.Menus,

@@ -16,6 +16,7 @@ uses
   Vcl.Dialogs,
   Vcl.Menus,
   Vcl.StdCtrls,
+  ApiKeyStore,
   uSTT,
   uSTT.Google,
   uSTT.Amazon,
@@ -67,6 +68,7 @@ type
     { Private declarations }
     FSpeechToTextEngines : TEngineManager<TBaseSpeechToText>;
     FSettings : TIniFile;
+    FApiKeyStore : TApiKeyStore;
   public
     { Public declarations }
   end;
@@ -89,6 +91,7 @@ var
   amazonEngine : TAmazonSpeechToText;
 begin
   FSpeechToTextEngines := TEngineManager<TBaseSpeechToText>.Create;
+  FApiKeyStore := TApiKeyStore.GetInstance;
 
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
 
@@ -101,7 +104,7 @@ begin
   amazonEngine := TAmazonSpeechToText.Create(nil, AWSAccessKey, AWSSecretKey, AWSRegion, 'bucket');
   FSpeechToTextEngines.RegisterEngine(amazonEngine, miAmazon, HandleAmazonEngineSelected);
 
-  whisperOnlineEngine := TOpenAiWhisperOnline.Create(CHATGPT_APIKEY, '', '');
+  whisperOnlineEngine := TOpenAiWhisperOnline.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'), '', '');
   FSpeechToTextEngines.RegisterEngine(whisperOnlineEngine, miOpenAIWhisper, HandleWhisperOnlineEngineSelected);
 
   engine := FSettings.ReadString('Settings', 'Engine', 'MicrosoftSpeech');
@@ -113,6 +116,7 @@ procedure TVoiceRecognitionForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
   FreeAndNil(FSpeechToTextEngines);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TVoiceRecognitionForm.GoogleAuthenticate1Click(Sender: TObject);
