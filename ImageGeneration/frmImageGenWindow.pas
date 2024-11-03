@@ -81,7 +81,6 @@ procedure TfrmImageGenerator.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FImageList);
   FreeAndNil(FOpenAI);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmImageGenerator.btnExecuteClick(Sender: TObject);

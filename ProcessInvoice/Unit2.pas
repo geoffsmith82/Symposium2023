@@ -144,7 +144,6 @@ procedure TForm2.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FAssistant);
   FreeAndNil(FIniFile);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TForm2.FormCreate(Sender: TObject);

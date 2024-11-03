@@ -101,8 +101,6 @@ uses
   frmApiKeyStore,
   uTranslate.LanguageCodes;
 
-{$i ..\Libs\apikey.inc}
-
 procedure TfrmMainTranslationWindow.btnTranslateClick(Sender: TObject);
 begin
   mmoTranslatedText.Text := FTranslateEngines.ActiveEngine.Translate(mmoSourceText.Text, toLanguageCode, fromLanguageCode);
@@ -112,7 +110,6 @@ procedure TfrmMainTranslationWindow.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FSettings);
   FreeAndNil(FTranslateEngines);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmMainTranslationWindow.miGoogleAuthenticateClick(Sender: TObject);
@@ -157,10 +154,10 @@ begin
   microsoftEngine := TMicrosoftTranslate.Create(FApiKeyStore.LoadApiKey('ms_translate_key'), 'https://api.cognitive.microsofttranslator.com/');
   FTranslateEngines.RegisterEngine(microsoftEngine, miMicrosoft, HandleMicrosoftEngineSelected);
 
-  googleEngine := TGoogleTranslate.Create(google_clientid, google_clientsecret, FSettings);
+  googleEngine := TGoogleTranslate.Create(FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), FSettings);
   FTranslateEngines.RegisterEngine(googleEngine, miGoogle, HandleGoogleEngineSelected);
 
-  amazonEngine := TAmazonTranslate.Create(AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion'));
+  amazonEngine := TAmazonTranslate.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion'));
   FTranslateEngines.RegisterEngine(amazonEngine, miAmazonTranslate, HandleMicrosoftEngineSelected);
 
   languageEngine := FSettings.ReadString('Settings', 'LanguageEngine', 'Microsoft Translate');

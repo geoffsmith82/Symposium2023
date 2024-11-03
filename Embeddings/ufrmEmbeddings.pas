@@ -321,7 +321,6 @@ procedure TfrmEmbeddings.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FOpenAI);
   FreeAndNil(FEmbeddingOpenAI);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmEmbeddings.DisplayMatches(const closestMatches: TArray<TEmbeddingMatch>; const questions: TArray<string>);

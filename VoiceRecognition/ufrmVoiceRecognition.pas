@@ -428,7 +428,6 @@ begin
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
   FreeAndNil(FOpenAI);
-  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);
