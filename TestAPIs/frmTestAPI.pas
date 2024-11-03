@@ -39,10 +39,13 @@ type
     Exit1: TMenuItem;
     TestMenuItem: TMenuItem;
     Button2: TButton;
+    miSettings: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FSettings : TIniFile;
@@ -126,7 +129,8 @@ uses
   uLLM.X.Ai,
   uDALLe2.DTO,
   uImageGeneration,
-  uImageGeneration.Replicate
+  uImageGeneration.Replicate,
+  frmApiKeyStore
   ;
 
 {$I ..\Libs\apikey.inc}
@@ -372,6 +376,18 @@ begin
   FProcedures := TList<TTestProcedure>.Create;
 
   FindProcedures;
+end;
+
+procedure TfrmTestApiWindow.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores);
+  end;
 end;
 
 procedure TfrmTestApiWindow.Button2Click(Sender: TObject);

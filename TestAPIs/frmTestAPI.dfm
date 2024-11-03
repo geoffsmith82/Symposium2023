@@ -1,37 +1,48 @@
 object frmTestApiWindow: TfrmTestApiWindow
   Left = 0
   Top = 0
+  Margins.Left = 8
+  Margins.Top = 8
+  Margins.Right = 8
+  Margins.Bottom = 8
   Caption = 'frmTestApiWindow'
-  ClientHeight = 442
-  ClientWidth = 745
+  ClientHeight = 1105
+  ClientWidth = 1863
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -30
   Font.Name = 'Segoe UI'
   Font.Style = []
   Menu = MainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  TextHeight = 15
+  PixelsPerInch = 240
+  TextHeight = 41
   object Memo1: TMemo
     Left = 0
-    Top = 0
-    Width = 745
-    Height = 442
+    Top = 65
+    Width = 1863
+    Height = 1040
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
     Align = alClient
     Lines.Strings = (
       'Memo1')
     TabOrder = 0
-    ExplicitTop = 150
-    ExplicitWidth = 628
-    ExplicitHeight = 292
   end
   object Button2: TButton
-    Left = 135
+    Left = 0
     Top = 0
-    Width = 114
-    Height = 25
+    Width = 1863
+    Height = 65
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Align = alTop
     Caption = 'Authenticate'
     TabOrder = 1
     OnClick = Button2Click
@@ -48,6 +59,13 @@ object frmTestApiWindow: TfrmTestApiWindow
     end
     object TestMenuItem: TMenuItem
       Caption = 'Tests'
+    end
+    object miSettings: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
     end
   end
 end
