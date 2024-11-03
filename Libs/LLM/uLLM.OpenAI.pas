@@ -22,7 +22,7 @@ type
     procedure ListOpenAIModels(out AModelList: TStringList);
     procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
-    procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string);
+    procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);
     procedure HandleErrorResponse(AResponse: TRESTResponse);
   public
     constructor Create(const APIKey: string);
@@ -43,6 +43,7 @@ var
   LRESTResponse: TRESTResponse;
   LJSONResponse: TJSONObject;
   FunctionReturnValue: string;
+  LInitialMsgCount : Integer;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -54,13 +55,15 @@ begin
 
   try
     BuildJSONRequestBody(LRESTRequest, ChatConfig, AMessages);
-
+    LInitialMsgCount := AMessages.Count;
     LRESTRequest.Execute;
 
     if LRESTResponse.StatusCode = 200 then
     begin
       LJSONResponse := LRESTResponse.JSONValue as TJSONObject;
-      ProcessResponse(LJSONResponse, Result, FunctionReturnValue);
+      ProcessResponse(LJSONResponse, Result, FunctionReturnValue, AMessages);
+      if Result.Finish_Reason = 'tool_calls' then
+        Result := ChatCompletion(ChatConfig, AMessages);
     end
     else
     begin
@@ -100,16 +103,22 @@ var
   LMessage: TChatMessage;
   LJSONFunctions: TJSONArray;
 begin
-  LJSONBody := TJSONObject.Create;
-  LJSONMessages := TJSONArray.Create;
+  LJSONBody := nil;
+  LJSONMessages := nil;
+  LJSONMessage := nil;
+  LMessage := nil;
+  LJSONFunctions := nil;
+
   try
+    LJSONBody := TJSONObject.Create;
+    LJSONMessages := TJSONArray.Create;
     for LMessage in AMessages do
     begin
       LJSONMessages.AddElement(LMessage.AsJSON);
     end;
 
     if ChatConfig.model.IsEmpty then
-      ChatConfig.model := 'gpt-3.5-turbo';
+      ChatConfig.model := 'gpt-4o';
 
     LJSONBody.AddPair('model', ChatConfig.model);
     LJSONBody.AddPair('messages', LJSONMessages);
@@ -132,17 +141,17 @@ begin
     if Functions.Count > 0 then
     begin
       LJSONFunctions := Functions.GetAvailableFunctionsJSON;
-      LJSONBody.AddPair('tools', LJSONFunctions);
+      LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-
-    ARequest.AddBody(LJSONBody.ToString, TRESTContentType.ctAPPLICATION_JSON);
+    OutputDebugString(PChar(LJSONBody.ToJSON));
+    ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     LJSONBody.Free;
   end;
 end;
 
-procedure TOpenAI.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string);
+procedure TOpenAI.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);
 var
   LChoices: TJSONArray;
   LChoice: TJSONObject;
@@ -152,6 +161,8 @@ var
   ToolValue : TJSONValue;
   ToolCall: TJSONObject;
   FunctionCallObj: TJSONObject;
+  FunctionId: string;
+  FunctionName: string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
   if Assigned(LJSONResponse.GetValue('model')) then
@@ -172,14 +183,25 @@ begin
   // Handle function calls
   if Assigned(LMessageJSON) then
   begin
+
     if LMessageJSON.TryGetValue<TJSONArray>('tool_calls', ToolCallsArray) then
     begin
+      var funcCall := TFunctionCallMessage.Create(ToolCallsArray);
+      AMessages.Add(funcCall);
+
       for ToolValue in ToolCallsArray do
       begin
         ToolCall := ToolValue as TJSONObject;
         FunctionCallObj := ToolCall.GetValue<TJSONObject>('function');
+        FunctionId := ToolCall.GetValue<string>('id');
+        FunctionName := FunctionCallObj.GetValue<string>('name');
         // Invoke the function with the arguments
         Functions.InvokeFunction(FunctionCallObj, FunctionReturnValue);
+        var funcMsg := TFunctionMessage.Create;
+        funcMsg.function_name := FunctionName;
+        funcMsg.Content := FunctionReturnValue;
+        funcMsg.Id := FunctionId;
+        AMessages.Add(funcMsg);
       end;
     end;
   end;

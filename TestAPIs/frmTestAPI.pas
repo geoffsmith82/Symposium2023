@@ -84,6 +84,11 @@ type
 
     [FunctionDescription('Get the weather forecast')]
     function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
+    [FunctionDescription('Get the time')]
+    function GetTimeAt([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the time')]const location: string): string;
+
+
+
     procedure FindProcedures;
   end;
 
@@ -269,8 +274,10 @@ var
   answer: string;
 begin
   openAI := TOpenAI.Create(chatgpt_apikey);
+  settings := Default(TChatSettings);
   try
     openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
     settings.model := 'gpt-4o';
     settings.json_mode := False;
     settings.max_tokens := 4096;
@@ -282,6 +289,30 @@ begin
     chatAnswer := openAI.ChatCompletion(settings, messages);
     answer := chatAnswer.Content;
     Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+
   finally
     FreeAndNil(messages);
     FreeAndNil(openAI);
@@ -329,6 +360,20 @@ procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
 begin
   Fgooglespeech.Authenticate;
 end;
+
+
+{*
+  Just a simple stub function to demo function calling
+*}
+
+function TfrmTestApiWindow.GetTimeAt(const state, location: string): string;
+begin
+  Result := DateTimeToStr(now);
+end;
+
+{*
+  Just a simple stub function to demo function calling
+*}
 
 function TfrmTestApiWindow.GetWeather(const state: string; const location: string): string;
 begin

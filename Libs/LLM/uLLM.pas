@@ -23,6 +23,29 @@ type
   end;
 
 {$M+}
+  TFunctionMessage = class(TChatMessage)
+  private
+    FId : string;
+  public
+    function_name: string;
+    constructor Create;
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  published
+    property Id : string read FId write FId;
+  end;
+
+  TFunctionCallMessage = class(TChatMessage)
+  private
+    FJSON : TJSONObject;
+  public
+    constructor Create(function_call_json: TJSONArray);
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  end;
+{$M-}
+
+{$M+}
   TChatVisionMessage = class(TChatMessage)
   private
     FImageURLs : TObjectList<TChatAttachment>;
@@ -336,6 +359,53 @@ begin
   end;
 
   Result := msg;
+end;
+
+{ TFunctionMessage }
+
+function TFunctionMessage.AsJSON: TJSONObject;
+var
+  LJSONMsg : TJSONObject;
+begin
+  LJSONMsg := TJSONObject.Create;
+  LJSONMsg.AddPair('role', 'tool');
+  LJSONMsg.AddPair('tool_call_id', FId);
+  LJSONMsg.AddPair('name', function_name);
+  LJSONMsg.AddPair('content', Content);
+
+  Result := LJSONMsg;
+end;
+
+constructor TFunctionMessage.Create;
+begin
+
+end;
+
+destructor TFunctionMessage.Destroy;
+begin
+
+  inherited;
+end;
+
+{ TFunctionCallMessage }
+
+function TFunctionCallMessage.AsJSON: TJSONObject;
+begin
+  Result := FJSON;
+end;
+
+constructor TFunctionCallMessage.Create(function_call_json: TJSONArray);
+var
+  content : TJSONObject;
+begin
+  FJSON := TJSONObject.Create;
+  FJSON.AddPair('tool_calls', function_call_json.Clone as TJSONArray);
+  FJSON.AddPair('role', 'assistant');
+end;
+
+destructor TFunctionCallMessage.Destroy;
+begin
+  inherited;
 end;
 
 end.

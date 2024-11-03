@@ -19,11 +19,12 @@ type
     Description: string;
     Parameters: TJSONObject;
     constructor Create(const AName, ADescription: string; const AParameters: TJSONObject);
+    destructor Destroy; override;
   end;
 
   TFunctionRegistry = class
   private
-    FMethods: TDictionary<string, TFunctionDescription>;
+    FMethods: TObjectDictionary<string, TFunctionDescription>;
     procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
@@ -52,7 +53,7 @@ end;
 
 constructor TFunctionRegistry.Create;
 begin
-  FMethods := TDictionary<string, TFunctionDescription>.Create;
+  FMethods := TObjectDictionary<string, TFunctionDescription>.Create([doOwnsValues]);
 end;
 
 destructor TFunctionRegistry.Destroy;
@@ -144,6 +145,7 @@ begin
   Params.AddPair('type', 'object');
   Params.AddPair('properties', Properties);
   Params.AddPair('required', RequiredArray);
+  Params.AddPair('additionalProperties', TJSONBool.Create(false));
   Result := Params;
 end;
 
@@ -246,27 +248,50 @@ function TFunctionRegistry.GetAvailableFunctionsJSON: TJSONArray;
 var
   ToolsArray: TJSONArray;
   FuncDesc: TFunctionDescription;
-  FunctionJSON: TJSONObject;
-  ToolObject: TJSONObject;
-  functionArray : TArray<string>;
+  FunctionJSON, ToolObject: TJSONObject;
+  functionArray: TArray<string>;
   functionName: string;
 begin
   ToolsArray := TJSONArray.Create;
   functionArray := FMethods.Keys.ToArray;
+
   for functionName in functionArray do
   begin
-    FuncDesc := FMethods[functionName];
-    ToolObject := TJSONObject.Create;
-    ToolObject.AddPair('name', FuncDesc.Name);
-    ToolObject.AddPair('description', FuncDesc.Description);
-    ToolObject.AddPair('parameters', FuncDesc.Parameters);
-    FunctionJSON := TJSONObject.Create;
-    FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
-    FunctionJSON.AddPair('function', ToolObject);
+    if FMethods.TryGetValue(functionName, FuncDesc) then
+    begin
+      ToolObject := TJSONObject.Create;
+      try
+        ToolObject.AddPair('name', FuncDesc.Name);
+        ToolObject.AddPair('description', FuncDesc.Description);
+        ToolObject.AddPair('strict', TJSONBool.Create(True));
+        ToolObject.AddPair('parameters', FuncDesc.Parameters.Clone as TJSONObject);
 
-    ToolsArray.AddElement(FunctionJSON);
+        FunctionJSON := TJSONObject.Create;
+        try
+          FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
+          FunctionJSON.AddPair('function', ToolObject);
+
+          ToolsArray.AddElement(FunctionJSON);
+        except
+          FunctionJSON.Free;
+          raise;
+        end;
+      except
+        ToolObject.Free;
+        raise;
+      end;
+    end;
   end;
+
   Result := ToolsArray;
+end;
+
+
+
+destructor TFunctionDescription.Destroy;
+begin
+  FreeAndNil(Parameters);
+  inherited;
 end;
 
 end.
