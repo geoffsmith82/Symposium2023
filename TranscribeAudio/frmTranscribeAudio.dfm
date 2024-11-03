@@ -145,5 +145,12 @@ object VoiceRecognitionForm: TVoiceRecognitionForm
         OnClick = GoogleAuthenticate1Click
       end
     end
+    object Settings1: TMenuItem
+      Caption = 'Settings'
+      object miAPIKeys: TMenuItem
+        Caption = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
   end
 end

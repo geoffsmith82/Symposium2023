@@ -42,6 +42,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnLatestForcastClick(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
   private
     { Private declarations }
     FElevenLabsVoiceService : TElevenLabsService;
@@ -86,6 +87,11 @@ begin
   finally
     FreeAndNil(frmApiKeyStores)
   end;
+end;
+
+procedure TfrmWeatherWindow.miExitClick(Sender: TObject);
+begin
+  Application.Terminate;
 end;
 
 procedure TfrmWeatherWindow.FormCreate(Sender: TObject);

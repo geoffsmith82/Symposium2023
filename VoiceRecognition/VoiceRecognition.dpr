@@ -27,7 +27,10 @@ uses
   uAudioRecorder in '..\Libs\SpeechToText\uAudioRecorder.pas',
   uRevAI.SpeechToText in '..\Libs\SpeechToText\uRevAI.SpeechToText.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas',
-  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas';
+  uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
+  ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
 

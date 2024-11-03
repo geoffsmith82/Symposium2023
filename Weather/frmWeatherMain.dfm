@@ -117,6 +117,7 @@ object frmWeatherWindow: TfrmWeatherWindow
       Caption = '&File'
       object miExit: TMenuItem
         Caption = 'Exit'
+        OnClick = miExitClick
       end
     end
     object miSettings: TMenuItem

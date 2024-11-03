@@ -64,6 +64,7 @@ uses
   uBaseSpeechRecognition,
   uEngineManager,
   uAudioRecorder,
+  ApiKeyStore,
   BubbleText
   ;
 
@@ -140,6 +141,7 @@ type
     FAudio : TAudioRecorder;
     FStatus : TRecognitionStatus;
     FOpenAI : TOpenAI;
+    FApiKeyStore : TApiKeyStore;
 
     procedure LoadAudioInputsMenu;
 
@@ -352,11 +354,10 @@ var
   lSpeechEngine: string;
 begin
   FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, ms_cognative_service_resource_key, 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, ElevenLabsAPIKey), miElevenLabsSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, AWSRegion), miAmazonSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
   FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, google_clientid, google_clientsecret, 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, chatgpt_apikey), miOpenAiTextToSpeech);
+  FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey')), miOpenAiTextToSpeech);
 
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedTextToSpeechEngine', 'TWindowsSpeechService');
@@ -371,19 +372,19 @@ var
   lDeepGram : TDeepGramRecognition;
   lRevAi : TRevAiRecognition;
 begin
-  lRevAi := TRevAiRecognition.Create(revai_key);
+  lRevAi := TRevAiRecognition.Create(FApiKeyStore.LoadApiKey('revai_key'));
   lRevAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lRevAi.OnConnect := OnHandleConnect;
   lRevAi.OnDisconnect := OnHandleDisconnect;  
   FSpeechRecognitionEngines.RegisterEngine(lRevAi, miRevAI);
 
-  lAssemblyAi := TAssemblyAiRecognition.Create(assemblyai_key);
+  lAssemblyAi := TAssemblyAiRecognition.Create(FApiKeyStore.LoadApiKey('assemblyai_key'));
   lAssemblyAi.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lAssemblyAi.OnConnect := OnHandleConnect;
   lAssemblyAi.OnDisconnect := OnHandleDisconnect;
   FSpeechRecognitionEngines.RegisterEngine(lAssemblyAi, miAssemblyAI);
 
-  lDeepGram := TDeepGramRecognition.Create(deepgram_key);
+  lDeepGram := TDeepGramRecognition.Create(FApiKeyStore.LoadApiKey('deepgram_key'));
   lDeepGram.OnHandleSpeechRecognitionCompletion := OnHandleSpeechRecognitionCompletion;
   lDeepGram.OnConnect := OnHandleConnect;
   lDeepGram.OnDisconnect := OnHandleDisconnect;
@@ -404,9 +405,10 @@ procedure TfrmVoiceRecognition.FormCreate(Sender: TObject);
 begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  FApiKeyStore := TApiKeyStore.GetInstance;
   FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
   FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
-  FOpenAI := TOpenAI.Create(chatgpt_apikey);
+  FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   FAudio := TAudioRecorder.Create;
   FAudio.OnAudioData := OnAudioData;
 
@@ -427,6 +429,7 @@ begin
   FreeAndNil(FTextToSpeechEngines);
   FreeAndNil(FSpeechRecognitionEngines);
   FreeAndNil(FOpenAI);
+  FreeAndNil(FApiKeyStore);
 end;
 
 procedure TfrmVoiceRecognition.OnHandleConnect(Connection: TObject);

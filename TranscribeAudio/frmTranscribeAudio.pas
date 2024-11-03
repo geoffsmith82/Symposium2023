@@ -53,6 +53,8 @@ type
     miOpenAIWhisperLocal: TMenuItem;
     GoogleAuthenticate1: TMenuItem;
     miGoogleMenu: TMenuItem;
+    Settings1: TMenuItem;
+    miAPIKeys: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure btnBrowseClick(Sender: TObject);
     procedure btnRecognizeSpeechClick(Sender: TObject);
@@ -64,6 +66,7 @@ type
     procedure HandleMicrosoftEngineSelected(Sender: TObject);
     procedure HandleWhisperOnlineEngineSelected(Sender: TObject);
     procedure HandleAmazonEngineSelected(Sender: TObject);
+    procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
     FSpeechToTextEngines : TEngineManager<TBaseSpeechToText>;
@@ -79,6 +82,9 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  frmApiKeyStore;
 
 {$I ..\Libs\apikey.inc}
 
@@ -173,6 +179,18 @@ begin
   end;
 end;
 
+
+procedure TVoiceRecognitionForm.miAPIKeysClick(Sender: TObject);
+var
+  frmApiKeyStores : TfrmApiKeyStores;
+begin
+  frmApiKeyStores := TfrmApiKeyStores.Create(nil);
+  try
+    frmApiKeyStores.ShowModal;
+  finally
+    FreeAndNil(frmApiKeyStores)
+  end;
+end;
 
 procedure TVoiceRecognitionForm.miEngineSelectedClick(Sender: TObject);
 begin

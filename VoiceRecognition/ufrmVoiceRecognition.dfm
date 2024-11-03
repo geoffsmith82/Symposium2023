@@ -230,6 +230,10 @@ object frmVoiceRecognition: TfrmVoiceRecognition
         RadioItem = True
         OnClick = SelectSpeechEngine
       end
+      object miOpenAiTextToSpeech: TMenuItem
+        Caption = 'OpenAI'
+        OnClick = SelectSpeechEngine
+      end
     end
     object miSpeechRecognitionEngine: TMenuItem
       Caption = 'Speech Recognition Engine'
