@@ -94,9 +94,16 @@ begin
   data := TFile.ReadAllText(FileName);
   JsonData := TJSONObject.ParseJSONValue(data) as TJSONObject;
   try
-    EncryptedData := ProtectData(TEncoding.UTF8.GetBytes(ApiKey));
-    JsonData.RemovePair(Name);
-    JsonData.AddPair(Name, TNetEncoding.Base64String.EncodeBytesToString(EncryptedData));
+    if APIKey.Length > 0 then
+    begin
+      EncryptedData := ProtectData(TEncoding.UTF8.GetBytes(ApiKey));
+      JsonData.RemovePair(Name);
+      JsonData.AddPair(Name, TNetEncoding.Base64String.EncodeBytesToString(EncryptedData));
+    end
+    else
+    begin
+      JsonData.RemovePair(Name);
+    end;
     TFile.WriteAllText(FileName, JsonData.ToJSON);
   finally
     JsonData.Free;

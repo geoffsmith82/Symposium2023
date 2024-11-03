@@ -21,12 +21,22 @@ type
   TfrmApiKeyStores = class(TForm)
     StringGrid: TStringGrid;
     btnClose: TButton;
+    btnCancel: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure StringGridDrawCell(Sender: TObject; ACol, ARow: LongInt;
+      Rect: TRect; State: TGridDrawState);
+    procedure StringGridSelectCell(Sender: TObject; ACol, ARow: LongInt;
+      var CanSelect: Boolean);
+    procedure StringGridSetEditText(Sender: TObject; ACol, ARow: LongInt;
+      const Value: string);
+    procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
     FApiKeyStore : TApiKeyStore;
+    FModifiedRows: array of Boolean;
+    function MaskAPIKey(const APIKey: string): string;
   public
     { Public declarations }
   end;
@@ -38,6 +48,24 @@ implementation
 
 
 procedure TfrmApiKeyStores.btnCloseClick(Sender: TObject);
+var
+  i: Integer;
+  ApiKeyName, ApiKeyValue: string;
+begin
+  for i := 1 to StringGrid.RowCount - 1 do
+  begin
+    if FModifiedRows[i] then
+    begin
+      ApiKeyName := StringGrid.Cells[0, i];
+      ApiKeyValue := StringGrid.Cells[1, i];
+      FApiKeyStore.SaveApiKey(ApiKeyName, ApiKeyValue);
+    end;
+  end;
+
+  Close;
+end;
+
+procedure TfrmApiKeyStores.btnCancelClick(Sender: TObject);
 begin
   Close;
 end;
@@ -49,8 +77,8 @@ begin
   StringGrid.Cells[0, 0] := 'Name';
   StringGrid.Cells[1, 0] := 'Key';
 
-  StringGrid.ColWidths[0] := StringGrid.Width div 2;
-  StringGrid.ColWidths[1] := StringGrid.Width div 2;
+  StringGrid.ColWidths[0] := 300;
+  StringGrid.ColWidths[1] := StringGrid.Width - StringGrid.ColWidths[0];
 
   StringGrid.Cells[0, 1] := 'chatgpt_apikey';
   StringGrid.Cells[0, 2] := 'X_AI';
@@ -67,12 +95,107 @@ begin
     StringGrid.Cells[1, i] :=  FApiKeyStore.LoadApiKey(StringGrid.Cells[0, i]);
   end;
 
+  // Initialize modified tracking array
+  SetLength(FModifiedRows, StringGrid.RowCount);
+  for i := 0 to High(FModifiedRows) do
+    FModifiedRows[i] := False;
 
 end;
 
 procedure TfrmApiKeyStores.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FApiKeyStore);
+end;
+
+function TfrmApiKeyStores.MaskAPIKey(const APIKey: string): string;
+var
+  MaskedText: string;
+  SpecialCharPos, VisibleEndChars: Integer;
+begin
+  MaskedText := '';
+  VisibleEndChars := 2; // Number of characters to show at the end
+
+  // Check if the length of the API key is more than 15 characters
+  if Length(APIKey) > 15 then
+  begin
+    // Look for '-' or '_' in the first 6 characters
+    SpecialCharPos := Pos('-', Copy(APIKey, 1, 6));
+    if SpecialCharPos = 0 then
+      SpecialCharPos := Pos('_', Copy(APIKey, 1, 6));
+
+    // If a special character is found within the first 6 characters
+    if SpecialCharPos > 0 then
+    begin
+      // Make sure 15 characters remain masked in the middle
+      if (Length(APIKey) - SpecialCharPos - VisibleEndChars) >= 15 then
+        MaskedText := Copy(APIKey, 1, SpecialCharPos) +
+                      StringOfChar('*', Length(APIKey) - SpecialCharPos - VisibleEndChars) +
+                      Copy(APIKey, Length(APIKey) - VisibleEndChars + 1, VisibleEndChars)
+      else
+        // If not enough characters to mask, fall back to masking everything but start and end
+        MaskedText := APIKey[1] + StringOfChar('*', Length(APIKey) - 2) + APIKey[Length(APIKey)];
+    end
+    else
+    begin
+      // Default masking without special character: show first and last characters only
+      MaskedText := APIKey[1] +
+                    StringOfChar('*', Length(APIKey) - 2 - VisibleEndChars) +
+                    Copy(APIKey, Length(APIKey) - VisibleEndChars + 1, VisibleEndChars);
+    end;
+  end
+  else
+    // For shorter API keys, mask the entire key
+    MaskedText := StringOfChar('*', Length(APIKey));
+
+  Result := MaskedText;
+end;
+
+
+
+procedure TfrmApiKeyStores.StringGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  CellText, DisplayText: string;
+begin
+  CellText := StringGrid.Cells[ACol, ARow];
+
+  // Check if we are in the APIKey column and not editing
+  if (ACol = 1) and (not StringGrid.EditorMode) then
+  begin
+    // Use MaskAPIKey function to get the masked version of the API key
+    DisplayText := MaskAPIKey(CellText);
+
+    // Draw the masked text
+    StringGrid.Canvas.FillRect(Rect);
+    StringGrid.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, DisplayText);
+  end
+  else
+  begin
+    // Draw cell text normally for non-APIKey cells or when editing
+//    StringGrid.Canvas.FillRect(Rect);
+//    StringGrid.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, CellText);
+  end;
+end;
+
+
+procedure TfrmApiKeyStores.StringGridSelectCell(Sender: TObject; ACol,
+  ARow: LongInt; var CanSelect: Boolean);
+begin
+  // Enable editing mode for the APIKey column when selected
+  if ACol = 1 then
+    StringGrid.EditorMode := True;
+end;
+
+procedure TfrmApiKeyStores.StringGridSetEditText(Sender: TObject; ACol,
+  ARow: LongInt; const Value: string);
+begin
+  if ACol = 1 then
+  begin
+    // Allow direct editing of the APIKey
+    StringGrid.Cells[ACol, ARow] := Value;
+
+    // Mark row as modified
+    FModifiedRows[ARow] := True;
+  end;
 end;
 
 end.
