@@ -43,7 +43,6 @@ var
   LRESTResponse: TRESTResponse;
   LJSONResponse: TJSONObject;
   FunctionReturnValue: string;
-  LInitialMsgCount : Integer;
 begin
   Result := Default(TChatResponse);
   Result.Content := '';
@@ -55,7 +54,6 @@ begin
 
   try
     BuildJSONRequestBody(LRESTRequest, ChatConfig, AMessages);
-    LInitialMsgCount := AMessages.Count;
     LRESTRequest.Execute;
 
     if LRESTResponse.StatusCode = 200 then

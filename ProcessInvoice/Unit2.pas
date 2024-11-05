@@ -41,7 +41,7 @@ type
   private
     { Private declarations }
     FAssistant : TOpenAIAssistant;
-    FThreadID : string;
+    FThread : TOpenAIThread;
     FIniFile : TIniFile;
     FApiKeyStore : TApiKeyStore;
     function ExtractInvoiceInfo(const PDFFileName: string): string;
@@ -97,7 +97,8 @@ end;
 
 function TForm2.ExtractInvoiceInfo(const PDFFileName: string): string;
 var
-  FileID, RunID, Status: string;
+  FileID, Status: string;
+  JobRun : TOpenAIRun;
   Messages: TJSONArray;
   I: Integer;
   ContentArr : TJSONArray;
@@ -111,21 +112,21 @@ begin
   end;
 
 
-  FileID := FAssistant.UploadFile(PDFFileName);
-  FThreadID := FAssistant.CreateThread;
+  FileID := FAssistant.Files.UploadFile(PDFFileName);
+  FThread := FAssistant.Threads.CreateThread;
 
   msg := TFile.ReadAllText(DataFilename('invoiceRead.txt'));
 
 
-  FAssistant.AddMessage(msg, FileID);
-  RunID := FAssistant.CreateRun;
+  FThread.AddMessage(msg, FileID);
+  JobRun := FThread.Runs.CreateRun;
   repeat
     Sleep(1000);  // Wait for 1 second before checking status again
-    Status := FAssistant.GetRunStatus(RunID);
+    Status := JobRun.GetRunStatus;
   until (Status = 'completed') or (Status = 'failed');
   if Status = 'completed' then
   begin
-    Messages := FAssistant.GetThreadMessages;
+    Messages := FThread.GetThreadMessages;
     for I := 0 to Messages.Count - 1 do
     begin
       if Messages.Items[I].GetValue<string>('role') = 'assistant' then

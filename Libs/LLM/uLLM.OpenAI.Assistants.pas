@@ -14,7 +14,77 @@ uses
   System.IOUtils;
 
 type
-  TOpenAIAssistant = class
+{$M+}
+  TOpenAIRun = class
+  private
+    FAPIKey: string;
+    FAssistantID: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    FThreadID : string;
+    FRunID: string;
+    procedure ResetRequestToDefault;
+  public
+
+    function GetRunStatus: string;
+
+    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string; inRunId: string);
+    destructor Destroy; override;
+  end;
+
+  TOpenAIRunList = class(TObjectList<TOpenAIRun>)
+  private
+    FAPIKey: string;
+    FAssistantID: string;
+    FThreadID: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    procedure ResetRequestToDefault;
+  public
+    function CreateRun: TOpenAIRun;
+    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string);
+    destructor Destroy; override;
+  end;
+
+  TOpenAIThread = class
+  private
+    FAPIKey: string;
+    FAssistantID: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    FThreadID : string;
+    FRuns: TOpenAIRunList;
+    procedure ResetRequestToDefault;
+  public
+
+    function AddMessage(const Content: string; const FileID: string): Boolean;
+
+    function GetThreadMessages: TJSONArray;
+
+    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string);
+    destructor Destroy; override;
+  published
+    property ThreadID: string read FThreadID;
+    property Runs: TOpenAIRunList read FRuns;
+  end;
+
+  TOpenAIThreadList = class(TObjectList<TOpenAIThread>)
+  private
+    FAPIKey: string;
+    FAssistantID: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    procedure ResetRequestToDefault;
+  public
+    function CreateThread: TOpenAIThread;
+    constructor Create(const APIKey: string; const inAssistantID: string);
+  end;
+
+  TOpenAIFiles = class
   private
     FAPIKey: string;
     FRESTClient: TRESTClient;
@@ -22,19 +92,33 @@ type
     FRESTResponse: TRESTResponse;
     procedure ResetRequestToDefault;
   public
+    function UploadFile(const FileName: string): string;
+    constructor Create(const APIKey: string);
+    destructor Destroy; override;
+  end;
+
+  TOpenAIAssistant = class
+  private
+    FAPIKey: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    FFiles : TOpenAIFiles;
+    FThreads: TOpenAIThreadList;
+    procedure ResetRequestToDefault;
+    function GetThreads: TOpenAIThreadList;
+  public
     FAssistantID: string;
-    FThreadID: string;
     constructor Create(const APIKey: string);
     destructor Destroy; override;
 
     function CreateAssistant(model: string; name: string; instructions: string): string;
-    function UploadFile(const FileName: string): string;
-    function CreateThread: string;
-    function AddMessage(const Content: string; const FileID: string): Boolean;
-    function CreateRun: string;
-    function GetRunStatus(const RunID: string): string;
-    function GetThreadMessages: TJSONArray;
+
+  published
+    property Files: TOpenAIFiles read FFiles;
+    property Threads: TOpenAIThreadList read GetThreads;
   end;
+{$M-}
 
   function ExtractJsonString(const Input: string): string;
 
@@ -46,6 +130,7 @@ begin
   FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
   FRESTResponse := TRESTResponse.Create(nil);
   FRESTRequest := TRESTRequest.Create(nil);
+  FFiles := TOpenAIFiles.Create(APIKey);
 end;
 
 procedure TOpenAIAssistant.ResetRequestToDefault;
@@ -62,7 +147,17 @@ begin
   FRESTResponse.Free;
   FRESTRequest.Free;
   FRESTClient.Free;
+  FFiles.Free;
+  FThreads.Free;
   inherited;
+end;
+
+function TOpenAIAssistant.GetThreads: TOpenAIThreadList;
+begin
+  if not Assigned(FThreads) then
+    Result := TOpenAIThreadList.Create(FAPIKey, FAssistantID)
+  else
+    Result := FThreads;
 end;
 
 function TOpenAIAssistant.CreateAssistant(model: string; name: string; instructions: string): string;
@@ -77,6 +172,7 @@ begin
     JsonBody.AddPair('model', model);
     JsonBody.AddPair('name', name);
     JsonBody.AddPair('instructions', instructions);
+
     JsonBody.AddPair('tools', TJSONArray.Create(TJSONObject.Create.AddPair('type', 'file_search')));
     OutputDebugString(PChar(JsonBody.ToJSON));
     FRESTRequest.AddBody(JsonBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
@@ -88,7 +184,32 @@ begin
   end;
 end;
 
-function TOpenAIAssistant.UploadFile(const FileName: string): string;
+constructor TOpenAIFiles.Create(const APIKey: string);
+begin
+  FAPIKey := APIKey;
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+destructor TOpenAIFiles.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+procedure TOpenAIFiles.ResetRequestToDefault;
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
+function TOpenAIFiles.UploadFile(const FileName: string): string;
 var
   jsonResponse: TJSONObject;
 begin
@@ -102,17 +223,68 @@ begin
   Result := jsonResponse.GetValue<string>('id');
 end;
 
-function TOpenAIAssistant.CreateThread: string;
+destructor TOpenAIThread.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+procedure TOpenAIThread.ResetRequestToDefault;
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
+procedure TOpenAIThreadList.ResetRequestToDefault;
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
+constructor TOpenAIThread.Create(const APIKey: string; const inAssistantID: string; inThreadId:string);
+begin
+  FAPIKey := APIKey;
+  FAssistantID := inAssistantID;
+  FThreadID := inThreadId;
+  FRuns := TOpenAIRunList.Create(FAPIKey, FAssistantID, FThreadID);
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+constructor TOpenAIThreadList.Create(const APIKey: string; const inAssistantID: string);
+begin
+  inherited Create(True);
+  FAPIKey := APIKey;
+  FAssistantID := inAssistantID;
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+function TOpenAIThreadList.CreateThread: TOpenAIThread;
+var
+  threadID : string;
 begin
   ResetRequestToDefault;
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'threads';
   FRESTRequest.Execute;
-  Result := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
-  FThreadID := Result;
+  threadID := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
+
+  Result := TOpenAIThread.Create(FAPIKey, FAssistantID, threadID);
+  Add(Result);
 end;
 
-function TOpenAIAssistant.AddMessage(const Content: string; const FileID: string): Boolean;
+function TOpenAIThread.AddMessage(const Content: string; const FileID: string): Boolean;
 var
   JsonBody: TJSONObject;
   jsonAttachment : TJSONObject;
@@ -147,9 +319,30 @@ begin
   end;
 end;
 
-function TOpenAIAssistant.CreateRun: string;
+procedure TOpenAIRunList.ResetRequestToDefault;
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
+constructor TOpenAIRunList.Create(const APIKey, inAssistantID: string; inThreadId: string);
+begin
+  inherited Create(True);
+  FApiKey := APIKey;
+  FAssistantID := inAssistantID;
+  FThreadID := inThreadID;
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+function TOpenAIRunList.CreateRun: TOpenAIRun;
 var
   JsonBody: TJSONObject;
+  RunId : string;
 begin
   ResetRequestToDefault;
   FRESTRequest.Method := rmPOST;
@@ -159,22 +352,50 @@ begin
     JsonBody.AddPair('assistant_id', FAssistantID);
     FRESTRequest.AddBody(JsonBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
     FRESTRequest.Execute;
-    Result := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
+    RunId := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
+    Result := TOpenAIRun.Create(FAPIKey, FAssistantID, FThreadID, RunId);
   finally
     JsonBody.Free;
   end;
 end;
 
-function TOpenAIAssistant.GetRunStatus(const RunID: string): string;
+destructor TOpenAIRunList.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+constructor TOpenAIRun.Create(const APIKey, inAssistantID: string; inThreadId: string; inRunId: string);
+begin
+  FAPIKey := APIKey;
+  FAssistantID := inAssistantID;
+  FRunID := inRunId;
+  FThreadID := inThreadId;
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+destructor TOpenAIRun.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+function TOpenAIRun.GetRunStatus: string;
 begin
   ResetRequestToDefault;
   FRESTRequest.Method := rmGET;
-  FRESTRequest.Resource := 'threads/' + FThreadID + '/runs/' + RunID;
+  FRESTRequest.Resource := 'threads/' + FThreadID + '/runs/' + FRunID;
   FRESTRequest.Execute;
   Result := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('status');
 end;
 
-function TOpenAIAssistant.GetThreadMessages: TJSONArray;
+function TOpenAIThread.GetThreadMessages: TJSONArray;
 begin
   ResetRequestToDefault;
   FRESTRequest.Method := rmGET;
@@ -217,5 +438,14 @@ end;
 
 
 
+
+procedure TOpenAIRun.ResetRequestToDefault;
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
 
 end.
