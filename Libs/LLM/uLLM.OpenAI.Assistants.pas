@@ -104,18 +104,52 @@ type
      Total : Integer;
   end;
 
+  TOpenAIVectorFile = class
+  private
+    FId: string;
+    FCreatedAt: Int64;
+    FVectorStoreId: string;
+    FStatus: string;
+  public
+    property Id: string read FId write FId;
+    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property VectorStoreId: string read FVectorStoreId write FVectorStoreId;
+    property Status: string read FStatus write FStatus;
+  end;
+
+  TOpenAIVectorFileList = class(TObjectList<TOpenAIVectorFile>)
+  private
+    FAPIKey: string;
+    FStoreId: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    function GetFiles(const StoreId: string): Boolean;
+  public
+    procedure AddFileToStore(const FileId: string);
+    constructor Create(const APIKey: string; const StoreId: string);
+    destructor Destroy; override;
+  end;
+
   TOpenAIVectorStore = class
   private
+    FAPIKey: string;
     FId: string;
     FName: string;
     FDescription: string;
     CreatedAt: Int64;
     Bytes: Int64;
     FileCounts: TOpenAIFileCounts;
+    FFileList: TOpenAIVectorFileList;
+    function GetFileList: TOpenAIVectorFileList;
   public
     property Id: string read FId write FId;
     property Name: string read FName write FName;
     property Description: string read FDescription write FDescription;
+    property FileList: TOpenAIVectorFileList read GetFileList;
+
+    constructor Create(APIKey: string);
+    destructor Destroy; override;
   end;
 
 
@@ -125,11 +159,11 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    function CreateVectorStore(const AName, AExpiresAfter: Integer; const AMetadata: TJSONObject = nil): TOpenAIVectorStore;
   public
     constructor Create(const APIKey: string);
     destructor Destroy; override;
     procedure LoadStores;
+    function CreateVectorStore(const AName, AExpiresAfter: Integer; const AMetadata: TJSONObject = nil): TOpenAIVectorStore;
   end;
 
 
@@ -474,6 +508,7 @@ var
   Store: TOpenAIVectorStore;
   expires_after : TJSONObject;
 begin
+  Result := nil;
   // Initialize REST request
   ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
@@ -505,12 +540,13 @@ begin
       begin
         try
           // Create and populate TOpenAIVectorStore instance
-          Store := TOpenAIVectorStore.Create;
+          Store := TOpenAIVectorStore.Create(FAPIKey);
           Store.Id := ResponseObject.GetValue<string>('id');
           Store.Name := ResponseObject.GetValue<string>('name');
           Store.Description := ResponseObject.GetValue<string>('description');
           Store.CreatedAt := ResponseObject.GetValue<Int64>('created_at');
           Result := Store; // Return the created store
+          Add(Store);
         finally
           ResponseObject.Free;
         end;
@@ -566,7 +602,7 @@ begin
             for I := 0 to JSONArray.Count - 1 do
             begin
               // Parse each vector store object
-              Store := TOpenAIVectorStore.Create;
+              Store := TOpenAIVectorStore.Create(FAPIKey);
               try
                 JSONObject := JSONArray.Items[I] as TJSONObject;
                 Store.Id := JSONObject.GetValue<string>('id');
@@ -617,5 +653,147 @@ begin
     end;
   end;
 end;
+
+{ TOpenAIVectorStore }
+
+constructor TOpenAIVectorStore.Create(APIKey: string);
+begin
+  inherited Create;
+  FAPIKey := APIKey;
+end;
+
+destructor TOpenAIVectorStore.Destroy;
+begin
+  FreeAndNil(FFileList);
+  inherited;
+end;
+
+function TOpenAIVectorStore.GetFileList: TOpenAIVectorFileList;
+begin
+  if not Assigned(FFileList) then
+  begin
+    FFileList := TOpenAIVectorFileList.Create(FAPIKey, FId);
+    FFileList.GetFiles(FId);
+  end;
+  Result := FFileList;
+end;
+
+{ TOpenAIVectorFileList }
+
+procedure TOpenAIVectorFileList.AddFileToStore(const FileId: string);
+var
+  JSONObject, ResponseObject: TJSONObject;
+  NewFile: TOpenAIVectorFile;
+begin
+  // Initialize the REST components and reset request
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
+
+  FRESTRequest.Resource := Format('vector_stores/%s/files', [FStoreId]);
+  FRESTRequest.Method := rmPOST;
+
+  // Build JSON object for the request body
+  JSONObject := TJSONObject.Create;
+  try
+    JSONObject.AddPair('file_id', FileId);
+    FRESTRequest.Body.Add(JSONObject.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+
+    // Execute the request
+    FRESTRequest.Execute;
+
+    // Check for successful response
+    if FRESTResponse.StatusCode = 200 then
+    begin
+      ResponseObject := TJSONObject.ParseJSONValue(FRESTResponse.Content) as TJSONObject;
+      if Assigned(ResponseObject) then
+      begin
+        try
+          // Create and populate TOpenAIVectorFile instance for the new file
+          NewFile := TOpenAIVectorFile.Create;
+          NewFile.Id := ResponseObject.GetValue<string>('id');
+          NewFile.CreatedAt := ResponseObject.GetValue<Int64>('created_at');
+          NewFile.VectorStoreId := ResponseObject.GetValue<string>('vector_store_id');
+          NewFile.Status := ResponseObject.GetValue<string>('status');
+
+          Add(NewFile); // Add to the list
+        finally
+          ResponseObject.Free;
+        end;
+      end;
+    end
+    else
+      raise Exception.CreateFmt('Failed to add file to vector store. Status Code: %d', [FRESTResponse.StatusCode]);
+
+  finally
+    JSONObject.Free;
+  end;
+end;
+
+
+constructor TOpenAIVectorFileList.Create(const APIKey: string; const StoreId: string);
+begin
+  inherited Create(True);
+  FAPIKey := APIKey;
+  FStoreId := StoreId;
+end;
+
+destructor TOpenAIVectorFileList.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+function TOpenAIVectorFileList.GetFiles(const StoreId: string): Boolean;
+var
+  JSONArray: TJSONArray;
+  JSONObject: TJSONObject;
+  FileItem: TOpenAIVectorFile;
+  I: Integer;
+begin
+  Result := False;
+  Clear; // Clear existing items in case we're re-fetching
+
+  // Initialize the REST components and reset request
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
+
+  // Setup REST request
+  FRESTRequest.Resource := Format('vector_stores/%s/files', [StoreId]);
+  FRESTRequest.Method := rmGET;
+
+  // Execute the request
+  FRESTRequest.Execute;
+
+  // Check response status
+  if FRESTResponse.StatusCode = 200 then
+  begin
+    JSONArray := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<TJSONArray>('data');
+    if Assigned(JSONArray) then
+    begin
+      try
+        for I := 0 to JSONArray.Count - 1 do
+        begin
+          JSONObject := JSONArray.Items[I] as TJSONObject;
+          FileItem := TOpenAIVectorFile.Create;
+          try
+            FileItem.Id := JSONObject.GetValue<string>('id');
+            FileItem.CreatedAt := JSONObject.GetValue<Int64>('created_at');
+            FileItem.VectorStoreId := JSONObject.GetValue<string>('vector_store_id');
+            Add(FileItem); // Add to the list
+          except
+            FileItem.Free;
+            raise;
+          end;
+        end;
+        Result := True; // Files successfully retrieved
+      finally
+        JSONArray.Free;
+      end;
+    end;
+  end
+  else
+    raise Exception.CreateFmt('Failed to retrieve files. Status Code: %d', [FRESTResponse.StatusCode]);
+end;
+
 
 end.
