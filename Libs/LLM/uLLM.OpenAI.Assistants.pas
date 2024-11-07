@@ -11,9 +11,11 @@ uses
   Windows,
   REST.Client,
   REST.Types,
-  System.IOUtils;
+  System.IOUtils,
+  uLLM;
 
 type
+
 {$M+}
   TOpenAIRun = class
   private
@@ -24,13 +26,14 @@ type
     FRESTResponse: TRESTResponse;
     FThreadID : string;
     FRunID: string;
-    procedure ResetRequestToDefault;
   public
 
     function GetRunStatus: string;
 
     constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string; inRunId: string);
     destructor Destroy; override;
+  published
+    property RunID: string read FRunID;
   end;
 
   TOpenAIRunList = class(TObjectList<TOpenAIRun>)
@@ -41,7 +44,6 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    procedure ResetRequestToDefault;
   public
     function CreateRun: TOpenAIRun;
     constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string);
@@ -57,7 +59,6 @@ type
     FRESTResponse: TRESTResponse;
     FThreadID : string;
     FRuns: TOpenAIRunList;
-    procedure ResetRequestToDefault;
   public
 
     function AddMessage(const Content: string; const FileID: string): Boolean;
@@ -78,7 +79,6 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    procedure ResetRequestToDefault;
   public
     function CreateThread: TOpenAIThread;
     constructor Create(const APIKey: string; const inAssistantID: string);
@@ -90,12 +90,48 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    procedure ResetRequestToDefault;
   public
     function UploadFile(const FileName: string): string;
     constructor Create(const APIKey: string);
     destructor Destroy; override;
   end;
+
+  TOpenAIFileCounts = record
+     InProgress : Integer;
+     Completed : Integer;
+     Failed : Integer;
+     Cancelled : Integer;
+     Total : Integer;
+  end;
+
+  TOpenAIVectorStore = class
+  private
+    FId: string;
+    FName: string;
+    FDescription: string;
+    CreatedAt: Int64;
+    Bytes: Int64;
+    FileCounts: TOpenAIFileCounts;
+  public
+    property Id: string read FId write FId;
+    property Name: string read FName write FName;
+    property Description: string read FDescription write FDescription;
+  end;
+
+
+  TOpenAIVectorStoreList = class(TObjectList<TOpenAIVectorStore>)
+  private
+    FAPIKey: string;
+    FRESTClient: TRESTClient;
+    FRESTRequest: TRESTRequest;
+    FRESTResponse: TRESTResponse;
+    function CreateVectorStore(const AName, AExpiresAfter: Integer; const AMetadata: TJSONObject = nil): TOpenAIVectorStore;
+  public
+    constructor Create(const APIKey: string);
+    destructor Destroy; override;
+    procedure LoadStores;
+  end;
+
 
   TOpenAIAssistant = class
   private
@@ -105,7 +141,8 @@ type
     FRESTResponse: TRESTResponse;
     FFiles : TOpenAIFiles;
     FThreads: TOpenAIThreadList;
-    procedure ResetRequestToDefault;
+    FVectorStores : TOpenAIVectorStoreList;
+    function GetVectorStores: TOpenAIVectorStoreList;
     function GetThreads: TOpenAIThreadList;
   public
     FAssistantID: string;
@@ -116,6 +153,7 @@ type
 
   published
     property Files: TOpenAIFiles read FFiles;
+    property VectorStores: TOpenAIVectorStoreList read GetVectorStores;
     property Threads: TOpenAIThreadList read GetThreads;
   end;
 {$M-}
@@ -124,6 +162,15 @@ type
 
 implementation
 
+procedure ResetRequestToDefault(FRESTRequest : TRestRequest; FRESTClient : TRESTClient; FRESTResponse : TRESTResponse; APIkey: string);
+begin
+  FRESTRequest.ResetToDefaults;
+  FRESTRequest.Client := FRESTClient;
+  FRESTRequest.Response := FRESTResponse;
+  FRESTRequest.AddParameter('Authorization', 'Bearer ' + APIkey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+end;
+
 constructor TOpenAIAssistant.Create(const APIKey: string);
 begin
   FAPIKey := APIKey;
@@ -131,15 +178,6 @@ begin
   FRESTResponse := TRESTResponse.Create(nil);
   FRESTRequest := TRESTRequest.Create(nil);
   FFiles := TOpenAIFiles.Create(APIKey);
-end;
-
-procedure TOpenAIAssistant.ResetRequestToDefault;
-begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 end;
 
 destructor TOpenAIAssistant.Destroy;
@@ -155,16 +193,27 @@ end;
 function TOpenAIAssistant.GetThreads: TOpenAIThreadList;
 begin
   if not Assigned(FThreads) then
-    Result := TOpenAIThreadList.Create(FAPIKey, FAssistantID)
-  else
-    Result := FThreads;
+    FThreads := TOpenAIThreadList.Create(FAPIKey, FAssistantID);
+
+  Result := FThreads;
+end;
+
+function TOpenAIAssistant.GetVectorStores: TOpenAIVectorStoreList;
+begin
+  if not Assigned(FVectorStores) then
+  begin
+    FVectorStores := TOpenAIVectorStoreList.Create(FAPIKey);
+//    FVectorStores.
+    FVectorStores.LoadStores;
+  end;
+  Result := FVectorStores;
 end;
 
 function TOpenAIAssistant.CreateAssistant(model: string; name: string; instructions: string): string;
 var
   JsonBody: TJSONObject;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'assistants';
   JsonBody := TJSONObject.Create;
@@ -200,20 +249,11 @@ begin
   inherited;
 end;
 
-procedure TOpenAIFiles.ResetRequestToDefault;
-begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-end;
-
 function TOpenAIFiles.UploadFile(const FileName: string): string;
 var
   jsonResponse: TJSONObject;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'files';
   FRESTRequest.Params.AddItem('purpose', 'assistants').Kind := pkGETorPOST;
@@ -229,24 +269,6 @@ begin
   FRESTRequest.Free;
   FRESTClient.Free;
   inherited;
-end;
-
-procedure TOpenAIThread.ResetRequestToDefault;
-begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-end;
-
-procedure TOpenAIThreadList.ResetRequestToDefault;
-begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
 end;
 
 constructor TOpenAIThread.Create(const APIKey: string; const inAssistantID: string; inThreadId:string);
@@ -274,7 +296,7 @@ function TOpenAIThreadList.CreateThread: TOpenAIThread;
 var
   threadID : string;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'threads';
   FRESTRequest.Execute;
@@ -291,7 +313,7 @@ var
   jsonTools : TJSONArray;
   jsonTool: TJSONObject;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'threads/' + FThreadID + '/messages';
   JsonBody := TJSONObject.Create;
@@ -319,15 +341,6 @@ begin
   end;
 end;
 
-procedure TOpenAIRunList.ResetRequestToDefault;
-begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-end;
-
 constructor TOpenAIRunList.Create(const APIKey, inAssistantID: string; inThreadId: string);
 begin
   inherited Create(True);
@@ -344,7 +357,7 @@ var
   JsonBody: TJSONObject;
   RunId : string;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmPOST;
   FRESTRequest.Resource := 'threads/' + FThreadID + '/runs';
   JsonBody := TJSONObject.Create;
@@ -388,7 +401,7 @@ end;
 
 function TOpenAIRun.GetRunStatus: string;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmGET;
   FRESTRequest.Resource := 'threads/' + FThreadID + '/runs/' + FRunID;
   FRESTRequest.Execute;
@@ -397,7 +410,7 @@ end;
 
 function TOpenAIThread.GetThreadMessages: TJSONArray;
 begin
-  ResetRequestToDefault;
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
   FRESTRequest.Method := rmGET;
   FRESTRequest.Resource := 'threads/' + FThreadID + '/messages';
   FRESTRequest.Execute;
@@ -436,16 +449,173 @@ begin
   Result := Trim(Copy(Input, StartPos, EndPos - StartPos));
 end;
 
+{ TOpenAIVectorStoreList }
 
-
-
-procedure TOpenAIRun.ResetRequestToDefault;
+constructor TOpenAIVectorStoreList.Create(const APIKey: string);
 begin
-  FRESTRequest.ResetToDefaults;
-  FRESTRequest.Client := FRESTClient;
-  FRESTRequest.Response := FRESTResponse;
-  FRESTRequest.AddParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  FRESTRequest.AddParameter('OpenAI-Beta', 'assistants=v2', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  inherited Create(True);
+  FAPIKey := APIKey;
+  FRESTClient := TRESTClient.Create('https://api.openai.com/v1');
+  FRESTResponse := TRESTResponse.Create(nil);
+  FRESTRequest := TRESTRequest.Create(nil);
+end;
+
+destructor TOpenAIVectorStoreList.Destroy;
+begin
+  FRESTResponse.Free;
+  FRESTRequest.Free;
+  FRESTClient.Free;
+  inherited;
+end;
+
+function TOpenAIVectorStoreList.CreateVectorStore(const AName, AExpiresAfter: Integer; const AMetadata: TJSONObject): TOpenAIVectorStore;
+var
+  JSONObject, ResponseObject: TJSONObject;
+  Store: TOpenAIVectorStore;
+  expires_after : TJSONObject;
+begin
+  // Initialize REST request
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
+  FRESTRequest.Method := rmPOST;
+  FRESTRequest.Resource := 'vector_stores';
+
+  // Build JSON object for the request body
+  JSONObject := TJSONObject.Create;
+  try
+    JSONObject.AddPair('name', AName);
+    expires_after := TJSONObject.Create;
+    expires_after.AddPair('anchor', 'last_active_at');
+    expires_after.AddPair('days', TJSONNumber.Create(AExpiresAfter));
+    JSONObject.AddPair('expires_after', expires_after);
+
+    if Assigned(AMetadata) then
+      JSONObject.AddPair('metadata', AMetadata.Clone as TJSONObject);
+
+    // Add JSON to request
+    FRESTRequest.AddBody(JSONObject.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+
+    // Execute the request
+    FRESTRequest.Execute;
+
+    // Check for successful response
+    if FRESTResponse.StatusCode = 201 then
+    begin
+      ResponseObject := TJSONObject.ParseJSONValue(FRESTResponse.Content) as TJSONObject;
+      if Assigned(ResponseObject) then
+      begin
+        try
+          // Create and populate TOpenAIVectorStore instance
+          Store := TOpenAIVectorStore.Create;
+          Store.Id := ResponseObject.GetValue<string>('id');
+          Store.Name := ResponseObject.GetValue<string>('name');
+          Store.Description := ResponseObject.GetValue<string>('description');
+          Store.CreatedAt := ResponseObject.GetValue<Int64>('created_at');
+          Result := Store; // Return the created store
+        finally
+          ResponseObject.Free;
+        end;
+      end;
+    end
+    else
+      raise Exception.CreateFmt('Failed to create vector store. Status Code: %d', [FRESTResponse.StatusCode]);
+
+  finally
+    JSONObject.Free;
+  end;
+end;
+
+
+procedure TOpenAIVectorStoreList.LoadStores;
+var
+  JSONArray: TJSONArray;
+  JSONObject, FileCountsObject: TJSONObject;
+  Store: TOpenAIVectorStore;
+  I: Integer;
+  HasMore: Boolean;
+  NextPageId: string;
+  v : Integer;
+begin
+  // Initialize the REST components and reset request
+  ResetRequestToDefault(FRESTRequest, FRESTClient, FRESTResponse, FAPIkey);
+
+  NextPageId := '';
+  HasMore := True;
+
+  while HasMore do
+  begin
+    try
+      FRESTRequest.Method := rmGET;
+      FRESTRequest.Resource := 'vector_stores';
+
+      // Add pagination parameters if there's a NextPageId
+      if NextPageId <> '' then
+        FRESTRequest.AddParameter('starting_after', NextPageId, TRESTRequestParameterKind.pkGETorPOST);
+
+      // Execute the request
+      FRESTRequest.Execute;
+
+      // Check if the response status is OK
+      if FRESTResponse.StatusCode = 200 then
+      begin
+        JSONObject := TJSONObject.ParseJSONValue(FRESTResponse.Content) as TJSONObject;
+        try
+          JSONArray := JSONObject.GetValue<TJSONArray>('data');
+
+          if Assigned(JSONArray) then
+          begin
+            for I := 0 to JSONArray.Count - 1 do
+            begin
+              // Parse each vector store object
+              Store := TOpenAIVectorStore.Create;
+              try
+                JSONObject := JSONArray.Items[I] as TJSONObject;
+                Store.Id := JSONObject.GetValue<string>('id');
+                Store.Name := JSONObject.GetValue<string>('name');
+                Store.CreatedAt := JSONObject.GetValue<Int64>('created_at');
+                if JSONObject.TryGetValue<Integer>('bytes', v) then
+                  Store.Bytes := v;
+
+                // Parse nested file_counts object
+                FileCountsObject := JSONObject.GetValue<TJSONObject>('file_counts');
+                if Assigned(FileCountsObject) then
+                begin
+                  Store.FileCounts.InProgress := FileCountsObject.GetValue<Integer>('in_progress');
+                  Store.FileCounts.Completed := FileCountsObject.GetValue<Integer>('completed');
+                  Store.FileCounts.Failed := FileCountsObject.GetValue<Integer>('failed');
+                  Store.FileCounts.Cancelled := FileCountsObject.GetValue<Integer>('cancelled');
+                  Store.FileCounts.Total := FileCountsObject.GetValue<Integer>('total');
+                end;
+
+                // Add the store to the list
+                Add(Store);
+              except
+                Store.Free;
+                raise;
+              end;
+            end;
+          end;
+
+          // Check if there's more data to load
+          if JSONObject.TryGetValue<Boolean>('has_more', HasMore) then
+          begin
+            if HasMore then
+              NextPageId := JSONObject.GetValue<string>('last_id'); // Set the ID for the next page
+          end
+          else
+            HasMore := False;
+
+        finally
+          JSONObject.Free;
+        end;
+      end
+      else
+        raise Exception.CreateFmt('Failed to load stores. Status Code: %d', [FRESTResponse.StatusCode]);
+
+    except
+      on E: Exception do
+        raise Exception.CreateFmt('Error loading vector stores: %s', [E.Message]);
+    end;
+  end;
 end;
 
 end.
