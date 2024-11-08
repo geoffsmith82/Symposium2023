@@ -40,31 +40,37 @@ begin
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Alloy';
   voice.VoiceId := 'alloy';
+  voice.VoiceGender := 'female';
   FVoicesInfo.Add(voice);
 
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Echo';
   voice.VoiceId := 'echo';
+  voice.VoiceGender := 'male';
   FVoicesInfo.Add(voice);
 
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Fable';
   voice.VoiceId := 'fable';
+  voice.VoiceGender := 'male';
   FVoicesInfo.Add(voice);
 
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Onyx';
   voice.VoiceId := 'onyx';
+  voice.VoiceGender := 'male';
   FVoicesInfo.Add(voice);
 
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Nova';
   voice.VoiceId := 'nova';
+  voice.VoiceGender := 'female';
   FVoicesInfo.Add(voice);
 
   voice := TVoiceInfo.Create;
   voice.VoiceName := 'Shimmer';
   voice.VoiceId := 'shimmer';
+  voice.VoiceGender := 'female';
   FVoicesInfo.Add(voice);
 
   Result := FVoicesInfo;
