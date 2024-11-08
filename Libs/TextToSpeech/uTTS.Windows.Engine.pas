@@ -25,7 +25,7 @@ type
     FSpFileStream: ISpeechFileStream;
   public
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    constructor Create(AOwner: TComponent);
+    constructor Create;
     destructor Destroy; override;
   end;
 
@@ -33,9 +33,9 @@ implementation
 
 { TWindowsSpeechService }
 
-constructor TWindowsSpeechService.Create(AOwner: TComponent);
+constructor TWindowsSpeechService.Create;
 begin
-  inherited Create(AOwner as TWinControl, '', '');
+  inherited Create('', '');
 end;
 
 destructor TWindowsSpeechService.Destroy;

@@ -35,7 +35,7 @@ type
     function GetVoices: TObjectList<TVoiceInfo>; override;
     function GetVoiceList: TGoogleVoicesListClass;
   public
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+    constructor Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
     procedure Authenticate;
@@ -55,9 +55,9 @@ begin
   ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
 end;
 
-constructor TGoogleSpeechService.Create(Sender: TWinControl; const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
+constructor TGoogleSpeechService.Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
 begin
-  inherited Create(Sender, AResourceKey, AHost);
+  inherited Create(AResourceKey, AHost);
   FSecretKey := ASecretKey;
   FOAuth2 := TEnhancedOAuth2Authenticator.Create(nil);
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';

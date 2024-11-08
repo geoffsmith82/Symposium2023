@@ -31,16 +31,16 @@ type
   protected
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
-    constructor Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string);
+    constructor Create(const AccountName:string; const AccountKey: string; const Region: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
   end;
 
 implementation
 
-constructor TAmazonPollyService.Create(Sender: TWinControl; const AccountName:string; const AccountKey: string; const Region: string);
+constructor TAmazonPollyService.Create(const AccountName:string; const AccountKey: string; const Region: string);
 begin
-  inherited Create(Sender, '', '');
+  inherited Create('', '');
   FAccessKey := AccountName;
   FSecretKey := AccountKey;
 

@@ -9,9 +9,6 @@ uses
   System.Threading,
   System.Generics.Collections,
   System.Win.ComObj,
-  Vcl.Dialogs,
-  Vcl.Forms,
-  Vcl.Controls,
   Winapi.ActiveX,
   Winapi.Windows,
   DirectShow9
@@ -39,7 +36,7 @@ type
     FHost: string;
   public
     OnFinishedPlaying:  TNotifyEvent;
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
+    constructor Create(const AResourceKey: string; const AHost: string);
     destructor Destroy; override;
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; virtual; abstract;
     procedure PlayText(const text:string; const VoiceName: string = '');
@@ -116,7 +113,7 @@ begin
              end).Start;
 end;
 
-constructor TBaseTextToSpeech.Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
+constructor TBaseTextToSpeech.Create(const AResourceKey: string; const AHost: string);
 begin
   FResourceKey := AResourceKey;
   FHost := AHost;

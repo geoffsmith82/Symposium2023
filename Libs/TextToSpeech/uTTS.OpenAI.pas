@@ -20,16 +20,16 @@ type
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
-    constructor Create(Sender: TWinControl; const AResourceKey: string);
+    constructor Create(const AResourceKey: string);
   end;
 
 implementation
 
 { TOpenAITextToSpeech }
 
-constructor TOpenAITextToSpeech.Create(Sender: TWinControl; const AResourceKey: string);
+constructor TOpenAITextToSpeech.Create(const AResourceKey: string);
 begin
-  inherited Create(Sender, AResourceKey, '');
+  inherited Create(AResourceKey, '');
 end;
 
 function TOpenAITextToSpeech.GetVoices: TObjectList<TVoiceInfo>;

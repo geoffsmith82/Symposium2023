@@ -18,7 +18,7 @@ type
   protected
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
-    constructor Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
+    constructor Create(const AResourceKey: string; const AHost: string);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
   end;
 
@@ -26,9 +26,9 @@ implementation
 
 { TCoquiTTSService }
 
-constructor TCoquiTTSService.Create(Sender: TWinControl; const AResourceKey: string; const AHost: string);
+constructor TCoquiTTSService.Create(const AResourceKey: string; const AHost: string);
 begin
-  inherited Create(Sender, AResourceKey, AHost);
+  inherited Create(AResourceKey, AHost);
 end;
 
 function TCoquiTTSService.GetVoices: TObjectList<TVoiceInfo>;

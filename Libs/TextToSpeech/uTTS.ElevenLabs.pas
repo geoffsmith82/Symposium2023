@@ -18,16 +18,17 @@ type
   protected
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
-    constructor Create(Sender: TWinControl; const AResourceKey: string);
+    constructor Create(const AResourceKey: string);
+    destructor Destroy; override;
     procedure SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
     function TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream; override;
   end;
 
 implementation
 
-constructor TElevenLabsService.Create(Sender: TWinControl; const AResourceKey: string);
+constructor TElevenLabsService.Create(const AResourceKey: string);
 begin
-  inherited Create(Sender, AResourceKey, '');
+  inherited Create(AResourceKey, '');
 end;
 
 function TElevenLabsService.GetVoices: TObjectList<TVoiceInfo>;
