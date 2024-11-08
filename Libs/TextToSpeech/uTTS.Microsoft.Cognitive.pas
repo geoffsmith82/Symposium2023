@@ -95,22 +95,24 @@ var
   LVoice : TVoiceInfo;
   LVoices : TMicrosoftCognitiveVoicesClass;
 begin
-  FVoicesInfo.Clear;
-  LVoices := nil;
-  try
-    LVoices := GetVoiceList;
-    for LMicrosoftVoice in LVoices.Items do
-    begin
-      LVoice := TVoiceInfo.Create;
-      LVoice.VoiceName := LMicrosoftVoice.DisplayName;
-      LVoice.VoiceGender := LMicrosoftVoice.Gender;
-      LVoice.VoiceId := LMicrosoftVoice.Name;
-      FVoicesInfo.Add(LVoice);
+  if FVoicesInfo.Count = 0 then
+  begin
+    LVoices := nil;
+    try
+      LVoices := GetVoiceList;
+      for LMicrosoftVoice in LVoices.Items do
+      begin
+        LVoice := TVoiceInfo.Create;
+        LVoice.VoiceName := LMicrosoftVoice.DisplayName;
+        LVoice.VoiceGender := LMicrosoftVoice.Gender;
+        LVoice.VoiceId := LMicrosoftVoice.ShortName;
+        FVoicesInfo.Add(LVoice);
+      end;
+    finally
+      FreeAndNil(LVoices);
     end;
-  finally
-    FreeAndNil(LVoices);
-    Result := FVoicesInfo;
   end;
+  Result := FVoicesInfo;
 end;
 
 function TMicrosoftCognitiveService.TextToSpeech(text: string; VoiceName: string = ''): TMemoryStream;

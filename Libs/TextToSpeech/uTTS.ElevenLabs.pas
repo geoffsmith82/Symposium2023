@@ -16,6 +16,8 @@ uses
 type
   TElevenLabsService = class(TBaseTextToSpeech)
   protected
+    FVoiceList: TObjectList<TVoiceInfo>;
+    function GetVoiceList: TObjectList<TVoiceInfo>;
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(const AResourceKey: string);
@@ -32,6 +34,19 @@ begin
 end;
 
 function TElevenLabsService.GetVoices: TObjectList<TVoiceInfo>;
+begin
+  if not Assigned(FVoiceList) then
+    FVoiceList := GetVoiceList;
+  Result := FVoiceList;
+end;
+
+destructor TElevenLabsService.Destroy;
+begin
+  FreeAndNil(FVoiceList);
+  inherited;
+end;
+
+function TElevenLabsService.GetVoiceList: TObjectList<TVoiceInfo>;
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
