@@ -52,7 +52,7 @@ uses
 procedure TGoogleSpeechService.Authenticate;
 begin
   FHTTPServer.Active := True;
-  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil,nil,0);
+  ShellExecute(0, 'OPEN', PChar(FOAuth2.AuthorizationRequestURI), nil, nil, 0);
 end;
 
 constructor TGoogleSpeechService.Create(const AResourceKey: string; const ASecretKey: string; const AApplicationName: string; const AHost: string; Settings : TIniFile);
@@ -63,12 +63,14 @@ begin
   FOAuth2.Scope := 'https://www.googleapis.com/auth/cloud-platform';
   FOAuth2.AuthorizationEndpoint := 'https://accounts.google.com/o/oauth2/auth?access_type=offline';
   FOAuth2.AccessTokenEndpoint := 'https://accounts.google.com/o/oauth2/token';
-  FOAuth2.RedirectionEndpoint := 'http://localhost:7777/';
+  FOAuth2.RedirectionEndpoint := 'http://localhost:7779/';
   FOAuth2.ClientID := FResourceKey;
   FOAuth2.ClientSecret := FSecretKey;
   FHTTPServer := TIdHttpServer.Create;
-  FHTTPServer.DefaultPort := 7777;
+  FHTTPServer.DefaultPort := 7779;
+  //FHTTPServer.
   FHTTPServer.OnCommandGet := IdHTTPServer1CommandGet;
+ // FHTTPServer.On
   FSettings := Settings;
   FOAuth2.RefreshToken := FSettings.ReadString('GoogleAuthentication', 'RefreshToken', '');
 end;
@@ -106,18 +108,20 @@ var
   LGoogleVoice : TGoogleVoiceClass;
   LVoice : TVoiceInfo;
 begin
-  FVoicesInfo.Clear;
-  LGoogleVoiceList := GetVoiceList;
-  try
-    for LGoogleVoice in LGoogleVoiceList.voices do
-    begin
-      LVoice := TVoiceInfo.Create;
-      LVoice.VoiceName := LGoogleVoice.name;
-      LVoice.VoiceId := LGoogleVoice.name;
-      FVoicesInfo.Add(LVoice);
+  if FVoicesInfo.count = 0 then
+  begin
+    LGoogleVoiceList := GetVoiceList;
+    try
+      for LGoogleVoice in LGoogleVoiceList.voices do
+      begin
+        LVoice := TVoiceInfo.Create;
+        LVoice.VoiceName := LGoogleVoice.name;
+        LVoice.VoiceId := LGoogleVoice.name;
+        FVoicesInfo.Add(LVoice);
+      end;
+    finally
+      FreeAndNil(LGoogleVoiceList);
     end;
-  finally
-    FreeAndNil(LGoogleVoiceList);
   end;
   Result := FVoicesInfo;
 end;

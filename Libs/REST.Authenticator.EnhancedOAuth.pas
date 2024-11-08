@@ -24,7 +24,6 @@ uses
     System.NetEncoding
   , System.Net.URLClient
   , System.DateUtils
-  , Dialogs
   , REST.Client
   , REST.Consts
   , REST.Types

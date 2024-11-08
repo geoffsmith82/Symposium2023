@@ -118,7 +118,7 @@ begin
   FResourceKey := AResourceKey;
   FHost := AHost;
   FFormatExt := '.mp3';
-  FVoicesInfo := TObjectList<TVoiceInfo>.Create;
+  FVoicesInfo := TObjectList<TVoiceInfo>.Create(True);
 end;
 
 end.

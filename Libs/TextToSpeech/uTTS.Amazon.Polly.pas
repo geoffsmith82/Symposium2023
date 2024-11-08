@@ -63,27 +63,29 @@ var
   i : Integer;
   LVoice : TVoiceInfo;
 begin
-  FVoicesInfo.Clear;
-  LCredentials := TBasicAWSCredentials.Create(FAccessKey, FSecretKey);
-  LConfig := TAmazonPollyConfig.Create;
-  LConfig.RegionEndpoint := FRegion;
+  if FVoicesInfo.Count = 0 then
+  begin
+    LCredentials := TBasicAWSCredentials.Create(FAccessKey, FSecretKey);
+    LConfig := TAmazonPollyConfig.Create;
+    LConfig.RegionEndpoint := FRegion;
 
-  LPolly := TAmazonPollyClient.Create(LCredentials, LConfig);
-  try
-    LRequest := TDescribeVoicesRequest.Create;
-    LResponse := LPolly.DescribeVoices(LRequest);
-    for i  := 0 to LResponse.Voices.Count - 1 do
-    begin
-      LPollyVoice := LResponse.Voices[i];
-      LVoice := TVoiceInfo.Create;
-      LVoice.VoiceName := LPollyVoice.Name;
-      LVoice.VoiceId := LPollyVoice.Id.Value;
-      LVoice.VoiceGender := LPollyVoice.Gender.Value;
-      FVoicesInfo.Add(LVoice);
+    LPolly := TAmazonPollyClient.Create(LCredentials, LConfig);
+    try
+      LRequest := TDescribeVoicesRequest.Create;
+      LResponse := LPolly.DescribeVoices(LRequest);
+      for i  := 0 to LResponse.Voices.Count - 1 do
+      begin
+        LPollyVoice := LResponse.Voices[i];
+        LVoice := TVoiceInfo.Create;
+        LVoice.VoiceName := LPollyVoice.Name;
+        LVoice.VoiceId := LPollyVoice.Id.Value;
+        LVoice.VoiceGender := LPollyVoice.Gender.Value;
+        FVoicesInfo.Add(LVoice);
+      end;
+    finally
+      LResponse := nil;
+      FreeAndNil(LPolly);
     end;
-  finally
-    LResponse := nil;
-    FreeAndNil(LPolly);
   end;
   Result := FVoicesInfo;
 end;

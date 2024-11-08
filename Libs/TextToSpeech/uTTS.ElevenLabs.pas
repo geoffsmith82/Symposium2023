@@ -16,8 +16,7 @@ uses
 type
   TElevenLabsService = class(TBaseTextToSpeech)
   protected
-    FVoiceList: TObjectList<TVoiceInfo>;
-    function GetVoiceList: TObjectList<TVoiceInfo>;
+    function GetVoiceList(VoicesInfo: TObjectList<TVoiceInfo>): Boolean;
     function GetVoices: TObjectList<TVoiceInfo>; override;
   public
     constructor Create(const AResourceKey: string);
@@ -35,18 +34,17 @@ end;
 
 function TElevenLabsService.GetVoices: TObjectList<TVoiceInfo>;
 begin
-  if not Assigned(FVoiceList) then
-    FVoiceList := GetVoiceList;
-  Result := FVoiceList;
+  if FVoicesInfo.Count = 0 then
+    GetVoiceList(FVoicesInfo);
+  Result := FVoicesInfo;
 end;
 
 destructor TElevenLabsService.Destroy;
 begin
-  FreeAndNil(FVoiceList);
   inherited;
 end;
 
-function TElevenLabsService.GetVoiceList: TObjectList<TVoiceInfo>;
+function TElevenLabsService.GetVoiceList(VoicesInfo: TObjectList<TVoiceInfo>): Boolean;
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
@@ -56,7 +54,7 @@ var
   LJSONLabels: TJSONObject;
   LVoice : TVoiceInfo;
 begin
-  FVoicesInfo.Clear;
+ // VoicesInfo.Clear;
 
   LRESTClient := nil;
   LRESTRequest := nil;
@@ -100,7 +98,7 @@ begin
               LVoice.VoiceName := GetValue('name').Value;
 
               LVoice.VoiceId := GetValue('voice_id').Value;
-              FVoicesInfo.Add(LVoice);
+              VoicesInfo.Add(LVoice);
             end;
           end;
         end;
@@ -119,7 +117,7 @@ begin
     LRESTResponse.Free;
   end;
 
-  Result := FVoicesInfo;
+  Result := True
 end;
 
 procedure TElevenLabsService.SendTextToSpeechRequest(const apiKey: string; const voice: string; const text: string; out responseStream: TMemoryStream);
