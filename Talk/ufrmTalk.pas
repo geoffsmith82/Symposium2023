@@ -28,6 +28,7 @@ uses
   uTTS.OpenAI,
   uTTS.ElevenLabs,
   uTTS.Microsoft.Cognitive,
+  uTTS.Amazon.Polly,
   ApiKeyStore.Windows,
   ApiKeyStore,
   System.ImageList
@@ -51,6 +52,7 @@ type
     FOpenAITTS : TOpenAITextToSpeech;
     FElevenLabsTTS : TElevenLabsService;
     FMsTTS : TMicrosoftCognitiveService;
+    FPolly : TAmazonPollyService;
   public
     { Public declarations }
   end;
@@ -137,6 +139,19 @@ begin
       item.TagObject := FMsTTS;
       item.Text := FMsTTS.Voices[i].VoiceName;
       item.Detail := FMsTTS.Voices[i].VoiceId + ' ' + FMsTTS.Voices[i].VoiceGender;
+    end;
+  end;
+
+  if not FKeyStore.LoadApiKey('AWSAccessKey').IsEmpty then
+  begin
+    FPolly := TAmazonPollyService.Create(FKeyStore.LoadApiKey('AWSAccessKey'), FKeyStore.LoadApiKey('AWSSecretKey'), FKeyStore.LoadSetting('AWSRegion'));
+    for i := 0 to FPolly.Voices.Count - 1 do
+    begin
+      item := lvVoices.Items.Add;
+      item.ImageIndex := 4;
+      item.TagObject := FPolly;
+      item.Text := FPolly.Voices[i].VoiceName;
+      item.Detail := FPolly.Voices[i].VoiceId + ' ' + FPolly.Voices[i].VoiceGender;
     end;
   end;
 
