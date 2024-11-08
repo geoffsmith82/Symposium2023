@@ -29,6 +29,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
     - Simple Server app that can be added to a ChatGPT GPT action to allow your computer to write delphi code. See [AI Generated Delphi](https://github.com/geoffsmith82/AIGeneratedDelphi) for some example programs created with ChatGPTAction.
   - [EmbeddingsDemo](./EmbeddingsDemo)
 	- Simple demo showing how Embeddings work
+  - [Talk](./Talk)
+    - Program demonstrating calling various Text to Speech API's and the different voices available
   - [Translate](./Translate)
 	- translates between languages using the various cloud API's.  
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
