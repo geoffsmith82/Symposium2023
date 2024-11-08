@@ -86,6 +86,9 @@ end;
 function TWindowsSpeechService.TextToSpeech(text, VoiceName: string): TMemoryStream;
 var
   LFileName: string;
+  VoiceToken: ISpeechObjectToken;
+  VoiceTokens: ISpeechObjectTokens;
+  I: Integer;
 begin
   FFormatExt := '.wav';
   FSpeech := nil;
@@ -95,6 +98,24 @@ begin
   try
     // Create the voice instance
     FSpeech := CoSpVoice.Create;
+
+    // Get the list of available voices
+    VoiceTokens := FSpeech.GetVoices('', '');
+
+    // Find the voice that matches the provided VoiceName
+    VoiceToken := nil;
+    for I := 0 to VoiceTokens.Count - 1 do
+    begin
+      if SameText(VoiceTokens.Item(I).Id, VoiceName) then
+      begin
+        VoiceToken := VoiceTokens.Item(I);
+        Break;
+      end;
+    end;
+
+    // Set the voice if found
+    if Assigned(VoiceToken) then
+      FSpeech.Voice := VoiceToken;
 
     // Create the file stream for the speech output
     FSpFileStream := CoSpFileStream.Create;
@@ -128,6 +149,7 @@ begin
     TFile.Delete(LFileName);
   end;
 end;
+
 
 
 end.
