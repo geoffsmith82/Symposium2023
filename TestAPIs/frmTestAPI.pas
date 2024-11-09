@@ -79,6 +79,8 @@ type
     procedure TestGoogleVoices;
     procedure TestOpenAIVision;
     procedure TestAnthropicClaudeVision;
+    procedure TestAzureVision;
+
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
     procedure TestGroqVisionLLM;
@@ -202,6 +204,39 @@ begin
     Memo1.Lines.Add('Answer: ' + answer);
   finally
     FreeAndNil(anthropic);
+    FreeAndNil(messages);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestAzureVision;
+var
+  azureOpenAI: TMicrosoftOpenAI;
+  Local_modelObj: TBaseModelInfo;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatVisionMessage;
+  answer: string;
+begin
+  Memo1.Lines.Add('======== Model Anthropic');
+  azureOpenAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint, 'gpt-4o');
+  try
+    for Local_modelObj in azureOpenAI.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+    settings.json_mode := False;
+    settings.model := 'gpt-4o';
+    settings.max_tokens := 1024;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatVisionMessage.Create;
+    msg.Role := 'user';
+    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    msg.Content := 'Describe the following image';
+    messages.Add(msg);
+    answer := azureOpenAI.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer: ' + answer);
+  finally
+    FreeAndNil(azureOpenAI);
     FreeAndNil(messages);
   end;
 end;
