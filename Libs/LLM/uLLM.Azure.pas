@@ -2,14 +2,17 @@ unit uLLM.Azure;
 
 interface
 uses
+  System.Classes,
+  System.JSON,
+  System.SysUtils,
+  windows,
   System.Generics.Collections,
   REST.Client,
   REST.Types,
   REST.Response.Adapter,
-  System.JSON,
   REST.Json,
-  System.SysUtils,
-  uLLM
+  uLLM,
+  uLLM.Functions
   ;
 type
   TCapabilities = class
@@ -44,28 +47,28 @@ type
   TMicrosoftOpenAI = class(TBaseLLM)
   private
     FEndpoint : string;
+    FDeploymentId: string;
     function GetAzureModels: TModelsResponse;
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
+  private
+    FFunctions : TFunctionRegistry;
+    procedure HandleErrorResponse(AResponse: TRESTResponse);
   public
-    constructor Create(const APIKey: string; const Endpoint: string);
+    constructor Create(const APIKey: string; const Endpoint: string; const DeploymentId: string);
+    destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    property Functions: TFunctionRegistry read FFunctions write FFunctions;
   end;
 
 implementation
 { TMicrosoftOpenAI }
 
-constructor TMicrosoftOpenAI.Create(const APIKey: string; const Endpoint: string);
-begin
-  inherited Create(APIKey);
-  FEndpoint := Endpoint;
-end;
 
-function TMicrosoftOpenAI.ChatCompletion(ChatConfig: TChatSettings;
-  AMessages: TObjectList<TChatMessage>): TChatResponse;
+function TMicrosoftOpenAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 const
-  API_Version = '2023-03-15-preview';
+  API_Version = '2024-10-21';
 var
   LRESTClient: TRESTClient;
   LRESTRequest: TRESTRequest;
@@ -91,9 +94,10 @@ begin
     try
       LRESTRequest.Client := LRESTClient;
       LRESTRequest.Response := LRESTResponse;
-      LRESTRequest.Resource := 'openai/deployments/gpt-35-turbo/chat/completions';
+      LRESTRequest.Resource := 'openai/deployments/{deploymentId}/chat/completions';
       LRESTRequest.Method := TRESTRequestMethod.rmPOST;
       LRESTRequest.Params.AddItem('api-version', API_Version, TRESTRequestParameterKind.pkQUERY);
+      LRESTRequest.Params.AddItem('deploymentId', FDeploymentId, TRESTRequestParameterKind.pkURLSEGMENT);
 
       LRESTRequest.AddParameter('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER,[poDoNotEncode]);
       LRESTRequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
@@ -138,7 +142,46 @@ begin
   end;
 end;
 
+procedure TMicrosoftOpenAI.HandleErrorResponse(AResponse: TRESTResponse);
+var
+  LJSONResponse: TJSONObject;
+  LJSONMsg: TJSONObject;
+begin
+  LJSONResponse := TJSONObject.ParseJSONValue(AResponse.Content) as TJSONObject;
+  if Assigned(LJSONResponse) then
+  try
+    if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
+    begin
+      raise Exception.CreateFmt(
+        'Error: %s - %s. Param: %s',
+        [LJSONMsg.GetValue<string>('type'),
+         LJSONMsg.GetValue<string>('message'),
+         LJSONMsg.GetValue<string>('param')])
+    end
+    else
+      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+  finally
+    LJSONResponse.Free;
+  end
+  else
+    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+end;
 
+
+constructor TMicrosoftOpenAI.Create(const APIKey: string; const Endpoint: string; const DeploymentId: string);
+begin
+  inherited Create(APIKey);
+  FEndpoint := Endpoint;
+  FDeploymentId := DeploymentId;
+  FFunctions := TFunctionRegistry.Create;  
+end;
+
+
+destructor TMicrosoftOpenAI.Destroy;
+begin
+  FreeAndNil(FFunctions);
+  inherited;
+end;
 function TMicrosoftOpenAI.Completion(const AQuestion, AModel: string): string;
 begin
   raise Exception.Create('Not Implemented');

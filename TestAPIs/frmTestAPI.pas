@@ -86,6 +86,7 @@ type
     procedure TestGrokLLM;
 
     procedure TestOpenAIFunctionCalling;
+    procedure TestAzureFunctionCalling;
     procedure TestGroqFunctionCalling;
 
     procedure TestAPIKeyStore;
@@ -341,6 +342,60 @@ begin
   end;
 end;
 
+procedure TfrmTestApiWindow.TestAzureFunctionCalling;
+var
+  openAI: TMicrosoftOpenAI;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  openAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'), AzureOpenAIEndpoint);
+  settings := Default(TChatSettings);
+  try
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'gpt-4o';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(openAI);
+  end;
+end;
 
 procedure TfrmTestApiWindow.FormDestroy(Sender: TObject);
 begin
