@@ -30,7 +30,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [EmbeddingsDemo](./EmbeddingsDemo)
 	- Simple demo showing how Embeddings work
   - [Talk](./Talk)
-    - Program demonstrating calling various Text to Speech API's and the different voices available
+    - Program demonstrating calling various Text to Speech API's and the different voices available (FMX)
   - [Translate](./Translate)
 	- translates between languages using the various cloud API's.  
 	- Simplify translating Delphi programs when using Delphi's built-in multi language resource support.
