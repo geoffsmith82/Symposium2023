@@ -1,4 +1,4 @@
-#Talk
+# Talk
 Talk demonstrates calling the different Text to Speech API's available, including:
   - Google
   - OpenAI
@@ -6,4 +6,4 @@ Talk demonstrates calling the different Text to Speech API's available, includin
   - Eleven Labs
   - Windows Builtin SAPI
   
-  ![image](./Talk/TalkDialog.PNG)
+  ![image](./TalkDialog.PNG)
