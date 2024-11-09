@@ -961,16 +961,10 @@ var
   huggingFace: THuggingFaceLLM;
   modelObj: TBaseModelInfo;
   answer: string;
+  messages : TObjectList<TChatMessage>;
+  msg : TChatMessage;
+  config : TChatSettings;
 begin
-  //    imgs := imageGenReplicate.Generate('A bird sitting on a branch in a tree', 1, TDALLESIZE.DALLE1024, 'stable-diffusion');
-  //    try
-  //      for I := 0 to length(imgs.data) - 1 do
-  //      begin
-  //        Memo1.Lines.Add('ImageURL: ' + imgs.data[i].url);
-  //      end;
-  //    finally
-  //      FreeAndNil(imgs);
-  //    end;
   Memo1.Lines.Add('======== Model HuggingFace');
   huggingFace := THuggingFaceLLM.Create(FApiKeyStore.LoadApiKey('HuggingFace_APIKey'));
   try
@@ -978,10 +972,19 @@ begin
     begin
       Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
     end;
-    answer := huggingFace.Completion('How long is a piece of string', 'gpt2');
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'How long is a piece of string?';
+    messages.Add(msg);
+
+    config := Default(TChatSettings);
+    config.model := 'meta-llama/Llama-3.2-1B-Instruct';
+    answer := huggingFace.ChatCompletion(config, messages).Content;
     Memo1.Lines.Add('Answer : ' + answer);
   finally
     FreeAndNil(huggingFace);
+    FreeAndNil(messages);
   end;
 end;
 
