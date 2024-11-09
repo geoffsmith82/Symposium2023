@@ -271,7 +271,7 @@ var
   msvoice: TMicrosoftCognitiveService;
 begin
   Memo1.Lines.Add('======== Microsoft Voices');
-  msvoice := TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com');
+  msvoice := TMicrosoftCognitiveService.Create(FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com');
   try
     voice := msvoice.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -371,9 +371,9 @@ end;
 procedure TfrmTestApiWindow.FormCreate(Sender: TObject);
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  Fgooglespeech := TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
-  FProcedures := TList<TTestProcedure>.Create;
   FApiKeyStore := TApiKeyStore.GetInstance;
+  Fgooglespeech := TGoogleSpeechService.Create(FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
+  FProcedures := TList<TTestProcedure>.Create;
   FindProcedures;
 end;
 
@@ -518,7 +518,7 @@ var
   ticks: DWORD;
 begin
   Memo1.Lines.Add('======== OpenAI Voices');
-  openAIVoice := TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey'));
+  openAIVoice := TOpenAITextToSpeech.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     voice := openAIVoice.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -539,7 +539,7 @@ var
   ticks: UInt64;
 begin
   Memo1.Lines.Add('======== ElevenLabs Voices');
-  elevenlabs := TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
+  elevenlabs := TElevenLabsService.Create(FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
   try
     voice := elevenlabs.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -671,7 +671,7 @@ var
   Local_voice: TVoiceInfo;
 begin
   Memo1.Lines.Add('======== Amazon Polly Voices');
-  polly := TAmazonPollyService.Create(Self, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), FApiKeyStore.LoadSetting('AWSRegion'));
+  polly := TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), FApiKeyStore.LoadSetting('AWSRegion'));
   try
     for Local_voice in polly.Voices do
     begin
@@ -705,7 +705,7 @@ var
   Local_voice: TVoiceInfo;
 begin
   Memo1.Lines.Add('======== ElevenLabs Voices');
-  elevenlabs := TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
+  elevenlabs := TElevenLabsService.Create(FApiKeyStore.LoadApiKey('ElevenLabsAPIKey'));
   try
     for Local_voice in elevenlabs.Voices do
     begin
@@ -722,7 +722,7 @@ var
   conqui : TCoquiTTSService;
 begin
   Memo1.Lines.Add('======== Conqui Polly Voices');
-  conqui := TCoquiTTSService.Create(Self, 'key', 'http://172.24.24.116:5002');
+  conqui := TCoquiTTSService.Create('key', 'http://172.24.24.116:5002');
   try
     for voice in conqui.Voices do
     begin
@@ -741,7 +741,7 @@ var
   ticks: UInt64;
 begin
   Memo1.Lines.Add('======== Amazon Polly Voices');
-  polly := TAmazonPollyService.Create(Self, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), FApiKeyStore.LoadSetting('AWSRegion'));
+  polly := TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretKey'), FApiKeyStore.LoadSetting('AWSRegion'));
   try
     voice := polly.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -761,7 +761,7 @@ var
   Local_voice: TVoiceInfo;
 begin
   Memo1.Lines.Add('======== Windows Voices');
-  mswindows := TWindowsSpeechService.Create(Self);
+  mswindows := TWindowsSpeechService.Create;
   try
     for Local_voice in mswindows.Voices do
     begin
@@ -779,7 +779,7 @@ var
   ticks: UInt64;
 begin
   Memo1.Lines.Add('======== Windows Voices');
-  mswindows := TWindowsSpeechService.Create(Self);
+  mswindows := TWindowsSpeechService.Create;
   try
     voice := mswindows.Voices[1];
     Memo1.Lines.Add(voice.VoiceId + ' | ' + voice.VoiceName + ' | ' + voice.VoiceGender);
@@ -799,7 +799,7 @@ var
   Local_voice: TVoiceInfo;
 begin
   Memo1.Lines.Add('======== Microsoft Voices');
-  msvoice := TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com');
+  msvoice := TMicrosoftCognitiveService.Create(FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com');
   try
     for Local_voice in msvoice.Voices do
     begin
@@ -901,7 +901,7 @@ var
   openAIVoice: TOpenAITextToSpeech;
   voice: TVoiceInfo;
 begin
-  openAIVoice := TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey'));
+  openAIVoice := TOpenAITextToSpeech.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   try
     for voice in openAIVoice.Voices do
     begin

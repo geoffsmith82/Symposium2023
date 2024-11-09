@@ -355,12 +355,12 @@ procedure TfrmVoiceRecognition.SetupTextToSpeechEngines;
 var
   lSpeechEngine: string;
 begin
-  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
-//  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(Self, FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
-  FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(Self, FApiKeyStore.LoadApiKey('chatgpt_apikey')), miOpenAiTextToSpeech);
+  FTextToSpeechEngines.RegisterEngine(TMicrosoftCognitiveService.Create(FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TElevenLabsService.Create(FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TWindowsSpeechService.Create, miWindowsSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TGoogleSpeechService.Create(FApiKeyStore.LoadApiKey('google_clientid'), FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+  FTextToSpeechEngines.RegisterEngine(TOpenAITextToSpeech.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey')), miOpenAiTextToSpeech);
 
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedTextToSpeechEngine', 'TWindowsSpeechService');

@@ -8,6 +8,8 @@ uses
   System.UITypes,
   System.Classes,
   System.Variants,
+  System.IniFiles,
+  System.ImageList,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -20,6 +22,7 @@ uses
   FMX.Controls.Presentation,
   FMX.ScrollBox,
   FMX.Memo,
+  FMX.Menus,
   FMX.ListView,
   FMX.StdCtrls,
   FMX.ImgList,
@@ -29,10 +32,9 @@ uses
   uTTS.ElevenLabs,
   uTTS.Microsoft.Cognitive,
   uTTS.Amazon.Polly,
+  uTTS.GoogleSpeech,
   ApiKeyStore.Windows,
-  ApiKeyStore,
-  System.ImageList
-
+  ApiKeyStore
   ;
 
 type
@@ -41,10 +43,17 @@ type
     Memo1: TMemo;
     btnTalk: TButton;
     ImageList: TImageList;
+    MainMenu: TMainMenu;
+    MenuItem1: TMenuItem;
+    miExit: TMenuItem;
+    miSettings: TMenuItem;
+    miGoogleAuthenticate: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnTalkClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure miExitClick(Sender: TObject);
+    procedure miGoogleAuthenticateClick(Sender: TObject);
   private
     { Private declarations }
     FKeyStore: TApiKeyStore;
@@ -53,6 +62,7 @@ type
     FElevenLabsTTS : TElevenLabsService;
     FMsTTS : TMicrosoftCognitiveService;
     FPolly : TAmazonPollyService;
+    FGoogleSpeech : TGoogleSpeechService;
   public
     { Public declarations }
   end;
@@ -155,7 +165,19 @@ begin
     end;
   end;
 
-
+//  if not FKeyStore.LoadApiKey('google_refreshtoken').IsEmpty then
+  begin
+    var   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+    FGoogleSpeech := TGoogleSpeechService.Create(FKeyStore.LoadApiKey('google_clientid'),  FKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
+    for i := 0 to FGoogleSpeech.Voices.Count - 1 do
+    begin
+      item := lvVoices.Items.Add;
+      item.ImageIndex := 5;
+      item.TagObject := FGoogleSpeech;
+      item.Text := FGoogleSpeech.Voices[i].VoiceName;
+      item.Detail := FGoogleSpeech.Voices[i].VoiceId + ' ' + FGoogleSpeech.Voices[i].VoiceGender;
+    end;
+  end;
 end;
 
 procedure TfrmTalk.FormDestroy(Sender: TObject);
@@ -171,6 +193,23 @@ begin
   lvVoices.Width := Width / 3;
   Memo1.Position.X := lvVoices.Width + lvVoices.Position.X + 10;
   Memo1.Width := Width - Memo1.Position.X - 20;
+end;
+
+procedure TfrmTalk.miExitClick(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
+procedure TfrmTalk.miGoogleAuthenticateClick(Sender: TObject);
+begin
+  if FKeyStore.LoadApiKey('google_refreshtoken').IsEmpty then
+  begin
+    var   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+   // Assert(Assigned(FGoogleSpeech));
+
+    FGoogleSpeech := TGoogleSpeechService.Create(FKeyStore.LoadApiKey('google_clientid'),  FKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
+    FGoogleSpeech.Authenticate;
+  end;
 end;
 
 end.
