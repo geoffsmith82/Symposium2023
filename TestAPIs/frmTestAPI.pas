@@ -351,7 +351,7 @@ var
   chatAnswer: TChatResponse;
   answer: string;
 begin
-  openAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'), AzureOpenAIEndpoint);
+  openAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint, 'gpt-4o');
   settings := Default(TChatSettings);
   try
     openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
@@ -539,7 +539,7 @@ var
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Microsoft OpenAI');
-  microsoftOpenAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint);
+  microsoftOpenAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint, 'gpt-4o');
   try
     for Local_modelObj in microsoftOpenAI.ModelInfo do
     begin
