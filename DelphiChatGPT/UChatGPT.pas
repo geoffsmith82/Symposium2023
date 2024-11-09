@@ -97,15 +97,15 @@ begin
 
 
   FTextToSpeechEngine.RegisterEngine(
-     TMicrosoftCognitiveService.Create(Self, FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
+     TMicrosoftCognitiveService.Create(FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
-     TElevenLabsService.Create(Self, FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
-//  FTextToSpeechEngine.RegisterEngine(
-//     TAmazonPollyService.Create(Self, AWSAccessKey, AWSSecretkey, FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);//'ADUG Demo', '');
+     TElevenLabsService.Create(FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
-     TWindowsSpeechService.Create(Self), miWindowsSpeechEngine);
+     TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);//'ADUG Demo', '');
   FTextToSpeechEngine.RegisterEngine(
-     TGoogleSpeechService.Create(Self, FApiKeyStore.LoadApiKey('google_clientid'),  FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
+     TWindowsSpeechService.Create, miWindowsSpeechEngine);
+  FTextToSpeechEngine.RegisterEngine(
+     TGoogleSpeechService.Create( FApiKeyStore.LoadApiKey('google_clientid'),  FApiKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings), miGoogleSpeechEngine);
 
   lSpeechEngine := FSettings.ReadString('Speech', 'SelectedEngine', 'TWindowsSpeechService');
   FTextToSpeechEngine.SelectEngine(lSpeechEngine);
