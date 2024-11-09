@@ -391,18 +391,19 @@ end;
 
 function TFunctionCallMessage.AsJSON: TJSONObject;
 begin
-  Result := FJSON;
+  Result := FJSON.Clone as TJSONObject;
 end;
 
 constructor TFunctionCallMessage.Create(function_call_json: TJSONArray);
 begin
   FJSON := TJSONObject.Create;
-  FJSON.AddPair('tool_calls', function_call_json.Clone as TJSONArray);
+  FJSON.AddPair('tool_calls', function_call_json);
   FJSON.AddPair('role', 'assistant');
 end;
 
 destructor TFunctionCallMessage.Destroy;
 begin
+  FreeAndNil(FJSON);
   inherited;
 end;
 

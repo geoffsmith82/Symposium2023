@@ -86,6 +86,7 @@ type
     procedure TestGrokLLM;
 
     procedure TestOpenAIFunctionCalling;
+    procedure TestGroqFunctionCalling;
 
     procedure TestAPIKeyStore;
 
@@ -302,7 +303,7 @@ begin
     settings.model := 'gpt-4o';
     settings.json_mode := False;
     settings.max_tokens := 4096;
-    messages := TObjectList<TChatMessage>.Create;
+    messages := TObjectList<TChatMessage>.Create(True);
     msg := TChatMessage.Create;
     msg.Role := 'user';
     msg.Content := 'What is the weather for Bendigo?';
@@ -590,6 +591,61 @@ begin
   finally
     FreeAndNil(grok);
     FreeAndNil(messages);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestGroqFunctionCalling;
+var
+  groq: TGroqLLM;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  groq := TGroqLLM.Create(FApiKeyStore.LoadApiKey('groq_apikey'));
+  settings := Default(TChatSettings);
+  try
+    groq.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    groq.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'llama-3.2-90b-text-preview';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := groq.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := groq.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := groq.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+    messages.Clear;
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(groq);
   end;
 end;
 

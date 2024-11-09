@@ -273,11 +273,11 @@ begin
 
           ToolsArray.AddElement(FunctionJSON);
         except
-          FunctionJSON.Free;
+          FreeAndNil(FunctionJSON);
           raise;
         end;
       except
-        ToolObject.Free;
+        FreeAndNil(ToolObject);
         raise;
       end;
     end;

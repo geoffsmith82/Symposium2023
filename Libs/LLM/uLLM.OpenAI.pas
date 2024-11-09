@@ -6,6 +6,7 @@ uses
   System.Classes,
   System.JSON,
   System.SysUtils,
+  windows,
   System.Generics.Collections,
   REST.Client,
   REST.Types,
@@ -68,9 +69,9 @@ begin
       HandleErrorResponse(LRESTResponse);
     end;
   finally
-    LRESTClient.Free;
-    LRESTRequest.Free;
-    LRESTResponse.Free;
+    FreeAndNil(LRESTClient);
+    FreeAndNil(LRESTRequest);
+    FreeAndNil(LRESTResponse);
   end;
 end;
 
@@ -145,7 +146,7 @@ begin
     OutputDebugString(PChar(LJSONBody.ToJSON));
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
-    LJSONBody.Free;
+    FreeAndNil(LJSONBody);
   end;
 end;
 
@@ -161,6 +162,7 @@ var
   FunctionCallObj: TJSONObject;
   FunctionId: string;
   FunctionName: string;
+  content : string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
   if Assigned(LJSONResponse.GetValue('model')) then
@@ -175,7 +177,9 @@ begin
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
   LMessageJSON := LChoice.GetValue('message') as TJSONObject;
-  AResponse.Content := LMessageJSON.GetValue<string>('content');
+  Content := '';
+  LMessageJSON.TryGetValue<string>('content', Content);
+  AResponse.Content := Content;
   AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
 
   // Handle function calls
@@ -184,7 +188,7 @@ begin
 
     if LMessageJSON.TryGetValue<TJSONArray>('tool_calls', ToolCallsArray) then
     begin
-      var funcCall := TFunctionCallMessage.Create(ToolCallsArray);
+      var funcCall := TFunctionCallMessage.Create(ToolCallsArray.Clone as TJSONArray);
       AMessages.Add(funcCall);
 
       for ToolValue in ToolCallsArray do
