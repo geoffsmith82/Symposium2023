@@ -392,6 +392,8 @@ end;
 function TFunctionCallMessage.AsJSON: TJSONObject;
 begin
   Result := FJSON.Clone as TJSONObject;
+  if not Content.IsEmpty then
+    Result.AddPair('content', Content);
 end;
 
 constructor TFunctionCallMessage.Create(function_call_json: TJSONArray);

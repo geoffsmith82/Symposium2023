@@ -33,7 +33,7 @@ type
     destructor Destroy; override;
     procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
-    function GetAvailableFunctionsJSON: TJSONArray;
+    function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray;
     function Count: Integer;
   end;
 
@@ -244,7 +244,7 @@ begin
 end;
 
 
-function TFunctionRegistry.GetAvailableFunctionsJSON: TJSONArray;
+function TFunctionRegistry.GetAvailableFunctionsJSON(UseStrict: Boolean): TJSONArray;
 var
   ToolsArray: TJSONArray;
   FuncDesc: TFunctionDescription;
@@ -263,7 +263,8 @@ begin
       try
         ToolObject.AddPair('name', FuncDesc.Name);
         ToolObject.AddPair('description', FuncDesc.Description);
-        ToolObject.AddPair('strict', TJSONBool.Create(True));
+        if UseStrict then
+          ToolObject.AddPair('strict', TJSONBool.Create(True));
         ToolObject.AddPair('parameters', FuncDesc.Parameters.Clone as TJSONObject);
 
         FunctionJSON := TJSONObject.Create;

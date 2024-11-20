@@ -91,6 +91,7 @@ type
     procedure TestOpenAIFunctionCalling;
     procedure TestAzureFunctionCalling;
     procedure TestGroqFunctionCalling;
+    procedure TestXaiGrokFunctionCalling;
 
     procedure TestAPIKeyStore;
 
@@ -771,6 +772,61 @@ begin
   finally
     FreeAndNil(messages);
     FreeAndNil(groq);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestXaiGrokFunctionCalling;
+var
+  grok: TXGrokAI;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  grok := TXGrokAI.Create(FApiKeyStore.LoadApiKey('X_AI'));
+  settings := Default(TChatSettings);
+  try
+    grok.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    grok.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'grok-beta';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := grok.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := grok.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := grok.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+    messages.Clear;
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(grok);
   end;
 end;
 
