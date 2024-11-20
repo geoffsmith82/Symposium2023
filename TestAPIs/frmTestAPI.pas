@@ -80,6 +80,7 @@ type
     procedure TestOpenAIVision;
     procedure TestAnthropicClaudeVision;
     procedure TestAzureVision;
+    procedure TestXaiGrokVision;
 
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
@@ -237,6 +238,40 @@ begin
     Memo1.Lines.Add('Answer: ' + answer);
   finally
     FreeAndNil(azureOpenAI);
+    FreeAndNil(messages);
+  end;
+end;
+
+
+procedure TfrmTestApiWindow.TestXaiGrokVision;
+var
+  grokAI: TXGrokAI;
+  Local_modelObj: TBaseModelInfo;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatVisionMessage;
+  answer: string;
+begin
+  Memo1.Lines.Add('======== Model Anthropic');
+  grokAI := TXGrokAI.Create(FApiKeyStore.LoadApiKey('X_AI'));
+  try
+    for Local_modelObj in grokAI.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+    settings.json_mode := False;
+    settings.model := 'grok-vision-beta';
+    settings.max_tokens := 1024;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatVisionMessage.Create;
+    msg.Role := 'user';
+    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    msg.Content := 'Describe the following image';
+    messages.Add(msg);
+    answer := grokAI.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer: ' + answer);
+  finally
+    FreeAndNil(grokAI);
     FreeAndNil(messages);
   end;
 end;
