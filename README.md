@@ -57,6 +57,14 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	- A project to test out the different API's and the functionality of the API's
 	
 	
+### Project Supports LLM Features
+
+| Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini |
+|----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
+| **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | No                 | No              |
+| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | No                 | No              |
+	
+	
 ### Questions / Need Help?	
    Create an issue and I will respond to it.
 	
