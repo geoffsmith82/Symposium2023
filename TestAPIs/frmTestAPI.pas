@@ -94,7 +94,7 @@ type
     procedure TestXaiGrokFunctionCalling;
 
 
-    [FunctionDescription('Get the weather forecast')]
+    [FunctionDescription('Get the weather forecast for a place in Australia')]
     function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
     [FunctionDescription('Get the time')]
     function GetTimeAt([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the time')]const location: string): string;
@@ -718,7 +718,7 @@ begin
   try
     groq.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
     groq.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
-    settings.model := 'llama-3.2-90b-text-preview';
+    settings.model := 'llama-3.2-90b-vision-preview';
     settings.json_mode := False;
     settings.max_tokens := 4096;
     messages := TObjectList<TChatMessage>.Create(True);
