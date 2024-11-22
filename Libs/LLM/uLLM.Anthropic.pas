@@ -3,14 +3,18 @@ unit uLLM.Anthropic;
 interface
 
 uses
-  System.Generics.Collections,
-  REST.Client,
-  REST.Types,
+  System.Classes,
+
+
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
   windows,
-  uLLM
+  System.Generics.Collections,
+  REST.Client,
+  REST.Types,
+  uLLM,
+  uLLM.Functions
   ;
 
 type
