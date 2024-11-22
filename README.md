@@ -61,9 +61,10 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 | Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini |
 |----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
-| **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | Yes                | No              |
-| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | No                 | No              |
-	
+| **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | Yes                | No*              |
+| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | No*                | No*              |
+
+ *Feature not currently supported/implementated
 	
 ### Questions / Need Help?	
    Create an issue and I will respond to it.
