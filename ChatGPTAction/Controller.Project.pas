@@ -8,6 +8,7 @@ uses
   MVCFramework.Swagger.Commons,
   MVCFramework.Serializer.Commons,
   System.SysUtils,
+  System.StrUtils,
   System.Generics.Collections,
   System.Win.ComObj,
   System.Classes,
@@ -64,11 +65,6 @@ type
     [MVCHTTPMethod([httpPUT])]
     procedure UpdateProjectFile(projectId: String; fileId: String);
 
-    // Update Project via diff File
-    [MVCPath('/projects/($projectId)/files/($fileId)/diffupdate')]
-    [MVCHTTPMethod([httpPOST])]
-    procedure UpdateProjectViaDiffFile(projectId: String; fileId: String);
-
     // Compile Project
     [MVCPath('/projects/($projectId)/compile')]
     [MVCHTTPMethod([httpPOST])]
@@ -89,15 +85,50 @@ uses
   System.NetEncoding,
   MVCFramework.Logger,
   Files.Extra,
-  Action.FileUtils,
   udmCompiler,
   udmFixInsight,
   udmDiff,
   FormUnit1
   ;
 
-const ProjectPaths : string = 'D:\Programming\ChatGPTAction\Projects';
+const ProjectPaths : string = 'Z:\Programming\ChatGPTAction\Projects';
 
+function ReturnRelativePath(fullPath: string; basePath: string): string;
+begin
+  // Normalize the paths to ensure comparison is consistent
+  fullPath := TPath.GetFullPath(fullPath);
+  basePath := TPath.GetFullPath(basePath);
+
+  // Check if the full path starts with the base path
+  if StartsText(basePath, fullPath) then
+  begin
+    // Strip the basePath from the fullPath
+    Result := fullPath.Substring(basePath.Length);
+
+    // Remove any leading path separator
+    if (Result <> '') and (Result[1] = PathDelim) then
+      Result := Result.Substring(1);
+  end
+  else
+  begin
+    // If basePath is not part of fullPath, return the full path unchanged
+    Result := fullPath;
+  end;
+end;
+
+function IsPathBelowRoot(const RootPath, TestPath: string): Boolean;
+var
+  NormalizedRoot, NormalizedTest: string;
+begin
+  // Normalize the paths to remove any trailing slashes and resolve relative segments
+  NormalizedRoot := TPath.GetFullPath(TPath.GetFullPath(RootPath));
+  NormalizedTest := TPath.GetFullPath(TPath.GetFullPath(TestPath));
+
+  // Check if the normalized test path starts with the normalized root path
+  Result := NormalizedTest.StartsWith(NormalizedRoot, True) and
+            (Length(NormalizedTest) > Length(NormalizedRoot)) and
+            (NormalizedTest[Length(NormalizedRoot) + 1] = TPath.DirectorySeparatorChar);
+end;
 
 procedure TProjectManagementController.ListProjects;
 var
@@ -171,7 +202,7 @@ begin
   end;
 
 
-  LogMessage(DateTimeToStr(now) + ' ' + AContext.Request.PathInfo + ' ' + filename);
+  LogMessage(DateTimeToStr(now) + ' ' + AContext.Request.PathInfo + ' ' + filename + ' ' + Context.Request.Body);
 end;
 
 procedure TProjectManagementController.CreateProject;
@@ -243,7 +274,7 @@ begin
 
       project.FileName := relFilename;
       project.FileSize := TFile.GetSize(dir);
-      project.Id := GetFileIDFromFilename(dir).ToString;
+      project.Id := relFilename;
       projects.Files.Add(project);
     end;
 
@@ -273,25 +304,40 @@ var
   dprojFilename : string;
   templateFilename: string;
   guidProject : TGuid;
-  dprFilename : string;
+  srcRes : string;
+  dstRes : string;
+  JSONBody : TJSONObject;
 begin
-  FileData := Context.Request.BodyAs<TProjectDProjRequest>;
+  FileData := TProjectDProjRequest.Create;
+  JSONBody := TJSONObject.Parse(Context.Request.Body) as TJSONObject;
+  FileData.dprogFileName := JSONBody.S['dprogFileName'];
+  
   try
     // Extract file information from the JSON object
-    dprFilename := FileData.ProjectFileName;
+    dprojFilename := FileData.dprogFileName;
+    if dprojFilename.IsEmpty then
+      raise Exception.Create('dprojFileName was not set');
+
+
+    if projectId.IsEmpty then
+      raise Exception.Create('Must specify a projectId');
+
     projectPath := TPath.Combine(ProjectPaths, projectId);
-    templateFilename := 'D:\Programming\ChatGPTAction\Projects\Snake\vcltemplate.dproj';
+    templateFilename := 'Z:\Programming\ChatGPTAction\Projects\Snake\vcltemplate.dproj';
+    srcRes := 'Z:\Programming\ChatGPTAction\Projects\Snake\vcltemplate.res';
     fileContent := TFile.ReadAllText(templateFilename);
 
     if not TDirectory.Exists(projectPath) then
       raise Exception.Create('Project does not exist');
     try
-      fullDprFilename := TPath.Combine(projectPath, dprFilename);
+      fullDprFilename := TPath.Combine(projectPath, ChangeFileExt(dprojFilename, '.dpr'));
+      dstRes := ChangeFileExt(fullDprFilename, '.res');
       dprojFilename := ChangeFileExt(fullDprFilename,'.dproj');
       guidProject := TGUID.NewGuid;
       fileContent := fileContent.Replace('<!--DPR-->', ExtractFilename(fullDprFilename));
       fileContent := fileContent.Replace('<!--NEWGUID-->', guidProject.ToString);
       TFile.WriteAllText(dprojFilename, fileContent);
+      TFile.Copy(srcRes, dstRes);
     finally
 
     end;
@@ -299,12 +345,11 @@ begin
     // Create response JSON object
     NewFile := TUploadedFileResponse.Create;
     try
-      NewFile.Id := GetFileIDFromFilename(dprojFilename).ToString;
+      NewFile.Id := ExtractFileName(dprojFilename);
       NewFile.Filename := ExtractFileName(dprojFilename);
       NewFile.FileType:= '.dproj';
       NewFile.FileSize := TFile.GetSize(dprojFilename);
       NewFile.UploadDate := now;
-//      NewFile.Description := description;
 
       Render(NewFile, False);  // Return the added file with 201 status
     finally
@@ -313,7 +358,8 @@ begin
   except
     on E: Exception do
     begin
-      BadRequestResponse(E.Message);
+      Context.Response.StatusCode := HTTP_STATUS.BadRequest;
+      Context.Response.Content := E.Message;
     end;
   end;
 end;
@@ -327,13 +373,20 @@ var
   fullPath : string;
   fileContent : string;
   description : string;
+  JSONBody : TJSONObject;
 begin
-  FileData := Context.Request.BodyAs<TFileUploadRequest>;
+  OutputDebugString(PChar(Context.Request.Body));
   try
+    JSONBody := TJSONObject.Parse(Context.Request.Body) as TJSONObject;
+    FileData.FileName := JSONBody.Values['fileName'];
+    FileData.FileContent := JSONBody.Values['fileContent'];    
     // Extract file information from the JSON object
     FileName := FileData.FileName;
     fileContent := FileData.FileContent;
     projectPath := TPath.Combine(ProjectPaths, projectId);
+    if projectId.IsEmpty then
+      raise Exception.Create('ProjectId was not set');
+
     if not TDirectory.Exists(projectPath) then
       raise Exception.Create('Project does not exist');
     if ExtractFileExt(filename).ToUpper = '.RES' then
@@ -352,25 +405,24 @@ begin
     // Create response JSON object
     NewFileResponse := TUploadedFileResponse.Create;
     try
-      NewFileResponse.Id := GetFileIDFromFilename(fullPath).ToString;
+      NewFileResponse.Id := ExtractFileName(fullPath);
+
       NewFileResponse.FileName := ExtractFileName(fullPath);
       NewFileResponse.FileType := ExtractFileExt(fullPath);
       NewFileResponse.FileSize := TFile.GetSize(fullPath);
       NewFileResponse.UploadDate := now;
       NewFileResponse.Description := description;
-//      NewFile.S['url'] := '/path/to/upload/directory/' + FileName;
-//      NewFile.S['description'] := Description;
 
       Render(NewFileResponse);  // Return the added file with 201 status
     finally
-   //   NewFile.Free;
+
     end;
 
   except
     on E: Exception do
     begin
       LogMessage(E.Message);
-      BadRequestResponse(E.Message);
+      raise e;
     end;
   end;
 end;
@@ -385,20 +437,21 @@ begin
   try
     // Code to retrieve the specific file contents from storage (e.g., database)
     projectPath := TPath.Combine(ProjectPaths, projectId);
-    v := fileId.ToInt64;
-    filePath := GetFilenameFromFileID(v);
-    //GetFilePathFromObjectID('D:\Programming\project2.dpr', fileId);
+    filePath :=  TPath.Combine(projectPath, fileId);
+
+    if not IsPathBelowRoot(projectPath, filePath) then
+      raise Exception.Create('Trying to escape root');
+
     data := TFile.ReadAllText(filePath);
-    //TPath.Combine(projectPath, fileId);
     // Set appropriate content type for binary data
     Context.Response.ContentType := 'application/octet-stream';
     Context.Response.Content := data;
-    // Render the file content
-    // RenderBinary(FileContent);
+
   except
     on E: Exception do
     begin
-      NotFoundResponse(E.Message);
+      Context.Response.StatusCode := HTTP_STATUS.NotFound;
+      Context.Response.Content := E.Message;
     end;
   end;
 end;
@@ -423,8 +476,12 @@ begin
     FileName := FileData.S['fileName'];
     fileContent := FileData.S['fileContent'];
     position := FileData.I['position'];
-    v := fileId.ToInt64;
-    fullPath := GetFilenameFromFileID(v);
+    projectPath := TPath.Combine(ProjectPaths, projectId);
+    fullPath :=  TPath.Combine(projectPath, fileId);
+    
+
+    if not IsPathBelowRoot(projectPath, fullPath) then
+      raise Exception.Create('Trying to escape root');
 
     if TPath.GetExtension(fullPath).ToUpper = '.DPROJ' then
     begin
@@ -448,7 +505,7 @@ begin
 
     NewFile := TProjectFile.Create;
     try
-      NewFile.Id := GetFileIDFromFilename(fullPath).ToString;
+      NewFile.Id := ReturnRelativePath(fullPath, projectPath);
       NewFile.FileName := ExtractFileName(fullPath);
       NewFile.FileType := ExtractFileExt(fullPath);
       NewFile.FileSize := TFile.GetSize(fullPath);
@@ -461,33 +518,9 @@ begin
     on E: Exception do
     begin
       LogMessage(E.Message);
-      BadRequestResponse(E.Message);
+      Context.Response.StatusCode := HTTP_STATUS.BadRequest;
+      Context.Response.Content := E.Message;
     end;
-  end;
-end;
-
-
-procedure TProjectManagementController.UpdateProjectViaDiffFile(projectId, fileId: String);
-var
-  dmDiff: TdmDiff;
-  projectPath : string;
-  v : Int64;
-  fullPath: string;
-  diffRequest : TFileDiffUpdateRequest;
-  tmpFilename : string;
-begin
-  dmDiff := TdmDiff.Create(nil);
-  try
-    diffRequest := Context.Request.BodyAs<TFileDiffUpdateRequest>;
-    projectPath := TPath.Combine(ProjectPaths, projectId);
-    tmpFilename := TPath.GetTempFileName;
-    v := fileId.ToInt64;
-    fullPath := GetFilenameFromFileID(v);
-    TFile.WriteAllText(tmpFilename, diffRequest.DiffContent);
-
-    dmDiff.MergeDiff(projectPath, fullPath, tmpFilename);
-  finally
-    FreeAndNil(dmDiff);
   end;
 end;
 
@@ -500,6 +533,7 @@ var
   dmFixInsight: TdmFixInsight;
   CompileData: TProjectCompileRequest;
   ResponseObj : TCompilationResponse;
+  JSONBody : TJSONObject;
 begin
   projectPath := TPath.Combine(ProjectPaths, projectId);
   if not TDirectory.Exists(projectPath) then
@@ -523,7 +557,11 @@ begin
   CompileData := nil;
   try
     dmFixInsight := TdmFixInsight.Create(nil);
-    CompileData := Context.Request.BodyAs<TProjectCompileRequest>;
+    CompileData := TProjectCompileRequest.Create;
+
+    JSONBody := TJSONObject.Parse(Context.Request.Body) as TJSONObject;
+    CompileData.ProjectFileName := JSONBody.Values['projectFileName'];
+
     projectFile := CompileData.ProjectFileName;
     if TPath.GetExtension(projectFile).ToUpper = '.DPROJ' then
       projectFile := ChangeFileExt(projectFile, '.dpr');
@@ -553,11 +591,15 @@ var
   projectPath : string;
   projectFile : string;
   ResponseObj : TCompilationResponse;
+  JSONBody : TJSONObject;
 begin
   ResponseObj := nil;
   dmCompiler := nil;
   CompileData := Context.Request.BodyAs<TProjectCompileRequest>;
   try
+    JSONBody := TJSONObject.Parse(Context.Request.Body) as TJSONObject;
+    CompileData.ProjectFileName := JSONBody.Values['projectFileName'];
+  
     try
       ResponseObj := TCompilationResponse.Create;
       dmCompiler := TdmCompiler.Create(nil);

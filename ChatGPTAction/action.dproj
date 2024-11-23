@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{AA16EB5E-FC78-41D2-8249-65F2A4A6BE5B}</ProjectGuid>
         <ProjectName Condition="'$(ProjectName)'==''">action</ProjectName>
-        <ProjectVersion>20.1</ProjectVersion>
+        <ProjectVersion>20.2</ProjectVersion>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -100,7 +100,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_UnitSearchPath>D:\Programming\components\smi300\Sources;D:\Programming\components\delphimvcframework\sources;D:\Programming\components\delphimvcframework\lib\loggerpro;D:\Programming\components\delphimvcframework\lib\swagdoc\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_UnitSearchPath>Z:\Programming\components\smi300\Sources;Z:\Programming\components\delphimvcframework\sources;Z:\Programming\components\delphimvcframework\lib\loggerpro;Z:\Programming\components\delphimvcframework\lib\swagdoc\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -132,7 +133,6 @@
         <DCCReference Include="Controller.Personal.pas"/>
         <DCCReference Include="Controller.Project.pas"/>
         <DCCReference Include="Files.Extra.pas"/>
-        <DCCReference Include="Action.FileUtils.pas"/>
         <DCCReference Include="udmCompiler.pas">
             <Form>dmCompiler</Form>
             <FormType>dfm</FormType>
@@ -151,11 +151,6 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Controller.Personal.DataObjects.pas"/>
-        <DCCReference Include="udmDiff.pas">
-            <Form>dmDiff</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="Controller.Weather.pas"/>
         <DCCReference Include="Controller.Weather.DataObjects.pas"/>
         <DCCReference Include="..\Weather\udmWeather.pas">

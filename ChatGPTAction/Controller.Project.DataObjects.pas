@@ -13,10 +13,10 @@ uses
 type
   TProjectDProjRequest = class
   private
-    FProjectFileName: string;
+    FDprFileName: string;
   public
-    [MVCNameAs('dprFileName')]
-    property ProjectFileName: string read FProjectFileName write FProjectFileName;
+    [MVCNameAs('dprogFileName')]
+    property dprogFileName: string read FDprFileName write FDprFileName;
   end;
 
 

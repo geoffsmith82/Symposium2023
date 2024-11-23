@@ -10,7 +10,6 @@ uses
   Controller.Personal in 'Controller.Personal.pas',
   Controller.Project in 'Controller.Project.pas',
   Files.Extra in 'Files.Extra.pas',
-  Action.FileUtils in 'Action.FileUtils.pas',
   udmCompiler in 'udmCompiler.pas' {dmCompiler: TDataModule},
   Controller.Project.DataObjects in 'Controller.Project.DataObjects.pas',
   udmFixInsight in 'udmFixInsight.pas' {dmFixInsight: TDataModule},
