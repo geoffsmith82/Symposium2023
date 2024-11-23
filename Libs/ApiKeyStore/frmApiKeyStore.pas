@@ -104,7 +104,7 @@ begin
   SettingsStringGrid.ColWidths[0] := 300;
   SettingsStringGrid.ColWidths[1] := SettingsStringGrid.Width - SettingsStringGrid.ColWidths[0];
 
-  StringGrid.RowCount := 17;
+  StringGrid.RowCount := 18;
   SettingsStringGrid.RowCount := 3;
 
   StringGrid.Cells[0, 1] := 'chatgpt_apikey';
@@ -122,12 +122,14 @@ begin
   StringGrid.Cells[0,13] := 'google_clientsecret';
   StringGrid.Cells[0,14] := 'Replicate_APIKey';
   StringGrid.Cells[0,15] := 'AzureAPIKey';
-  StringGrid.Cells[0,16] := 'picovoice';
+  StringGrid.Cells[0,16] := 'Claude_APIKey';
+  StringGrid.Cells[0,17] := 'picovoice';
 
 
 
   SettingsStringGrid.Cells[0, 1] := 'AWSRegion';
   SettingsStringGrid.Cells[0, 2] := 'AzureOpenAIEndpoint';
+
 
 
 
