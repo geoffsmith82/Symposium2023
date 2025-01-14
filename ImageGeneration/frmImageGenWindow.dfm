@@ -17,6 +17,7 @@ object frmImageGenerator: TfrmImageGenerator
   Menu = mmMainMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   PixelsPerInch = 240
   DesignSize = (
     1570
@@ -33,9 +34,20 @@ object frmImageGenerator: TfrmImageGenerator
     Margins.Bottom = 8
     Caption = 'Image Prompt'
   end
+  object Label2: TLabel
+    Left = 1069
+    Top = 13
+    Width = 187
+    Height = 41
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Caption = 'Balance: $2.10'
+  end
   object mmoImagePrompt: TMemo
-    Left = 40
-    Top = 60
+    Left = 53
+    Top = 135
     Width = 1203
     Height = 223
     Margins.Left = 8
@@ -45,8 +57,8 @@ object frmImageGenerator: TfrmImageGenerator
     TabOrder = 0
   end
   object btnExecute: TButton
-    Left = 1272
-    Top = 58
+    Left = 1323
+    Top = 129
     Width = 188
     Height = 62
     Margins.Left = 8
@@ -59,8 +71,8 @@ object frmImageGenerator: TfrmImageGenerator
     OnClick = btnExecuteClick
   end
   object seImageCount: TSpinEdit
-    Left = 1312
-    Top = 135
+    Left = 1363
+    Top = 241
     Width = 148
     Height = 52
     Margins.Left = 8
@@ -74,8 +86,8 @@ object frmImageGenerator: TfrmImageGenerator
     Value = 1
   end
   object cboSize: TComboBox
-    Left = 1230
-    Top = 210
+    Left = 1288
+    Top = 309
     Width = 230
     Height = 49
     Margins.Left = 8
@@ -92,32 +104,35 @@ object frmImageGenerator: TfrmImageGenerator
       '512x512'
       '1024x1024')
   end
-  object ScrollBox1: TScrollBox
+  object ScrollBox: TScrollBox
     Left = 40
-    Top = 320
-    Width = 1455
-    Height = 723
+    Top = 400
+    Width = 1471
+    Height = 643
     Margins.Left = 8
     Margins.Top = 8
     Margins.Right = 8
     Margins.Bottom = 8
     VertScrollBar.Range = 5000
+    VertScrollBar.Smooth = True
     Anchors = [akLeft, akTop, akRight, akBottom]
     AutoScroll = False
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
     TabOrder = 4
-    object ImagesFlowPanel: TFlowPanel
-      Left = 0
-      Top = 0
-      Width = 1408
-      Height = 5000
-      Margins.Left = 8
-      Margins.Top = 8
-      Margins.Right = 8
-      Margins.Bottom = 8
-      Align = alTop
-      Caption = 'ImagesFlowPanel'
-      TabOrder = 0
-    end
+    UseWheelForScrolling = True
+  end
+  object Button1: TButton
+    Left = 1297
+    Top = 13
+    Width = 198
+    Height = 41
+    Margins.Left = 8
+    Margins.Top = 8
+    Margins.Right = 8
+    Margins.Bottom = 8
+    Caption = 'Buy Credits...'
+    TabOrder = 5
   end
   object mmMainMenu: TMainMenu
     Left = 184

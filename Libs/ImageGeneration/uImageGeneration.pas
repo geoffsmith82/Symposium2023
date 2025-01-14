@@ -17,6 +17,12 @@ type
     version: string;
   end;
 
+  TBaseImageSettings = class
+    model: string;
+    n: Integer;
+    seed: Integer;
+  end;
+
   TBaseImageGeneration = class abstract
   protected
     FAPIKey : string;

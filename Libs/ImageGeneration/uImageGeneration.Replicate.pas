@@ -100,6 +100,7 @@ type
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
     function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string): TGeneratedImagesClass; override;
+    function GetBalance: Double;
     constructor Create(const APIKey: string; const endpoint: string = 'https://api.replicate.com');
   end;
 
@@ -272,6 +273,13 @@ begin
       SetLength(FOutput, LJsonArray.Count);
       for I := 0 to LJsonArray.Count - 1 do
         Output[I] := LJsonArray.Items[I].Value;
+    end
+    else if Assigned(LJsonValue) and (LJsonValue is TJSONString) then
+    begin
+    //  LJsonArray := LJsonValue as TJSONArray;
+      SetLength(FOutput, 1);
+     // for I := 0 to LJsonArray.Count - 1 do
+        Output[0] := LJsonValue.Value;
     end;
 
     Error := LJsonObj.GetValue('error').Value;
@@ -314,11 +322,11 @@ var
 begin
   LVersion := '';
   Result := nil;
-  for i := 0 to FModelInfo.Count - 1 do
+  for i := 0 to ModelInfo.Count - 1 do
   begin
-    if FModelInfo[i].modelName = modelVersion then
+    if ModelInfo[i].modelName = modelVersion then
     begin
-      LVersion := FModelInfo[i].version;
+      LVersion := ModelInfo[i].version;
       Break;
     end;
   end;
@@ -367,7 +375,7 @@ begin
           repeat
             LResponseString := GetPredictionDetails(LPrediction, LOperationCompleted);
             Sleep(500);
-          until (LStopwatch.ElapsedMilliseconds > 30000) or LOperationCompleted;
+          until (LStopwatch.ElapsedMilliseconds > 40000) or LOperationCompleted;
         finally
           FreeAndNil(LPrediction);
         end;
@@ -378,7 +386,7 @@ begin
 
           Result := TGeneratedImagesClass.Create;
 
-          SetLength(LData, Length(LRepresentation.FOutput));
+          SetLength(LData, Length(LRepresentation.Output[0]));
           Result.data := LData;
           for i := 0 to Length(LRepresentation.Output) - 1 do
           begin
@@ -405,6 +413,51 @@ begin
   end;
 end;
 
+function TImageGenerationReplicate.GetBalance: Double;
+var
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LRestResponse: TRESTResponse;
+  LJSONValue: TJSONObject;
+begin
+  FModelInfo.Clear;
+
+  LRestClient := TRESTClient.Create(FEndpoint);
+  try
+    LRestRequest := TRESTRequest.Create(nil);
+    LRestResponse := TRESTResponse.Create(nil);
+    try
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Response := LRestResponse;
+      LRestRequest.Resource := '/v1/balance';
+
+      LRestRequest.Method := rmGET;
+
+      LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+
+      LRestRequest.Execute;
+
+      if LRestResponse.StatusCode = 200 then
+      begin
+        LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
+        LJSONValue.TryGetValue('balance', Result);
+        FreeAndNil(LJSONValue);
+      end
+      else
+      begin
+        // Handle errors or exceptions if needed
+      end;
+
+    finally
+      LRestRequest.Free;
+      LRestResponse.Free;
+    end;
+
+  finally
+    LRestClient.Free;
+  end;
+end;
+
 function TImageGenerationReplicate.GetModelInfo: TObjectList<TImageModelInfo>;
 var
   LRestClient: TRESTClient;
@@ -416,7 +469,11 @@ var
   I: Integer;
   LModelInfo: TImageModelInfo;
 begin
-  FModelInfo.Clear;
+  if FModelInfo.Count > 0 then
+  begin
+    Result := FModelInfo;
+    Exit;
+  end;
 
   LRestClient := TRESTClient.Create(FEndpoint);
   try
