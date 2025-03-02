@@ -108,6 +108,8 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>Talk</SanitizedProjectName>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;emsserverresource;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;emshosting;FireDACCommonDriver;IndyIPClient;emsedge;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;fmxase;dbrtl;DBXInterBaseDriver;bindcomp;inetstn;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -303,7 +305,6 @@
         </DelphiCompile>
         <DCCReference Include="ufrmTalk.pas">
             <Form>frmTalk</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Amazon.Polly.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\uTTS.Coqui.pas"/>
@@ -318,6 +319,9 @@
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\TextToSpeech\SpeechLib_TLB.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\FMX.frmApiKeyStore.pas">
+            <Form>frmApiKeyStores</Form>
+        </DCCReference>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -1312,10 +1316,8 @@
             <Platforms>
                 <Platform value="Android">True</Platform>
                 <Platform value="Android64">True</Platform>
-                <Platform value="iOSDevice32">False</Platform>
                 <Platform value="iOSDevice64">True</Platform>
                 <Platform value="iOSSimARM64">True</Platform>
-                <Platform value="OSX32">False</Platform>
                 <Platform value="OSX64">True</Platform>
                 <Platform value="OSXARM64">True</Platform>
                 <Platform value="Win32">True</Platform>

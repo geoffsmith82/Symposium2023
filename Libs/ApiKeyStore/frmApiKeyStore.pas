@@ -42,8 +42,8 @@ type
     { Private declarations }
     FApiKeyStore : TApiKeyStore;
     FModifiedRows: array of Boolean;
-    FEditCell: TPoint;
     FSettingsModifiedRows: array of Boolean;
+    FEditCell: TPoint;
     function MaskAPIKey(const APIKey: string): string;
   public
     { Public declarations }
