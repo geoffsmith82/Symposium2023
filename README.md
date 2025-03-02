@@ -1,5 +1,7 @@
 # Artificial Intelligence and ChatGPT
-Source code and Documentation for my [ADUG](https://www.adug.org.au) [Symposium Talk presented on the 28th of April 2023](https://www.youtube.com/watch?v=7HNiOMcHBW8). I have since added to and enhanced the code to further demonstrate capabilities of AI.
+Source code and Documentation for my [ADUG](https://www.adug.org.au) [Symposium Talk presented on the 28th of April 2023](https://www.youtube.com/watch?v=7HNiOMcHBW8). 
+
+**I have since added to and continue to enhance the code to further demonstrate capabilities of AI.**
 
 The goal of this project is to enable delphi users to be able to use AI technology in their applications.  There are many different types of AI and thousands of different models.  This project is working on creating generalized interfaces to the different types of AI models and make them easily accessible.
 
@@ -62,7 +64,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 | Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini |
 |----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
 | **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | Yes                | No*              |
-| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | No*                | No*              |
+| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | Yes                | No*              |
 
  *Feature not currently supported/implementated
 	

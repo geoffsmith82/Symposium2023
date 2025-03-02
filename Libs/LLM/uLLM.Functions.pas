@@ -8,6 +8,7 @@ uses
   System.JSON,
   System.Rtti,
   System.TypInfo,
+  FMX.Types,
   System.Generics.Collections,
   uAttributes
   ;
@@ -33,7 +34,9 @@ type
     destructor Destroy; override;
     procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
+    procedure InvokeClaudeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
     function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray;
+    function GetAvailableFunctionsClaudeJSON(UseStrict: Boolean): TJSONArray;
     function Count: Integer;
   end;
 
@@ -185,6 +188,21 @@ begin
     raise Exception.Create('Function not registered');
 end;
 
+procedure TFunctionRegistry.InvokeClaudeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
+var
+  FunctionName: string;
+  Method: TFunctionDescription;
+begin
+  FunctionName := JSONObject.GetValue<string>('name');
+  if FMethods.TryGetValue(FunctionName, Method) then
+  begin
+    InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
+  end
+  else
+    raise Exception.Create('Function not registered');
+end;
+
+
 procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
 var
   ArgsObject: TJSONObject;
@@ -193,12 +211,16 @@ var
   Params: TArray<TRttiParameter>;
   Args: TArray<TValue>;
   ParamValue: TJSONValue;
-  ParamStr: string;
   I: Integer;
   ResultValue: TValue;
 begin
-  ParamStr := JSONObject.GetValue<string>('arguments');
-  ArgsObject := TJSONObject.ParseJSONValue(ParamStr) as TJSONObject;
+  Log.d(JSONObject.ToJSON);
+
+  // Extract the 'input' JSON object properly
+  ArgsObject := JSONObject.GetValue<TJSONObject>('input');
+
+  if ArgsObject = nil then
+    raise Exception.Create('Invalid JSON: "input" field is missing or not a valid JSON object');
 
   Context := TRttiContext.Create;
   try
@@ -213,19 +235,22 @@ begin
       begin
         ParamValue := ArgsObject.GetValue(Params[I].Name);
 
+        if ParamValue = nil then
+          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+
         case Params[I].ParamType.TypeKind of
-          tkInteger: Args[I] := StrToInt(ParamValue.Value);
+          tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
+          tkFloat: Args[I] := StrToFloatDef(ParamValue.Value, 0.0);
           tkString, tkLString, tkUString, tkWString: Args[I] := ParamValue.Value;
-          tkFloat: Args[I] := StrToFloat(ParamValue.Value);
           tkEnumeration:
             if Params[I].ParamType.Handle = TypeInfo(Boolean) then
               Args[I] := SameText(ParamValue.Value, 'true')
             else
-              raise Exception.Create('Unsupported enumeration type');
-          tkClass: Args[I] := TObject(StrToInt(ParamValue.Value));
-          // Add more cases for other types as needed
+              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+          tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
+          tkChar: Args[I] := ParamValue.Value[1];
         else
-          raise Exception.Create('Unsupported parameter type');
+          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
         end;
       end;
 
@@ -239,7 +264,6 @@ begin
       raise Exception.Create('Method not found');
   finally
     Context.Free;
-    FreeAndNil(ArgsObject);
   end;
 end;
 
@@ -287,6 +311,48 @@ begin
   Result := ToolsArray;
 end;
 
+function TFunctionRegistry.GetAvailableFunctionsClaudeJSON(UseStrict: Boolean): TJSONArray;
+var
+  ToolsArray: TJSONArray;
+  FuncDesc: TFunctionDescription;
+  FunctionJSON, ToolObject: TJSONObject;
+  functionArray: TArray<string>;
+  functionName: string;
+begin
+  ToolsArray := TJSONArray.Create;
+  functionArray := FMethods.Keys.ToArray;
+
+  for functionName in functionArray do
+  begin
+    if FMethods.TryGetValue(functionName, FuncDesc) then
+    begin
+      ToolObject := TJSONObject.Create;
+      try
+        ToolObject.AddPair('name', FuncDesc.Name);
+        ToolObject.AddPair('description', FuncDesc.Description);
+        if UseStrict then
+          ToolObject.AddPair('strict', TJSONBool.Create(True));
+        ToolObject.AddPair('input_schema', FuncDesc.Parameters.Clone as TJSONObject);
+
+        FunctionJSON := TJSONObject.Create;
+        try
+         // FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
+          FunctionJSON.AddPair('function', ToolObject);
+
+          ToolsArray.AddElement(ToolObject);
+        except
+          FreeAndNil(FunctionJSON);
+          raise;
+        end;
+      except
+        FreeAndNil(ToolObject);
+        raise;
+      end;
+    end;
+  end;
+
+  Result := ToolsArray;
+end;
 
 
 destructor TFunctionDescription.Destroy;

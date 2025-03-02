@@ -10,6 +10,8 @@ uses
   ;
 
 type
+  TOnLog = reference to procedure(inLog:string);
+
   TChatMessage = class
     Role: string;
     Content: string;
@@ -28,6 +30,27 @@ type
     FId : string;
   public
     function_name: string;
+    constructor Create;
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  published
+    property Id : string read FId write FId;
+  end;
+
+  TClaudeJSONFunctionMessage = class(TChatMessage)
+  private
+    FJson: TJSONObject;
+  public
+    constructor Create(json:TJSONObject);
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  end;
+
+
+  TClaudeFunctionMessage = class(TChatMessage)
+  private
+    FId : string;
+  public
     constructor Create;
     destructor Destroy; override;
     function AsJSON: TJSONObject; override;
@@ -200,7 +223,7 @@ end;
 
 destructor TBaseLLM.Destroy;
 begin
-  FreeAndNil(ModelInfo);
+  FreeAndNil(FModelInfo);
   inherited;
 end;
 
@@ -404,6 +427,69 @@ begin
 end;
 
 destructor TFunctionCallMessage.Destroy;
+begin
+  FreeAndNil(FJSON);
+  inherited;
+end;
+
+{ TClaudeFunctionMessage }
+
+function TClaudeFunctionMessage.AsJSON: TJSONObject;
+var
+  LJSONMsg : TJSONObject;
+  LSubMsg : TJSONObject;
+  Arr: TJSONArray;
+begin
+  LJSONMsg := TJSONObject.Create;
+  LJSONMsg.AddPair('role', 'user');
+  LSubMsg := TJSONObject.Create;
+  LSubMsg.AddPair('type', 'tool_result');
+  LSubMsg.AddPair('tool_use_id', FId);
+  LSubMsg.AddPair('content', Content);
+  Arr := TJSONArray.Create;
+  Arr.AddElement(LSubMsg);
+  LJSONMsg.AddPair('content', Arr);
+
+  Result := LJSONMsg;
+end;
+
+constructor TClaudeFunctionMessage.Create;
+begin
+
+end;
+
+destructor TClaudeFunctionMessage.Destroy;
+begin
+
+  inherited;
+end;
+
+{ TClaudeJSONFunctionMessage }
+
+function TClaudeJSONFunctionMessage.AsJSON: TJSONObject;
+begin
+  Result := FJSON.Clone as TJSONObject;
+end;
+
+constructor TClaudeJSONFunctionMessage.Create(json: TJSONObject);
+var
+  content : TJSONObject;
+  arr : TJSONArray;
+  c : TJSONOBject;
+begin
+  content := TJSONObject.Create;
+  arr := TJSONArray.Create;
+  content.AddPair('content', arr);
+  content.AddPair('role', 'assistant');
+  c := TJSONOBject.Create;
+  c.AddPair('type', 'text');
+  c.AddPair('text', 'Thinking');
+  arr.AddElement(c);
+  FJSON := content;
+  arr.AddElement(json.Clone as TJSONObject);
+end;
+
+destructor TClaudeJSONFunctionMessage.Destroy;
 begin
   FreeAndNil(FJSON);
   inherited;

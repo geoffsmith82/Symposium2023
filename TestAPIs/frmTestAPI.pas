@@ -91,6 +91,7 @@ type
     procedure TestOpenAIFunctionCalling;
     procedure TestAzureFunctionCalling;
     procedure TestGroqFunctionCalling;
+    procedure TestAnthropicClaudeFunctionCalling;
     procedure TestXaiGrokFunctionCalling;
 
 
@@ -193,13 +194,13 @@ begin
       Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
     end;
     settings.json_mode := False;
-    settings.model := 'claude-3-5-sonnet-20240620';
+    settings.model := 'claude-3-7-sonnet-20250219';
     settings.max_tokens := 1024;
     messages := TObjectList<TChatMessage>.Create;
     msg := TClaudeVisionMessage.Create;
     msg.Role := 'user';
     msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
-    msg.Content := 'Describe the following image';
+    msg.Content := 'Describe the following image. It does not contain popcorn. If it is not popcorn what can it be?';
     messages.Add(msg);
     answer := anthropic.ChatCompletion(settings, messages).Content;
     Memo1.Lines.Add('Answer: ' + answer);
@@ -758,6 +759,68 @@ begin
     FreeAndNil(groq);
   end;
 end;
+
+
+procedure TfrmTestApiWindow.TestAnthropicClaudeFunctionCalling;
+var
+  claude: TAnthropic;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  claude := TAnthropic.Create(FApiKeyStore.LoadApiKey('Claude_APIKey'));
+{  claude.OnLog := procedure(inLog: string)
+                  begin
+                    Memo1.Lines.Add(inLog);
+                  end; }
+  settings := Default(TChatSettings);
+  try
+    claude.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    claude.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'claude-3-5-sonnet-20241022';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := claude.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := claude.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := claude.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+    messages.Clear;
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(claude);
+  end;
+end;
+
 
 procedure TfrmTestApiWindow.TestXaiGrokFunctionCalling;
 var
