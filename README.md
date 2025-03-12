@@ -1,7 +1,7 @@
 # Artificial Intelligence and ChatGPT
 Source code and Documentation for my [ADUG](https://www.adug.org.au) [Symposium Talk presented on the 28th of April 2023](https://www.youtube.com/watch?v=7HNiOMcHBW8). 
 
-**I have since added to and continue to enhance the code to further demonstrate capabilities of AI.**
+**I have since added to and continue to enhance the code to further demonstrate capabilities of AI, adding things that wasn't available at the time.**
 
 The goal of this project is to enable delphi users to be able to use AI technology in their applications.  There are many different types of AI and thousands of different models.  This project is working on creating generalized interfaces to the different types of AI models and make them easily accessible.
 
