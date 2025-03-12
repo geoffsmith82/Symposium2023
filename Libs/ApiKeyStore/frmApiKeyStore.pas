@@ -104,7 +104,7 @@ begin
   SettingsStringGrid.ColWidths[0] := 300;
   SettingsStringGrid.ColWidths[1] := SettingsStringGrid.Width - SettingsStringGrid.ColWidths[0];
 
-  StringGrid.RowCount := 18;
+  StringGrid.RowCount := 19;
   SettingsStringGrid.RowCount := 3;
 
   StringGrid.Cells[0, 1] := 'chatgpt_apikey';
@@ -124,6 +124,7 @@ begin
   StringGrid.Cells[0,15] := 'AzureAPIKey';
   StringGrid.Cells[0,16] := 'Claude_APIKey';
   StringGrid.Cells[0,17] := 'picovoice';
+  StringGrid.Cells[0,18] := 'WEATHER_API_KEY';
 
 
 
