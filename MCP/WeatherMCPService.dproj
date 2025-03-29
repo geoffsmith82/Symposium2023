@@ -154,10 +154,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="BaseService.pas"/>
-        <DCCReference Include="MCPAttributes.pas"/>
-        <DCCReference Include="MCPInterface.pas"/>
-        <DCCReference Include="MCPMethodProcessor.pas"/>
+        <DCCReference Include="..\Libs\MCP\MCP.BaseService.pas"/>
+        <DCCReference Include="..\Libs\MCP\MCP.Attributes.pas"/>
+        <DCCReference Include="..\Libs\MCP\MCP.ServiceInterface.pas"/>
+        <DCCReference Include="..\Libs\MCP\MCP.MethodProcessor.pas"/>
         <DCCReference Include="WeatherApi.pas"/>
         <DCCReference Include="WeatherService.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>

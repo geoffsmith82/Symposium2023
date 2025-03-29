@@ -26,6 +26,9 @@ type
     FServiceName: string;
     FServiceVersion: string;
     FServiceInstructions: string;
+    // Resources and Prompts related properties
+    FResources: TJSONArray;
+    FPrompts: TJSONArray;
   protected
     // MCP Protocol implementation
     function CreateInitializeResponse(const RequestID: string): TJSONObject; virtual;
@@ -36,11 +39,19 @@ type
     function HandleToolsList(const RequestID: string): TJSONObject; virtual;
     function HandleToolsCall(const RequestID: string; Params: TJSONObject): TJSONObject; virtual;
     function HandleGetCapabilities(const RequestID: string): TJSONObject; virtual;
+    function HandlePromptsList(const RequestID: string): TJSONObject; virtual;
+    function HandleResourcesList(const RequestID: string): TJSONObject; virtual;
     procedure ProcessJSONRPCRequest(Request: TJSONObject; out Response: TJSONObject); virtual;
     procedure ProcessRequest(const RequestStr: string; out ResponseStr: string); virtual;
 
     // Tools-related methods
     function GetTools: TJSONArray; virtual;
+    
+    // Resources-related methods
+    function GetResources: TJSONArray; virtual;
+    
+    // Prompts-related methods
+    function GetPrompts: TJSONArray; virtual;
 
     // Property access
     property ProtocolVersion: string read FProtocolVersion;
@@ -72,6 +83,10 @@ begin
   // Set default protocol version
   FProtocolVersion := '2024-11-05';
   FIsInitialized := False;
+  
+  // Initialize resources and prompts arrays
+  FResources := TJSONArray.Create;
+  FPrompts := TJSONArray.Create;
 end;
 
 destructor TMCPBaseService.Destroy;
@@ -81,6 +96,12 @@ begin
     FClientInfo.Free;
   if Assigned(FClientCapabilities) then
     FClientCapabilities.Free;
+  
+  // Free resources and prompts arrays
+  if Assigned(FResources) then
+    FResources.Free;
+  if Assigned(FPrompts) then
+    FPrompts.Free;
 
   inherited;
 end;
@@ -111,6 +132,17 @@ begin
   var ToolsObj := TJSONObject.Create;
   ToolsObj.AddPair('listChanged', TJSONBool.Create(False));
   Capabilities.AddPair('tools', ToolsObj);
+  
+  // Add resources capability
+  var ResourcesObj := TJSONObject.Create;
+  ResourcesObj.AddPair('listChanged', TJSONBool.Create(False));
+  Capabilities.AddPair('resources', ResourcesObj);
+  
+  // Add prompts capability
+  var PromptsObj := TJSONObject.Create;
+  PromptsObj.AddPair('listChanged', TJSONBool.Create(False));
+  Capabilities.AddPair('prompts', PromptsObj);
+  
   ResponseContent.AddPair('capabilities', Capabilities);
 
   // Add instructions
@@ -210,6 +242,18 @@ begin
   Result := TMCPRTTIHelper.GetToolsForObject(Self);
 end;
 
+function TMCPBaseService.GetResources: TJSONArray;
+begin
+  // Return the resources array (override in descendant classes)
+  Result := FResources.Clone as TJSONArray;
+end;
+
+function TMCPBaseService.GetPrompts: TJSONArray;
+begin
+  // Return the prompts array (override in descendant classes)
+  Result := FPrompts.Clone as TJSONArray;
+end;
+
 function TMCPBaseService.HandleToolsList(const RequestID: string): TJSONObject;
 var
   ResultObj: TJSONObject;
@@ -219,6 +263,34 @@ begin
 
   // Get tools array using RTTI
   ResultObj.AddPair('tools', GetTools);
+
+  // Create and return the response
+  Result := CreateJSONRPCResponse(RequestID, ResultObj);
+end;
+
+function TMCPBaseService.HandleResourcesList(const RequestID: string): TJSONObject;
+var
+  ResultObj: TJSONObject;
+begin
+  // Create the response
+  ResultObj := TJSONObject.Create;
+
+  // Get resources array
+  ResultObj.AddPair('resources', GetResources);
+
+  // Create and return the response
+  Result := CreateJSONRPCResponse(RequestID, ResultObj);
+end;
+
+function TMCPBaseService.HandlePromptsList(const RequestID: string): TJSONObject;
+var
+  ResultObj: TJSONObject;
+begin
+  // Create the response
+  ResultObj := TJSONObject.Create;
+
+  // Get prompts array
+  ResultObj.AddPair('prompts', GetPrompts);
 
   // Create and return the response
   Result := CreateJSONRPCResponse(RequestID, ResultObj);
@@ -335,6 +407,13 @@ begin
     MethodProcessor.Free;
   end;
 
+  // Add resources and prompts capabilities if available
+  if GetResources.Count > 0 then
+    CapabilitiesObj.AddPair('resources/list', 'List available resources');
+    
+  if GetPrompts.Count > 0 then
+    CapabilitiesObj.AddPair('prompts/list', 'List available prompts');
+
   ResultObj.AddPair('capabilities', CapabilitiesObj);
 
   // Add commands - this provides backward compatibility
@@ -348,6 +427,14 @@ begin
       CommandsObj.AddPair(ToolAttr.Name, ToolAttr.Description);
     end;
   end;
+  
+  // Add resources and prompts commands if available
+  if GetResources.Count > 0 then
+    CommandsObj.AddPair('resources/list', 'List available resources');
+    
+  if GetPrompts.Count > 0 then
+    CommandsObj.AddPair('prompts/list', 'List available prompts');
+    
   ResultObj.AddPair('commands', CommandsObj);
 
   // Add service description
@@ -429,6 +516,14 @@ begin
       else if Method = 'tools/list' then
       begin
         Response := HandleToolsList(RequestID);
+      end
+      else if Method = 'resources/list' then
+      begin
+        Response := HandleResourcesList(RequestID);
+      end
+      else if Method = 'prompts/list' then
+      begin
+        Response := HandlePromptsList(RequestID);
       end
       else if Method = 'getCapabilities' then
       begin
