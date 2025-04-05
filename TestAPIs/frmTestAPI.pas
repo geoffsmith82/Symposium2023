@@ -38,12 +38,12 @@ type
     File1: TMenuItem;
     Exit1: TMenuItem;
     TestMenuItem: TMenuItem;
-    Button2: TButton;
     miSettings: TMenuItem;
     miAPIKeys: TMenuItem;
+    miGoogleAuthenticate: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
+    procedure miGoogleAuthenticateClick(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
   private
@@ -535,7 +535,7 @@ begin
   end;
 end;
 
-procedure TfrmTestApiWindow.Button2Click(Sender: TObject);
+procedure TfrmTestApiWindow.miGoogleAuthenticateClick(Sender: TObject);
 begin
   Fgooglespeech.Authenticate;
 end;

@@ -20,17 +20,18 @@ uses
   FMX.Grid.Style,
   FMX.ScrollBox,
   FMX.Grid,
+  uAPIKeyNameList,
   ApiKeyStore;
 
 type
   TfrmApiKeyStores = class(TForm)
     TabControl1: TTabControl;
-    TabItem1: TTabItem;
-    TabItem2: TTabItem;
+    tiAPIKeys: TTabItem;
+    tiSettings: TTabItem;
     btnCancel: TButton;
     btnClose: TButton;
-    StringGrid: TStringGrid;
-    SettingsStringGrid: TStringGrid;
+    sgAPIKeys: TStringGrid;
+    sgSettings: TStringGrid;
     StringColumn1: TStringColumn;
     StringColumn2: TStringColumn;
     StringColumn3: TStringColumn;
@@ -38,11 +39,11 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure SettingsStringGridEditingDone(Sender: TObject; const ACol, ARow: Integer);
-    procedure StringGridDrawColumnCell(Sender: TObject; const Canvas: TCanvas;
+    procedure sgSettingsEditingDone(Sender: TObject; const ACol, ARow: Integer);
+    procedure sgAPIKeysDrawColumnCell(Sender: TObject; const Canvas: TCanvas;
         const Column: TColumn; const Bounds: TRectF; const Row: Integer; const
         Value: TValue; const State: TGridDrawStates);
-    procedure StringGridEditingDone(Sender: TObject; const ACol, ARow: Integer);
+    procedure sgAPIKeysEditingDone(Sender: TObject; const ACol, ARow: Integer);
   private
     { Private declarations }
     FApiKeyStore : TApiKeyStore;
@@ -68,22 +69,22 @@ var
   i: Integer;
   ApiKeyName, ApiKeyValue: string;
 begin
-  for i := 0 to StringGrid.RowCount - 1 do
+  for i := 0 to sgAPIKeys.RowCount - 1 do
   begin
     if FModifiedRows[i] then
     begin
-      ApiKeyName := StringGrid.Cells[0, i];
-      ApiKeyValue := StringGrid.Cells[1, i];
+      ApiKeyName := sgAPIKeys.Cells[0, i];
+      ApiKeyValue := sgAPIKeys.Cells[1, i];
       FApiKeyStore.SaveApiKey(ApiKeyName, ApiKeyValue);
     end;
   end;
 
-  for i := 0 to SettingsStringGrid.RowCount - 1 do
+  for i := 0 to sgSettings.RowCount - 1 do
   begin
     if FSettingsModifiedRows[i] then
     begin
-      ApiKeyName := SettingsStringGrid.Cells[0, i];
-      ApiKeyValue := SettingsStringGrid.Cells[1, i];
+      ApiKeyName := sgSettings.Cells[0, i];
+      ApiKeyValue := sgSettings.Cells[1, i];
       FApiKeyStore.SaveSetting(ApiKeyName, ApiKeyValue);
     end;
   end;
@@ -96,56 +97,43 @@ var
   i : Integer;
 begin
   StringColumn1.Width := 300;
-  StringColumn2.Width := StringGrid.Width - StringColumn1.Width - 20;
+  StringColumn2.Width := sgAPIKeys.Width - StringColumn1.Width - 20;
 
   StringColumn3.Width := 300;
-  StringColumn4.Width := SettingsStringGrid.Width - StringColumn3.Width - 20;
+  StringColumn4.Width := sgSettings.Width - StringColumn3.Width - 20;
 
-  StringGrid.RowCount := 17;
-  SettingsStringGrid.RowCount := 2;
+  sgAPIKeys.RowCount := High(ApiKeyNames);
+  sgSettings.RowCount := 2;
 
-  StringGrid.Cells[0, 0] := 'chatgpt_apikey';
-  StringGrid.Cells[0, 1] := 'X_AI';
-  StringGrid.Cells[0, 2] := 'groq_apikey';
-  StringGrid.Cells[0, 3] := 'ElevenLabsAPIKey';
-  StringGrid.Cells[0, 4] := 'revai_key';
-  StringGrid.Cells[0, 5] := 'assemblyai_key';
-  StringGrid.Cells[0, 6] := 'deepgram_key';
-  StringGrid.Cells[0, 7] := 'HuggingFace_APIKey';
-  StringGrid.Cells[0, 8] := 'ms_cognative_service_resource_key';
-  StringGrid.Cells[0, 9] := 'AWSAccessKey';
-  StringGrid.Cells[0,10] := 'AWSSecretKey';
-  StringGrid.Cells[0,11] := 'google_clientid';
-  StringGrid.Cells[0,12] := 'google_clientsecret';
-  StringGrid.Cells[0,13] := 'Replicate_APIKey';
-  StringGrid.Cells[0,14] := 'AzureAPIKey';
-  StringGrid.Cells[0,15] := 'Claude_APIKey';
-  StringGrid.Cells[0,16] := 'picovoice';
+  for i := 1 to High(ApiKeyNames) do
+  begin
+    sgAPIKeys.Cells[0, i - 1] := ApiKeyNames[i];
+  end;
 
-  SettingsStringGrid.Cells[0, 0] := 'AWSRegion';
-  SettingsStringGrid.Cells[0, 1] := 'AzureOpenAIEndpoint';
+  sgSettings.Cells[0, 0] := 'AWSRegion';
+  sgSettings.Cells[0, 1] := 'AzureOpenAIEndpoint';
 
   FApiKeyStore := TApiKeyStore.GetInstance;
 
-  for i := 0 to StringGrid.RowCount - 1 do
+  for i := 0 to sgAPIKeys.RowCount - 1 do
   begin
-    StringGrid.Cells[1, i] :=  FApiKeyStore.LoadApiKey(StringGrid.Cells[0, i]);
+    sgAPIKeys.Cells[1, i] :=  FApiKeyStore.LoadApiKey(sgAPIKeys.Cells[0, i]);
   end;
 
-  for i := 0 to SettingsStringGrid.RowCount - 1 do
+  for i := 0 to sgSettings.RowCount - 1 do
   begin
-    SettingsStringGrid.Cells[1, i] :=  FApiKeyStore.LoadSetting(SettingsStringGrid.Cells[0, i]);
+    sgSettings.Cells[1, i] :=  FApiKeyStore.LoadSetting(sgSettings.Cells[0, i]);
   end;
 
   // Initialize modified tracking array
-  SetLength(FModifiedRows, StringGrid.RowCount);
+  SetLength(FModifiedRows, sgAPIKeys.RowCount);
   for i := 0 to High(FModifiedRows) do
     FModifiedRows[i] := False;
 
-    StringGrid.EditorMode := False;
+    sgAPIKeys.EditorMode := False;
 
   // Initialize modified tracking array
-  SetLength(FSettingsModifiedRows, SettingsStringGrid.RowCount);
+  SetLength(FSettingsModifiedRows, sgSettings.RowCount);
   for i := 0 to High(FSettingsModifiedRows) do
     FSettingsModifiedRows[i] := False;
 
@@ -194,7 +182,7 @@ begin
   Result := MaskedText;
 end;
 
-procedure TfrmApiKeyStores.SettingsStringGridEditingDone(Sender: TObject; const
+procedure TfrmApiKeyStores.sgSettingsEditingDone(Sender: TObject; const
     ACol, ARow: Integer);
 begin
   if ACol = 1 then
@@ -206,7 +194,7 @@ end;
 
 
 
-procedure TfrmApiKeyStores.StringGridDrawColumnCell(Sender: TObject;
+procedure TfrmApiKeyStores.sgAPIKeysDrawColumnCell(Sender: TObject;
   const Canvas: TCanvas; const Column: TColumn; const Bounds: TRectF;
   const Row: Integer; const Value: TValue; const State: TGridDrawStates);
 var
@@ -225,7 +213,7 @@ begin
   Canvas.FillText(Bounds, DisplayText, False, 1, [], TTextAlign.Leading, TTextAlign.Center);
 end;
 
-procedure TfrmApiKeyStores.StringGridEditingDone(Sender: TObject; const ACol,
+procedure TfrmApiKeyStores.sgAPIKeysEditingDone(Sender: TObject; const ACol,
     ARow: Integer);
 begin
   if ACol = 1 then

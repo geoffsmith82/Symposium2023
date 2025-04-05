@@ -18,6 +18,7 @@ uses
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   FMX.frmApiKeyStore in '..\Libs\ApiKeyStore\FMX.frmApiKeyStore.pas' {frmApiKeyStores},
+  uAPIKeyNameList in '..\Libs\ApiKeyStore\uAPIKeyNameList.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas';
 
 {$R *.res}

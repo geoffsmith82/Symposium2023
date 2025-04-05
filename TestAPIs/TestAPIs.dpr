@@ -42,6 +42,7 @@ uses
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
   ApiKeyStore.Android in '..\Libs\ApiKeyStore\ApiKeyStore.Android.pas',
+  uAPIKeyNameList in '..\Libs\ApiKeyStore\uAPIKeyNameList.pas',
   frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}

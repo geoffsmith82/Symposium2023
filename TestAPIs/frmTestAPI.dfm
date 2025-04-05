@@ -7,7 +7,7 @@ object frmTestApiWindow: TfrmTestApiWindow
   Margins.Bottom = 8
   Caption = 'AI API Tester'
   ClientHeight = 990
-  ClientWidth = 1844
+  ClientWidth = 1843
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,9 +21,9 @@ object frmTestApiWindow: TfrmTestApiWindow
   TextHeight = 41
   object Memo1: TMemo
     Left = 0
-    Top = 66
-    Width = 1844
-    Height = 924
+    Top = 0
+    Width = 1843
+    Height = 990
     Margins.Left = 8
     Margins.Top = 8
     Margins.Right = 8
@@ -32,20 +32,6 @@ object frmTestApiWindow: TfrmTestApiWindow
     Lines.Strings = (
       'Memo1')
     TabOrder = 0
-  end
-  object Button2: TButton
-    Left = 0
-    Top = 0
-    Width = 1844
-    Height = 66
-    Margins.Left = 8
-    Margins.Top = 8
-    Margins.Right = 8
-    Margins.Bottom = 8
-    Align = alTop
-    Caption = 'Authenticate'
-    TabOrder = 1
-    OnClick = Button2Click
   end
   object MainMenu: TMainMenu
     Left = 456
@@ -65,6 +51,10 @@ object frmTestApiWindow: TfrmTestApiWindow
       object miAPIKeys: TMenuItem
         Caption = 'API Keys...'
         OnClick = miAPIKeysClick
+      end
+      object miGoogleAuthenticate: TMenuItem
+        Caption = 'Google Authenticate...'
+        OnClick = miGoogleAuthenticateClick
       end
     end
   end

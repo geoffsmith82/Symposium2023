@@ -15,7 +15,8 @@ uses
   Vcl.Grids,
   Vcl.StdCtrls,
   Vcl.ComCtrls,
-  ApiKeyStore
+  ApiKeyStore,
+  uAPIKeyNameList
   ;
 
 type
@@ -104,35 +105,16 @@ begin
   SettingsStringGrid.ColWidths[0] := 300;
   SettingsStringGrid.ColWidths[1] := SettingsStringGrid.Width - SettingsStringGrid.ColWidths[0];
 
-  StringGrid.RowCount := 19;
+  StringGrid.RowCount := High(ApiKeyNames) + 1;
   SettingsStringGrid.RowCount := 3;
 
-  StringGrid.Cells[0, 1] := 'chatgpt_apikey';
-  StringGrid.Cells[0, 2] := 'X_AI';
-  StringGrid.Cells[0, 3] := 'groq_apikey';
-  StringGrid.Cells[0, 4] := 'ElevenLabsAPIKey';
-  StringGrid.Cells[0, 5] := 'revai_key';
-  StringGrid.Cells[0, 6] := 'assemblyai_key';
-  StringGrid.Cells[0, 7] := 'deepgram_key';
-  StringGrid.Cells[0, 8] := 'HuggingFace_APIKey';
-  StringGrid.Cells[0, 9] := 'ms_cognative_service_resource_key';
-  StringGrid.Cells[0,10] := 'AWSAccessKey';
-  StringGrid.Cells[0,11] := 'AWSSecretKey';
-  StringGrid.Cells[0,12] := 'google_clientid';
-  StringGrid.Cells[0,13] := 'google_clientsecret';
-  StringGrid.Cells[0,14] := 'Replicate_APIKey';
-  StringGrid.Cells[0,15] := 'AzureAPIKey';
-  StringGrid.Cells[0,16] := 'Claude_APIKey';
-  StringGrid.Cells[0,17] := 'picovoice';
-  StringGrid.Cells[0,18] := 'WEATHER_API_KEY';
-
-
+  for I := Low(ApiKeyNames) to High(ApiKeyNames) do
+  begin
+    StringGrid.Cells[0,  i] := ApiKeyNames[i];
+  end;
 
   SettingsStringGrid.Cells[0, 1] := 'AWSRegion';
   SettingsStringGrid.Cells[0, 2] := 'AzureOpenAIEndpoint';
-
-
-
 
   FApiKeyStore := TApiKeyStore.GetInstance;
 

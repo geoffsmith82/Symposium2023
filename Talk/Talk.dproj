@@ -323,6 +323,7 @@
             <Form>frmApiKeyStores</Form>
         </DCCReference>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
