@@ -186,7 +186,7 @@ var
   Local_modelObj: TBaseModelInfo;
   settings: TChatSettings;
   messages: System.Generics.Collections.TObjectList<TChatMessage>;
-  msg: TClaudeVisionMessage;
+  msg: TChatVisionMessage;
   answer: string;
 begin
   Memo1.Lines.Add('======== Model Anthropic');
@@ -200,7 +200,7 @@ begin
     settings.model := 'claude-3-7-sonnet-20250219';
     settings.max_tokens := 1024;
     messages := TObjectList<TChatMessage>.Create;
-    msg := TClaudeVisionMessage.Create;
+    msg := TAnthropic.CreateChatVisionMessage;
     msg.Role := 'user';
     msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
     msg.Content := 'Describe the following image. It does not contain popcorn. If it is not popcorn what can it be?';
@@ -256,7 +256,7 @@ var
   msg: TChatVisionMessage;
   answer: string;
 begin
-  Memo1.Lines.Add('======== Model Anthropic');
+  Memo1.Lines.Add('======== Model X.AI');
   grokAI := TXGrokAI.Create(FApiKeyStore.LoadApiKey('X_AI'));
   try
     for Local_modelObj in grokAI.ModelInfo do
@@ -323,11 +323,11 @@ begin
     config.model := 'gemini-2.0-flash-exp';
     config.json_mode := False;
     AMessages := TObjectList<TChatMessage>.Create;
-    MessageVision := TChatVisionMessage.Create;
+    MessageVision := TGemini.CreateChatVisionMessage;
     MessageVision.Role := 'system';
     MessageVision.Content := 'You are a useful assistant';
     AMessages.Add(MessageVision);
-    MessageVision := TChatVisionMessage.Create;
+    MessageVision := TGemini.CreateChatVisionMessage;
     MessageVision.Role := 'user';
     MessageVision.Content := 'Describe the following image';
     MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
