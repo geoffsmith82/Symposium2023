@@ -62,7 +62,7 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
-    property Functions: TFunctionRegistry read FFunctions write FFunctions;
+    property Functions: TFunctionRegistry read FFunctions;
   end;
 
 implementation

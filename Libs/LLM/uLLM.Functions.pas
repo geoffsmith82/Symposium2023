@@ -16,7 +16,7 @@ uses
 type
   TFunctionDescription = class
     Name: string;
-    Method: TMethod;
+    Method: System.TMethod;
     Description: string;
     Parameters: TJSONObject;
     constructor Create(const AName, ADescription: string; const AParameters: TJSONObject);
@@ -24,19 +24,17 @@ type
   end;
 
   TFunctionRegistry = class
-  private
+  protected
     FMethods: TObjectDictionary<string, TFunctionDescription>;
-    procedure InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
+    procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
   public
     constructor Create;
     destructor Destroy; override;
-    procedure RegisterFunction(const Func: Pointer; const Instance: TObject);
-    procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
-    procedure InvokeClaudeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
-    function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray;
-    function GetAvailableFunctionsClaudeJSON(UseStrict: Boolean): TJSONArray;
+    procedure RegisterFunction(const Func: Pointer; const Instance: TObject); virtual;
+    procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string); virtual;
+    function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray; virtual;
     function Count: Integer;
   end;
 
@@ -188,21 +186,6 @@ begin
     raise Exception.Create('Function not registered');
 end;
 
-procedure TFunctionRegistry.InvokeClaudeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
-var
-  FunctionName: string;
-  Method: TFunctionDescription;
-begin
-  FunctionName := JSONObject.GetValue<string>('name');
-  if FMethods.TryGetValue(FunctionName, Method) then
-  begin
-    InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
-  end
-  else
-    raise Exception.Create('Function not registered');
-end;
-
-
 procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
 var
   ArgsObject: TJSONObject;
@@ -310,50 +293,6 @@ begin
 
   Result := ToolsArray;
 end;
-
-function TFunctionRegistry.GetAvailableFunctionsClaudeJSON(UseStrict: Boolean): TJSONArray;
-var
-  ToolsArray: TJSONArray;
-  FuncDesc: TFunctionDescription;
-  FunctionJSON, ToolObject: TJSONObject;
-  functionArray: TArray<string>;
-  functionName: string;
-begin
-  ToolsArray := TJSONArray.Create;
-  functionArray := FMethods.Keys.ToArray;
-
-  for functionName in functionArray do
-  begin
-    if FMethods.TryGetValue(functionName, FuncDesc) then
-    begin
-      ToolObject := TJSONObject.Create;
-      try
-        ToolObject.AddPair('name', FuncDesc.Name);
-        ToolObject.AddPair('description', FuncDesc.Description);
-        if UseStrict then
-          ToolObject.AddPair('strict', TJSONBool.Create(True));
-        ToolObject.AddPair('input_schema', FuncDesc.Parameters.Clone as TJSONObject);
-
-        FunctionJSON := TJSONObject.Create;
-        try
-         // FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
-          FunctionJSON.AddPair('function', ToolObject);
-
-          ToolsArray.AddElement(ToolObject);
-        except
-          FreeAndNil(FunctionJSON);
-          raise;
-        end;
-      except
-        FreeAndNil(ToolObject);
-        raise;
-      end;
-    end;
-  end;
-
-  Result := ToolsArray;
-end;
-
 
 destructor TFunctionDescription.Destroy;
 begin

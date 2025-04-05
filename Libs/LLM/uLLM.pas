@@ -37,8 +37,6 @@ type
     property Id : string read FId write FId;
   end;
 
-
-
   TFunctionCallMessage = class(TChatMessage)
   private
     FJSON : TJSONObject;
@@ -141,6 +139,8 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; virtual; abstract;
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
+    class function CreateChatMessage: TChatMessage; virtual;
+    class function CreateChatVisionMessage: TChatVisionMessage; virtual;
   published
     property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
   end;
@@ -198,6 +198,16 @@ constructor TBaseLLM.Create(const APIKey: string);
 begin
   FAPIKey := APIKey;
   FModelInfo := TObjectList<TBaseModelInfo>.Create;
+end;
+
+class function TBaseLLM.CreateChatMessage: TChatMessage;
+begin
+  Result := TChatMessage.Create;
+end;
+
+class function TBaseLLM.CreateChatVisionMessage: TChatVisionMessage;
+begin
+  Result := TChatVisionMessage.Create;
 end;
 
 destructor TBaseLLM.Destroy;
@@ -322,8 +332,6 @@ begin
   Result := LJSONMsg;
 end;
 
-
-
 { TFunctionMessage }
 
 function TFunctionMessage.AsJSON: TJSONObject;
@@ -346,7 +354,6 @@ end;
 
 destructor TFunctionMessage.Destroy;
 begin
-
   inherited;
 end;
 

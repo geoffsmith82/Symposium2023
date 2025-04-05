@@ -69,7 +69,7 @@ type
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     // function Completion(const AQuestion: string; const AModel: string): string; override; // Optional: Implement if needed, might just wrap ChatCompletion
 
-    property Functions: TFunctionRegistry read FFunctions write FFunctions; // Optional: if function calling is needed
+    property Functions: TFunctionRegistry read FFunctions;
   end;
 
 implementation

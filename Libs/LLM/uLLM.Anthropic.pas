@@ -7,6 +7,7 @@ uses
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
+  System.Rtti,
   FMX.Types,
   windows,
   System.Generics.Collections,
@@ -51,6 +52,13 @@ type
     function AsJSON: TJSONObject; override;
   end;
 
+  TClaudeFunctionRegistry = class(TFunctionRegistry)
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string); override;
+    function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray; override;
+  end;
 
   TAnthropic = class(TBaseLLM)
   protected
@@ -68,7 +76,10 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
-    property Functions: TFunctionRegistry read FFunctions write FFunctions;
+
+    class function CreateChatVisionMessage: TChatVisionMessage; override;
+
+    property Functions: TFunctionRegistry read FFunctions;
     property OnLog: TOnLog read FOnLog write FOnLog;
   end;
 
@@ -197,7 +208,7 @@ begin
     // Include available functions in the request
     if Functions.Count > 0 then
     begin
-      LJSONFunctions := Functions.GetAvailableFunctionsClaudeJSON(False);
+      LJSONFunctions := Functions.GetAvailableFunctionsJSON(False);
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
     end;
     OutputDebugString(PChar(LJSONBody.ToJSON));
@@ -250,7 +261,7 @@ begin
           FunctionId := LChoice.GetValue<string>('id');
           FunctionName := LChoice.GetValue<string>('name');
           // Invoke the function with the arguments
-          Functions.InvokeClaudeFunction(LChoice as TJSONObject, FunctionReturnValue);
+          Functions.InvokeFunction(LChoice as TJSONObject, FunctionReturnValue);
           var funcMsg := TClaudeFunctionMessage.Create;
           funcMsg.Content := FunctionReturnValue;
           funcMsg.Id := FunctionId;
@@ -288,7 +299,12 @@ end;
 constructor TAnthropic.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
-  FFunctions := TFunctionRegistry.Create;
+  FFunctions := TClaudeFunctionRegistry.Create;
+end;
+
+class function TAnthropic.CreateChatVisionMessage: TChatVisionMessage;
+begin
+  Result := TClaudeVisionMessage.Create;
 end;
 
 destructor TAnthropic.Destroy;
@@ -488,5 +504,75 @@ begin
   FreeAndNil(FJSON);
   inherited;
 end;
+
+
+procedure TClaudeFunctionRegistry.InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string);
+var
+  FunctionName: string;
+  Method: TFunctionDescription;
+begin
+  FunctionName := JSONObject.GetValue<string>('name');
+  if FMethods.TryGetValue(FunctionName, Method) then
+  begin
+    InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
+  end
+  else
+    raise Exception.Create('Function not registered');
+end;
+
+constructor TClaudeFunctionRegistry.Create;
+begin
+  inherited Create;
+end;
+
+destructor TClaudeFunctionRegistry.Destroy;
+begin
+
+  inherited;
+end;
+
+function TClaudeFunctionRegistry.GetAvailableFunctionsJSON(UseStrict: Boolean): TJSONArray;
+var
+  ToolsArray: TJSONArray;
+  FuncDesc: TFunctionDescription;
+  FunctionJSON, ToolObject: TJSONObject;
+  functionArray: TArray<string>;
+  functionName: string;
+begin
+  ToolsArray := TJSONArray.Create;
+  functionArray := FMethods.Keys.ToArray;
+
+  for functionName in functionArray do
+  begin
+    if FMethods.TryGetValue(functionName, FuncDesc) then
+    begin
+      ToolObject := TJSONObject.Create;
+      try
+        ToolObject.AddPair('name', FuncDesc.Name);
+        ToolObject.AddPair('description', FuncDesc.Description);
+        if UseStrict then
+          ToolObject.AddPair('strict', TJSONBool.Create(True));
+        ToolObject.AddPair('input_schema', FuncDesc.Parameters.Clone as TJSONObject);
+
+        FunctionJSON := TJSONObject.Create;
+        try
+         // FunctionJSON.AddPair('type', 'function'); // Ensure 'type' is included
+          FunctionJSON.AddPair('function', ToolObject);
+
+          ToolsArray.AddElement(ToolObject);
+        except
+          FreeAndNil(FunctionJSON);
+          raise;
+        end;
+      except
+        FreeAndNil(ToolObject);
+        raise;
+      end;
+    end;
+  end;
+
+  Result := ToolsArray;
+end;
+
 
 end.
