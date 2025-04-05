@@ -21,7 +21,7 @@ uses
   uLLM.Azure in '..\Libs\LLM\uLLM.Azure.pas',
   REST.Authenticator.EnhancedOAuth in '..\Libs\REST.Authenticator.EnhancedOAuth.pas',
   uLLM.OpenAI in '..\Libs\LLM\uLLM.OpenAI.pas',
-  uLLM.Google.PaLM in '..\Libs\LLM\uLLM.Google.PaLM.pas',
+  uLLM.Google.Gemini in '..\Libs\LLM\uLLM.Google.Gemini.pas',
   uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
   uLLM.Replicate in '..\Libs\LLM\uLLM.Replicate.pas',
   uLLM.HuggingFace in '..\Libs\LLM\uLLM.HuggingFace.pas',

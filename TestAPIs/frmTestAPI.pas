@@ -60,6 +60,7 @@ type
     procedure ListReplicateLLM;
     procedure ListAzureLLMModels;
     procedure ListGoogleLLMModels;
+    procedure TestGoogleLLM;
     procedure ListAmazonVoices;
     procedure ListAnthropicModels;
     procedure ListElevenLabsVoices;
@@ -77,7 +78,9 @@ type
     procedure TestWindowsVoice;
     procedure TestMicrosoftVoices;
     procedure TestGoogleVoices;
+
     procedure TestOpenAIVision;
+    procedure TestGoogleAIVision;
     procedure TestAnthropicClaudeVision;
     procedure TestAzureVision;
     procedure TestXaiGrokVision;
@@ -128,7 +131,7 @@ uses
   uLLM,
   uLLM.OpenAI,
   uLLM.Azure,
-  uLLM.Google.PaLM,
+  uLLM.Google.Gemini,
   uLLM.Anthropic,
   uLLM.HuggingFace,
   uLLM.Replicate,
@@ -306,6 +309,37 @@ begin
     FreeAndNil(AMessages);
   end;
 end;
+
+procedure TfrmTestApiWindow.TestGoogleAIVision;
+var
+  gemini: TGemini;
+  config: TChatSettings;
+  AMessages: System.Generics.Collections.TObjectList<TChatMessage>;
+  MessageVision: TChatVisionMessage;
+  response: TChatResponse;
+begin
+  gemini := TGemini.Create(FApiKeyStore.LoadApiKey('google_AI_APIKey'));
+  try
+    config.model := 'gemini-2.0-flash-exp';
+    config.json_mode := False;
+    AMessages := TObjectList<TChatMessage>.Create;
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'system';
+    MessageVision.Content := 'You are a useful assistant';
+    AMessages.Add(MessageVision);
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'user';
+    MessageVision.Content := 'Describe the following image';
+    MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    AMessages.Add(MessageVision);
+    response := gemini.ChatCompletion(Config, AMessages);
+    Memo1.Lines.Add(response.Content);
+  finally
+    FreeAndNil(gemini);
+    FreeAndNil(AMessages);
+  end;
+end;
+
 
 procedure TfrmTestApiWindow.TestGoogleVoices;
 var
@@ -608,18 +642,57 @@ end;
 
 procedure TfrmTestApiWindow.ListGoogleLLMModels;
 var
-  palm: TGooglePaLM;
+  gemini: TGemini;
   Local_modelObj: TBaseModelInfo;
 begin
   Memo1.Lines.Add('======== Model Google');
-  palm := TGooglePaLM.Create(FApiKeyStore.LoadApiKey('google_makersuite'));
+  gemini := TGemini.Create(FApiKeyStore.LoadApiKey('google_AI_APIKey'));
   try
-    for Local_modelObj in palm.ModelInfo do
+    for Local_modelObj in gemini.ModelInfo do
     begin
       Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
     end;
   finally
-    FreeAndNil(palm);
+    FreeAndNil(gemini);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestGoogleLLM;
+var
+  gemini: TGemini;
+  modelObj: TBaseModelInfo;
+  answer: string;
+  settings: TChatSettings;
+  messages: TObjectList<TChatMessage>;
+  msg : TChatMessage;
+begin
+  Memo1.Lines.Add('======== Model Google Gemini');
+  messages := nil;
+  gemini := nil;
+
+  try
+    gemini := TGemini.Create(FApiKeyStore.LoadApiKey('google_AI_APIKey'));
+    for modelObj in gemini.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+    settings.model := 'gemini-2.0-flash-exp';
+    settings.json_mode := False;
+
+
+
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'How long is a piece of string';
+    messages.Add(msg);
+
+
+    answer := gemini.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(gemini);
+    FreeAndNil(messages);
   end;
 end;
 

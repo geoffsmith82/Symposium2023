@@ -112,7 +112,7 @@
         <DCCReference Include="..\Libs\LLM\uLLM.Azure.pas"/>
         <DCCReference Include="..\Libs\REST.Authenticator.EnhancedOAuth.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
-        <DCCReference Include="..\Libs\LLM\uLLM.Google.PaLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Google.Gemini.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Anthropic.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Replicate.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.HuggingFace.pas"/>

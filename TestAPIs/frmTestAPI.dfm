@@ -5,9 +5,9 @@ object frmTestApiWindow: TfrmTestApiWindow
   Margins.Top = 8
   Margins.Right = 8
   Margins.Bottom = 8
-  Caption = 'frmTestApiWindow'
-  ClientHeight = 1105
-  ClientWidth = 1863
+  Caption = 'AI API Tester'
+  ClientHeight = 990
+  ClientWidth = 1844
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,9 +21,9 @@ object frmTestApiWindow: TfrmTestApiWindow
   TextHeight = 41
   object Memo1: TMemo
     Left = 0
-    Top = 65
-    Width = 1863
-    Height = 1040
+    Top = 66
+    Width = 1844
+    Height = 924
     Margins.Left = 8
     Margins.Top = 8
     Margins.Right = 8
@@ -36,8 +36,8 @@ object frmTestApiWindow: TfrmTestApiWindow
   object Button2: TButton
     Left = 0
     Top = 0
-    Width = 1863
-    Height = 65
+    Width = 1844
+    Height = 66
     Margins.Left = 8
     Margins.Top = 8
     Margins.Right = 8
