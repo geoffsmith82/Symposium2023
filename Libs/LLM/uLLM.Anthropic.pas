@@ -4,8 +4,6 @@ interface
 
 uses
   System.Classes,
-
-
   REST.Response.Adapter,
   System.JSON,
   System.SysUtils,
@@ -26,6 +24,33 @@ type
     constructor Create(const AErrorType, AMessage: string);
     property ErrorType: string read FErrorType;
   end;
+
+  TClaudeJSONFunctionMessage = class(TChatMessage)
+  private
+    FJson: TJSONObject;
+  public
+    constructor Create(json:TJSONObject);
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  end;
+
+
+  TClaudeFunctionMessage = class(TChatMessage)
+  private
+    FId : string;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function AsJSON: TJSONObject; override;
+  published
+    property Id : string read FId write FId;
+  end;
+
+
+  TClaudeVisionMessage = class(TChatVisionMessage)
+    function AsJSON: TJSONObject; override;
+  end;
+
 
   TAnthropic = class(TBaseLLM)
   protected
@@ -358,6 +383,110 @@ begin
     FreeAndNil(LRESTRequest);
     FreeAndNil(LRESTClient);
   end;
+end;
+
+{ TClaudeVisionMessage }
+
+function TClaudeVisionMessage.AsJSON: TJSONObject;
+var
+  msg : TJSONObject;
+  source: TJSONObject;
+  contentObj: TJSONObject;
+  contentArr: TJSONArray;
+  I: Integer;
+begin
+  msg := TJSONObject.Create;
+  if FImageURLs.Count = 0 then
+  begin
+    msg.AddPair('role', Role);
+    msg.AddPair('content', content);
+  end
+  else
+  begin
+    contentArr := TJSONArray.Create;
+    for I := 0 to FImageURLs.Count -1 do
+    begin
+      contentObj:= TJSONObject.Create;
+      contentObj.AddPair('type', 'image');
+      source := TJSONObject.Create;
+      source.AddPair('type', 'base64');
+      source.AddPair('media_type', FImageURLs[i].mimeType);
+      source.AddPair('data', FImageURLs[i].data);
+      contentObj.AddPair('source', source);
+      contentArr.AddElement(contentObj);
+    end;
+    contentObj:= TJSONObject.Create;
+    contentObj.AddPair('type', 'text');
+    contentObj.AddPair('text', content);
+    contentArr.AddElement(contentObj);
+    msg.AddPair('role', 'user');
+    msg.AddPair('content', contentArr);
+  end;
+
+  Result := msg;
+end;
+
+{ TClaudeFunctionMessage }
+
+function TClaudeFunctionMessage.AsJSON: TJSONObject;
+var
+  LJSONMsg : TJSONObject;
+  LSubMsg : TJSONObject;
+  Arr: TJSONArray;
+begin
+  LJSONMsg := TJSONObject.Create;
+  LJSONMsg.AddPair('role', 'user');
+  LSubMsg := TJSONObject.Create;
+  LSubMsg.AddPair('type', 'tool_result');
+  LSubMsg.AddPair('tool_use_id', FId);
+  LSubMsg.AddPair('content', Content);
+  Arr := TJSONArray.Create;
+  Arr.AddElement(LSubMsg);
+  LJSONMsg.AddPair('content', Arr);
+
+  Result := LJSONMsg;
+end;
+
+constructor TClaudeFunctionMessage.Create;
+begin
+
+end;
+
+destructor TClaudeFunctionMessage.Destroy;
+begin
+
+  inherited;
+end;
+
+{ TClaudeJSONFunctionMessage }
+
+function TClaudeJSONFunctionMessage.AsJSON: TJSONObject;
+begin
+  Result := FJSON.Clone as TJSONObject;
+end;
+
+constructor TClaudeJSONFunctionMessage.Create(json: TJSONObject);
+var
+  content : TJSONObject;
+  arr : TJSONArray;
+  c : TJSONOBject;
+begin
+  content := TJSONObject.Create;
+  arr := TJSONArray.Create;
+  content.AddPair('content', arr);
+  content.AddPair('role', 'assistant');
+  c := TJSONOBject.Create;
+  c.AddPair('type', 'text');
+  c.AddPair('text', 'Thinking');
+  arr.AddElement(c);
+  FJSON := content;
+  arr.AddElement(json.Clone as TJSONObject);
+end;
+
+destructor TClaudeJSONFunctionMessage.Destroy;
+begin
+  FreeAndNil(FJSON);
+  inherited;
 end;
 
 end.
