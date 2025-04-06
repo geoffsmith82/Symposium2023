@@ -27,7 +27,7 @@ type
   protected
     FMethods: TObjectDictionary<string, TFunctionDescription>;
     procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
-    function GenerateParameterJSON(Method: TRttiMethod): TJSONObject;
+    function GenerateParameterJSON(Method: TRttiMethod): TJSONObject; virtual;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
   public
     constructor Create;

@@ -94,6 +94,7 @@ type
     procedure TestOpenAIFunctionCalling;
     procedure TestAzureFunctionCalling;
     procedure TestGroqFunctionCalling;
+    procedure TestGoogleGeminiFunctionCalling;
     procedure TestAnthropicClaudeFunctionCalling;
     procedure TestXaiGrokFunctionCalling;
 
@@ -322,6 +323,8 @@ begin
   try
     config.model := 'gemini-2.0-flash-exp';
     config.json_mode := False;
+    config.top_p := 0;
+    config.top_k := 0;
     AMessages := TObjectList<TChatMessage>.Create;
     MessageVision := TGemini.CreateChatVisionMessage;
     MessageVision.Role := 'system';
@@ -833,6 +836,67 @@ begin
   end;
 end;
 
+procedure TfrmTestApiWindow.TestGoogleGeminiFunctionCalling;
+var
+  gemini: TGemini;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  gemini := TGemini.Create(FApiKeyStore.LoadApiKey('google_AI_APIKey'));
+{  gemini.OnLog := procedure(inLog: string)
+                  begin
+                    Memo1.Lines.Add(inLog);
+                  end; }
+  settings := Default(TChatSettings);
+  try
+    gemini.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    gemini.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'gemini-2.0-flash-exp';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    settings.top_p := 0;
+    settings.top_k := 0;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := gemini.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := gemini.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := gemini.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+    messages.Clear;
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(gemini);
+  end;
+end;
 
 procedure TfrmTestApiWindow.TestAnthropicClaudeFunctionCalling;
 var

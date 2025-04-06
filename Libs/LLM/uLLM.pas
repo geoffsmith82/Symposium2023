@@ -74,6 +74,12 @@ type
   end;
 
 
+  TGeminiUsageMetadata = record
+    PromptTokenCount: Cardinal;
+    CandidatesTokenCount: Cardinal;
+    TotalTokenCount: Cardinal;
+  end;
+
   TChatResponse = record
     Content : string;
     Completion_Tokens : Cardinal;
@@ -82,6 +88,7 @@ type
     Prompt_Tokens : Cardinal;
     Total_Tokens : Cardinal;
     Tool_Calls : TArray<TChatToolCall>;
+    Usage: TGeminiUsageMetadata;
     Log_Id : string;
     Model : string;
   end;
@@ -90,6 +97,7 @@ type
      model : string;
      temperature : Double;
      top_p : Double;
+     top_k : Double;
      seed : Integer;
      json_mode : Boolean;
      n : Integer;
