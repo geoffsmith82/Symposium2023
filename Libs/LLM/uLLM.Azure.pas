@@ -350,7 +350,11 @@ var
   LModelObj: TBaseModelInfo;
   LModelData: TModelData;
 begin
-  FModelInfo.Clear;
+  if Assigned(FModelInfo) and (FModelInfo.Count <> 0) then
+  begin
+    Result := FModelInfo;
+    Exit;
+  end;
 
   LModelList := GetAzureModels;
   try
