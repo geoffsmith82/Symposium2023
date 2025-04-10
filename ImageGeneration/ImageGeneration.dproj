@@ -97,6 +97,8 @@
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.Replicate.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.XAI.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
             <Form>frmApiKeyStores</Form>
             <FormType>dfm</FormType>

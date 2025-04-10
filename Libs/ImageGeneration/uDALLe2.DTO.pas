@@ -25,7 +25,7 @@ type
   end;
 
   TGeneratedImagesClass = class
-  private
+  protected
     FCreated: Extended;
     FData: TArray<TDataClass>;
   public

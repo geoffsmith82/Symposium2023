@@ -27,6 +27,7 @@ uses
   ApiKeyStore,
   uImageGeneration.OpenAI,
   uImageGeneration.Replicate,
+  uImageGeneration.XAI,
   uImageGeneration,
   uDALLe2.DTO
   ;
@@ -36,6 +37,7 @@ type
   public
     Version : string;
     Model: string;
+    Engine: TBaseImageGeneration;
   end;
 
   TfrmImageGenerator = class(TForm)
@@ -74,6 +76,7 @@ type
     FApiKeyStore : TApiKeyStore;
     FOpenAI : TBaseImageGeneration;
     FReplicate : TImageGenerationReplicate;
+    FXAI : TImageGenerationXAI;
     FImageGenerator : TBaseImageGeneration;
     FModels : TObjectList<TImageModelInfo>;
     procedure AddImageToScrollBox(ImageWidth, ImageHeight, Margin: Integer);
@@ -105,7 +108,7 @@ begin
   FOpenAI := TImageGenerationOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   if not FApiKeyStore.LoadApiKey('Replicate_APIKey').IsEmpty then
   begin
-    FReplicate := TImageGenerationReplicate.Create(FApiKeyStore.LoadApiKey('Replicate_APIKey'), {'http://192.168.1.18:8080'});
+    FReplicate := TImageGenerationReplicate.Create(FApiKeyStore.LoadApiKey('Replicate_APIKey'){ {'http://192.168.1.18:8080'});
     FModels := FReplicate.ModelInfo;
     for I := 0 to FModels.Count - 1 do
     begin
@@ -116,6 +119,7 @@ begin
       mi.RadioItem := True;
       mi.AutoCheck := True;
       mi.GroupIndex := 100;
+      mi.Engine := FReplicate;
       miGenerator.Add(mi)
     end;
 
@@ -130,6 +134,24 @@ begin
           end
           );
       end);}
+  end;
+  if not FApiKeyStore.LoadApiKey('X_AI').IsEmpty then
+  begin
+    FXAI := TImageGenerationXAI.Create(FApiKeyStore.LoadApiKey('X_AI'){ {'http://192.168.1.18:8080'});
+    FModels := FXAI.ModelInfo;
+    for I := 0 to FModels.Count - 1 do
+    begin
+      mi := TModelMenuItem.Create(nil);
+      mi.Caption := FModels[i].modelName;
+      mi.Model := FModels[i].modelName;
+      mi.Version := FModels[i].version;
+      mi.RadioItem := True;
+      mi.AutoCheck := True;
+      mi.GroupIndex := 100;
+      mi.Engine := FXAI;
+      miGenerator.Add(mi)
+    end;
+
   end;
   FCurrentImage := nil;
 end;
@@ -221,7 +243,7 @@ begin
     if mi is TModelMenuItem and mi.Checked then
     begin
       model := (mi as TModelMenuItem).Model;
-      FImageGenerator := FReplicate;
+      FImageGenerator := (mi as TModelMenuItem).Engine;
       break;
     end
   end;

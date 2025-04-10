@@ -65,10 +65,12 @@ The example programs below is an attempt to demonstrate the capabilities availab
 |----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
 | **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | Yes                | Yes              |
 | **Function Calling** | Yes    | Yes                  | Yes  | Yes        | Yes                | Yes              |
-| **Image Generation** |        |                      |      |            |                    |                  |
+| **Image Generation** |        |                      |      | Yes %      |                    |                  |
 | **Audio Output**     |        |                      |      |            |                    |                  |
  
  *Feature not currently supported/implementated
+ 
+ % Supported via separate Image Generation API.
 	
 ### Questions / Need Help?	
    Create an issue and I will respond to it.
@@ -126,7 +128,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 - [Open-Assistant](https://open-assistant.io/)
 
 ### External Libraries required to build projects
- - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi. - For Voice recognition
+ - [ICS 9.0](http://wiki.overbyte.eu/wiki/index.php/ICS_Download) or from the GetIt package manager built into Delphi. - For Web Sockets to support Voice recognition
  - [landgraf-dev/aws-sdk-delphi](https://github.com/landgraf-dev/aws-sdk-delphi) AWS SDK
  - [DelphiMVCFramework](https://github.com/danieleteti/delphimvcframework) for ChatGPTAction 
 
