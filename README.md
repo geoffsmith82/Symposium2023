@@ -67,6 +67,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 | **Function Calling** | Yes    | Yes                  | Yes  | Yes        | Yes                | Yes              |
 | **Image Generation** |        |                      |      | Yes %      |                    |                  |
 | **Audio Output**     |        |                      |      |            |                    |                  |
+| **Structured Outputs**|       |                      |      |            |                    |                  |
  
  *Feature not currently supported/implementated
  
@@ -79,7 +80,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - Google - Text to Speech, LLM, Translate
   - Microsoft Azure - Text to Speech, GPT, Translate
   - Amazon - [Text to Speech](https://aws.amazon.com/polly/), [Translate](https://aws.amazon.com/translate/)
-  - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-sonnet and claude-3-haiku, supporting one of largest context windows currently available (200k tokens)
+  - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-7-sonnet and claude-3-5-haiku, supporting one of largest context windows currently available (200k tokens)
   - [X.AI](https://x.ai) grok-beta LLM
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
@@ -94,7 +95,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
 ### Getting the projects working	
   - Each of the cloud API's need to have been setup in their respective developer consoles.  
   - Run the TestAPIs project and select the Settings->API Keys... menu item.  Add the api for the providers you want to use.
-  - If you're not using a particular provider you don't need a key for it.
+  - If you're not using a particular provider you don't need a key for it. Just leave the key blank in the API Keys dialog.
 
 ## Questions about code and how to set things up
   - Please feel free to raise issues about any questions you have about the code.  I know there is a lot to this project and lots to setup, so I would like to improve the documentation to make it easy for everyone to use all the parts of this project.
