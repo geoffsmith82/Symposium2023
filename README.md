@@ -53,6 +53,8 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	![image](./VoiceRecognition/screenshot-hal9000.png)
   - [Image generation](./ImageGeneration)
     - generate an image using text that you provide using OpenAI's DALLE-2 and DALLE-3 API.
+  - [MCP](./MCP)
+    - creates a Media Context Protocol (MCP) Server demonstrates the MCP protocol querying for current weather conditions.
   - [ProcessInvoice](./ProcessInvoice)
     - from a pdf invoice extract out the important details and format as a machine readable JSON string
   - [TestAPIs](./TestAPIs)
@@ -63,11 +65,11 @@ The example programs below is an attempt to demonstrate the capabilities availab
 
 | Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini |
 |----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
-| **Vision Support**   | Yes    | Yes                  | Yes  | Yes        | Yes                | Yes              |
-| **Function Calling** | Yes    | Yes                  | Yes  | Yes        | Yes                | Yes              |
-| **Image Generation** |        |                      |      | Yes %      |                    |                  |
-| **Audio Output**     |        |                      |      |            |                    |                  |
-| **Structured Outputs**|       |                      |      |            |                    |                  |
+| **Vision Support**   | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |
+| **Function Calling** | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |
+| **Image Generation** |        |                      |       | ✔ %       |                    |                  |
+| **Audio Output**     |        |                      |       |            |                    |                  |
+| **Structured Outputs**|       |                      |       |            |                    |                  |
  
  *Feature not currently supported/implementated
  

@@ -863,6 +863,7 @@ begin
     msg := TChatMessage.Create;
     msg.Role := 'user';
     msg.Content := 'What is the weather for Bendigo, Victoria?';
+    Memo1.Lines.Add('Question : ' + msg.Content);
     messages.Add(msg);
     chatAnswer := gemini.ChatCompletion(settings, messages);
     answer := chatAnswer.Content;
@@ -872,6 +873,7 @@ begin
     msg := TChatMessage.Create;
     msg.Role := 'user';
     msg.Content := 'What is the time at Bendigo, Victoria?';
+    Memo1.Lines.Add('Question : ' + msg.Content);
     messages.Add(msg);
     chatAnswer := gemini.ChatCompletion(settings, messages);
     answer := chatAnswer.Content;
@@ -885,7 +887,8 @@ begin
     messages.Add(msg);
     msg := TChatMessage.Create;
     msg.Role := 'user';
-    msg.Content := 'What is the time and weather for Bendigo?';
+    msg.Content := 'What is the time and weather for Bendigo, Victoria?';
+    Memo1.Lines.Add('Question : ' + msg.Content);
     messages.Add(msg);
     chatAnswer := gemini.ChatCompletion(settings, messages);
     answer := chatAnswer.Content;
