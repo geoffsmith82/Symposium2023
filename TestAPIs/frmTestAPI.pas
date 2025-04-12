@@ -56,6 +56,7 @@ type
   public
     { Public declarations }
     procedure ListOpenAIModels;
+    procedure ListMistralAIModels;
     procedure ListReplicateImageGenerators;
     procedure ListReplicateLLM;
     procedure ListAzureLLMModels;
@@ -84,12 +85,14 @@ type
     procedure TestAnthropicClaudeVision;
     procedure TestAzureVision;
     procedure TestXaiGrokVision;
+    procedure TestMistralVision;
 
     procedure TestHunggingFaceLLM;
     procedure TestGroqLLM;
     procedure TestGroqVisionLLM;
     procedure ListGroqModels;
     procedure TestGrokLLM;
+    procedure TestMistralLLM;
 
     procedure TestOpenAIFunctionCalling;
     procedure TestAzureFunctionCalling;
@@ -97,6 +100,8 @@ type
     procedure TestGoogleGeminiFunctionCalling;
     procedure TestAnthropicClaudeFunctionCalling;
     procedure TestXaiGrokFunctionCalling;
+    procedure TestHuggingFaceFunctionCalling;
+    procedure TestMistralFunctionCalling;
 
 
     [FunctionDescription('Get the weather forecast for a place in Australia')]
@@ -136,6 +141,7 @@ uses
   uLLM.Anthropic,
   uLLM.HuggingFace,
   uLLM.Replicate,
+  uLLM.Mistral,
   uLLM.Groq,
   uLLM.X.Ai,
   uDALLe2.DTO,
@@ -281,6 +287,39 @@ begin
   end;
 end;
 
+procedure TfrmTestApiWindow.TestMistralVision;
+var
+  mistralLLM: TMistral;
+  Local_modelObj: TBaseModelInfo;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatVisionMessage;
+  answer: string;
+begin
+  Memo1.Lines.Add('======== Model Mistral Vision');
+  mistralLLM := TMistral.Create(FApiKeyStore.LoadApiKey('Mistral_APIKey'));
+  try
+    for Local_modelObj in mistralLLM.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+    settings.json_mode := False;
+    settings.model := 'pixtral-12b-2409';
+    settings.max_tokens := 1024;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatVisionMessage.Create;
+    msg.Role := 'user';
+    msg.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    msg.Content := 'Describe the following image';
+    messages.Add(msg);
+    answer := mistralLLM.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer: ' + answer);
+  finally
+    FreeAndNil(mistralLLM);
+    FreeAndNil(messages);
+  end;
+end;
+
 procedure TfrmTestApiWindow.TestOpenAIVision;
 var
   openAIVision: TOpenAI;
@@ -409,6 +448,61 @@ begin
     msg := TChatMessage.Create;
     msg.Role := 'user';
     msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(openAI);
+  end;
+end;
+
+procedure TfrmTestApiWindow.TestHuggingFaceFunctionCalling;
+var
+  openAI: THuggingFaceLLM;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  openAI := THuggingFaceLLM.Create(FApiKeyStore.LoadApiKey('HuggingFace_APIKey'));
+  settings := Default(TChatSettings);
+  try
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    openAI.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'meta-llama/Llama-3.1-70B-Instruct';
+    settings.json_mode := False;
+    settings.max_tokens := 3400;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo, Victoria?';
+    messages.Add(msg);
+    chatAnswer := openAI.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo, victoria?';
     messages.Add(msg);
     chatAnswer := openAI.ChatCompletion(settings, messages);
     answer := chatAnswer.Content;
@@ -583,6 +677,23 @@ begin
     end;
   finally
     FreeAndNil(openAI);
+  end;
+end;
+
+procedure TfrmTestApiWindow.ListMistralAIModels;
+var
+  mistralAI: TMistral;
+  Local_modelObj: TBaseModelInfo;
+begin
+  Memo1.Lines.Add('======== Model Mistral AI');
+  mistralAI := TMistral.Create(FApiKeyStore.LoadApiKey('Mistral_APIKey'));
+  try
+    for Local_modelObj in mistralAI.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(mistralAI);
   end;
 end;
 
@@ -836,6 +947,66 @@ begin
   end;
 end;
 
+procedure TfrmTestApiWindow.TestMistralFunctionCalling;
+var
+  mistral: TMistral;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  mistral := TMistral.Create(FApiKeyStore.LoadApiKey('Mistral_APIKey'));
+  settings := Default(TChatSettings);
+  try
+    mistral.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    mistral.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'mistral-large-latest';
+    settings.json_mode := False;
+    settings.max_tokens := 32384;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := mistral.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    msg := TChatMessage.Create;
+    msg.Role := chatAnswer.Role;
+    msg.Content := chatAnswer.Content;
+    messages.Add(msg);
+    Memo1.Lines.Add('Answer : ' + answer);
+    Sleep(2000);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := mistral.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    Sleep(2000);
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := mistral.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+    messages.Clear;
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(mistral);
+  end;
+end;
+
 procedure TfrmTestApiWindow.TestGoogleGeminiFunctionCalling;
 var
   gemini: TGemini;
@@ -1053,6 +1224,42 @@ begin
   end;
 end;
 
+procedure TfrmTestApiWindow.TestMistralLLM;
+var
+  mistral: TMistral;
+  modelObj: TBaseModelInfo;
+  answer: string;
+  settings: TChatSettings;
+  messages: TObjectList<TChatMessage>;
+  msg : TChatMessage;
+begin
+  Memo1.Lines.Add('======== Model Mistral');
+  messages := nil;
+  mistral := nil;
+
+  try
+    mistral := TMistral.Create(FApiKeyStore.LoadApiKey('Mistral_APIKey'));
+    for modelObj in mistral.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
+    end;
+    settings.model := 'mistral-large-latest';
+    settings.json_mode := False;
+    messages := TObjectList<TChatMessage>.Create;
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'How long is a piece of string';
+    messages.Add(msg);
+
+    Memo1.Lines.Add('Question : ' + msg.Content);
+    answer := mistral.ChatCompletion(settings, messages).Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+  finally
+    FreeAndNil(mistral);
+    FreeAndNil(messages);
+  end;
+end;
+
 procedure TfrmTestApiWindow.TestGroqVisionLLM;
 var
   groq: TGroqLLM;
@@ -1216,6 +1423,7 @@ begin
     FreeAndNil(mswindows);
   end;
 end;
+
 
 procedure TfrmTestApiWindow.ListMicrosoftVoices;
 var
