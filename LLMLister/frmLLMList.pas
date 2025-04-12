@@ -32,6 +32,7 @@ uses
   uLLM.HuggingFace,
   uLLM.OpenAI,
   uLLM.Replicate,
+  uLLM.Mistral,
   uLLM.X.Ai
   ;
 
@@ -57,6 +58,7 @@ type
     FAzureAI : TMicrosoftOpenAI;
     FGrokAI : TXGrokAI;
     FGeminiAI : TGemini;
+    FMistralAI : TMistral;
     FClaudeAI : TAnthropic;
     FGroqAI : TGroqLLM;
   public
@@ -152,6 +154,19 @@ begin
       item.TagObject := FGroqAI;
       item.Text := FGroqAI.ModelInfo[i].modelName;
       item.Detail := FGroqAI.ModelInfo[i].modelName + ' ' + FGroqAI.ModelInfo[i].version;
+    end;
+  end;
+
+  if not FKeyStore.LoadApiKey('Mistral_APIKey').IsEmpty then
+  begin
+    FMistralAI := TMistral.Create(FKeyStore.LoadApiKey('Mistral_APIKey'));
+    for i := 0 to FMistralAI.ModelInfo.Count - 1 do
+    begin
+      item := lvLLMs.Items.Add;
+      item.ImageIndex := 10;
+      item.TagObject := FMistralAI;
+      item.Text := FMistralAI.ModelInfo[i].modelName;
+      item.Detail := FMistralAI.ModelInfo[i].modelName + ' ' + FMistralAI.ModelInfo[i].version;
     end;
   end;
 

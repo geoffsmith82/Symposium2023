@@ -63,13 +63,13 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	
 ### Project Supports LLM Features
 
-| Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini |
-|----------------------|--------|-----------------------|------|------------|--------------------|-----------------|
-| **Vision Support**   | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |
-| **Function Calling** | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |
-| **Image Generation** |        |                      |       | ✔ %       |                    |                  |
-| **Audio Output**     |        |                      |       |            |                    |                  |
-| **Structured Outputs**|       |                      |       |            |                    |                  |
+| Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini | Mistral |
+|----------------------|--------|-----------------------|------|------------|--------------------|-----------------|-----------------|
+| **Vision Support**   | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔             |
+| **Function Calling** | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔             |
+| **Image Generation** |        |                      |       | ✔ %       |                    |                  |                |
+| **Audio Output**     |        |                      |       |            |                    |                  |                |
+| **Structured Outputs**|       |                      |       |            |                    |                  |                |
  
  *Feature not currently supported/implementated
  
@@ -83,7 +83,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - Microsoft Azure - Text to Speech, GPT, Translate
   - Amazon - [Text to Speech](https://aws.amazon.com/polly/), [Translate](https://aws.amazon.com/translate/)
   - [Anthropic](https://www.anthropic.com) claude-3-opus, claude-3-7-sonnet and claude-3-5-haiku, supporting one of largest context windows currently available (200k tokens)
-  - [X.AI](https://x.ai) grok-beta LLM
+  - [X.AI](https://x.ai) grok LLM
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning

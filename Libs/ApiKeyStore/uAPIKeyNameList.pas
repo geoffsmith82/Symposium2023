@@ -3,7 +3,7 @@ unit uAPIKeyNameList;
 interface
 
 const
-  ApiKeyNames: array[1..20] of string = (
+  ApiKeyNames: array[1..21] of string = (
     'chatgpt_apikey',
     'X_AI',
     'groq_apikey',
@@ -12,6 +12,7 @@ const
     'assemblyai_key',
     'deepgram_key',
     'HuggingFace_APIKey',
+    'Mistral_APIKey',
     'ms_cognative_service_resource_key',
     'AWSAccessKey',
     'AWSSecretKey',

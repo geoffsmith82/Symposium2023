@@ -35,7 +35,7 @@ type
     function AsJSON: TJSONObject; override;
   end;
 
-
+{$M+}
   TClaudeFunctionMessage = class(TChatMessage)
   private
     FId : string;
@@ -46,7 +46,7 @@ type
   published
     property Id : string read FId write FId;
   end;
-
+{$M-}
 
   TClaudeVisionMessage = class(TChatVisionMessage)
     function AsJSON: TJSONObject; override;

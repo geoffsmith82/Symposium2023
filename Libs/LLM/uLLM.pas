@@ -80,19 +80,6 @@ type
     TotalTokenCount: Cardinal;
   end;
 
-  TChatResponse = record
-    Content : string;
-    Completion_Tokens : Cardinal;
-    Finish_Reason: string;
-    System_Fingerprint: string;
-    Prompt_Tokens : Cardinal;
-    Total_Tokens : Cardinal;
-    Tool_Calls : TArray<TChatToolCall>;
-    Usage: TGeminiUsageMetadata;
-    Log_Id : string;
-    Model : string;
-  end;
-
   TChatSettings = record
      model : string;
      temperature : Double;
@@ -107,6 +94,23 @@ type
      frequency_penalty : Double;
      user : string;
   end;
+
+
+  TChatResponse = record
+    Content : string;
+    Role: string;
+    Completion_Tokens : Cardinal;
+    Finish_Reason: string;
+    System_Fingerprint: string;
+    Prompt_Tokens : Cardinal;
+    Total_Tokens : Cardinal;
+    Tool_Calls : TArray<TChatToolCall>;
+    Usage: TGeminiUsageMetadata;
+    Log_Id : string;
+    Model : string;
+    ChatConfig : TChatSettings;
+  end;
+
 
   TParameterDictionary = TDictionary<string, string>;
 
