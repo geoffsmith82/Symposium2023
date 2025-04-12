@@ -323,6 +323,7 @@ end;
 
 constructor TChatVisionMessage.Create;
 begin
+  inherited;
   FImageURLs := TObjectList<TChatAttachment>.Create;
 end;
 
@@ -361,7 +362,7 @@ end;
 
 constructor TFunctionMessage.Create;
 begin
-
+  inherited;
 end;
 
 destructor TFunctionMessage.Destroy;
@@ -380,6 +381,7 @@ end;
 
 constructor TFunctionCallMessage.Create(function_call_json: TJSONArray);
 begin
+  inherited Create;
   FJSON := TJSONObject.Create;
   FJSON.AddPair('tool_calls', function_call_json);
   FJSON.AddPair('role', 'assistant');

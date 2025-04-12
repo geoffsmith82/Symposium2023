@@ -30,7 +30,7 @@ type
 
     function GetRunStatus: string;
 
-    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string; inRunId: string);
+    constructor Create(const APIKey: string; const inAssistantID: string; const inThreadId: string; const inRunId: string);
     destructor Destroy; override;
   published
     property RunID: string read FRunID;
@@ -46,7 +46,7 @@ type
     FRESTResponse: TRESTResponse;
   public
     function CreateRun: TOpenAIRun;
-    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string);
+    constructor Create(const APIKey: string; const inAssistantID: string; const inThreadId: string);
     destructor Destroy; override;
   end;
 
@@ -65,7 +65,7 @@ type
 
     function GetThreadMessages: TJSONArray;
 
-    constructor Create(const APIKey: string; const inAssistantID: string; inThreadId: string);
+    constructor Create(const APIKey: string; const inAssistantID: string; const inThreadId: string);
     destructor Destroy; override;
   published
     property ThreadID: string read FThreadID;
@@ -148,7 +148,7 @@ type
     property Description: string read FDescription write FDescription;
     property FileList: TOpenAIVectorFileList read GetFileList;
 
-    constructor Create(APIKey: string);
+    constructor Create(const APIKey: string);
     destructor Destroy; override;
   end;
 
@@ -183,7 +183,7 @@ type
     constructor Create(const APIKey: string);
     destructor Destroy; override;
 
-    function CreateAssistant(model: string; name: string; instructions: string): string;
+    function CreateAssistant(const model: string; const name: string; const instructions: string): string;
 
   published
     property Files: TOpenAIFiles read FFiles;
@@ -196,7 +196,7 @@ type
 
 implementation
 
-procedure ResetRequestToDefault(FRESTRequest : TRestRequest; FRESTClient : TRESTClient; FRESTResponse : TRESTResponse; APIkey: string);
+procedure ResetRequestToDefault(FRESTRequest : TRestRequest; FRESTClient : TRESTClient; FRESTResponse : TRESTResponse; const APIkey: string);
 begin
   FRESTRequest.ResetToDefaults;
   FRESTRequest.Client := FRESTClient;
@@ -243,7 +243,7 @@ begin
   Result := FVectorStores;
 end;
 
-function TOpenAIAssistant.CreateAssistant(model: string; name: string; instructions: string): string;
+function TOpenAIAssistant.CreateAssistant(const model: string; const name: string; const instructions: string): string;
 var
   JsonBody: TJSONObject;
 begin
@@ -305,7 +305,7 @@ begin
   inherited;
 end;
 
-constructor TOpenAIThread.Create(const APIKey: string; const inAssistantID: string; inThreadId:string);
+constructor TOpenAIThread.Create(const APIKey: string; const inAssistantID: string; const inThreadId:string);
 begin
   FAPIKey := APIKey;
   FAssistantID := inAssistantID;
@@ -375,7 +375,7 @@ begin
   end;
 end;
 
-constructor TOpenAIRunList.Create(const APIKey, inAssistantID: string; inThreadId: string);
+constructor TOpenAIRunList.Create(const APIKey: string; const inAssistantID: string; const inThreadId: string);
 begin
   inherited Create(True);
   FApiKey := APIKey;
@@ -414,7 +414,7 @@ begin
   inherited;
 end;
 
-constructor TOpenAIRun.Create(const APIKey, inAssistantID: string; inThreadId: string; inRunId: string);
+constructor TOpenAIRun.Create(const APIKey: string; const inAssistantID: string; const inThreadId: string; const inRunId: string);
 begin
   FAPIKey := APIKey;
   FAssistantID := inAssistantID;
@@ -656,7 +656,7 @@ end;
 
 { TOpenAIVectorStore }
 
-constructor TOpenAIVectorStore.Create(APIKey: string);
+constructor TOpenAIVectorStore.Create(const APIKey: string);
 begin
   inherited Create;
   FAPIKey := APIKey;

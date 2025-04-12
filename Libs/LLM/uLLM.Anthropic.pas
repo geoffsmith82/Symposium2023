@@ -70,7 +70,7 @@ type
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
     procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);
     procedure HandleErrorResponse(AResponse: TRESTResponse);
-    procedure DoOnLog(inLog: string);
+    procedure DoOnLog(const inLog: string);
   public
     constructor Create(const APIKey: string);
     destructor Destroy; override;
@@ -313,7 +313,7 @@ begin
   inherited;
 end;
 
-procedure TAnthropic.DoOnLog(inLog: string);
+procedure TAnthropic.DoOnLog(const inLog: string);
 begin
   if Assigned(FOnLog) then
     FOnLog(inLog);
@@ -465,7 +465,7 @@ end;
 
 constructor TClaudeFunctionMessage.Create;
 begin
-
+  inherited;
 end;
 
 destructor TClaudeFunctionMessage.Destroy;
@@ -487,6 +487,7 @@ var
   arr : TJSONArray;
   c : TJSONOBject;
 begin
+  inherited Create;
   content := TJSONObject.Create;
   arr := TJSONArray.Create;
   content.AddPair('content', arr);

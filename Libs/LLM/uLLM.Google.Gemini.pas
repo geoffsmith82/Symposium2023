@@ -74,7 +74,7 @@ type
     FFunctionName: string;
     FResultJson: string; // Store the raw JSON result string
   public
-    constructor Create(AFunctionName: string; AResultJson: string);
+    constructor Create(const AFunctionName: string; const AResultJson: string);
     function AsJSON: TJSONObject; override; // Not used directly for Gemini, see ConvertMessagesToGeminiContent
     property FunctionName: string read FFunctionName;
     property ResultJson: string read FResultJson;
@@ -126,7 +126,7 @@ uses
   System.IOUtils,
   System.Net.Mime; // Needed for TNetEncoding
 
-procedure Log(msg: string);
+procedure Log(const msg: string);
 begin
   FMX.Types.Log.d(msg);
 end;
@@ -169,7 +169,7 @@ begin
 end;
 
 // --- TGeminiFunctionResultMessage ---
-constructor TGeminiFunctionResultMessage.Create(AFunctionName: string; AResultJson: string);
+constructor TGeminiFunctionResultMessage.Create(const AFunctionName: string; const AResultJson: string);
 begin
   inherited Create;
   Role := 'tool'; // Gemini uses 'tool' role for function results
@@ -316,6 +316,7 @@ end;
 // --- TGemini ---
 constructor TGemini.Create(const AAPIKey: string);
 begin
+  inherited Create(AAPIKey);
   FBaseURL := 'https://generativelanguage.googleapis.com';
   FAPIVersion := 'v1beta';
   FAPIKey := AAPIKey;
