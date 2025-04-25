@@ -122,19 +122,6 @@ object frmWeatherWindow: TfrmWeatherWindow
         TabOrder = 0
         OnClick = btnLatestForcastClick
       end
-      object chkUseGPT4: TCheckBox
-        Left = 952
-        Top = 48
-        Width = 243
-        Height = 42
-        Margins.Left = 8
-        Margins.Top = 8
-        Margins.Right = 8
-        Margins.Bottom = 8
-        Anchors = []
-        Caption = 'Use GPT4'
-        TabOrder = 1
-      end
     end
   end
   object MainMenu: TMainMenu

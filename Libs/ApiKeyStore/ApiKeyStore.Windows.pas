@@ -1,7 +1,7 @@
 unit ApiKeyStore.Windows;
 
 interface
-
+{$IFDEF MSWINDOWS}
 uses
   System.SysUtils,
   System.Classes,
@@ -22,8 +22,11 @@ type
     function LoadSetting(const Name: string): string; override;
   end;
 
+{$ENDIF}
+
 implementation
 
+{$IFDEF MSWINDOWS}
 uses
   System.IOUtils,
   System.NetEncoding,
@@ -198,6 +201,8 @@ begin
   else
     raise Exception.CreateFmt('API Key for "%s" not found.', [Name]);
 end;
+
+{$ENDIF}
 
 end.
 

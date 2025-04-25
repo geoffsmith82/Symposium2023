@@ -32,7 +32,6 @@ type
     mmWeatherAnswer: TMemo;
     Panel1: TPanel;
     btnLatestForcast: TButton;
-    chkUseGPT4: TCheckBox;
     MainMenu: TMainMenu;
     miFile: TMenuItem;
     miExit: TMenuItem;
@@ -119,10 +118,8 @@ begin
     ' If something doesn''t occur of the forcast, it should say "over the forecast period".' +
     ' Include the names of the days based on the date of the start time local. Do it in the style of Jane Bunn' + System.sLineBreak + System.sLineBreak;
 
-  if chkUseGPT4.Checked then
-    model := 'gpt-4o'
-  else
-    model := 'gpt-3.5-turbo';
+
+  model := 'gpt-4o';
 
   location := 'Bendigo';
   state := 'Victoria';
