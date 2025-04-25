@@ -106,13 +106,13 @@ type
     procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse; const AModel: string);
   protected
     function BuildJSONRequestBody(const AChatConfig: TChatSettings; const AMessages: TObjectList<TChatMessage>): TJSONObject; virtual;
-    function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
-    function Completion(const AQuestion, AModel: string): string; override;
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
     property APIKey: string read FAPIKey write FAPIKey;
   public
     constructor Create(const AAPIKey: string);
     destructor Destroy; override;
+    function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
+    function Completion(const AQuestion, AModel: string): string; override;
   published
     property BaseURL: string read FBaseURL write FBaseURL;
     property APIVersion: string read FAPIVersion write FAPIVersion;
