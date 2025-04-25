@@ -17,7 +17,7 @@ type
   protected
     function GetModelInfo: TObjectList<TImageModelInfo>; override;
   public
-    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string = 'dall-e-2'): TGeneratedImagesClass; override;
+    function Generate(const prompt: string; n: Integer; size: TDALLESize; const modelVersion: string = 'gpt-image-1'): TGeneratedImagesClass; override;
   end;
 
 implementation
@@ -64,7 +64,16 @@ begin
     LResponse.ContentType := 'application/json';
     LRequest.Response := LResponse;
     LRequest.Execute;
-    Result := TGeneratedImagesClass.FromJsonString(LResponse.Content);
+    if LResponse.StatusCode = 200 then
+    begin
+      Result := TGeneratedImagesClass.FromJsonString(LResponse.Content);
+    end
+    else
+    begin
+      var error := (LRequest.Response.JSONValue as TJSONObject).GetValue('error') as TJSONObject;
+      var messagestr := error.GetValue<string>('message');
+      raise Exception.Create(messagestr);
+    end;
   finally
     FreeAndNil(LRequest);
     FreeAndNil(LResponse);
@@ -77,6 +86,12 @@ var
   LModel : TImageModelInfo;
 begin
   FModelInfo.Clear;
+
+  LModel := TImageModelInfo.Create;
+  LModel.ModelName := 'gpt-image-1';
+  LModel.Version := 'gpt-image-1';
+  FModelInfo.Add(LModel);
+
   LModel := TImageModelInfo.Create;
   LModel.ModelName := 'dall-e-3';
   LModel.Version := 'dall-e-3';

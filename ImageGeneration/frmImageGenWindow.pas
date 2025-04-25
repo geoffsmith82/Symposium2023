@@ -45,7 +45,6 @@ type
     miFile: TMenuItem;
     miExit: TMenuItem;
     miGenerator: TMenuItem;
-    miDALLE2: TMenuItem;
     mmoImagePrompt: TMemo;
     btnExecute: TButton;
     Label1: TLabel;
@@ -55,7 +54,6 @@ type
     pmPopupMenu: TPopupMenu;
     miSaveImage: TMenuItem;
     SaveDialog: TSaveDialog;
-    miDALLE3: TMenuItem;
     miSetup: TMenuItem;
     miAPIKeys: TMenuItem;
     Label2: TLabel;
@@ -106,6 +104,20 @@ begin
   FImageList := TObjectList<TImage>.Create;
   FApiKeyStore := TApiKeyStore.GetInstance;
   FOpenAI := TImageGenerationOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
+  FModels := FOpenAI.ModelInfo;
+  for I := 0 to FModels.Count - 1 do
+  begin
+    mi := TModelMenuItem.Create(nil);
+    mi.Caption := FModels[i].modelName;
+    mi.Model := FModels[i].modelName;
+    mi.Version := FModels[i].version;
+    mi.RadioItem := True;
+    mi.AutoCheck := True;
+    mi.GroupIndex := 100;
+    mi.Engine := FOpenAI;
+    miGenerator.Add(mi)
+  end;
+
   if not FApiKeyStore.LoadApiKey('Replicate_APIKey').IsEmpty then
   begin
     FReplicate := TImageGenerationReplicate.Create(FApiKeyStore.LoadApiKey('Replicate_APIKey'){ {'http://192.168.1.18:8080'});
@@ -248,19 +260,18 @@ begin
     end
   end;
 
-  if miDALLE2.Checked then
+  btnExecute.Enabled := False;
+  try
+    images := FImageGenerator.Generate(mmoImagePrompt.Lines.Text, seImageCount.Value, size, model);
+  except
+    on e: Exception do
   begin
-    model := 'dall-e-2';
-    FImageGenerator := FOpenAI;
-  end
-  else if miDALLE3.Checked then
-  begin
-    FImageGenerator := FOpenAI;
-    model := 'dall-e-3';
+      ShowMessage(e.Message);
+      btnExecute.Enabled := True;
+      Exit;
+    end;
   end;
 
-  btnExecute.Enabled := False;
-  images := FImageGenerator.Generate(mmoImagePrompt.Lines.Text, seImageCount.Value, size, model);
   TTask.Run(procedure ()
   begin
     UpdateImages(images);
@@ -310,13 +321,13 @@ begin
             AddImageToScrollBox(ImageWidth,ImageHeight, 10);
           end
           );
-{          var balance := FReplicate.GetBalance;
+{          var balance := FReplicate.GetBalance;}
           TThread.Synchronize(nil, procedure ()
           begin
-            Label2.Caption := 'Balance: ' + FormatFloat('$0.00', balance);
+//            Label2.Caption := 'Balance: ' + FormatFloat('$0.00', balance);
             btnExecute.Enabled := True;
           end
-          );}
+          );
         finally
           CoUninitialize;
           FreeAndNil(memStream);

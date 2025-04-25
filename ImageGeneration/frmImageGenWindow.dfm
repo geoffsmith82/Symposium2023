@@ -146,19 +146,6 @@ object frmImageGenerator: TfrmImageGenerator
     end
     object miGenerator: TMenuItem
       Caption = 'Generator'
-      object miDALLE2: TMenuItem
-        AutoCheck = True
-        Caption = 'OpenAI DALL-E 2'
-        GroupIndex = 100
-        RadioItem = True
-      end
-      object miDALLE3: TMenuItem
-        AutoCheck = True
-        Caption = 'OpenAI DALL-E 3'
-        Checked = True
-        GroupIndex = 100
-        RadioItem = True
-      end
     end
     object miSetup: TMenuItem
       Caption = 'Setup'
