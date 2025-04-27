@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{0BC7D229-00F9-486A-9FDE-E94DDA52B4AC}</ProjectGuid>
         <ProjectName Condition="'$(ProjectName)'==''">ProcessInvoice</ProjectName>
-        <ProjectVersion>20.2</ProjectVersion>
+        <ProjectVersion>20.3</ProjectVersion>
         <TargetedPlatforms>1</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
@@ -107,6 +107,7 @@
             <Form>frmApiKeyStores</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
