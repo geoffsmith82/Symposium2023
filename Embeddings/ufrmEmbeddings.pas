@@ -17,7 +17,6 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.Menus,
-  uGoogleCustomSearch,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
   FireDAC.Stan.Error,
@@ -40,6 +39,7 @@ uses
   uLLM,
   uEmbeddings,
   uEmbeddings.OpenAI,
+  uGoogleCustomSearch,
   frmApiKeyStore
   ;
 
@@ -48,7 +48,6 @@ type
     Index: Integer;
     Distance: Double;
   end;
-
 
   TfrmEmbeddings = class(TForm)
     btnGoogleSearch: TButton;
@@ -97,17 +96,16 @@ implementation
 
 uses udmEmbeddings;
 
-{$I ..\Libs\apikey.inc}
-
 procedure TfrmEmbeddings.btnGoogleSearchClick(Sender: TObject);
-const
-  API_KEY = google_custom_search_key;
-  CX = google_custom_search_cx;
 var
   GoogleCustomSearch: TGoogleCustomSearch;
   SearchResult: TGoogleSearchResult;
   Item: TGoogleSearchItem;
+  API_KEY : string;
+  CX : string;
 begin
+  API_KEY := FApiKeyStore.LoadApiKey('google_custom_search_key');
+  CX := FApiKeyStore.LoadApiKey('google_custom_search_cx');
   GoogleCustomSearch := TGoogleCustomSearch.Create(API_KEY, CX);
   try
     SearchResult := GoogleCustomSearch.Search('OpenAI');
@@ -226,6 +224,7 @@ begin
     // add more questions here ...
   );
 end;
+
 procedure TfrmEmbeddings.miAPIKeysClick(Sender: TObject);
 var
   frmApiKeyStores : TfrmApiKeyStores;
@@ -250,6 +249,7 @@ begin
     // add more compare questions here ...
   );
 end;
+
 procedure TfrmEmbeddings.btnEmbeddingsClick(Sender: TObject);
 var
   questions : TArray<string>;
