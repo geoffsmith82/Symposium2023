@@ -20,6 +20,7 @@ uses
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
   uLLM.Azure in '..\Libs\LLM\uLLM.Azure.pas',
   uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
+  uLLM.Mistral in '..\Libs\LLM\uLLM.Mistral.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas';
 
 {$R *.res}

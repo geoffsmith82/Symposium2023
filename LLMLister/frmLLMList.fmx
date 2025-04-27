@@ -46,6 +46,15 @@ object frmLLMLister: TfrmLLMLister
       end
     end
   end
+  object Splitter: TSplitter
+    Align = Left
+    Cursor = crHSplit
+    MinSize = 20.000000000000000000
+    Position.X = 305.000000000000000000
+    Size.Width = 16.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+  end
   object ImageList: TImageList
     Source = <
       item

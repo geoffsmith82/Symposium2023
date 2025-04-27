@@ -12,6 +12,7 @@ uses
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
+  FMX.StdCtrls,
   FMX.Graphics,
   FMX.Dialogs,
   FMX.ListView.Types,
@@ -46,6 +47,7 @@ type
     miSettings: TMenuItem;
     miGoogleAuthenticate: TMenuItem;
     miAPIKeys: TMenuItem;
+    Splitter: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
