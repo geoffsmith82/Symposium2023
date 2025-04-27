@@ -1,19 +1,6 @@
 program FaceDetectionCloud;
 
 uses
-  {$IFDEF EurekaLog}
-  EMemLeaks,
-  EResLeaks,
-  EDebugExports,
-  EDebugJCL,
-  EFixSafeCallException,
-  EMapWin32,
-  EAppVCL,
-  EDialogWinAPIMSClassic,
-  EDialogWinAPIEurekaLogDetailed,
-  EDialogWinAPIStepsToReproduce,
-  ExceptionLog7,
-  {$ENDIF EurekaLog}
   Vcl.Forms,
   frmFaceWindow in 'frmFaceWindow.pas' {frmFaceDetection},
   uBaseFaceRecognition in '..\Libs\FaceRecognition\uBaseFaceRecognition.pas',
@@ -25,6 +12,7 @@ uses
   uMicrosoft.FaceRecognition.DTO in '..\Libs\FaceRecognition\uMicrosoft.FaceRecognition.DTO.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  uAPIKeyNameList in '..\Libs\ApiKeyStore\uAPIKeyNameList.pas',
   frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}
