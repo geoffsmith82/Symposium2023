@@ -95,10 +95,11 @@ begin
       item.Detail := FOpenAI.ModelInfo[i].modelName + ' ' + FOpenAI.ModelInfo[i].version;
     end;
   end;
-
-  if not FKeyStore.LoadApiKey('AzureAPIKey').IsEmpty then
+  var azureKey := FKeyStore.LoadApiKey('AzureAPIKey');
+  var azureEndpoint := FKeyStore.LoadSetting('AzureOpenAIEndpoint');
+  if ((azureKey.IsEmpty=False) and (azureEndpoint.IsEmpty = False)) then
   begin
-    FAzureAI := TMicrosoftOpenAI.Create(FKeyStore.LoadApiKey('AzureAPIKey'), FKeyStore.LoadSetting('AzureOpenAIEndpoint'), '');
+    FAzureAI := TMicrosoftOpenAI.Create(azureKey, azureEndpoint, '');
     for i := 0 to FAzureAI.ModelInfo.Count - 1 do
     begin
       item := lvLLMs.Items.Add;
