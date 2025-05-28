@@ -32,6 +32,7 @@ uses
   uLLM.Groq,
   uLLM.HuggingFace,
   uLLM.OpenAI,
+  uLLM.OpenRouter,
   uLLM.Replicate,
   uLLM.Mistral,
   uLLM.X.Ai
@@ -61,6 +62,7 @@ type
     FGrokAI : TXGrokAI;
     FGeminiAI : TGemini;
     FMistralAI : TMistral;
+    FOpenRouterAI: TOpenRouter;
     FClaudeAI : TAnthropic;
     FGroqAI : TGroqLLM;
   public
@@ -171,6 +173,20 @@ begin
       item.Detail := FMistralAI.ModelInfo[i].modelName + ' ' + FMistralAI.ModelInfo[i].version;
     end;
   end;
+
+  if not FKeyStore.LoadApiKey('OpenRouter_APIKey').IsEmpty then
+  begin
+    FOpenRouterAI := TOpenRouter.Create(FKeyStore.LoadApiKey('OpenRouter_APIKey'));
+    for i := 0 to FOpenRouterAI.ModelInfo.Count - 1 do
+    begin
+      item := lvLLMs.Items.Add;
+      item.ImageIndex := 11;
+      item.TagObject := FOpenRouterAI;
+      item.Text := FOpenRouterAI.ModelInfo[i].modelName;
+      item.Detail := FOpenRouterAI.ModelInfo[i].modelName + ' ' + FOpenRouterAI.ModelInfo[i].version;
+    end;
+  end;
+
 
 end;
 
