@@ -6,7 +6,6 @@ uses
   System.Classes,
   System.JSON,
   System.SysUtils,
-  windows,
   System.Generics.Collections,
   REST.Client,
   REST.Types,
@@ -36,6 +35,10 @@ type
 
 
 implementation
+
+uses
+  FMX.Types
+  ;
 
 function TOpenAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
@@ -143,7 +146,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    OutputDebugString(PChar(LJSONBody.ToJSON));
+    Log.d(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);

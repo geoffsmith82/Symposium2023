@@ -9,7 +9,6 @@ uses
   System.SysUtils,
   System.Rtti,
   FMX.Types,
-  windows,
   System.Generics.Collections,
   REST.Client,
   REST.Types,
@@ -211,7 +210,7 @@ begin
       LJSONFunctions := Functions.GetAvailableFunctionsJSON(False);
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
     end;
-    OutputDebugString(PChar(LJSONBody.ToJSON));
+    Log.d(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);

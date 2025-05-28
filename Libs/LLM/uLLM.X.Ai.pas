@@ -37,7 +37,8 @@ type
 implementation
 
 uses
-  Winapi.Windows;
+  FMX.Types
+  ;
 
 function TXGrokAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
@@ -145,7 +146,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    OutputDebugString(PChar(LJSONBody.ToJSON));
+    Log.d(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);

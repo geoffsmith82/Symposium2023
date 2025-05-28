@@ -8,7 +8,6 @@ uses
   System.Classes,
   System.JSON,
   System.Generics.Collections,
-  Windows,
   REST.Client,
   REST.Types,
   System.IOUtils,
@@ -196,6 +195,10 @@ type
 
 implementation
 
+uses
+  FMX.Types
+  ;
+
 procedure ResetRequestToDefault(FRESTRequest : TRestRequest; FRESTClient : TRESTClient; FRESTResponse : TRESTResponse; const APIkey: string);
 begin
   FRESTRequest.ResetToDefaults;
@@ -257,7 +260,7 @@ begin
     JsonBody.AddPair('instructions', instructions);
 
     JsonBody.AddPair('tools', TJSONArray.Create(TJSONObject.Create.AddPair('type', 'file_search')));
-    OutputDebugString(PChar(JsonBody.ToJSON));
+    Log.d(JsonBody.ToJSON);
     FRESTRequest.AddBody(JsonBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
     FRESTRequest.Execute;
     Result := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
