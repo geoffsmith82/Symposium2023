@@ -86,6 +86,7 @@ The example programs below is an attempt to demonstrate the capabilities availab
   - [X.AI](https://x.ai) grok LLM
   - [Replicate](https://www.replicate.com) access a wide range of models
   - [Huggingface](https://huggingface.co/) access a wide range of models
+  - [OpenRouter](https://openrouter.ai) access a wide range of models
   - [ElevenLabs](https://beta.elevenlabs.io/) Text to Speech and Voice Cloning
   - [OpenAI](https://platform.openai.com) Text to Speech, Whisper Voice Recognition, DALLE-2, DALLE-3 Image Generation, GPT4 LLM
   - [AssemblyAI](https://www.assemblyai.com/app) Voice Recognition

@@ -3,7 +3,7 @@ unit uAPIKeyNameList;
 interface
 
 const
-  ApiKeyNames: array[1..21] of string = (
+  ApiKeyNames: array[1..24] of string = (
     'chatgpt_apikey',
     'X_AI',
     'groq_apikey',
@@ -13,12 +13,15 @@ const
     'deepgram_key',
     'HuggingFace_APIKey',
     'Mistral_APIKey',
+    'OpenRouter_APIKey',
     'ms_cognative_service_resource_key',
     'AWSAccessKey',
     'AWSSecretKey',
     'google_clientid',
     'google_clientsecret',
     'google_AI_APIKey',
+    'google_custom_search_key',
+    'google_custom_search_cx',
     'Replicate_APIKey',
     'AzureAPIKey',
     'Claude_APIKey',
