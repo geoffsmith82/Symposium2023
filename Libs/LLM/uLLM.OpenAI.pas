@@ -132,6 +132,9 @@ begin
       LJSONBody.AddPair('n', ChatConfig.n);
     if ChatConfig.seed > 0 then
       LJSONBody.AddPair('seed', ChatConfig.seed);
+    if ChatConfig.store then
+      LJSONBody.AddPair('store', TJSONBool.Create(ChatConfig.store));
+
     if ChatConfig.json_mode then
     begin
       LJSONMessage := TJSONObject.Create;

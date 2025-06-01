@@ -93,6 +93,8 @@ type
      presence_penalty : Double;
      frequency_penalty : Double;
      user : string;
+     store : Boolean;
+     class operator Initialize (out Dest: TChatSettings);
   end;
 
 
@@ -394,5 +396,13 @@ begin
 end;
 
 
+
+{ TChatSettings }
+
+class operator TChatSettings.Initialize(out Dest: TChatSettings);
+begin
+  Dest.n := 1;
+  Dest.json_mode := False;
+end;
 
 end.
