@@ -1,0 +1,101 @@
+object frmDescribePicture: TfrmDescribePicture
+  Left = 0
+  Top = 0
+  Caption = 'Image Processing'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object MainMenu: TMainMenu
+    Left = 344
+    Top = 136
+    object miFile: TMenuItem
+      Text = 'File'
+      object miExit: TMenuItem
+        Locked = True
+        Text = 'Exit'
+        OnClick = miExitClick
+      end
+    end
+    object miSettings: TMenuItem
+      Text = 'Settings'
+      object miGoogleAuthenticate: TMenuItem
+        Locked = True
+        Text = 'Google Authenticate...'
+      end
+      object miAPIKeys: TMenuItem
+        Locked = True
+        Text = 'API Keys...'
+        OnClick = miAPIKeysClick
+      end
+    end
+    object miModelMenu: TMenuItem
+      Text = 'Models'
+    end
+  end
+  object Image1: TImage
+    MultiResBitmap = <
+      item
+      end>
+    Align = Client
+    Size.Width = 640.000000000000000000
+    Size.Height = 255.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Position.Y = 305.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 175.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object Memo: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      TextSettings.WordWrap = True
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      Position.X = 8.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 624.000000000000000000
+      Size.Height = 122.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Viewport.Width = 620.000000000000000000
+      Viewport.Height = 118.000000000000000000
+    end
+    object btnDescribe: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 15.000000000000000000
+      Size.Width = 129.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Describe the Picture'
+      TextSettings.Trimming = None
+      OnClick = btnDescribeClick
+    end
+  end
+  object Layout2: TLayout
+    Align = Top
+    Size.Width = 640.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    object btnOpen: TButton
+      Position.X = 16.000000000000000000
+      Position.Y = 16.000000000000000000
+      TabOrder = 0
+      Text = 'Open'
+      TextSettings.Trimming = None
+      OnClick = btnOpenClick
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Left = 208
+    Top = 184
+  end
+end
