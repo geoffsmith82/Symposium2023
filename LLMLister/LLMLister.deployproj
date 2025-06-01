@@ -1,0 +1,69 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Condition="Exists('$(BDS)\bin\CodeGear.Deployment.targets')" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+    <ProjectExtensions>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <PropertyGroup>
+        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='Android64'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSSimARM64'"/>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(Platform)'=='OSX64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win32'"/>
+    <ItemGroup Condition="'$(Platform)'=='Android64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Android'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64'"/>
+    <ItemGroup Condition="'$(Platform)'=='OSXARM64'">
+        <DeployFile Include="OSXARM64\Debug\LLMLister.dSYM" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>LLMLister.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+            <RemoteName>LLMLister</RemoteName>
+            <DeployClass>ProjectOSXDebug</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Debug\LLMLister.info.plist" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>LLMLister.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Debug\LLMLister.entitlements" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>LLMLister.app\..\</RemoteDir>
+            <RemoteName>LLMLister.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(ProjectName).Artwork\macOS\AppIcon.icns" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>LLMLister.app\Contents\Resources\</RemoteDir>
+            <RemoteName>LLMLister.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Debug\LLMLister" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>LLMLister.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>LLMLister</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
+    <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
+    <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
+</Project>

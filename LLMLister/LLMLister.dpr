@@ -22,6 +22,7 @@ uses
   uLLM.Anthropic in '..\Libs\LLM\uLLM.Anthropic.pas',
   uLLM.Mistral in '..\Libs\LLM\uLLM.Mistral.pas',
   uLLM.OpenRouter in '..\Libs\LLM\uLLM.OpenRouter.pas',
+  ApiKeyStore.OSX in '..\Libs\ApiKeyStore\ApiKeyStore.OSX.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas';
 
 {$R *.res}
