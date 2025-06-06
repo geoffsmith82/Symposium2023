@@ -6,7 +6,7 @@
         <FrameworkType>FMX</FrameworkType>
         <MainSource>ImageGenerationFMX.dpr</MainSource>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
-        <ProjectGuid>{6DE37279-BBE3-4056-9B8A-2E56A4947F52}</ProjectGuid>
+        <ProjectGuid>{C71532BD-D8D8-4E27-B1A5-86D08B921DDD}</ProjectGuid>
         <ProjectName Condition="'$(ProjectName)'==''">ImageGenerationFMX</ProjectName>
         <ProjectVersion>20.3</ProjectVersion>
         <TargetedPlatforms>131075</TargetedPlatforms>
@@ -67,7 +67,7 @@
         <SanitizedProjectName>ImageGenerationFMX</SanitizedProjectName>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_Define>EUREKALOG_VER7;EUREKALOG;$(DCC_Define)</DCC_Define>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_ExeOutput>..\bin\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Fmx;$(DCC_Namespace)</DCC_Namespace>

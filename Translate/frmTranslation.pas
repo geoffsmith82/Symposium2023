@@ -78,7 +78,7 @@ type
     procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
-    FTranslateEngines: TEngineManager<TBaseTranslate>;
+    FTranslateEngines: TEngineManager<TBaseTranslate, TMenuItem>;
     FApiKeyStore : TApiKeyStore;
     FSettings : TIniFile;
     fromLanguageCode : string;
@@ -146,7 +146,7 @@ var
   amazonEngine : TAmazonTranslate;
 begin
   filename := ChangeFileExt(ParamStr(0),'.ini');
-  FTranslateEngines := TEngineManager<TBaseTranslate>.Create;
+  FTranslateEngines := TEngineManager<TBaseTranslate, TMenuItem>.Create;
   FApiKeyStore := TApiKeyStore.GetInstance;
   FSettings := TIniFile.Create(filename);
   toLanguageCode := FSettings.ReadString('Settings', 'ToLanguageCode', 'en');

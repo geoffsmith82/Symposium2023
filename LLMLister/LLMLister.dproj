@@ -5,8 +5,9 @@
         <Config Condition="'$(Config)'==''">Debug</Config>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>LLMLister.dpr</MainSource>
-        <Platform Condition="'$(Platform)'==''">OSXARM64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{9FA4C31F-D23B-443F-8DEC-0FFA3F7E52F3}</ProjectGuid>
+        <ProjectName Condition="'$(ProjectName)'==''">LLMLister</ProjectName>
         <ProjectVersion>20.3</ProjectVersion>
         <TargetedPlatforms>693267</TargetedPlatforms>
     </PropertyGroup>
@@ -104,7 +105,8 @@
         <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
         <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_Define>..\bin\$(Platform)\$(Config);$(DCC_Define)</DCC_Define>
+        <DCC_ExeOutput>..\bin\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
@@ -268,9 +270,10 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_OSXARM64)'!=''">
-        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <DCC_ExeOutput>..\bin\$(Platform)\$(Config)</DCC_ExeOutput>
         <Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
-        <Manifest_File>(None)</Manifest_File>
+        <Icns_MainIcns>$(ProjectName).Artwork\macOS\AppIcon.icns</Icns_MainIcns>
+        <Icon_MainIcon>$(ProjectName).Artwork\macOS\AppIcon.ico</Icon_MainIcon>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
@@ -279,6 +282,10 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <Icns_MainIcns>$(ProjectName).Artwork\Windows\AppIcon.icns</Icns_MainIcns>
+        <Icon_MainIcon>$(ProjectName).Artwork\Windows\AppIcon.ico</Icon_MainIcon>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_DebugInformation>0</DCC_DebugInformation>
@@ -319,10 +326,10 @@
         <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Azure.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Anthropic.pas"/>
-        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.OSX.pas"/>
-        <DCCReference Include="..\Libs\LLM\uLLM.OpenRouter.pas"/>
-        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Mistral.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenRouter.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.OSX.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

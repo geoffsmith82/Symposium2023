@@ -5,53 +5,54 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  Vcl.Menus,
   System.Generics.Collections
   ;
 
 type
-  TEngineManager<T: class> = class
+  TEngineManager<T: class; M: class> = class
   public
     FEngines : TObjectDictionary<string, T>;
-    FEngineMenuItems : TDictionary<string, TMenuItem>;
-    FEngineNames: TDictionary<TMenuItem, string>;
+    FEngineMenuItems : TDictionary<string, M>;
+    FEngineNames: TDictionary<M, string>;
     FEngineOnSelect: TDictionary<T, TNotifyEvent>;
     FActiveEngine : T;
-    FActiveMenu: TMenuItem;
+    FActiveMenu: M;
   public
     function ActiveEngine: T;
-    function ActiveMenuItem: TMenuItem;
-    procedure SelectEngine(menuItem: TMenuItem); overload;
+    function ActiveMenuItem: M;
+    procedure SelectEngine(menuItem: M); overload;
     procedure SelectEngine(engineName: string); overload;
-    procedure RegisterEngine(engineClass: T; menuItem: TMenuItem; OnSelect: TNotifyEvent = nil);
+    procedure RegisterEngine(engineClass: T; menuItem: M; OnSelect: TNotifyEvent = nil);
     constructor Create;
     destructor Destroy; override;
   end;
+
+
 
 
 implementation
 
 { TEngineManager<T> }
 
-function TEngineManager<T>.ActiveEngine: T;
+function TEngineManager<T, M>.ActiveEngine: T;
 begin
   Result := FActiveEngine;
 end;
 
-function TEngineManager<T>.ActiveMenuItem: TMenuItem;
+function TEngineManager<T, M>.ActiveMenuItem: M;
 begin
   Result := FActiveMenu;
 end;
 
-constructor TEngineManager<T>.Create;
+constructor TEngineManager<T, M>.Create;
 begin
   FEngines := TObjectDictionary<string, T>.Create([doOwnsValues]);
-  FEngineMenuItems := TDictionary<string, TMenuItem>.Create;
-  FEngineNames := TDictionary<TMenuItem, string>.Create;
+  FEngineMenuItems := TDictionary<string, M>.Create;
+  FEngineNames := TDictionary<M, string>.Create;
   FEngineOnSelect := TDictionary<T, TNotifyEvent>.Create;
 end;
 
-destructor TEngineManager<T>.Destroy;
+destructor TEngineManager<T, M>.Destroy;
 begin
   FreeAndNil(FEngines);
   FreeAndNil(FEngineMenuItems);
@@ -60,7 +61,7 @@ begin
   inherited;
 end;
 
-procedure TEngineManager<T>.RegisterEngine(engineClass: T; menuItem: TMenuItem; OnSelect: TNotifyEvent);
+procedure TEngineManager<T, M>.RegisterEngine(engineClass: T; menuItem: M; OnSelect: TNotifyEvent);
 var
   LEngineName: string;
 begin
@@ -76,12 +77,12 @@ begin
   end;
 end;
 
-procedure TEngineManager<T>.SelectEngine(menuItem: TMenuItem);
+procedure TEngineManager<T, M>.SelectEngine(menuItem: M);
 begin
   SelectEngine(FEngineNames[menuItem]);
 end;
 
-procedure TEngineManager<T>.SelectEngine(engineName: string);
+procedure TEngineManager<T, M>.SelectEngine(engineName: string);
 var
   LNewEngine : T;
   LOnSelect : TNotifyEvent;

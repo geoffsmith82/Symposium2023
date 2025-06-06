@@ -19,6 +19,8 @@ uses
   WeatherApi in 'WeatherApi.pas',
   WeatherService in 'WeatherService.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
+  MCP.Prompts in '..\Libs\MCP\MCP.Prompts.pas',
+  MCP.Resources in '..\Libs\MCP\MCP.Resources.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas';
 
 // Main program entry point
