@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{A5B5B87C-BD89-4630-9C64-995DDAE62852}</ProjectGuid>
         <ProjectName Condition="'$(ProjectName)'==''">DelphiChatGPT</ProjectName>
-        <ProjectVersion>20.2</ProjectVersion>
+        <ProjectVersion>20.3</ProjectVersion>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -102,6 +102,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_ExeOutput>..\bin\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\Polly\Base;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Transform;..\Libs\aws-sdk-delphi\Source\Core;..\Libs\aws-sdk-delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -151,6 +152,7 @@
             <Form>frmApiKeyStores</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

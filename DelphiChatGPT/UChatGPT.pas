@@ -67,7 +67,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
   private
-    FTextToSpeechEngine : TEngineManager<TBaseTextToSpeech>;
+    FTextToSpeechEngine : TEngineManager<TBaseTextToSpeech, TMenuItem>;
     FSettings : TIniFile;
     FApiKeyStore : TApiKeyStore;
     FOpenAI : TBaseLLM;
@@ -91,7 +91,7 @@ var
   currentModel : string;
 begin
   FApiKeyStore := TApiKeyStore.GetInstance;
-  FTextToSpeechEngine := TEngineManager<TBaseTextToSpeech>.Create;
+  FTextToSpeechEngine := TEngineManager<TBaseTextToSpeech, TMenuItem>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
 

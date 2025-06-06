@@ -79,7 +79,7 @@ type
     { Private declarations }
     FSettings : TIniFile;
     FApiKeyStore : TApiKeyStore;
-    FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition>;
+    FFaceRecognitionEngines: TEngineManager<TBaseFaceRecognition, TMenuItem>;
     procedure DownloadAndLoadImage(const AUrl: string; AImage: TImage);
     procedure OnCodeProjectSelected(Sender: TObject);
     procedure OnMicrosoftSelected(Sender: TObject);
@@ -365,7 +365,7 @@ procedure TfrmFaceDetection.FormCreate(Sender: TObject);
 var
   engine : TBaseFaceRecognition;
 begin
-  FFaceRecognitionEngines:= TEngineManager<TBaseFaceRecognition>.Create;
+  FFaceRecognitionEngines:= TEngineManager<TBaseFaceRecognition, TMenuItem>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   FApiKeyStore := TApiKeyStore.GetInstance;
 

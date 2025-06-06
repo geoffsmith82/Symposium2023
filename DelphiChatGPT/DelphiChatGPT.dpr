@@ -1,7 +1,6 @@
 program DelphiChatGPT;
 
 uses
-
   Vcl.Forms,
   UChatGPT in 'UChatGPT.pas' {Form1},
   SpeechLib_TLB in '..\Libs\TextToSpeech\SpeechLib_TLB.pas',
@@ -25,6 +24,7 @@ uses
   uAttributes in '..\Libs\LLM\uAttributes.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  uAPIKeyNameList in '..\Libs\ApiKeyStore\uAPIKeyNameList.pas',
   frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
 
 {$R *.res}

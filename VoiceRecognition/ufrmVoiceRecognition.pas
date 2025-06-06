@@ -139,8 +139,8 @@ type
     FSettings : TIniFile;
     FConnected : Boolean;
     FShouldBeListening : Boolean;
-    FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech>;
-    FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition>;
+    FTextToSpeechEngines : TEngineManager<TBaseTextToSpeech, TMenuItem>;
+    FSpeechRecognitionEngines : TEngineManager<TBaseSpeechRecognition, TMenuItem>;
     FTask : ITask;
     FAudio : TAudioRecorder;
     FStatus : TRecognitionStatus;
@@ -409,8 +409,8 @@ begin
   FConnected := False;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
   FApiKeyStore := TApiKeyStore.GetInstance;
-  FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech>.Create;
-  FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition>.Create;
+  FTextToSpeechEngines :=  TEngineManager<TBaseTextToSpeech, TMenuItem>.Create;
+  FSpeechRecognitionEngines := TEngineManager<TBaseSpeechRecognition, TMenuItem>.Create;
   FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
   FAudio := TAudioRecorder.Create;
   FAudio.OnAudioData := OnAudioData;
