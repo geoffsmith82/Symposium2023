@@ -12,6 +12,7 @@ uses
   System.Threading,
   FMX.Types,
   FMX.Controls,
+  FMX.Controls.Presentation,
   FMX.Forms,
   FMX.StdCtrls,
   FMX.Graphics,
@@ -49,6 +50,7 @@ type
     miGoogleAuthenticate: TMenuItem;
     miAPIKeys: TMenuItem;
     Splitter: TSplitter;
+    StatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
@@ -58,6 +60,7 @@ type
     { Private declarations }
     FKeyStore: TApiKeyStore;
     FSettings : TIniFile;
+    FlblStatus : TLabel;
     FOpenAI : TOpenAI;
     FAzureAI : TMicrosoftOpenAI;
     FGrokAI : TXGrokAI;
@@ -83,7 +86,9 @@ procedure TfrmLLMLister.FormCreate(Sender: TObject);
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   FKeyStore := TApiKeyStore.GetInstance;
-
+  FlblStatus := TLabel.Create(nil);
+  FlblStatus.Margins.Left := 10;
+  StatusBar.AddObject(FlblStatus);
   TTask.Run(LoadModels);
 end;
 
@@ -168,6 +173,7 @@ var
         item.TagObject := AObject;
         item.Text := AModelName;
         item.Detail := ADetail;
+        FlblStatus.Text := lvLLMs.ItemCount.ToString + ' Models';
       end);
   end;
 

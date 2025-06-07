@@ -258,6 +258,12 @@ var
   LModel : string;
   LModelObj : TBaseModelInfo;
 begin
+  if Assigned(FModelInfo) and (FModelInfo.Count <> 0) then
+  begin
+    Result := FModelInfo;
+    Exit;
+  end;
+
   LModelList := TStringList.Create;
   try
     ListOpenAIModels(LModelList);
