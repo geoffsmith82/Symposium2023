@@ -9,6 +9,7 @@ uses
   System.Classes,
   System.Variants,
   System.IniFiles,
+  System.Threading,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -49,6 +50,7 @@ type
     miAPIKeys: TMenuItem;
     Splitter: TSplitter;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure miAPIKeysClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miGoogleAuthenticateClick(Sender: TObject);
@@ -64,6 +66,8 @@ type
     FOpenRouterAI: TOpenRouter;
     FClaudeAI : TAnthropic;
     FGroqAI : TGroqLLM;
+    procedure LoadModels;
+    procedure AddModelsToList(AI: TBaseLLM; ImageIndex: Integer);
   public
     { Public declarations }
   end;
@@ -76,119 +80,110 @@ implementation
 {$R *.fmx}
 
 procedure TfrmLLMLister.FormCreate(Sender: TObject);
-var
-  i : Integer;
-  item : TListViewItem;
 begin
-  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
+  FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   FKeyStore := TApiKeyStore.GetInstance;
+
+  TTask.Run(LoadModels);
+end;
+
+procedure TfrmLLMLister.LoadModels;
+begin
   if not FKeyStore.LoadApiKey('chatgpt_apikey').IsEmpty then
   begin
     FOpenAI := TOpenAI.Create(FKeyStore.LoadApiKey('chatgpt_apikey'));
-    for i := 0 to FOpenAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 1;
-      item.TagObject := FOpenAI;
-      item.Text := FOpenAI.ModelInfo[i].modelName;
-      item.Detail := FOpenAI.ModelInfo[i].modelName + ' ' + FOpenAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FOpenAI, 1);
   end;
+
   var azureKey := FKeyStore.LoadApiKey('AzureAPIKey');
   var azureEndpoint := FKeyStore.LoadSetting('AzureOpenAIEndpoint');
-  if ((azureKey.IsEmpty=False) and (azureEndpoint.IsEmpty = False)) then
+  if (not azureKey.IsEmpty) and (not azureEndpoint.IsEmpty) then
   begin
     FAzureAI := TMicrosoftOpenAI.Create(azureKey, azureEndpoint, '');
-    for i := 0 to FAzureAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 3;
-      item.TagObject := FAzureAI;
-      item.Text := FAzureAI.ModelInfo[i].modelName;
-      item.Detail := FAzureAI.ModelInfo[i].modelName + ' ' + FAzureAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FAzureAI, 3);
   end;
 
   if not FKeyStore.LoadApiKey('X_AI').IsEmpty then
   begin
     FGrokAI := TXGrokAI.Create(FKeyStore.LoadApiKey('X_AI'));
-    for i := 0 to FGrokAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 7;
-      item.TagObject := FGrokAI;
-      item.Text := FGrokAI.ModelInfo[i].modelName;
-      item.Detail := FGrokAI.ModelInfo[i].modelName + ' ' + FGrokAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FGrokAI, 7);
   end;
 
   if not FKeyStore.LoadApiKey('google_AI_APIKey').IsEmpty then
   begin
     FGeminiAI := TGemini.Create(FKeyStore.LoadApiKey('google_AI_APIKey'));
-    for i := 0 to FGeminiAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 9;
-      item.TagObject := FGeminiAI;
-      item.Text := FGeminiAI.ModelInfo[i].modelName;
-      item.Detail := FGeminiAI.ModelInfo[i].modelName + ' ' + FGeminiAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FGeminiAI, 9);
   end;
 
   if not FKeyStore.LoadApiKey('Claude_APIKey').IsEmpty then
   begin
     FClaudeAI := TAnthropic.Create(FKeyStore.LoadApiKey('Claude_APIKey'));
-    for i := 0 to FClaudeAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 6;
-      item.TagObject := FClaudeAI;
-      item.Text := FClaudeAI.ModelInfo[i].modelName;
-      item.Detail := FClaudeAI.ModelInfo[i].modelName + ' ' + FClaudeAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FClaudeAI, 6);
   end;
 
   if not FKeyStore.LoadApiKey('groq_apikey').IsEmpty then
   begin
     FGroqAI := TGroqLLM.Create(FKeyStore.LoadApiKey('groq_apikey'));
-    for i := 0 to FGroqAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 8;
-      item.TagObject := FGroqAI;
-      item.Text := FGroqAI.ModelInfo[i].modelName;
-      item.Detail := FGroqAI.ModelInfo[i].modelName + ' ' + FGroqAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FGroqAI, 8);
   end;
 
   if not FKeyStore.LoadApiKey('Mistral_APIKey').IsEmpty then
   begin
     FMistralAI := TMistral.Create(FKeyStore.LoadApiKey('Mistral_APIKey'));
-    for i := 0 to FMistralAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 10;
-      item.TagObject := FMistralAI;
-      item.Text := FMistralAI.ModelInfo[i].modelName;
-      item.Detail := FMistralAI.ModelInfo[i].modelName + ' ' + FMistralAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FMistralAI, 10);
   end;
 
   if not FKeyStore.LoadApiKey('OpenRouter_APIKey').IsEmpty then
   begin
     FOpenRouterAI := TOpenRouter.Create(FKeyStore.LoadApiKey('OpenRouter_APIKey'));
-    for i := 0 to FOpenRouterAI.ModelInfo.Count - 1 do
-    begin
-      item := lvLLMs.Items.Add;
-      item.ImageIndex := 11;
-      item.TagObject := FOpenRouterAI;
-      item.Text := FOpenRouterAI.ModelInfo[i].modelName;
-      item.Detail := FOpenRouterAI.ModelInfo[i].modelName + ' ' + FOpenRouterAI.ModelInfo[i].version;
-    end;
+    AddModelsToList(FOpenRouterAI, 11);
+  end;
+end;
+procedure TfrmLLMLister.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FOpenAI);
+  FreeAndNil(FAzureAI);
+  FreeAndNil(FGrokAI);
+  FreeAndNil(FGeminiAI);
+  FreeAndNil(FClaudeAI);
+  FreeAndNil(FGroqAI);
+  FreeAndNil(FMistralAI);
+  FreeAndNil(FOpenRouterAI);
+  FreeAndNil(FSettings);
+end;
+
+procedure TfrmLLMLister.AddModelsToList(AI: TBaseLLM; ImageIndex: Integer);
+var
+  i: Integer;
+
+  procedure QueueItem(const AModelName, ADetail: string; const AImageIndex: Integer; const AObject: TBaseLLM);
+  begin
+    TThread.Queue(nil,
+      procedure
+      var
+        item: TListViewItem;
+      begin
+        item := lvLLMs.Items.Add;
+        item.ImageIndex := AImageIndex;
+        item.TagObject := AObject;
+        item.Text := AModelName;
+        item.Detail := ADetail;
+      end);
   end;
 
+begin
+  for i := 0 to AI.ModelInfo.Count - 1 do
+  begin
+    var ModelName := AI.ModelInfo[i].modelName;
+    var Version := AI.ModelInfo[i].version;
+    var Detail := ModelName + ' ' + Version;
 
+    QueueItem(ModelName, Detail, ImageIndex, AI);
+  end;
 end;
+
+
+
 
 procedure TfrmLLMLister.miAPIKeysClick(Sender: TObject);
 var
