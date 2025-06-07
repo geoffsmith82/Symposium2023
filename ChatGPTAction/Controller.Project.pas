@@ -13,7 +13,6 @@ uses
   System.Win.ComObj,
   System.Classes,
   JsonDataObjects,
-  Winapi.Windows,
   Winapi.ShLwApi,
   Winapi.ActiveX,
   Vcl.FileCtrl,
@@ -83,6 +82,7 @@ implementation
 uses
   System.IOUtils,
   System.NetEncoding,
+  FMX.Types,
   MVCFramework.Logger,
   Files.Extra,
   udmCompiler,
@@ -375,7 +375,7 @@ var
   description : string;
   JSONBody : TJSONObject;
 begin
-  OutputDebugString(PChar(Context.Request.Body));
+  FMX.Types.Log.d(Context.Request.Body);
   try
     JSONBody := TJSONObject.Parse(Context.Request.Body) as TJSONObject;
     FileData.FileName := JSONBody.Values['fileName'];

@@ -9,7 +9,6 @@ uses
   System.Generics.Collections,
   System.RTTI,
   System.TypInfo,
-  Winapi.Windows,
   MCP.Attributes;
 
 type
@@ -67,7 +66,9 @@ type
 implementation
 
 uses
-  MCP.MethodProcessor, MCP.ServiceInterface;
+  FMX.Types,
+  MCP.MethodProcessor,
+  MCP.ServiceInterface;
 
 { TMCPBaseService }
 
@@ -505,6 +506,7 @@ begin
 
       // Return the response
       Response := CreateJSONRPCResponse(RequestID, ResponseContent);
+      Log.d(Response.ToJSON);
     end
     else
     begin
@@ -603,7 +605,7 @@ begin
       if InputLine.Trim.IsEmpty then
         Continue;
 
-      OutputDebugString(PChar('Input: ' + InputLine));
+      Log.d('Input: ' + InputLine);
 
       // Process request and generate response
       ProcessRequest(InputLine, OutputLine);
@@ -611,7 +613,7 @@ begin
       // If there's a response, write it to stdout
       if not OutputLine.IsEmpty then
       begin
-        OutputDebugString(PChar('Output: ' + OutputLine));
+        Log.d('Output: ' + OutputLine);
         WriteLn(OutputLine);
         Flush(Output);
       end;

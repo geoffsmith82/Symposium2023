@@ -2,6 +2,7 @@ unit uTTS.Windows.Engine;
 
 interface
 
+{$IFDEF MSWINDOWS}
 uses
   System.SysUtils,
   System.Classes,
@@ -29,9 +30,13 @@ type
     destructor Destroy; override;
   end;
 
+{$ENDIF}
+
 implementation
 
 { TWindowsSpeechService }
+
+{$IFDEF MSWINDOWS}
 
 constructor TWindowsSpeechService.Create;
 begin
@@ -150,6 +155,5 @@ begin
   end;
 end;
 
-
-
+{$ENDIF}
 end.

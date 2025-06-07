@@ -3,8 +3,6 @@ unit uDeepGram.SpeechToText;
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
@@ -43,6 +41,10 @@ type
 
 implementation
 
+uses
+  FMX.Types
+  ;
+
 { TTSendThread }
 
 procedure TDeepGramSendThread.WSOnRecv(Sender: TSslWebSocketCli;
@@ -66,7 +68,7 @@ begin
         begin
           if channel.TryGetValue('alternatives', alternativesArray) then
           begin
-            OutputDebugString(PChar(alternativesArray.ToJSON));
+            Log.d(alternativesArray.ToJSON);
             if alternativesArray.Count > 0 then
             begin
               alternativeObj := alternativesArray[0] as TJSONObject;
@@ -156,7 +158,7 @@ begin
         continue;
       end;
       mm.Position := 0;
-      OutputDebugString(PChar('Size:' + mm.Size.ToString));
+      Log.d('Size:' + mm.Size.ToString);
       try
         if not Assigned(FWebSocket) or not FWebSocket.Connected then
           SetupWebSocket;

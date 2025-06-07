@@ -13,7 +13,8 @@ uses
   uEngineManager in '..\Libs\uEngineManager.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
-  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores};
+  frmApiKeyStore in '..\Libs\ApiKeyStore\frmApiKeyStore.pas' {frmApiKeyStores},
+  uAPIKeyNameList in '..\Libs\ApiKeyStore\uAPIKeyNameList.pas';
 
 {$R *.res}
 

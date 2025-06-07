@@ -3,7 +3,6 @@ unit frmTranslation;
 interface
 
 uses
-  Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
   System.Variants,

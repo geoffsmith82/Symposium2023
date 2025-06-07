@@ -3,7 +3,6 @@ unit frmTranscribeAudio;
 interface
 
 uses
-  Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
   System.Variants,
@@ -69,7 +68,7 @@ type
     procedure miAPIKeysClick(Sender: TObject);
   private
     { Private declarations }
-    FSpeechToTextEngines : TEngineManager<TBaseSpeechToText>;
+    FSpeechToTextEngines : TEngineManager<TBaseSpeechToText, TMenuItem>;
     FSettings : TIniFile;
     FApiKeyStore : TApiKeyStore;
   public
@@ -94,7 +93,7 @@ var
   whisperOnlineEngine : TOpenAiWhisperOnline;
   amazonEngine : TAmazonSpeechToText;
 begin
-  FSpeechToTextEngines := TEngineManager<TBaseSpeechToText>.Create;
+  FSpeechToTextEngines := TEngineManager<TBaseSpeechToText, TMenuItem>.Create;
   FApiKeyStore := TApiKeyStore.GetInstance;
 
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));

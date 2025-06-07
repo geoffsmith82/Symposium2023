@@ -8,7 +8,6 @@ uses
   System.JSON,
   System.Net.HttpClient,
   System.NetEncoding,
-  Winapi.Windows,
   System.Generics.Collections,
   System.IOUtils,
   System.RTTI,

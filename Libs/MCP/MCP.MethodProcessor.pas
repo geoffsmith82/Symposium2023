@@ -9,7 +9,6 @@ uses
   System.Generics.Collections,
   System.RTTI,
   System.TypInfo,
-  Winapi.Windows,
   MCP.Attributes,
   MCP.ServiceInterface;
 
@@ -37,6 +36,10 @@ type
   end;
 
 implementation
+
+uses
+  FMX.Types
+  ;
 
 { TMCPMethodProcessor }
 
@@ -186,7 +189,7 @@ begin
                          (RttiMethod.ReturnType.IsInstance and
                           RttiMethod.ReturnType.AsInstance.MetaclassType.InheritsFrom(TJSONObject)));
 
-            OutputDebugString(PChar('HasToJSON = ' + BoolToStr(HasToJSON, True)));
+            Log.d('HasToJSON = ' + BoolToStr(HasToJSON, True));
 
             if HasToJSON then
             begin
@@ -194,23 +197,23 @@ begin
                 // Make sure the method has no parameters or all have defaults
                 if (Length(RttiMethod.GetParameters) = 0) then
                 begin
-                  OutputDebugString(PChar('Invoking ToJSON method'));
+                  Log.d('Invoking ToJSON method');
                   var ResultValue := RttiMethod.Invoke(Value.AsObject, []);
                   if not ResultValue.IsEmpty and (ResultValue.AsObject is TJSONObject) then
                   begin
-                    OutputDebugString(PChar('ToJSON returned a valid TJSONObject'));
+                    Log.d('ToJSON returned a valid TJSONObject');
                     Result := ResultValue.AsObject as TJSONObject;
                     Exit;
                   end;
                 end;
               except
                 on E: Exception do
-                  OutputDebugString(PChar('ToJSON exception: ' + E.Message));
+                  Log.d('ToJSON exception: ' + E.Message);
               end;
             end;
 
             // Fall back to RTTI-based conversion
-            OutputDebugString(PChar('Using CreateClassToJSON fallback'));
+            Log.d('Using CreateClassToJSON fallback');
             Result := CreateClassToJSON(Value.AsObject);
           finally
             RttiContext.Free;

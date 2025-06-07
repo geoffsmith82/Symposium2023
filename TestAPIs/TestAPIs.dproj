@@ -65,7 +65,7 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_MapFile>3</DCC_MapFile>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\Polly\Base;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Transform;..\Libs\aws-sdk-delphi\Source\Core;..\Libs\aws-sdk-delphi\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\Polly\Base;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Polly\Base\Transform;..\Libs\aws-sdk-delphi\Source\Core;..\Libs\aws-sdk-delphi\Source;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\Translate\Base\Transform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>3081</VerInfo_Locale>
@@ -168,11 +168,11 @@
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Android.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Mistral.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
             <Form>frmApiKeyStores</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Libs\LLM\uLLM.Mistral.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

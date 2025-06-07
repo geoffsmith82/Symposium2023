@@ -3,8 +3,6 @@ unit uRevAI.SpeechToText;
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
@@ -46,6 +44,10 @@ type
 
 
 implementation
+
+uses
+  FMX.Types
+  ;
 
 
 { TTSendThread }
