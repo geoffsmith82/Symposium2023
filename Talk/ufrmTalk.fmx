@@ -70,6 +70,14 @@ object frmTalk: TfrmTalk
       end
     end
   end
+  object StatusBar: TStatusBar
+    Position.Y = 458.000000000000000000
+    ShowSizeGrip = True
+    Size.Width = 640.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+  end
   object ImageList: TImageList
     Source = <
       item

@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Types,
+  System.Threading,
   System.UITypes,
   System.Classes,
   System.Variants,
@@ -50,6 +51,7 @@ type
     miSettings: TMenuItem;
     miGoogleAuthenticate: TMenuItem;
     miAPIKeys: TMenuItem;
+    StatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure btnTalkClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -60,12 +62,15 @@ type
   private
     { Private declarations }
     FKeyStore: TApiKeyStore;
+    FlblStatus: TLabel;
     FWindowsSpeech : TWindowsSpeechService;
     FOpenAITTS : TOpenAITextToSpeech;
     FElevenLabsTTS : TElevenLabsService;
     FMsTTS : TMicrosoftCognitiveService;
     FPolly : TAmazonPollyService;
     FGoogleSpeech : TGoogleSpeechService;
+    procedure AddVoicesToList(TTS: TBaseTextToSpeech; ImageIndex: Integer);
+    procedure LoadVoices;
   public
     { Public declarations }
   end;
@@ -99,87 +104,99 @@ begin
 end;
 
 procedure TfrmTalk.FormCreate(Sender: TObject);
-var
-  i: Integer;
-  item : TListViewItem;
 begin
   FKeyStore := TApiKeyStore.GetInstance;
+  FlblStatus := TLabel.Create(nil);
+  FlblStatus.Margins.Left := 10;
+  StatusBar.AddObject(FlblStatus);
+  TTask.Run(LoadVoices);
+end;
+
+procedure TfrmTalk.LoadVoices;
+begin
+  // Windows Speech (always created)
   FwindowsSpeech := TWindowsSpeechService.Create;
-  for i := 0 to FwindowsSpeech.Voices.Count - 1 do
-  begin
-    item := lvVoices.Items.Add;
-    item.ImageIndex := 0;
-    item.TagObject := FwindowsSpeech;
-    item.Text := FwindowsSpeech.Voices[i].VoiceName;
-    item.Detail := FwindowsSpeech.Voices[i].VoiceId + ' ' + FwindowsSpeech.Voices[i].VoiceGender;
-  end;
+  AddVoicesToList(FwindowsSpeech, 0);
 
-
-
+  // OpenAI
   if not FKeyStore.LoadApiKey('chatgpt_apikey').IsEmpty then
   begin
     FOpenAITTS := TOpenAITextToSpeech.Create(FKeyStore.LoadApiKey('chatgpt_apikey'));
-    for i := 0 to FOpenAITTS.Voices.Count - 1 do
-    begin
-      item := lvVoices.Items.Add;
-      item.ImageIndex := 1;
-      item.TagObject := FOpenAITTS;
-      item.Text := FOpenAITTS.Voices[i].VoiceName;
-      item.Detail := FOpenAITTS.Voices[i].VoiceId + ' ' + FOpenAITTS.Voices[i].VoiceGender;
-    end;
+    AddVoicesToList(FOpenAITTS, 1);
   end;
 
+  // Eleven Labs
   if not FKeyStore.LoadApiKey('ElevenLabsAPIKey').IsEmpty then
   begin
     FElevenLabsTTS := TElevenLabsService.Create(FKeyStore.LoadApiKey('ElevenLabsAPIKey'));
-    for i := 0 to FElevenLabsTTS.Voices.Count - 1 do
-    begin
-      item := lvVoices.Items.Add;
-      item.ImageIndex := 2;
-      item.TagObject := FElevenLabsTTS;
-      item.Text := FElevenLabsTTS.Voices[i].VoiceName;
-      item.Detail := FElevenLabsTTS.Voices[i].VoiceId + ' ' + FElevenLabsTTS.Voices[i].VoiceGender;
-    end;
+    AddVoicesToList(FElevenLabsTTS, 2);
   end;
 
+  // Microsoft Cognitive
   if not FKeyStore.LoadApiKey('ms_cognative_service_resource_key').IsEmpty then
   begin
-    FMsTTS := TMicrosoftCognitiveService.Create(FKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com');
-    for i := 0 to FMsTTS.Voices.Count - 1 do
-    begin
-      item := lvVoices.Items.Add;
-      item.ImageIndex := 3;
-      item.TagObject := FMsTTS;
-      item.Text := FMsTTS.Voices[i].VoiceName;
-      item.Detail := FMsTTS.Voices[i].VoiceId + ' ' + FMsTTS.Voices[i].VoiceGender;
-    end;
+    FMsTTS := TMicrosoftCognitiveService.Create(
+      FKeyStore.LoadApiKey('ms_cognative_service_resource_key'),
+      'australiaeast.tts.speech.microsoft.com'
+    );
+    AddVoicesToList(FMsTTS, 3);
   end;
 
+  // Amazon Polly
   if not FKeyStore.LoadApiKey('AWSAccessKey').IsEmpty then
   begin
-    FPolly := TAmazonPollyService.Create(FKeyStore.LoadApiKey('AWSAccessKey'), FKeyStore.LoadApiKey('AWSSecretKey'), FKeyStore.LoadSetting('AWSRegion'));
-    for i := 0 to FPolly.Voices.Count - 1 do
-    begin
-      item := lvVoices.Items.Add;
-      item.ImageIndex := 4;
-      item.TagObject := FPolly;
-      item.Text := FPolly.Voices[i].VoiceName;
-      item.Detail := FPolly.Voices[i].VoiceId + ' ' + FPolly.Voices[i].VoiceGender;
-    end;
+    FPolly := TAmazonPollyService.Create(
+      FKeyStore.LoadApiKey('AWSAccessKey'),
+      FKeyStore.LoadApiKey('AWSSecretKey'),
+      FKeyStore.LoadSetting('AWSRegion')
+    );
+    AddVoicesToList(FPolly, 4);
   end;
 
+  // Google Speech
   if not FKeyStore.LoadApiKey('google_refreshtoken').IsEmpty then
   begin
-    var   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-    FGoogleSpeech := TGoogleSpeechService.Create(FKeyStore.LoadApiKey('google_clientid'),  FKeyStore.LoadApiKey('google_clientsecret'), 'ADUG Demo', '', FSettings);
-    for i := 0 to FGoogleSpeech.Voices.Count - 1 do
+    var Settings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
+    FGoogleSpeech := TGoogleSpeechService.Create(
+      FKeyStore.LoadApiKey('google_clientid'),
+      FKeyStore.LoadApiKey('google_clientsecret'),
+      'ADUG Demo',
+      '',
+      Settings
+    );
+    AddVoicesToList(FGoogleSpeech, 5);
+    Settings.Free;
+  end;
+end;
+
+procedure TfrmTalk.AddVoicesToList(TTS: TBaseTextToSpeech; ImageIndex: Integer);
+var
+  i: Integer;
+
+  procedure QueueVoice(const AName, ADetail: string; const AImageIndex: Integer; const AObject: TBaseTextToSpeech);
+  begin
+    TThread.Queue(nil, procedure
+    var
+      item: TListViewItem;
     begin
       item := lvVoices.Items.Add;
-      item.ImageIndex := 5;
-      item.TagObject := FGoogleSpeech;
-      item.Text := FGoogleSpeech.Voices[i].VoiceName;
-      item.Detail := FGoogleSpeech.Voices[i].VoiceId + ' ' + FGoogleSpeech.Voices[i].VoiceGender;
-    end;
+      item.ImageIndex := AImageIndex;
+      item.TagObject := AObject;
+      item.Text := AName;
+      item.Detail := ADetail;
+      FlblStatus.Text := lvVoices.ItemCount.ToString + ' Voices listed';
+    end);
+  end;
+
+begin
+  for i := 0 to TTS.Voices.Count - 1 do
+  begin
+    var VoiceName := TTS.Voices[i].VoiceName;
+    var VoiceId := TTS.Voices[i].VoiceId;
+    var VoiceGender := TTS.Voices[i].VoiceGender;
+    var Detail := VoiceId + ' ' + VoiceGender;
+
+    QueueVoice(VoiceName, Detail, ImageIndex, TTS);
   end;
 end;
 
