@@ -4,8 +4,10 @@ interface
 
 uses
   System.SysUtils,
+  System.IOUtils,
   System.Classes,
   System.JSON,
+  System.Generics.Collections,
   REST.Client,
   REST.Types,
   Web.HTTPApp,
@@ -63,13 +65,13 @@ begin
     // Add the system message first
     MessageObj := TJSONObject.Create;
     MessageObj.AddPair('role', 'system');
-    MessageObj.AddPair('content', 'You are a helpful assistant inside the Delphi IDE.');
+    MessageObj.AddPair('content', 'You are a helpful assistant inside the Delphi IDE. Local variables should start with L');
     NewMessages.AddElement(MessageObj);
 
     // Append the original messages
     for i := 0 to OriginalMessages.Count - 1 do
     begin
-      CopiedObj := TJSONObject(TJSONObject.ParseJSONValue(OriginalMessages.Items[i].ToJSON));
+      CopiedObj := OriginalMessages.Items[i].Clone as TJSONObject;
       NewMessages.AddElement(CopiedObj);
     end;
 
@@ -86,10 +88,6 @@ begin
   end;
 end;
 
-
-
-
-
 procedure TDelphiIdeProxyController.GetModels;
 var
   RequestBody: TJSONObject;
@@ -104,10 +102,10 @@ begin
       // Send the JSON response back to the client
       Render(ResponseBody, False);
     finally
-      ResponseBody.Free;
+      FreeAndNil(ResponseBody);
     end;
   finally
-    RequestBody.Free;
+    FreeAndNil(RequestBody);
   end;
 end;
 
@@ -127,8 +125,10 @@ var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
   RESTResponse: TRESTResponse;
-  JSONResponse: TJSONObject;
 begin
+  if not Assigned(Body) then
+    raise Exception.Create('OpenAI API request failed because the request contains no body');
+
   RESTClient := TRESTClient.Create(Endpoint);
   RESTRequest := TRESTRequest.Create(nil);
   RESTResponse := TRESTResponse.Create(nil);
@@ -144,10 +144,7 @@ begin
     RESTRequest.Method := Method;
 
     // Set the request body
-    if Assigned(Body) then
-    begin
-      RESTRequest.AddBody(Body.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
-    end;
+    RESTRequest.AddBody(Body);
 
     // Execute the request
     RESTRequest.Execute;
@@ -156,18 +153,17 @@ begin
     if (RESTResponse.StatusCode >= 200) and (RESTResponse.StatusCode < 300) then
     begin
       // Parse response body into JSON
-      JSONResponse := TJSONObject.ParseJSONValue(RESTResponse.Content) as TJSONObject;
-      Result := JSONResponse.Clone as TJSONObject;
+      Result := RESTResponse.JSONValue.Clone as TJSONObject;
     end
     else
     begin
       // Handle non-successful responses
-      raise Exception.CreateFmt('Replicate API request failed with status code %d: %s', [RESTResponse.StatusCode, RESTResponse.StatusText]);
+      raise Exception.CreateFmt('OpenAI API request failed with status code %d: %s', [RESTResponse.StatusCode, RESTResponse.StatusText]);
     end;
   finally
-    RESTClient.Free;
-    RESTRequest.Free;
-    RESTResponse.Free;
+    FreeAndNil(RESTClient);
+    FreeAndNil(RESTRequest);
+    FreeAndNil(RESTResponse);
   end;
 end;
 
