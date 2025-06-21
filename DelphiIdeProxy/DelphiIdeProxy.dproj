@@ -139,7 +139,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <DCC_UnitSearchPath>c:\Programming\Components\delphimvcframework\sources;C:\Programming\Components\delphimvcframework\lib\loggerpro\;C:\Programming\Components\delphimvcframework\lib\swagdoc\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Libs\delphimvcframework\sources;..\Libs\delphimvcframework\lib\loggerpro\;..\Libs\delphimvcframework\lib\swagdoc\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Manifest_File>(None)</Manifest_File>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
