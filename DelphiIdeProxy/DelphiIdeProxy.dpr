@@ -38,7 +38,7 @@ begin
     Result := 0;
 end;
 
-procedure SetPort(const AServer: TIdHTTPWebBrokerBridge; APort: String);
+procedure SetPort(const AServer: TIdHTTPWebBrokerBridge; APort: string);
 begin
   if not AServer.Active then
   begin
@@ -56,11 +56,6 @@ begin
   Write(cArrow);
 end;
 
-procedure  OnAuth(AContext: TIdContext; const AAuthType, AAuthData: String; var VUsername, VPassword: String; var VHandled: Boolean);
-begin
-
-end;
-
 procedure StartServer(const AServer: TIdHTTPWebBrokerBridge);
 begin
   if not AServer.Active then
@@ -70,7 +65,7 @@ begin
       Writeln(Format(sStartingServer, [AServer.DefaultPort]));
       AServer.Bindings.Clear;
       AServer.Active := True;
-      AServer.OnParseAuthentication := TMVCParseAuthentication2.OnParseAuthentication;
+      AServer.OnParseAuthentication := TWebModule1.OnParseAuthentication;
     end
     else
       Writeln(Format(sPortInUse, [AServer.DefaultPort.ToString]));
@@ -126,6 +121,8 @@ begin
       LResponse := LowerCase(LResponse);
       if sametext(LResponse, cCommandStop) then
         StopServer(LServer)
+      else if sametext(LResponse, cCommandStart) then
+        StartServer(LServer)
       else if sametext(LResponse, cCommandExit) then
         Exit
       else
@@ -141,11 +138,12 @@ end;
 
 begin
   try
-  if WebRequestHandler <> nil then
-    WebRequestHandler.WebModuleClass := WebModuleClass;
-    RunServer(8080);
+    if WebRequestHandler <> nil then
+      WebRequestHandler.WebModuleClass := WebModuleClass;
+    RunServer(8181);
   except
     on E: Exception do
       Writeln(E.ClassName, ': ', E.Message);
   end
 end.
+

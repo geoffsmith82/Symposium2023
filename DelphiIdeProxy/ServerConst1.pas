@@ -7,13 +7,6 @@ uses
   System.SysUtils
   ;
 
-type
-  TMVCParseAuthentication2 = class
-  public
-    class procedure OnParseAuthentication(AContext: TIdContext; const AAuthType, AAuthData: string; var VUsername,
-      VPassword: string; var VHandled: Boolean);
-  end;
-
 resourcestring
   sPortInUse = '- Error: Port %s already in use';
   sPortSet = '- Port set to %s';
@@ -42,13 +35,5 @@ const
 
 implementation
 
-{ TMVCParseAuthentication }
-
-class procedure TMVCParseAuthentication2.OnParseAuthentication(
-  AContext: TIdContext; const AAuthType, AAuthData: string; var VUsername,
-  VPassword: string; var VHandled: Boolean);
-begin
-  VHandled := True; //SameText(LowerCase(AAuthType), 'Token');
-end;
 
 end.

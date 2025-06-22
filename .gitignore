@@ -78,3 +78,5 @@ TranscribeAudio/models
 FaceDetection/Win32/Debug/FaceDetection.ini
 ChatGPTAction/Projects
 ProcessInvoice/Win32
+ImageGenerationFMX/OSXARM64
+LLMLister/OSXARM64

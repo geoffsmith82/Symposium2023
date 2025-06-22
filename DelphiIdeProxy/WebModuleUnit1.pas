@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  IdContext,
   MVCFramework,
   Web.HTTPApp;
 
@@ -16,10 +17,11 @@ type
   private
     { Private declarations }
     FMVC : TMVCEngine;
-    FAuthToken: string;
-    procedure WebModule1ParseAuthentication(Sender: TObject; const AuthType, AuthData: string);
   public
     { Public declarations }
+    class procedure OnParseAuthentication(AContext: TIdContext; const AAuthType,
+      AAuthData: string; var VUsername, VPassword: string;
+      var VHandled: Boolean);
   end;
 
 var
@@ -36,17 +38,11 @@ uses
   DelphiIdeProxyController
   ;
 
-procedure TWebModule1.WebModule1ParseAuthentication(Sender: TObject; const AuthType, AuthData: string);
+class procedure TWebModule1.OnParseAuthentication(
+  AContext: TIdContext; const AAuthType, AAuthData: string; var VUsername,
+  VPassword: string; var VHandled: Boolean);
 begin
-  // Check if the authentication type is Bearer (e.g., "Bearer <token>")
-  if AuthType = 'Bearer' then
-  begin
-    FAuthToken := AuthData;  // Store the token for later use in proxy request
-  end
-  else
-  begin
-    FAuthToken := '';  // Clear token if it's not Bearer auth
-  end;
+  VHandled := True; //SameText(LowerCase(AAuthType), 'Token');
 end;
 
 procedure TWebModule1.WebModule1DefaultHandlerAction(Sender: TObject;

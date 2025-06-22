@@ -23,7 +23,7 @@ type
     procedure OnAfterAction(AContext: TWebContext; const AActionName: string); override;
   private
     FAPiKeyId: string;
-    function ProxyRequestToReplicate(const Endpoint: string; const Method: TRESTRequestMethod; const Body: TJSONObject): TJSONObject;
+    function ProxyRequestToOpenAI(const Endpoint: string; const Method: TRESTRequestMethod; const Body: TJSONObject): TJSONObject;
 
   public
     [MVCPath('/v1/chat/completions')]
@@ -50,6 +50,7 @@ var
   MessageObj, CopiedObj: TJSONObject;
   ResponseBody: TJSONObject;
   i: Integer;
+  SystemMsg: string;
 begin
   RequestBody := TJSONObject.ParseJSONValue(Context.Request.Body) as TJSONObject;
 
@@ -65,7 +66,8 @@ begin
     // Add the system message first
     MessageObj := TJSONObject.Create;
     MessageObj.AddPair('role', 'system');
-    MessageObj.AddPair('content', 'You are a helpful assistant inside the Delphi IDE. Local variables should start with L');
+    SystemMsg := TFile.ReadAllText(TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), 'Data\SystemMsg.txt'));
+    MessageObj.AddPair('content', 'You are a helpful assistant inside the Delphi IDE. ' + SystemMsg);
     NewMessages.AddElement(MessageObj);
 
     // Append the original messages
@@ -80,7 +82,7 @@ begin
     RequestBody.AddPair('messages', NewMessages);
 
     // Proxy the request
-    ResponseBody := ProxyRequestToReplicate('https://api.openai.com/v1/chat/completions', rmPOST, RequestBody);
+    ResponseBody := ProxyRequestToOpenAI('https://api.openai.com/v1/chat/completions', rmPOST, RequestBody);
     Render(ResponseBody, False);
   finally
     FreeAndNil(RequestBody);
@@ -97,7 +99,7 @@ begin
   RequestBody := TJSONObject.ParseJSONValue(Context.Request.Body) as TJSONObject;
   try
     // Proxy the request to Replicate.com
-    ResponseBody := ProxyRequestToReplicate('https://api.openai.com/v1/models', rmGET, RequestBody);
+    ResponseBody := ProxyRequestToOpenAI('https://api.openai.com/v1/models', rmGET, RequestBody);
     try
       // Send the JSON response back to the client
       Render(ResponseBody, False);
@@ -120,7 +122,7 @@ begin
   FAPiKeyId := Context.Request.Headers['Authorization'].Split([' '])[1];
 end;
 
-function TDelphiIdeProxyController.ProxyRequestToReplicate(const Endpoint: string; const Method: TRESTRequestMethod; const Body: TJSONObject): TJSONObject;
+function TDelphiIdeProxyController.ProxyRequestToOpenAI(const Endpoint: string; const Method: TRESTRequestMethod; const Body: TJSONObject): TJSONObject;
 var
   RESTClient: TRESTClient;
   RESTRequest: TRESTRequest;
