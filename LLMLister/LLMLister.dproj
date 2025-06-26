@@ -327,6 +327,7 @@
         <DCCReference Include="..\Libs\LLM\uLLM.Anthropic.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.Mistral.pas"/>
         <DCCReference Include="..\Libs\LLM\uLLM.OpenRouter.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.DeepSeek.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.OSX.pas"/>
         <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
         <BuildConfiguration Include="Base">

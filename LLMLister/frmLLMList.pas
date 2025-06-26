@@ -31,6 +31,7 @@ uses
   uLLm.Azure,
   uLLm.Google.Gemini,
   uLLM.Groq,
+  uLLM.DeepSeek,
   uLLM.HuggingFace,
   uLLM.OpenAI,
   uLLM.OpenRouter,
@@ -62,6 +63,7 @@ type
     FSettings : TIniFile;
     FlblStatus : TLabel;
     FOpenAI : TOpenAI;
+    FDeepSeek : TDeepSeek;
     FAzureAI : TMicrosoftOpenAI;
     FGrokAI : TXGrokAI;
     FGeminiAI : TGemini;
@@ -86,7 +88,8 @@ procedure TfrmLLMLister.FormCreate(Sender: TObject);
 begin
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   FKeyStore := TApiKeyStore.GetInstance;
-  FlblStatus := TLabel.Create(nil);
+  FlblStatus := TLabel.Create(StatusBar);
+  FlblStatus.Align := TAlignLayout.Left;
   FlblStatus.Margins.Left := 10;
   StatusBar.AddObject(FlblStatus);
   TTask.Run(LoadModels);
@@ -126,6 +129,12 @@ begin
     AddModelsToList(FClaudeAI, 6);
   end;
 
+  if not FKeyStore.LoadApiKey('Deekseek_Key').IsEmpty then
+  begin
+    FDeepSeek := TDeepSeek.Create(FKeyStore.LoadApiKey('Deekseek_Key'));
+    AddModelsToList(FDeepSeek, 12);
+  end;
+
   if not FKeyStore.LoadApiKey('groq_apikey').IsEmpty then
   begin
     FGroqAI := TGroqLLM.Create(FKeyStore.LoadApiKey('groq_apikey'));
@@ -143,7 +152,9 @@ begin
     FOpenRouterAI := TOpenRouter.Create(FKeyStore.LoadApiKey('OpenRouter_APIKey'));
     AddModelsToList(FOpenRouterAI, 11);
   end;
+
 end;
+
 procedure TfrmLLMLister.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FOpenAI);
