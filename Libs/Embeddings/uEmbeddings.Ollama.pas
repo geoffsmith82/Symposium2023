@@ -1,4 +1,4 @@
-unit uEmbeddings.OpenAI;
+unit uEmbeddings.Ollama;
 
 interface
 
@@ -13,7 +13,7 @@ uses
   ;
 
 type
-  TEmbeddingsOpenAI = class (TEmbeddingService)
+  TEmbeddingsOllama = class (TEmbeddingService)
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   public
@@ -22,7 +22,7 @@ type
 
 implementation
 
-function TEmbeddingsOpenAI.Embeddings(const Texts: TArray<string>): TEmbeddings;
+function TEmbeddingsOllama.Embeddings(const Texts: TArray<string>): TEmbeddings;
 var
   LRestClient: TRESTClient;
   LRestRequest: TRESTRequest;
@@ -44,8 +44,8 @@ begin
     LRestResponse := TRESTResponse.Create(nil);
 
     LRestRequest.Client := LRestClient;
-    LRestClient.BaseURL := 'https://api.openai.com';
-    LRestRequest.Resource := '/v1/embeddings';
+    LRestClient.BaseURL := 'http://localhost:11434';
+    LRestRequest.Resource := '/api/embed';
     LRestRequest.Response := LRestResponse;
     LRestRequest.Method := TRESTRequestMethod.rmPOST;
 
@@ -56,7 +56,7 @@ begin
     LJson := TJSONObject.Create;
     LJson.AddPair('input', LJsonRequest);
 
-    LJson.AddPair('model', 'text-embedding-ada-002');
+    LJson.AddPair('model', 'mxbai-embed-large:latest');
 
     LRestRequest.AddBody(LJson.ToString, TRESTContentType.ctAPPLICATION_JSON);
     LRestRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
@@ -88,25 +88,15 @@ begin
   end;
 end;
 
-function TEmbeddingsOpenAI.GetModelInfo: TObjectList<TBaseModelInfo>;
+function TEmbeddingsOllama.GetModelInfo: TObjectList<TBaseModelInfo>;
 var
   modelInfo : TBaseModelInfo;
 begin
   if FModelInfo.Count = 0 then
   begin
     modelInfo := TBaseModelInfo.Create;
-    modelInfo.modelName := 'text-embedding-3-small';
-    modelInfo.version := 'text-embedding-3-small';
-    FModelInfo.Add(modelInfo);
-
-    modelInfo := TBaseModelInfo.Create;
-    modelInfo.modelName := 'text-embedding-3-large';
-    modelInfo.version := 'text-embedding-3-large';
-    FModelInfo.Add(modelInfo);
-
-    modelInfo := TBaseModelInfo.Create;
-    modelInfo.modelName := 'text-embedding-ada-002';
-    modelInfo.version := 'text-embedding-ada-002';
+    modelInfo.modelName := 'mxbai-embed-large:latest';
+    modelInfo.version := 'mxbai-embed-large:latest';
     FModelInfo.Add(modelInfo);
   end;
   Result := FModelInfo;

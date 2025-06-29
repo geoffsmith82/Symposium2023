@@ -15,13 +15,22 @@ type
   TEmbedding = TArray<Double>;
   TEmbeddings = TArray<TEmbedding>;
 
+  TBaseModelInfo = class
+    modelName: string;
+    version: string;
+  end;
+
 
   TEmbeddingService = class abstract
   protected
     FApiKey: string;
+    FModelInfo : TObjectList<TBaseModelInfo>;
+    function GetModelInfo: TObjectList<TBaseModelInfo>; virtual; abstract;
   public
     function Embeddings(const Texts: TArray<string>): TEmbeddings; virtual; abstract;
     constructor Create(APIKey: string);
+    destructor Destroy; override;
+    property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
   end;
 
 function CosineDistance(const Vector1, Vector2: TEmbedding): Double;
@@ -58,6 +67,13 @@ end;
 constructor TEmbeddingService.Create(APIKey: string);
 begin
   FAPIKey := APIKey;
+  FModelInfo := TObjectList<TBaseModelInfo>.Create;
+end;
+
+destructor TEmbeddingService.Destroy;
+begin
+  FreeAndNil(FModelInfo);
+  inherited;
 end;
 
 end.

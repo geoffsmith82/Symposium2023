@@ -3,7 +3,6 @@ unit ufrmEmbeddings;
 interface
 
 uses
-  Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
   System.Variants,
@@ -39,6 +38,7 @@ uses
   uLLM,
   uEmbeddings,
   uEmbeddings.OpenAI,
+  uEmbeddings.Ollama,
   uGoogleCustomSearch,
   frmApiKeyStore
   ;
