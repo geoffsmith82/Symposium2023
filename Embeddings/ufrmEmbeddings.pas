@@ -135,7 +135,7 @@ begin
                            'CONTEXT' + sLineBreak +
                            '{embedding1}' + sLineBreak + sLineBreak +
                            '{embedding2}' + sLineBreak);
-  chatSettings.model := 'gpt-4';
+  chatSettings.model := 'gpt-4o';
   chatMessages := TObjectList<TChatMessage>.Create;
   try
     chatMessage := TChatMessage.Create;

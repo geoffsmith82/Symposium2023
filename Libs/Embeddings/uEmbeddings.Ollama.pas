@@ -59,18 +59,17 @@ begin
     LJson.AddPair('model', 'mxbai-embed-large:latest');
 
     LRestRequest.AddBody(LJson.ToString, TRESTContentType.ctAPPLICATION_JSON);
-    LRestRequest.AddAuthParameter('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
     LRestRequest.Execute;
 
     if LRestResponse.StatusCode = 200 then
     begin
       LJsonResponse := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
-      LDataArray := LJsonResponse.GetValue<TJSONArray>('data');
+      LDataArray := LJsonResponse.GetValue<TJSONArray>('embeddings');
       SetLength(Result, LDataArray.Count);
 
       for I := 0 to LDataArray.Count - 1 do
       begin
-        LEmbeddingArray := LDataArray.Items[I].GetValue<TJSONArray>('embedding');
+        LEmbeddingArray := LDataArray.Items[I] as TJSONArray;
         SetLength(Result[I], LEmbeddingArray.Count);
         for J := 0 to LEmbeddingArray.Count - 1 do
           Result[I][J] := (LEmbeddingArray.Items[J] as TJSONNumber).AsDouble;

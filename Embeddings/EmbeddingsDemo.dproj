@@ -148,6 +148,7 @@
             <Form>frmApiKeyStores</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Libs\Embeddings\uEmbeddings.Ollama.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

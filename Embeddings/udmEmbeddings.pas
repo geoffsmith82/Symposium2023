@@ -21,9 +21,9 @@ uses
   FireDAC.UI.Intf,
   FireDAC.VCLUI.Wait,
   FireDAC.Comp.Client,
+  FireDAC.ConsoleUI.Wait,
   Data.DB,
-  uEmbeddings,
-  uLLM
+  uEmbeddings
   ;
 
 type
@@ -32,6 +32,7 @@ type
     PhysPgDriverLink: TFDPhysPgDriverLink;
     procedure DataModuleCreate(Sender: TObject);
   private
+    procedure LoadSQLiteExtension(FDConnection: TFDConnection; const ExtensionPath: string);
     { Private declarations }
   public
     { Public declarations }
@@ -45,9 +46,27 @@ var
 
 implementation
 
-{%CLASSGROUP 'Vcl.Controls.TControl'}
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
+
+procedure TdmEmbeddings.LoadSQLiteExtension(FDConnection: TFDConnection; const ExtensionPath: string);
+var
+  Query: TFDQuery;
+begin
+  if not Assigned(FDConnection) or not FDConnection.Connected then
+    raise Exception.Create('FDConnection must be assigned and connected.');
+
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := FDConnection;
+    Query.SQL.Text := Format('SELECT load_extension(''%s'')', [ExtensionPath]);
+    Query.Open;
+  finally
+    FreeAndNil(Query);
+  end;
+end;
+
 
 procedure TdmEmbeddings.AddDocument(embedding: TEmbeddings; docString: TArray<string>; docFilename: String; docMetadata: TJSONObject);
 var
