@@ -63,13 +63,13 @@ The example programs below is an attempt to demonstrate the capabilities availab
 	
 ### Project Supports LLM Features
 
-| Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini | Mistral |
-|----------------------|--------|-----------------------|------|------------|--------------------|-----------------|-----------------|
-| **Vision Support**   | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔             |
-| **Function Calling** | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔             |
-| **Image Generation** |        |                      |       | ✔ %       |                    |                  |                |
-| **Audio Output**     |        |                      |       |            |                    |                  |                |
-| **Structured Outputs**|       |                      |       |            |                    |                  |                |
+| Feature              | GPT-4o | Azure OpenAI Service | Groq | xAI's Grok | Anthropic's Claude | Google's Gemini | Mistral | DeekSeek |
+|----------------------|--------|-----------------------|------|------------|--------------------|-----------------|--------|----------|
+| **Vision Support**   | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔    |  *       |
+| **Function Calling** | ✔     |   ✔                  | ✔    | ✔         | ✔                 |  ✔              |  ✔    |  ✔      |
+| **Image Generation** |        |                      |       | ✔ %       |                    |                  |       |          |
+| **Audio Output**     |        |                      |       |            |                    |                  |       |          |
+| **Structured Outputs**|       |                      |       |            |                    |                  |       |          |
  
  *Feature not currently supported/implementated
  

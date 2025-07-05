@@ -26,7 +26,7 @@ type
   TFunctionRegistry = class
   protected
     FMethods: TObjectDictionary<string, TFunctionDescription>;
-    procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
+    procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); virtual;
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject; virtual;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
   public

@@ -9,11 +9,17 @@ uses
   System.Generics.Collections,
   REST.Client,
   REST.Types,
+  System.Rtti,
   uLLM,
-  uLLM.Functions
+  uLLM.Functions,
+  uLLM.Anthropic
   ;
 
 type
+  TDeepSeekFunctionRegistry = class(TFunctionRegistry)
+    procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); override;
+  end;
+
   TDeepSeek = class(TBaseLLM)
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
@@ -37,6 +43,7 @@ type
 implementation
 
 uses
+  System.TypInfo,
   FMX.Types
   ;
 
@@ -246,7 +253,7 @@ end;
 constructor TDeepSeek.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
-  FFunctions := TFunctionRegistry.Create;
+  FFunctions := TDeepSeekFunctionRegistry.Create;
 end;
 
 destructor TDeepSeek.Destroy;
@@ -398,5 +405,84 @@ begin
     FreeAndNil(LRESTClient);
   end;
 end;
+
+{ TDeepSeekFunctionRegistry }
+
+procedure TDeepSeekFunctionRegistry.InvokeFunctionFromJSON(
+  const Method: System.TMethod; const JSONObject: TJSONObject;
+  out ReturnValue: string);
+var
+  ArgsObject: TJSONObject;
+  ArgumentsString: string;
+  ArgumentsValue: TJSONValue;
+  Context: TRttiContext;
+  MethodType: TRttiMethod;
+  Params: TArray<TRttiParameter>;
+  Args: TArray<TValue>;
+  ParamValue: TJSONValue;
+  I: Integer;
+  ResultValue: TValue;
+begin
+  Log.d(JSONObject.ToJSON);
+
+  // Get the 'arguments' field, which is a string of JSON
+  ArgumentsValue := JSONObject.GetValue('arguments');
+  if not Assigned(ArgumentsValue) then
+    raise Exception.Create('Invalid JSON: "arguments" field is missing');
+
+  ArgumentsString := ArgumentsValue.Value;
+
+  // Parse the string into a JSON object
+  ArgsObject := TJSONObject.ParseJSONValue(ArgumentsString) as TJSONObject;
+  if ArgsObject = nil then
+    raise Exception.Create('Invalid JSON: "arguments" field is not valid JSON object');
+
+  Context := TRttiContext.Create;
+  try
+    MethodType := Context.GetType(TObject(Method.Data).ClassType).GetMethod(JSONObject.GetValue<string>('name'));
+
+    if Assigned(MethodType) then
+    begin
+      Params := MethodType.GetParameters;
+      SetLength(Args, Length(Params));
+
+      for I := 0 to High(Params) do
+      begin
+        ParamValue := ArgsObject.GetValue(Params[I].Name);
+
+        if ParamValue = nil then
+          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+
+        case Params[I].ParamType.TypeKind of
+          tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
+          tkFloat: Args[I] := StrToFloatDef(ParamValue.Value, 0.0);
+          tkString, tkLString, tkUString, tkWString: Args[I] := ParamValue.Value;
+          tkEnumeration:
+            if Params[I].ParamType.Handle = TypeInfo(Boolean) then
+              Args[I] := SameText(ParamValue.Value, 'true')
+            else
+              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+          tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
+          tkChar: Args[I] := ParamValue.Value[1];
+        else
+          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
+        end;
+      end;
+
+      ResultValue := MethodType.Invoke(TObject(Method.Data), Args);
+      if ResultValue.Kind = tkUString then
+        ReturnValue := ResultValue.AsString
+      else
+        ReturnValue := '';
+    end
+    else
+      raise Exception.Create('Method not found');
+  finally
+    ArgsObject.Free;
+    Context.Free;
+  end;
+end;
+
+
 
 end.

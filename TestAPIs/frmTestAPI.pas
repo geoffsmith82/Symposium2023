@@ -53,9 +53,11 @@ type
     Fgooglespeech : TGoogleSpeechService;
     FProcedures : TList<TTestProcedure>;
     procedure MenuItemClick(Sender: TObject);
+    procedure FindProcedures;
   public
     { Public declarations }
     procedure ListOpenAIModels;
+    procedure ListDeekSeekModels;
     procedure ListMistralAIModels;
     procedure ListReplicateImageGenerators;
     procedure ListReplicateLLM;
@@ -81,6 +83,7 @@ type
     procedure TestGoogleVoices;
 
     procedure TestOpenAIVision;
+    procedure TestDeepSeekVision;
     procedure TestGoogleAIVision;
     procedure TestAnthropicClaudeVision;
     procedure TestAzureVision;
@@ -95,6 +98,7 @@ type
     procedure TestMistralLLM;
 
     procedure TestOpenAIFunctionCalling;
+    procedure TestDeepSeekFunctionCalling;
     procedure TestAzureFunctionCalling;
     procedure TestGroqFunctionCalling;
     procedure TestGoogleGeminiFunctionCalling;
@@ -109,9 +113,6 @@ type
     [FunctionDescription('Get the time')]
     function GetTimeAt([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the time')]const location: string): string;
 
-
-
-    procedure FindProcedures;
   end;
 
 var
@@ -144,6 +145,7 @@ uses
   uLLM.Mistral,
   uLLM.Groq,
   uLLM.X.Ai,
+  uLLM.DeepSeek,
   uDALLe2.DTO,
   uImageGeneration,
   uImageGeneration.Replicate,
@@ -350,6 +352,39 @@ begin
   end;
 end;
 
+
+
+procedure TfrmTestApiWindow.TestDeepSeekVision;
+var
+  deepseek: TDeepSeek;
+  config: TChatSettings;
+  AMessages: System.Generics.Collections.TObjectList<TChatMessage>;
+  MessageVision: TChatVisionMessage;
+  response: TChatResponse;
+begin
+  deepseek := TDeepSeek.Create(FApiKeyStore.LoadApiKey('Deepseek_Key'));
+  try
+    config.model := 'deepseek-chat';
+    config.json_mode := False;
+    AMessages := TObjectList<TChatMessage>.Create;
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'system';
+    MessageVision.Content := 'You are a useful assistant';
+    AMessages.Add(MessageVision);
+    MessageVision := TChatVisionMessage.Create;
+    MessageVision.Role := 'user';
+    MessageVision.Content := 'Describe the following image';
+    MessageVision.AddImageFile('C:\Users\geoff\Pictures\Chickens  035.jpg', 'image/jpeg');
+    AMessages.Add(MessageVision);
+    response := deepseek.ChatCompletion(Config, AMessages);
+    Memo1.Lines.Add(response.Content);
+  finally
+    FreeAndNil(deepseek);
+    FreeAndNil(AMessages);
+  end;
+end;
+
+
 procedure TfrmTestApiWindow.TestGoogleAIVision;
 var
   gemini: TGemini;
@@ -473,6 +508,62 @@ begin
     FreeAndNil(openAI);
   end;
 end;
+
+procedure TfrmTestApiWindow.TestDeepSeekFunctionCalling;
+var
+  deepseek: TDeepSeek;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  deepseek := TDeepSeek.Create(FApiKeyStore.LoadApiKey('Deepseek_Key'));
+  settings := Default(TChatSettings);
+  try
+    deepseek.Functions.RegisterFunction(@TfrmTestApiWindow.GetWeather, Self);
+    deepseek.Functions.RegisterFunction(@TfrmTestApiWindow.GetTimeAt, Self);
+    settings.model := 'deepseek-chat';
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := deepseek.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := deepseek.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+    Memo1.Lines.Add('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := deepseek.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+    Memo1.Lines.Add('Answer : ' + answer);
+
+
+  finally
+    FreeAndNil(messages);
+    FreeAndNil(deepseek);
+  end;
+end;
+
 
 procedure TfrmTestApiWindow.TestHuggingFaceFunctionCalling;
 var
@@ -679,6 +770,26 @@ begin
     FreeAndNil(openAI);
   end;
 end;
+
+procedure TfrmTestApiWindow.ListDeekSeekModels;
+var
+  deepseek: TDeepSeek;
+  Local_modelObj: TBaseModelInfo;
+begin
+  Memo1.Lines.Add('======== Model DeekSeek');
+  deepseek := TDeepSeek.Create(FApiKeyStore.LoadApiKey('Deepseek_Key'));
+  try
+    for Local_modelObj in deepseek.ModelInfo do
+    begin
+      Memo1.Lines.Add('Model:' + Local_modelObj.modelName);
+    end;
+  finally
+    FreeAndNil(deepseek);
+  end;
+end;
+
+
+
 
 procedure TfrmTestApiWindow.ListMistralAIModels;
 var

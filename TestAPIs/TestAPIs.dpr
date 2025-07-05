@@ -38,6 +38,7 @@ uses
   uLLM.Functions in '..\Libs\LLM\uLLM.Functions.pas',
   uAttributes in '..\Libs\LLM\uAttributes.pas',
   uLLM.X.Ai in '..\Libs\LLM\uLLM.X.Ai.pas',
+  uLLM.DeepSeek in '..\Libs\LLM\uLLM.DeepSeek.pas',
   uLLM.OpenAI.Assistants in '..\Libs\LLM\uLLM.OpenAI.Assistants.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
