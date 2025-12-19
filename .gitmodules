@@ -1,0 +1,10 @@
+[submodule "Libs/Kastri"]
+	path = Libs/Kastri
+	url = https://github.com/DelphiWorlds/Kastri.git
+[submodule "Libs/aws-sdk-delphi"]
+	path = Libs/aws-sdk-delphi
+	url = https://github.com/landgraf-dev/aws-sdk-delphi
+[submodule "Libs/delphimvcframework"]
+	path = Libs/delphimvcframework
+	url = https://github.com/danieleteti/delphimvcframework.git
+
