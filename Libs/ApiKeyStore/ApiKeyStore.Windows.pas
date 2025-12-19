@@ -100,8 +100,17 @@ var
   data : string;
 begin
   FileName := TPath.Combine(TPath.GetDocumentsPath, 'ApiKeys.json');
-  data := TFile.ReadAllText(FileName);
-  JsonData := TJSONObject.ParseJSONValue(data) as TJSONObject;
+  if TFile.Exists(Filename) then
+  begin
+    data := TFile.ReadAllText(FileName);
+    JsonData := TJSONObject.ParseJSONValue(data) as TJSONObject;
+  end
+  else
+  begin
+    data := '';
+    JsonData := TJSONObject.Create;
+  end;
+
   try
     if APIKey.Length > 0 then
     begin
@@ -115,7 +124,7 @@ begin
     end;
     TFile.WriteAllText(FileName, JsonData.ToJSON);
   finally
-    JsonData.Free;
+    FreeAndNil(JsonData);
   end;
 end;
 
@@ -140,7 +149,7 @@ begin
     end;
     TFile.WriteAllText(FileName, JsonData.ToJSON);
   finally
-    JsonData.Free;
+    FreeAndNil(JsonData);
   end;
 end;
 
@@ -167,11 +176,9 @@ begin
         Result := base64Data;
       end;
     finally
-      JsonData.Free;
+      FreeAndNil(JsonData);
     end;
-  end
-  else
-    raise Exception.CreateFmt('Setting for "%s" not found.', [Name]);
+  end;
 end;
 
 function TWindowsApiKeyStore.LoadApiKey(const Name: string): string;
@@ -195,11 +202,9 @@ begin
         Result := TEncoding.UTF8.GetString(DecryptedData);
       end;
     finally
-      JsonData.Free;
+      FreeAndNil(JsonData);
     end;
-  end
-  else
-    raise Exception.CreateFmt('API Key for "%s" not found.', [Name]);
+  end;
 end;
 
 {$ENDIF}

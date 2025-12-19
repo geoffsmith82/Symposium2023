@@ -40,7 +40,11 @@ uses
 {$ENDIF}
 {$IFDEF ANDROID}
 uses
-  AndroidApiKeyStore; // Platform-specific unit for Android
+  ApiKeyStore.Android; // Platform-specific unit for Android
+{$ENDIF}
+{$IFDEF MACOS}
+uses
+  ApiKeyStore.OSX; // Platform-specific unit for Android
 {$ENDIF}
 
 constructor TApiKeyStore.Create;
@@ -67,6 +71,9 @@ begin
     {$ENDIF}
     {$IFDEF ANDROID}
     FInstance := TAndroidApiKeyStore.Create;
+    {$ENDIF}
+    {$IFDEF MACOS}
+    FInstance := TApiKeyStoreOSX.Create;
     {$ENDIF}
   end;
   Result := FInstance;

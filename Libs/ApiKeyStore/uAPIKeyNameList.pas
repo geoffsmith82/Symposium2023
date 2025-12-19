@@ -3,7 +3,7 @@ unit uAPIKeyNameList;
 interface
 
 const
-  ApiKeyNames: array[1..24] of string = (
+  ApiKeyNames: array[1..25] of string = (
     'chatgpt_apikey',
     'X_AI',
     'groq_apikey',
@@ -11,6 +11,7 @@ const
     'revai_key',
     'assemblyai_key',
     'deepgram_key',
+    'Deepseek_Key',
     'HuggingFace_APIKey',
     'Mistral_APIKey',
     'OpenRouter_APIKey',

@@ -20,8 +20,10 @@ uses
   FMX.Grid.Style,
   FMX.ScrollBox,
   FMX.Grid,
+  FMX.Layouts,
   uAPIKeyNameList,
-  ApiKeyStore;
+  ApiKeyStore
+  ;
 
 type
   TfrmApiKeyStores = class(TForm)
@@ -36,6 +38,7 @@ type
     StringColumn2: TStringColumn;
     StringColumn3: TStringColumn;
     StringColumn4: TStringColumn;
+    Layout1: TLayout;
     procedure btnCancelClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
