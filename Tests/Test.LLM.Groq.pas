@@ -34,7 +34,7 @@ end;
 
 procedure TGroqLLMTests.TearDown;
 begin
-//  FKeys.Free;
+
 end;
 
 function TGroqLLMTests.CreateLLM: TBaseLLM;

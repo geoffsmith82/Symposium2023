@@ -196,6 +196,10 @@
         <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.XAI.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
+        <DCCReference Include="Test.LLM.Anthropic.pas"/>
+        <DCCReference Include="Test.LLM.AzureOpenAI.pas"/>
+        <DCCReference Include="Test.LLM.Gemini.pas"/>
+        <DCCReference Include="Test.LLM.DeepSeek.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

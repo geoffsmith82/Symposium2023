@@ -44,7 +44,11 @@ uses
   uImageGeneration.Replicate in '..\Libs\ImageGeneration\uImageGeneration.Replicate.pas',
   uImageGeneration.XAI in '..\Libs\ImageGeneration\uImageGeneration.XAI.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
-  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas';
+  ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  Test.LLM.Anthropic in 'Test.LLM.Anthropic.pas',
+  Test.LLM.AzureOpenAI in 'Test.LLM.AzureOpenAI.pas',
+  Test.LLM.Gemini in 'Test.LLM.Gemini.pas',
+  Test.LLM.DeepSeek in 'Test.LLM.DeepSeek.pas';
 
 { keep comment here to protect the following conditional from being removed by the IDE when adding a unit }
 {$IFNDEF TESTINSIGHT}
