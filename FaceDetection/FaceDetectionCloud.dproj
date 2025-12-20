@@ -81,6 +81,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <DCC_UnitSearchPath>$(BDSCatalogRepository)\JEDICodeLibraryJCL-13\2025.10\source\common;$(BDSCatalogRepository)\JEDICodeLibraryJCL-13\2025.10\source\windows;$(BDSCatalogRepository)\JEDICodeLibraryJCL-13\2025.10\source\vcl;$(BDSCatalogRepository)\JEDIVisualComponentLibraryJVCL-13\2025.10\common;$(BDSCatalogRepository)\JEDIVisualComponentLibraryJVCL-13\2025.10\run;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
