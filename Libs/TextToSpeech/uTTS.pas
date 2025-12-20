@@ -30,6 +30,7 @@ type
   private
     procedure PlayMP3(const FileName: string);
   protected
+    FDefaultVoice: String;
     FFormatExt : string;
     FResourceKey: string;
     FApplicationName: string;
@@ -42,6 +43,7 @@ type
     procedure PlayText(const text:string; const VoiceName: string = '');
   public
     property Voices: TObjectList<TVoiceInfo> read GetVoices;
+    property DefaultVoice: String read FDefaultVoice;
   end;
 
 implementation

@@ -231,7 +231,7 @@ var
   msg: TChatVisionMessage;
   answer: string;
 begin
-  Memo1.Lines.Add('======== Model Anthropic');
+  Memo1.Lines.Add('======== Model Azure');
   azureOpenAI := TMicrosoftOpenAI.Create(FApiKeyStore.LoadApiKey('AzureAPIKey'), AzureOpenAIEndpoint, 'gpt-4o');
   try
     for Local_modelObj in azureOpenAI.ModelInfo do

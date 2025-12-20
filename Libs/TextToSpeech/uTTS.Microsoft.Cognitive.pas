@@ -37,6 +37,7 @@ begin
   inherited Create(AResourceKey, AHost);
   FOutputFormat := 'audio-24khz-48kbitrate-mono-mp3';
   FExpiryTime := 0;
+  FDefaultVoice := 'en-US-ChristopherNeural';
 end;
 
 procedure TMicrosoftCognitiveService.GetAccessToken;

@@ -30,6 +30,7 @@ implementation
 constructor TOpenAITextToSpeech.Create(const AResourceKey: string);
 begin
   inherited Create(AResourceKey, '');
+  FDefaultVoice := 'nova';
 end;
 
 function TOpenAITextToSpeech.GetVoices: TObjectList<TVoiceInfo>;
