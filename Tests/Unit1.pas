@@ -11,6 +11,8 @@ type
   public
     [Setup]
     procedure Setup;
+    [Test]
+    procedure Test1;
     [TearDown]
     procedure TearDown;
   end;
@@ -23,6 +25,11 @@ end;
 
 procedure TMyTestObject.TearDown;
 begin
+end;
+
+procedure TMyTestObject.Test1;
+begin
+
 end;
 
 initialization
