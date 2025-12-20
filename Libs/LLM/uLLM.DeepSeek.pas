@@ -374,7 +374,7 @@ begin
     LRESTRequest := TRESTRequest.Create(nil);
     LRESTResponse := TRESTResponse.Create(nil);
     LRESTRequest.Client := LRESTClient;
-    LRESTRequest.Resource := '/v1/models';
+    LRESTRequest.Resource := '/models';
     LRESTRequest.Method := rmGET;
     LRESTRequest.Response := LRESTResponse;
 
