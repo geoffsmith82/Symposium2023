@@ -75,7 +75,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_ExeOutput>..\bin\$(Platform)\$(Config)</DCC_ExeOutput>
-        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\TranscribeService;..\Libs\aws-sdk-delphi\Source\Services\TranscribeService\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\TranscribeService\Base\Transform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Libs\aws-sdk-delphi\Source\Services\TranscribeService;..\Libs\aws-sdk-delphi\Source\Services\TranscribeService\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\TranscribeService\Base\Transform;..\Libs\aws-sdk-delphi\Source\Services\TranscribeService\Base;..\Libs\aws-sdk-delphi\Source\Services\S3\Custom;..\Libs\aws-sdk-delphi\Source\Services\S3\Base;..\Libs\aws-sdk-delphi\Source\Services\S3\Base\Model;..\Libs\aws-sdk-delphi\Source\Services\S3\Base\Transform;..\Libs\aws-sdk-delphi\Source\Core;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -94,7 +94,6 @@
         </DelphiCompile>
         <DCCReference Include="frmTranscribeAudio.pas">
             <Form>VoiceRecognitionForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\SpeechToText\uSTT.pas"/>
         <DCCReference Include="..\Libs\SpeechToText\uSTT.Microsoft.pas"/>
@@ -108,7 +107,6 @@
         <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
         <DCCReference Include="..\Libs\ApiKeyStore\frmApiKeyStore.pas">
             <Form>frmApiKeyStores</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Libs\ApiKeyStore\uAPIKeyNameList.pas"/>
         <BuildConfiguration Include="Base">
@@ -131,6 +129,7 @@
                 <Source>
                     <Source Name="MainSource">TranscribeAudio.dpr</Source>
                 </Source>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Platforms>
                 <Platform value="Win32">False</Platform>
