@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{6C3AFFF5-DF43-4289-BC3D-440BAC17E39F}</ProjectGuid>
         <ProjectVersion>20.3</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
@@ -166,7 +166,36 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit1.pas"/>
+        <DCCReference Include="TestBase.AI.pas"/>
+        <DCCReference Include="TestBase.LLM.pas"/>
+        <DCCReference Include="TestBase.ImageGen.pas"/>
+        <DCCReference Include="Test.LLM.Groq.pas"/>
+        <DCCReference Include="Test.LLM.OpenAI.pas"/>
+        <DCCReference Include="Test.ImageGen.Replicate.pas"/>
+        <DCCReference Include="..\Libs\LLM\uAttributes.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Anthropic.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Azure.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.DeepSeek.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Functions.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Google.Gemini.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Google.PaLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Groq.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.HuggingFace.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Mistral.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.Assistants.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.OpenRouter.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.Replicate.pas"/>
+        <DCCReference Include="..\Libs\LLM\uLLM.X.Ai.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uDALLe2.DTO.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.Imagen.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.OpenAI.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.Replicate.pas"/>
+        <DCCReference Include="..\Libs\ImageGeneration\uImageGeneration.XAI.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.pas"/>
+        <DCCReference Include="..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -213,6 +242,18 @@
                 <DeployFile LocalName="Win32\Debug\TestAI.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>TestAI.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\TestAI.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>TestAI.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\TestAI.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>TestAI.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
