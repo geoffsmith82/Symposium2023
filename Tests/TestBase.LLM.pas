@@ -136,7 +136,7 @@ begin
     try
         settings.json_mode := False;
         settings.max_tokens := 1024;
-        var msg := TChatVisionMessage.Create;
+        var msg := LLM.CreateChatVisionMessage;
         msg.Role := 'user';
         msg.AddImageFile(TPath.Combine(DataPath, 'Chickens  035.jpg'), 'image/jpeg');
         msg.Content := 'Describe the following image';
