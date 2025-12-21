@@ -184,17 +184,13 @@ begin
       Inc(LMsgNo);
     end;
 
-//    if ChatConfig.model.IsEmpty then
-//      ChatConfig.model := 'gpt-4o';
-
     LJSONBody.AddPair('model', ChatConfig.model);
     LJSONBody.AddPair('messages', LJSONMessages);
     if ChatConfig.max_tokens > 0 then
       LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
     if ChatConfig.user.Length > 0 then
       LJSONBody.AddPair('user', ChatConfig.user);
-    if ChatConfig.n > 0 then
-      LJSONBody.AddPair('n', ChatConfig.n);
+
     if ChatConfig.seed > 0 then
       LJSONBody.AddPair('seed', ChatConfig.seed);
     if ChatConfig.json_mode then
@@ -274,17 +270,19 @@ procedure TAnthropic.HandleErrorResponse(AResponse: TRESTResponse);
 var
   LJSONResponse: TJSONObject;
   LJSONMsg: TJSONObject;
+  param : string;
 begin
   LJSONResponse := TJSONObject.ParseJSONValue(AResponse.Content) as TJSONObject;
   if Assigned(LJSONResponse) then
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
+      LJSONMsg.TryGetValue<string>('param', param);
       raise Exception.CreateFmt(
         'Error: %s - %s. Param: %s',
         [LJSONMsg.GetValue<string>('type'),
          LJSONMsg.GetValue<string>('message'),
-         LJSONMsg.GetValue<string>('param')])
+         param])
     end
     else
       raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
