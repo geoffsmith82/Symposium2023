@@ -25,12 +25,12 @@ implementation
 
 function TAnthropicLLMTests.DefaultModel: string;
 begin
-  Result := 'claude-sonnet-4';
+  Result := 'claude-sonnet-4-5-20250929';
 end;
 
 function TAnthropicLLMTests.DefaultVisionModel: string;
 begin
-  Result := 'claude-sonnet-4-5';
+  Result := 'claude-sonnet-4-5-20250929';
 end;
 
 procedure TAnthropicLLMTests.Setup;
