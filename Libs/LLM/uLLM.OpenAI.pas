@@ -125,7 +125,7 @@ begin
     LJSONBody.AddPair('model', ChatConfig.model);
     LJSONBody.AddPair('messages', LJSONMessages);
     if ChatConfig.max_tokens > 0 then
-      LJSONBody.AddPair('max_tokens', ChatConfig.max_tokens);
+      LJSONBody.AddPair('max_completion_tokens', ChatConfig.max_tokens);
     if ChatConfig.user.Length > 0 then
       LJSONBody.AddPair('user', ChatConfig.user);
     if ChatConfig.n > 0 then

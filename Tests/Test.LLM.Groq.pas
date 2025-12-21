@@ -30,7 +30,7 @@ end;
 
 function TGroqLLMTests.DefaultVisionModel: string;
 begin
-  Result := 'meta-llama/llama-4-scout-17b-16e-instruct';
+  Result := 'meta-llama/llama-4-maverick-17b-128e-instruct';
 end;
 
 procedure TGroqLLMTests.Setup;

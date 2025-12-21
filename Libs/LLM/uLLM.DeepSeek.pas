@@ -244,7 +244,7 @@ begin
     else
       raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
   finally
-    LJSONResponse.Free;
+    FreeAndNil(LJSONResponse);
   end
   else
     raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
@@ -478,7 +478,7 @@ begin
     else
       raise Exception.Create('Method not found');
   finally
-    ArgsObject.Free;
+    FreeAndNil(ArgsObject);
     Context.Free;
   end;
 end;

@@ -1390,7 +1390,7 @@ begin
     begin
       Memo1.Lines.Add('Model:' + modelObj.modelName + ' ' + modelObj.version);
     end;
-    settings.model := 'llama-3.2-90b-vision-preview';
+    settings.model := 'meta-llama/llama-4-maverick-17b-128e-instruct';
     settings.json_mode := False;
     messages := TObjectList<TChatMessage>.Create;
     MessageVision := TChatVisionMessage.Create;

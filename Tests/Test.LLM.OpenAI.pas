@@ -30,7 +30,7 @@ end;
 
 function TOpenAILLMTests.DefaultVisionModel: string;
 begin
-  Result := DefaultModel;
+  Result := 'gpt-4o';
 end;
 
 procedure TOpenAILLMTests.Setup;
