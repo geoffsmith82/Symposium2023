@@ -36,10 +36,13 @@ type
     created_at: Int64;
     updated_at: Int64;
     object_type: string;
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   TModelsResponse = class
     data: TArray<TModelData>;
+    destructor Destroy; override;
   end;
 
 
@@ -291,12 +294,11 @@ begin
   FreeAndNil(FFunctions);
   inherited;
 end;
+
 function TMicrosoftOpenAI.Completion(const AQuestion, AModel: string): string;
 begin
   raise Exception.Create('Not Implemented');
 end;
-
-
 
 function TMicrosoftOpenAI.GetAzureModels: TModelsResponse;
 var
@@ -371,6 +373,31 @@ begin
     FreeAndNil(LModelList);
   end;
   Result := FModelInfo;
+end;
+
+{ TModelData }
+
+constructor TModelData.Create;
+begin
+
+end;
+
+destructor TModelData.Destroy;
+begin
+  FreeAndNil(capabilities);
+  FreeAndNil(deprecation);
+end;
+
+{ TModelsResponse }
+
+destructor TModelsResponse.Destroy;
+var
+  i : Integer;
+begin
+  for i := 0 to High(data) do
+  begin
+    FreeAndNil(data[i]);
+  end;
 end;
 
 end.
