@@ -120,7 +120,7 @@ begin
     end;
 
     if ChatConfig.model.IsEmpty then
-      ChatConfig.model := 'gpt-4o';
+      ChatConfig.model := 'gpt-5.2';
 
     LJSONBody.AddPair('model', ChatConfig.model);
     LJSONBody.AddPair('messages', LJSONMessages);
