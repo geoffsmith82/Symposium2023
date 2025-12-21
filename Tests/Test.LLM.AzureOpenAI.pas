@@ -15,6 +15,7 @@ type
   protected
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
+    function DefaultVisionModel: string; override;
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
@@ -25,6 +26,11 @@ implementation
 function TAzureOpenAILLMTests.DefaultModel: string;
 begin
   Result := 'FIXME_AZURE_DEPLOYMENT';
+end;
+
+function TAzureOpenAILLMTests.DefaultVisionModel: string;
+begin
+  Result := 'FIXME_AZURE_VISIONDEPLOYMENT';
 end;
 
 procedure TAzureOpenAILLMTests.Setup;

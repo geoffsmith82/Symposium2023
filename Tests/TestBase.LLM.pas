@@ -6,6 +6,7 @@ uses
   DUnitX.TestFramework,
   System.Generics.Collections,
   System.SysUtils,
+  System.IOUtils,
   ApiKeyStore,
   uLLM,
   TestBase.AI;
@@ -16,11 +17,13 @@ type
     FKeys: TApiKeyStore;
     function CreateLLM: TBaseLLM; virtual; abstract;
     function DefaultModel: string; virtual; abstract;
+    function DefaultVisionModel: string; virtual; abstract;
     function SupportsSystemRole: Boolean; virtual;
 
   public
     [Test] procedure ListModels_And_Chat_User;
     [Test] procedure Chat_System_And_User;
+    [Test] procedure Chat_Vision_Test;
   end;
 
 implementation
@@ -104,6 +107,42 @@ begin
 
       Resp := LLM.ChatCompletion(Settings, Messages);
       Assert.IsNotEmpty(Resp.Content);
+    finally
+      Messages.Free;
+    end;
+  finally
+    LLM.Free;
+  end;
+end;
+
+procedure TBaseLLMTests.Chat_Vision_Test;
+var
+  LLM: TBaseLLM;
+  Settings: TChatSettings;
+  Messages: TObjectList<TChatMessage>;
+  answer: string;
+begin
+  RequireLiveTests;
+
+//  if not SupportsSystemRole then
+//    Skip('System role not supported by this provider');
+
+  LLM := CreateLLM;
+  try
+    Settings := Default(TChatSettings);
+    Settings.model := DefaultVisionModel;
+
+    Messages := TObjectList<TChatMessage>.Create(True);
+    try
+        settings.json_mode := False;
+        settings.max_tokens := 1024;
+        var msg := TChatVisionMessage.Create;
+        msg.Role := 'user';
+        msg.AddImageFile(TPath.Combine(DataPath, 'Chickens  035.jpg'), 'image/jpeg');
+        msg.Content := 'Describe the following image';
+        messages.Add(msg);
+        answer := LLM.ChatCompletion(settings, messages).Content;
+        Assert.IsNotEmpty(answer);
     finally
       Messages.Free;
     end;

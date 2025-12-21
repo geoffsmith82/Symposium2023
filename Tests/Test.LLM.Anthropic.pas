@@ -15,6 +15,7 @@ type
   protected
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
+    function DefaultVisionModel: string; override;
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
@@ -25,6 +26,11 @@ implementation
 function TAnthropicLLMTests.DefaultModel: string;
 begin
   Result := 'claude-sonnet-4';
+end;
+
+function TAnthropicLLMTests.DefaultVisionModel: string;
+begin
+  Result := 'claude-sonnet-4-5';
 end;
 
 procedure TAnthropicLLMTests.Setup;

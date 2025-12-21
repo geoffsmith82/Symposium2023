@@ -15,6 +15,7 @@ type
   protected
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
+    function DefaultVisionModel: string; override;
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
@@ -24,7 +25,12 @@ implementation
 
 function TGeminiLLMTests.DefaultModel: string;
 begin
-  Result := 'FIXME_GEMINI_MODEL';
+  Result := 'gemini-3-flash-preview';
+end;
+
+function TGeminiLLMTests.DefaultVisionModel: string;
+begin
+  Result := 'gemini-3-flash-preview';
 end;
 
 procedure TGeminiLLMTests.Setup;

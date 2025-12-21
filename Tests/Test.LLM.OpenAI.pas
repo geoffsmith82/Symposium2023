@@ -15,6 +15,7 @@ type
   protected
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
+    function DefaultVisionModel: string; override;
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
@@ -25,6 +26,11 @@ implementation
 function TOpenAILLMTests.DefaultModel: string;
 begin
   Result := 'gpt-5.2';
+end;
+
+function TOpenAILLMTests.DefaultVisionModel: string;
+begin
+  Result := DefaultModel;
 end;
 
 procedure TOpenAILLMTests.Setup;
