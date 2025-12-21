@@ -13,6 +13,7 @@ type
   [TestFixture]
   TAzureOpenAILLMTests = class(TBaseLLMTests)
   protected
+    FDeploymentId: string;
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
     function DefaultVisionModel: string; override;
@@ -25,16 +26,17 @@ implementation
 
 function TAzureOpenAILLMTests.DefaultModel: string;
 begin
-  Result := 'FIXME_AZURE_DEPLOYMENT';
+  Result := 'gpt-4o';
 end;
 
 function TAzureOpenAILLMTests.DefaultVisionModel: string;
 begin
-  Result := 'FIXME_AZURE_VISIONDEPLOYMENT';
+  Result := 'gpt-4o';
 end;
 
 procedure TAzureOpenAILLMTests.Setup;
 begin
+  FDeploymentId := 'gpt-4o';
 end;
 
 procedure TAzureOpenAILLMTests.TearDown;
@@ -49,7 +51,7 @@ begin
   Result := TMicrosoftOpenAI.Create(
     FKeys.LoadApiKey('AzureAPIKey'),
     FKeys.LoadSetting('AzureOpenAIEndpoint'),
-    DefaultModel
+    FDeploymentId
   );
 end;
 
