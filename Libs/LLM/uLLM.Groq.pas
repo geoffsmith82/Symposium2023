@@ -214,17 +214,19 @@ procedure TGroqLLM.HandleErrorResponse(AResponse: TRESTResponse);
 var
   LJSONResponse: TJSONObject;
   LJSONMsg: TJSONObject;
-      begin
+  param: string;
+begin
   LJSONResponse := TJSONObject.ParseJSONValue(AResponse.Content) as TJSONObject;
   if Assigned(LJSONResponse) then
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
+      LJSONMsg.TryGetValue<string>('param', param);
       raise Exception.CreateFmt(
         'Error: %s - %s. Param: %s',
         [LJSONMsg.GetValue<string>('type'),
          LJSONMsg.GetValue<string>('message'),
-         LJSONMsg.GetValue<string>('param')])
+         param])
     end
     else
       raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
