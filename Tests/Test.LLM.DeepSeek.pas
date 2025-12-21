@@ -19,6 +19,7 @@ type
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
+    [Test][Ignore] procedure Chat_Vision_Test; override;
   end;
 
 implementation
@@ -39,6 +40,11 @@ end;
 
 procedure TDeepSeekLLMTests.TearDown;
 begin
+end;
+
+procedure TDeepSeekLLMTests.Chat_Vision_Test;
+begin
+  inherited;
 end;
 
 function TDeepSeekLLMTests.CreateLLM: TBaseLLM;

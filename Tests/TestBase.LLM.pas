@@ -21,9 +21,9 @@ type
     function SupportsSystemRole: Boolean; virtual;
 
   public
-    [Test] procedure ListModels_And_Chat_User;
-    [Test] procedure Chat_System_And_User;
-    [Test] procedure Chat_Vision_Test;
+    [Test] procedure ListModels_And_Chat_User; virtual;
+    [Test] procedure Chat_System_And_User; virtual;
+    [Test] procedure Chat_Vision_Test; virtual;
   end;
 
 implementation
