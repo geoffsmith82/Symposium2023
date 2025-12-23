@@ -45,6 +45,8 @@ uses
   uImageGeneration.XAI in '..\Libs\ImageGeneration\uImageGeneration.XAI.pas',
   ApiKeyStore in '..\Libs\ApiKeyStore\ApiKeyStore.pas',
   ApiKeyStore.Windows in '..\Libs\ApiKeyStore\ApiKeyStore.Windows.pas',
+  Test.ImageGen.XAI in 'Test.ImageGen.XAI.pas',
+  Test.ImageGen.OpenAI in 'Test.ImageGen.OpenAI.pas',
   Test.LLM.Anthropic in 'Test.LLM.Anthropic.pas',
   Test.LLM.AzureOpenAI in 'Test.LLM.AzureOpenAI.pas',
   Test.LLM.Gemini in 'Test.LLM.Gemini.pas',

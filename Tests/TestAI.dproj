@@ -200,6 +200,8 @@
         <DCCReference Include="Test.LLM.AzureOpenAI.pas"/>
         <DCCReference Include="Test.LLM.Gemini.pas"/>
         <DCCReference Include="Test.LLM.DeepSeek.pas"/>
+        <DCCReference Include="Test.ImageGen.XAI.pas"/>
+        <DCCReference Include="Test.ImageGen.OpenAI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
