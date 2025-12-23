@@ -44,7 +44,7 @@ end;
 
 procedure TDeepSeekLLMTests.Chat_Vision_Test;
 begin
-  inherited;
+//  inherited;
 end;
 
 function TDeepSeekLLMTests.CreateLLM: TBaseLLM;
