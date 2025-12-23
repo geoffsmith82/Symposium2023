@@ -97,12 +97,12 @@ begin
     try
       Msg := LLM.CreateChatMessage;
       Msg.Role := 'system';
-      Msg.Content := 'You are a helpful assistant';
+      Msg.Content := 'Your name is HAL';
       Messages.Add(Msg);
 
       Msg := LLM.CreateChatMessage;
       Msg.Role := 'user';
-      Msg.Content := 'Call the time and weather functions';
+      Msg.Content := 'What is your name?';
       Messages.Add(Msg);
 
       Resp := LLM.ChatCompletion(Settings, Messages);

@@ -626,8 +626,10 @@ var
   LUsage: TGeminiUsageMetadata;
   LPromptFeedback: TJSONObject;
   LUsageObj: TJSONObject;
+  LTokenCount : Integer;
 begin
   ATextContent := '';
+  LTokenCount := 0;
   APendingCall := Default(TGeminiFunctionCall); // Initialize
   AChatResponse := Default(TChatResponse); // Initialize
 
@@ -635,7 +637,8 @@ begin
   if AJsonResponse.TryGetValue<TJSONObject>('usageMetadata', LUsageObj) then
   begin
     LUsage.PromptTokenCount := LUsageObj.GetValue<Integer>('promptTokenCount');
-    LUsage.CandidatesTokenCount := LUsageObj.GetValue<Integer>('candidatesTokenCount'); // Sum if multiple candidates
+    LUsageObj.TryGetValue<Integer>('candidatesTokenCount', LTokenCount); // Sum if multiple candidates
+    LUsage.CandidatesTokenCount := LTokenCount;
     LUsage.TotalTokenCount := LUsageObj.GetValue<Integer>('totalTokenCount');
     AChatResponse.Usage := LUsage; // Assign parsed usage
   end;
