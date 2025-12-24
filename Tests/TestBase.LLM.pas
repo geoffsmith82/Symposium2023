@@ -124,6 +124,9 @@ var
 begin
   RequireLiveTests;
 
+  if DefaultVisionModel.IsEmpty then
+    Exit;
+
 //  if not SupportsSystemRole then
 //    Skip('System role not supported by this provider');
 

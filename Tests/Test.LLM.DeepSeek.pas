@@ -19,7 +19,7 @@ type
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
-    [Test][Ignore] procedure Chat_Vision_Test; override;
+    [Test][Ignore('Ignored Test')] procedure Chat_Vision_Test; override;
   end;
 
 implementation
@@ -31,7 +31,7 @@ end;
 
 function TDeepSeekLLMTests.DefaultVisionModel: string;
 begin
-  Result := DefaultModel;
+  Result := '';
 end;
 
 procedure TDeepSeekLLMTests.Setup;
