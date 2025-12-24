@@ -7,8 +7,10 @@ uses
   System.Generics.Collections,
   System.SysUtils,
   System.IOUtils,
+  FMX.Types,
   ApiKeyStore,
   uLLM,
+  uAttributes,
   TestBase.AI;
 
 type
@@ -21,9 +23,14 @@ type
     function SupportsSystemRole: Boolean; virtual;
 
   public
+    [FunctionDescription('Get the weather forecast for a place in Australia')]
+    function GetWeather([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the weather forecast')]const location: string): string;
+    [FunctionDescription('Get the time')]
+    function GetTimeAt([ParamDescription('State of the location')]const state: string; [ParamDescription('Location for the time')]const location: string): string;
     [Test] procedure ListModels_And_Chat_User; virtual;
     [Test] procedure Chat_System_And_User; virtual;
     [Test] procedure Chat_Vision_Test; virtual;
+    [Test] procedure Chat_Function_Test; virtual;
   end;
 
 implementation
@@ -71,6 +78,61 @@ begin
       Messages.Free;
     end;
   finally
+    FreeAndNil(LLM);
+  end;
+end;
+
+procedure TBaseLLMTests.Chat_Function_Test;
+var
+  LLM: TBaseLLM;
+  settings: TChatSettings;
+  messages: System.Generics.Collections.TObjectList<TChatMessage>;
+  msg: TChatMessage;
+  chatAnswer: TChatResponse;
+  answer: string;
+begin
+  LLM := CreateLLM;
+  settings := Default(TChatSettings);
+  try
+    LLM.Functions.RegisterFunction(@TBaseLLMTests.GetWeather, Self);
+    LLM.Functions.RegisterFunction(@TBaseLLMTests.GetTimeAt, Self);
+    settings.model := DefaultModel;
+    settings.json_mode := False;
+    settings.max_tokens := 4096;
+    messages := TObjectList<TChatMessage>.Create(True);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := LLM.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+//    Log.d('Answer : ' + answer);
+
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time at Bendigo?';
+    messages.Add(msg);
+    chatAnswer := LLM.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+//    Log.d('Answer : ' + answer);
+
+//    Log.d('=============  Test Multiple function calls at once  ====================');
+    messages.Clear;
+    msg := TChatMessage.Create;
+    msg.Role := 'system';
+    msg.Content := 'You are a helpful assistant';
+    messages.Add(msg);
+    msg := TChatMessage.Create;
+    msg.Role := 'user';
+    msg.Content := 'What is the time and weather for Bendigo?';
+    messages.Add(msg);
+    chatAnswer := LLM.ChatCompletion(settings, messages);
+    answer := chatAnswer.Content;
+//    Log.d('Answer : ' + answer);
+
+
+  finally
+    FreeAndNil(messages);
     FreeAndNil(LLM);
   end;
 end;
@@ -152,6 +214,16 @@ begin
   finally
     LLM.Free;
   end;
+end;
+
+function TBaseLLMTests.GetTimeAt(const state, location: string): string;
+begin
+  Result := DateTimeToStr(now);
+end;
+
+function TBaseLLMTests.GetWeather(const state, location: string): string;
+begin
+  Result := 'The Temperature is 28 degrees';
 end;
 
 end.
