@@ -220,6 +220,7 @@ var
   LUsage: TJSONObject;
   FunctionId: string;
   FunctionName: string;
+  txt : string;
 begin
   LChoices := LJSONResponse.GetValue('content') as TJSONArray;
   if Assigned(LJSONResponse.GetValue('model')) then
@@ -239,7 +240,8 @@ begin
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   if LChoices.Count > 0 then      
   begin
-    AResponse.Content := (LChoices.Items[0] as TJSONObject).GetValue('text').Value;
+    if (LChoices.Items[0] as TJSONObject).TryGetValue<string>('text', txt) then
+      AResponse.Content := txt;
     LChoice := LChoices.Items[0] as TJSONObject;
   end;
 

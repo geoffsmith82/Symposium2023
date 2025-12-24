@@ -196,14 +196,16 @@ var
   ParamValue: TJSONValue;
   I: Integer;
   ResultValue: TValue;
+  argString : String;
 begin
   Log.d(JSONObject.ToJSON);
 
   // Extract the 'input' JSON object properly
-  ArgsObject := JSONObject.GetValue<TJSONObject>('input');
+  argString := JSONObject.GetValue<string>('arguments');
+  ArgsObject := TJSONObject.ParseJSONValue(argString) as TJSONObject;
 
   if ArgsObject = nil then
-    raise Exception.Create('Invalid JSON: "input" field is missing or not a valid JSON object');
+    raise Exception.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
 
   Context := TRttiContext.Create;
   try
