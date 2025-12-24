@@ -8,6 +8,7 @@ uses
   System.JSON,
   System.SysUtils,
   System.Rtti,
+  System.TypInfo,
   FMX.Types,
   System.Generics.Collections,
   REST.Client,
@@ -55,6 +56,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); override;
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string); override;
     function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray; override;
   end;
@@ -503,6 +505,71 @@ destructor TClaudeJSONFunctionMessage.Destroy;
 begin
   FreeAndNil(FJSON);
   inherited;
+end;
+
+procedure TClaudeFunctionRegistry.InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
+var
+  ArgsObject: TJSONObject;
+  Context: TRttiContext;
+  MethodType: TRttiMethod;
+  Params: TArray<TRttiParameter>;
+  Args: TArray<TValue>;
+  ParamValue: TJSONValue;
+  I: Integer;
+  ResultValue: TValue;
+  argString : String;
+begin
+  Log.d(JSONObject.ToJSON);
+
+  // Extract the 'input' JSON object properly
+  ArgsObject := JSONObject.GetValue<TJSONObject>('input');
+
+  if ArgsObject = nil then
+    raise Exception.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
+
+  Context := TRttiContext.Create;
+  try
+    MethodType := Context.GetType(TObject(Method.Data).ClassType).GetMethod(JSONObject.GetValue<string>('name'));
+
+    if Assigned(MethodType) then
+    begin
+      Params := MethodType.GetParameters;
+      SetLength(Args, Length(Params));
+
+      for I := 0 to High(Params) do
+      begin
+        ParamValue := ArgsObject.GetValue(Params[I].Name);
+
+        if ParamValue = nil then
+          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+
+        case Params[I].ParamType.TypeKind of
+          tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
+          tkFloat: Args[I] := StrToFloatDef(ParamValue.Value, 0.0);
+          tkString, tkLString, tkUString, tkWString: Args[I] := ParamValue.Value;
+          tkEnumeration:
+            if Params[I].ParamType.Handle = TypeInfo(Boolean) then
+              Args[I] := SameText(ParamValue.Value, 'true')
+            else
+              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+          tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
+          tkChar: Args[I] := ParamValue.Value[1];
+        else
+          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
+        end;
+      end;
+
+      ResultValue := MethodType.Invoke(TObject(Method.Data), Args);
+      if ResultValue.Kind = tkUString then
+        ReturnValue := ResultValue.AsString
+      else
+        ReturnValue := '';
+    end
+    else
+      raise Exception.Create('Method not found');
+  finally
+    Context.Free;
+  end;
 end;
 
 
