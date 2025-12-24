@@ -85,7 +85,7 @@ begin
   try
     WrappedJSON := TJSONObject.Create;
     WrappedJSON.AddPair('name', FuncName);
-    WrappedJSON.AddPair('input', InputObj.Clone as TJSONObject);
+    WrappedJSON.AddPair('arguments', InputObj.ToJSON);
     inherited InvokeFunction(WrappedJSON, ReturnValue);
   finally
     FreeAndNil(InputObj);

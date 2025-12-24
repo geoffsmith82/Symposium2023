@@ -50,7 +50,8 @@ uses
   Test.LLM.Anthropic in 'Test.LLM.Anthropic.pas',
   Test.LLM.AzureOpenAI in 'Test.LLM.AzureOpenAI.pas',
   Test.LLM.Gemini in 'Test.LLM.Gemini.pas',
-  Test.LLM.DeepSeek in 'Test.LLM.DeepSeek.pas';
+  Test.LLM.DeepSeek in 'Test.LLM.DeepSeek.pas',
+  Test.LLM.Mistral in 'Test.LLM.Mistral.pas';
 
 { keep comment here to protect the following conditional from being removed by the IDE when adding a unit }
 {$IFNDEF TESTINSIGHT}

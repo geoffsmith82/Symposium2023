@@ -517,7 +517,6 @@ var
   ParamValue: TJSONValue;
   I: Integer;
   ResultValue: TValue;
-  argString : String;
 begin
   Log.d(JSONObject.ToJSON);
 

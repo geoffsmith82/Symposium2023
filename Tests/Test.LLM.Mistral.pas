@@ -15,6 +15,7 @@ type
   protected
     function CreateLLM: TBaseLLM; override;
     function DefaultModel: string; override;
+    function DefaultVisionModel: string; override;
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
@@ -24,7 +25,12 @@ implementation
 
 function TMistralLLMTests.DefaultModel: string;
 begin
-  Result := 'FIXME_MISTRAL_MODEL';
+  Result := 'mistral-medium';
+end;
+
+function TMistralLLMTests.DefaultVisionModel: string;
+begin
+  Result := 'mistral-medium';
 end;
 
 procedure TMistralLLMTests.Setup;
