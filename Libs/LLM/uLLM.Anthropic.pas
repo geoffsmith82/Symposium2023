@@ -63,7 +63,6 @@ type
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   private
-    FFunctions : TFunctionRegistry;
     FOnLog: TOnLog;
     procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -78,7 +77,6 @@ type
 
     class function CreateChatVisionMessage: TChatVisionMessage; override;
 
-    property Functions: TFunctionRegistry read FFunctions;
     property OnLog: TOnLog read FOnLog write FOnLog;
   end;
 

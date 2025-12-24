@@ -54,7 +54,6 @@ type
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
   private
-    FFunctions : TFunctionRegistry;
     procedure CreateRESTClientAndRequest(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
     procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);
@@ -64,7 +63,6 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
-    property Functions: TFunctionRegistry read FFunctions;
   end;
 
 implementation

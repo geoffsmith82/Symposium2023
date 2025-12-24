@@ -94,7 +94,6 @@ type
   // --- Main Gemini LLM Class ---
   TGemini = class(TBaseLLM)
   private
-    FFunctions: TGeminiFunctionRegistry; // Use the specific registry
     FBaseURL: string;
     FAPIVersion: string;
     FAPIKey: string;
@@ -116,7 +115,6 @@ type
   published
     property BaseURL: string read FBaseURL write FBaseURL;
     property APIVersion: string read FAPIVersion write FAPIVersion;
-    property Functions: TGeminiFunctionRegistry read FFunctions;
   end;
 
 implementation

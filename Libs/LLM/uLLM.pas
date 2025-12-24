@@ -6,7 +6,8 @@ uses
   System.SysUtils,
   System.Classes,
   System.JSON,
-  System.Generics.Collections
+  System.Generics.Collections,
+  uLLM.Functions
   ;
 
 type
@@ -146,6 +147,7 @@ type
   TBaseLLM = class abstract
   protected
     FAPIKey : string;
+    FFunctions : TFunctionRegistry;
     FModelInfo : TObjectList<TBaseModelInfo>;
     function GetModelInfo: TObjectList<TBaseModelInfo>; virtual; abstract;
   public
@@ -157,6 +159,7 @@ type
     class function CreateChatVisionMessage: TChatVisionMessage; virtual;
   published
     property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
+    property Functions: TFunctionRegistry read FFunctions;
   end;
 {$M-}
 

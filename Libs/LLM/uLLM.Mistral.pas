@@ -41,7 +41,6 @@ type
 
   TMistral = class(TBaseLLM)
   private
-    FFunctions: TFunctionRegistry;
     FOnLog: TOnLog;
     procedure DoOnLog(const Msg: string);
     procedure CreateRESTClient(out AClient: TRESTClient; out ARequest: TRESTRequest; out AResponse: TRESTResponse);
@@ -55,7 +54,6 @@ type
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion, AModel: string): string; override;
 
-    property Functions: TFunctionRegistry read FFunctions;
     property OnLog: TOnLog read FOnLog write FOnLog;
   end;
 

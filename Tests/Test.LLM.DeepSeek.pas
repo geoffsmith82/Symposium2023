@@ -19,7 +19,7 @@ type
   public
     [Setup] procedure Setup;
     [TearDown] procedure TearDown;
-    [Test][Ignore('Ignored Test')] procedure Chat_Vision_Test; override;
+    [Test][Ignore('Not Supported by Deepseek.com')] procedure Chat_Vision_Test; override;
   end;
 
 implementation
