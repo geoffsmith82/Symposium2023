@@ -3,8 +3,6 @@ unit UChatGPT;
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Variants,
   System.Classes,
@@ -93,15 +91,17 @@ begin
   FApiKeyStore := TApiKeyStore.GetInstance;
   FTextToSpeechEngine := TEngineManager<TBaseTextToSpeech, TMenuItem>.Create;
   FSettings := TIniFile.Create(ChangeFileExt(ParamStr(0),'.ini'));
-  FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
+  if not FApiKeyStore.LoadApiKey('chatgpt_apikey').IsEmpty then
+    FOpenAI := TOpenAI.Create(FApiKeyStore.LoadApiKey('chatgpt_apikey'));
 
 
   FTextToSpeechEngine.RegisterEngine(
      TMicrosoftCognitiveService.Create(FApiKeyStore.LoadApiKey('ms_cognative_service_resource_key'), 'australiaeast.tts.speech.microsoft.com'), miMicrosoftSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
      TElevenLabsService.Create(FApiKeyStore.LoadApiKey('ElevenLabsAPIKey')), miElevenLabsSpeechEngine);
-  FTextToSpeechEngine.RegisterEngine(
-     TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);//'ADUG Demo', '');
+  if not FApiKeyStore.LoadSetting('AWSRegion').IsEmpty then
+    FTextToSpeechEngine.RegisterEngine(
+       TAmazonPollyService.Create(FApiKeyStore.LoadApiKey('AWSAccessKey'), FApiKeyStore.LoadApiKey('AWSSecretkey'), FApiKeyStore.LoadSetting('AWSRegion')), miAmazonSpeechEngine);//'ADUG Demo', '');
   FTextToSpeechEngine.RegisterEngine(
      TWindowsSpeechService.Create, miWindowsSpeechEngine);
   FTextToSpeechEngine.RegisterEngine(
