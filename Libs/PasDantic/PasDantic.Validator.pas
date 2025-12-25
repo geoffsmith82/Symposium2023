@@ -18,8 +18,9 @@ type
   end;
 
   TValidationResult = record
-    IsValid: Boolean;
     Errors: TArray<TValidationError>;
+    function IsValid: Boolean;
+    function ErrorCount: Integer;
   end;
 
 function ValidateModel(AInstance: TObject; const APath: string = ''): TValidationResult;
@@ -171,7 +172,6 @@ begin
       end;
     end;
 
-    Result.IsValid := Errors.Count = 0;
     Result.Errors := Errors.ToArray;
   finally
     Errors.Free;
@@ -184,6 +184,18 @@ constructor TValidationError.Create(const APath, AMessage: string);
 begin
   PropertyPath := APath;
   Message := AMessage;
+end;
+
+{ TValidationResult }
+
+function TValidationResult.ErrorCount: Integer;
+begin
+  Result := Length(Errors);
+end;
+
+function TValidationResult.IsValid: Boolean;
+begin
+  Result := ErrorCount = 0;
 end;
 
 end.
