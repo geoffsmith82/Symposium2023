@@ -3,7 +3,8 @@ unit PasDantic.Attributes;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  Rtti;
 
 type
   RequiredAttribute = class(TCustomAttribute)
@@ -32,10 +33,13 @@ type
 
   DefaultAttribute = class(TCustomAttribute)
   private
-    FValue: string;
+    FValue: TValue;
   public
-    constructor Create(const AValue: string);
-    property Value: string read FValue;
+    constructor Create(const AValue: string); overload;
+    constructor Create(const AValue: Integer); overload;
+    constructor Create(const AValue: Double); overload;
+
+    property Value: TValue read FValue;
   end;
 
   RegexAttribute = class(TCustomAttribute)
@@ -99,6 +103,16 @@ constructor ExampleAttribute.Create(const AExample: string);
 begin
   inherited Create;
   FExample := AExample;
+end;
+
+constructor DefaultAttribute.Create(const AValue: Double);
+begin
+  FValue := AValue;
+end;
+
+constructor DefaultAttribute.Create(const AValue: Integer);
+begin
+  FValue := AValue;
 end;
 
 end.

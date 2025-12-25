@@ -14,12 +14,24 @@ function GenerateJSONSchema(AClass: TClass): TJSONObject;
 
 implementation
 
+
+function IsIntegerType(const AType: TRttiType): Boolean;
+begin
+  Result := AType.TypeKind in [tkInteger, tkInt64];
+end;
+
+function IsFloatType(const AType: TRttiType): Boolean;
+begin
+  Result := AType.TypeKind in [tkFloat];
+end;
+
 function GenerateJSONSchema(AClass: TClass): TJSONObject;
 var
   Ctx: TRttiContext;
   RttiType: TRttiType;
-  Prop: TRttiProperty;
+  Field: TRttiField;
   Attr: TCustomAttribute;
+  DefaultAttr: DefaultAttribute;
   PropsObj, PropObj, NestedSchema: TJSONObject;
   RequiredArr: TJSONArray;
   IsRequired: Boolean;
@@ -30,26 +42,26 @@ begin
 
   RttiType := Ctx.GetType(AClass);
 
-  for Prop in RttiType.GetProperties do
+  for Field in RttiType.GetFields do
   begin
-    if not Prop.IsReadable then
+    if not Field.IsReadable then
       Continue;
 
     PropObj := TJSONObject.Create;
     IsRequired := False;
 
-    if Prop.PropertyType.TypeKind in [tkString, tkUString] then
+    if Field.FieldType.TypeKind in [tkString, tkUString] then
       PropObj.AddPair('type', 'string')
-    else if Prop.PropertyType.TypeKind = tkInteger then
+    else if Field.FieldType.TypeKind = tkInteger then
       PropObj.AddPair('type', 'integer')
-    else if Prop.PropertyType.TypeKind = tkFloat then
+    else if Field.FieldType.TypeKind = tkFloat then
       PropObj.AddPair('type', 'number')
-    else if Prop.PropertyType.TypeKind = tkClass then
+    else if Field.FieldType.TypeKind = tkClass then
     begin
-      if Prop.PropertyType.Name.StartsWith('TObjectList<') then
+      if Field.FieldType.Name.StartsWith('TObjectList<') then
       begin
         PropObj.AddPair('type', 'array');
-        var GenericName := Prop.PropertyType.ToString;
+        var GenericName := Field.FieldType.ToString;
         var InnerClassName := Copy(GenericName, Pos('<', GenericName) + 1, Length(GenericName) - Pos('<', GenericName) - 1);
         var InnerRttiType := Ctx.FindType(InnerClassName);
         if Assigned(InnerRttiType) and (InnerRttiType.TypeKind = tkClass) then
@@ -60,11 +72,11 @@ begin
       end
       else
       begin
-        PropObj := GenerateJSONSchema(Prop.PropertyType.AsInstance.MetaclassType);
+        PropObj := GenerateJSONSchema(Field.FieldType.AsInstance.MetaclassType);
       end;
     end;
 
-    for Attr in Prop.GetAttributes do
+    for Attr in Field.GetAttributes do
     begin
       if Attr is RequiredAttribute then
         IsRequired := True;
@@ -77,8 +89,30 @@ begin
       if Attr is RangeAttribute then
       begin
         var RA := RangeAttribute(Attr);
-        PropObj.AddPair('minimum', TJSONNumber.Create(RA.Min));
-        PropObj.AddPair('maximum', TJSONNumber.Create(RA.Max));
+
+        if IsIntegerType(Field.FieldType) then
+        begin
+          PropObj.AddPair('minimum', TJSONNumber.Create(Trunc(RA.Min)));
+          PropObj.AddPair('maximum', TJSONNumber.Create(Trunc(RA.Max)));
+        end
+        else
+        begin
+          PropObj.AddPair('minimum', TJSONNumber.Create(RA.Min));
+          PropObj.AddPair('maximum', TJSONNumber.Create(RA.Max));
+        end;
+      end;
+      if Attr is DefaultAttribute then
+      begin
+        DefaultAttr := DefaultAttribute(Attr);
+
+        case Field.FieldType.TypeKind of
+          tkInteger, tkInt64:
+            PropObj.AddPair('default', TJSONNumber.Create(DefaultAttr.Value.AsInteger));
+          tkFloat:
+            PropObj.AddPair('default', TJSONNumber.Create(DefaultAttr.Value.AsExtended));
+          tkString, tkUString:
+            PropObj.AddPair('default', DefaultAttr.Value.AsString);
+        end;
       end;
       if Attr is AllowedValuesAttribute then
       begin
@@ -94,10 +128,19 @@ begin
         PropObj.AddPair('example', ExampleAttribute(Attr).Example);
     end;
 
-    PropsObj.AddPair(Prop.Name, PropObj);
+    PropsObj.AddPair(Field.Name, PropObj);
+
+    IsRequired := True;
+
+    if Field.HasAttribute<OptionalAttribute> then
+      IsRequired := False;
 
     if IsRequired then
-      RequiredArr.Add(Prop.Name);
+    begin
+      var HasDefault := Field.HasAttribute<DefaultAttribute>;
+      if not HasDefault then
+        RequiredArr.Add(Field.Name);
+    end;
   end;
 
   Result.AddPair('type', 'object');

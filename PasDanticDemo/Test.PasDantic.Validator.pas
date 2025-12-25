@@ -6,7 +6,9 @@ uses
   DUnitX.TestFramework,
   System.SysUtils,
   System.Generics.Collections,
+  System.JSON,
   PasDantic.Validator,
+  PasDantic.SchemaGenerator,
   PasDantic.Attributes;
 
 type
@@ -34,6 +36,14 @@ type
     [Test] procedure Optional_Passes;
     [Test] procedure Regex_Pass;
     [Test] procedure Range_OutsideBounds_Fails;
+
+    [Test] procedure Schema_Root_Is_Object;
+    [Test] procedure Schema_Required_Fields_Match;
+    [Test] procedure Schema_String_Length_Constraints;
+    [Test] procedure Schema_Number_Range;
+    [Test] procedure Schema_Regex_Pattern;
+    [Test] procedure Schema_AllowedValues_As_Enum;
+    [Test] procedure Schema_Nested_Object;
   end;
 
 implementation
@@ -115,6 +125,30 @@ begin
   Address.Free;
   inherited Destroy;
 end;
+
+
+function GetObj(const Obj: TJSONObject; const Name: string): TJSONObject;
+begin
+  Result := Obj.Values[Name] as TJSONObject;
+  Assert.IsNotNull(Result, 'Missing object: ' + Name);
+end;
+
+function GetArr(const Obj: TJSONObject; const Name: string): TJSONArray;
+begin
+  Result := Obj.Values[Name] as TJSONArray;
+  Assert.IsNotNull(Result, 'Missing array: ' + Name);
+end;
+
+procedure AssertArrayContains(const Arr: TJSONArray; const Value: string);
+var
+  V: TJSONValue;
+begin
+  for V in Arr do
+    if SameText(V.Value, Value) then
+      Exit;
+  Assert.Fail(Format('Expected array to contain "%s"', [Value]));
+end;
+
 
 { TPasDanticValidatorTests }
 
@@ -488,6 +522,129 @@ begin
     Assert.IsTrue(Length(R.Errors) >= 5, 'Expected multiple aggregated errors');
   finally
     U.Free;
+  end;
+end;
+
+
+procedure TPasDanticValidatorTests.Schema_Root_Is_Object;
+var
+  Schema: TJSONObject;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Assert.AreEqual('object', Schema.GetValue<string>('type'));
+//    Assert.IsTrue(Schema.Contains('properties'));
+  finally
+    Schema.Free;
+  end;
+end;
+
+
+procedure TPasDanticValidatorTests.Schema_Required_Fields_Match;
+var
+  Schema: TJSONObject;
+  Required: TJSONArray;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Required := GetArr(Schema, 'required');
+
+    AssertArrayContains(Required, 'Name');
+    AssertArrayContains(Required, 'Address');
+  finally
+    Schema.Free;
+  end;
+end;
+
+[Test]
+procedure TPasDanticValidatorTests.Schema_String_Length_Constraints;
+var
+  Schema, Props, NameProp: TJSONObject;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Props := GetObj(Schema, 'properties');
+    NameProp := GetObj(Props, 'Name');
+
+    Assert.AreEqual('string', NameProp.GetValue<string>('type'));
+    Assert.AreEqual(3, NameProp.GetValue<Integer>('minLength'));
+    Assert.AreEqual(10, NameProp.GetValue<Integer>('maxLength'));
+  finally
+    Schema.Free;
+  end;
+end;
+
+[Test]
+procedure TPasDanticValidatorTests.Schema_Number_Range;
+var
+  Schema, Props, AgeProp: TJSONObject;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Props := GetObj(Schema, 'properties');
+    AgeProp := GetObj(Props, 'Age');
+
+    Assert.AreEqual('integer', AgeProp.GetValue<string>('type'));
+    Assert.AreEqual(0, AgeProp.GetValue<Integer>('minimum'));
+    Assert.AreEqual(120, AgeProp.GetValue<Integer>('maximum'));
+  finally
+    Schema.Free;
+  end;
+end;
+
+[Test]
+procedure TPasDanticValidatorTests.Schema_Regex_Pattern;
+var
+  Schema, Props, EmailProp: TJSONObject;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Props := GetObj(Schema, 'properties');
+    EmailProp := GetObj(Props, 'Email');
+
+    Assert.AreEqual('string', EmailProp.GetValue<string>('type'));
+    Assert.AreEqual('^\S+@\S+\.\S+$', EmailProp.GetValue<string>('pattern'));
+  finally
+    Schema.Free;
+  end;
+end;
+
+[Test]
+procedure TPasDanticValidatorTests.Schema_AllowedValues_As_Enum;
+var
+  Schema, Props, RoleProp: TJSONObject;
+  EnumArr: TJSONArray;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Props := GetObj(Schema, 'properties');
+    RoleProp := GetObj(Props, 'Role');
+    EnumArr := GetArr(RoleProp, 'enum');
+
+    AssertArrayContains(EnumArr, 'admin');
+    AssertArrayContains(EnumArr, 'user');
+    AssertArrayContains(EnumArr, 'guest');
+  finally
+    Schema.Free;
+  end;
+end;
+
+
+[Test]
+procedure TPasDanticValidatorTests.Schema_Nested_Object;
+var
+  Schema, Props, AddrProp: TJSONObject;
+begin
+  Schema := GenerateJSONSchema(TUser);
+  try
+    Props := GetObj(Schema, 'properties');
+    AddrProp := GetObj(Props, 'Address');
+
+    Assert.AreEqual('object', AddrProp.GetValue<string>('type'));
+    Assert.IsTrue(Assigned(AddrProp.FindValue('properties')));
+    Assert.IsTrue(Assigned(AddrProp.FindValue('required')));
+  finally
+    Schema.Free;
   end;
 end;
 
