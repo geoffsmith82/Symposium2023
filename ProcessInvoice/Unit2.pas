@@ -71,7 +71,7 @@ end;
 
 function TForm2.DataFilename(filename: string): string;
 begin
-  Result := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), '..\..\Data');
+  Result := TPath.Combine(TPath.GetDirectoryName(ParamStr(0)), '..\..\..\Data');
   Result := TPath.Combine(Result, filename);
 
   Result := TPath.GetFullPath(Result);
