@@ -220,7 +220,7 @@ begin
     JSONBody.AddPair('max_tokens', TJSONNumber.Create(ChatConfig.max_tokens));
 
   if FFunctions.Count > 0 then
-    JSONBody.AddPair('tools', FFunctions.GetAvailableFunctionsJSON);
+    JSONBody.AddPair('tools', FFunctions.GetAvailableFunctionsJSON(False));
 end;
 
 procedure TMistral.ProcessResponse(const AResponseJSON: TJSONObject; var AChatResponse: TChatResponse; AMessages: TObjectList<TChatMessage>; out FunctionReturnValue: string);
@@ -229,7 +229,7 @@ var
   Choice: TJSONObject;
   ToolCalls: TJSONArray;
   ToolCall: TJSONObject;
-  FuncId, FuncName: string;
+  FuncId: string;
   usage: TJSONObject;
 begin
   if AResponseJSON.TryGetValue<TJSONArray>('choices', Choices) and (Choices.Count > 0) then
@@ -247,17 +247,17 @@ begin
     else if AChatResponse.Finish_Reason = 'tool_calls' then
     begin
       ToolCalls := Choice.GetValue<TJSONObject>('message').GetValue<TJSONArray>('tool_calls');
+
+      // Add the assistant message with all tool_calls once, before the responses
+      AMessages.Add(TMistralFunctionCallMessage.Create(ToolCalls));
+
       for var i := 0 to ToolCalls.Count - 1 do
       begin
         ToolCall := ToolCalls[i] as TJSONObject;
         FuncId := ToolCall.GetValue<string>('id');
-        FuncName := ToolCall.GetValue<TJSONObject>('function').GetValue<string>('name');
 
         FFunctions.InvokeFunction(ToolCall.GetValue<TJSONObject>('function'), FunctionReturnValue);
-
-        AMessages.Add(TMistralFunctionCallMessage.Create(ToolCalls));
         AMessages.Add(TMistralFunctionResponseMessage.Create(FuncId, FunctionReturnValue));
-        Sleep(2000);
       end;
       AChatResponse := ChatCompletion(AChatResponse.ChatConfig, AMessages);
     end;
@@ -312,13 +312,14 @@ begin
   if FModelInfo.Count > 0 then
     Exit(FModelInfo);
 
-  Client := TRESTClient.Create(BASE_URL + '/models');
+  Client := TRESTClient.Create(BASE_URL);
   Request := TRESTRequest.Create(nil);
   Response := TRESTResponse.Create(nil);
   try
     Request.Client := Client;
     Request.Response := Response;
     Request.Method := rmGET;
+    Request.Resource := 'models';
     Request.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
     Request.Execute;
