@@ -126,7 +126,7 @@ end;
 function TImageGenerationXAI.DeserializeModels(const AJsonStr: string): TObjectList<TXAIModel>;
 var
   LJsonObj: TJSONObject;
-  LJsonArray: TJSONArray;
+  LJsonArray, LAliasArray: TJSONArray;
   LModel: TXAIModel;
   I, J: Integer;
 begin
@@ -152,12 +152,12 @@ begin
           LModel.PromptImageTokenPrice := GetValue<Integer>('prompt_image_token_price', 0);
           LModel.GeneratedImageTokenPrice := GetValue<Integer>('generated_image_token_price', 0);
 
-          LJsonArray := GetValue<TJSONArray>('aliases');
-          if Assigned(LJsonArray) then
+          LAliasArray := GetValue<TJSONArray>('aliases');
+          if Assigned(LAliasArray) then
           begin
-            SetLength(LModel.FAliases, LJsonArray.Count);
-            for J := 0 to LJsonArray.Count - 1 do
-              LModel.Aliases[J] := LJsonArray.Items[J].Value;
+            SetLength(LModel.FAliases, LAliasArray.Count);
+            for J := 0 to LAliasArray.Count - 1 do
+              LModel.Aliases[J] := LAliasArray.Items[J].Value;
           end;
         end;
         Result.Add(LModel);
