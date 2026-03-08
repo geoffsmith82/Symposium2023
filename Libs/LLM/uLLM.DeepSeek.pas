@@ -40,6 +40,7 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    class function SupportsStructuredOutput: Boolean; override;
   end;
 
 
@@ -146,7 +147,9 @@ begin
     if ChatConfig.store then
       LJSONBody.AddPair('store', TJSONBool.Create(ChatConfig.store));
 
-    if ChatConfig.json_mode then
+    if Assigned(ChatConfig.ResponseSchema) then
+      LJSONBody.AddPair('response_format', BuildResponseFormatJSON(ChatConfig.ResponseSchema, ChatConfig.ResponseSchemaName))
+    else if ChatConfig.json_mode then
     begin
       LJSONMessage := TJSONObject.Create;
       LJSONMessage.AddPair('type', 'json_object');
@@ -165,6 +168,12 @@ begin
   finally
     FreeAndNil(LJSONBody);
   end;
+end;
+
+class function TDeepSeek.SupportsStructuredOutput: Boolean;
+begin
+  // DeepSeek API does not currently support json_schema response_format
+  Result := False;
 end;
 
 procedure TDeepSeek.ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);

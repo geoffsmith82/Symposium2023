@@ -30,6 +30,7 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    class function SupportsStructuredOutput: Boolean; override;
   end;
 
 
@@ -132,7 +133,9 @@ begin
     if ChatConfig.store then
       LJSONBody.AddPair('store', TJSONBool.Create(ChatConfig.store));
 
-    if ChatConfig.json_mode then
+    if Assigned(ChatConfig.ResponseSchema) then
+      LJSONBody.AddPair('response_format', BuildResponseFormatJSON(ChatConfig.ResponseSchema, ChatConfig.ResponseSchemaName))
+    else if ChatConfig.json_mode then
     begin
       LJSONMessage := TJSONObject.Create;
       LJSONMessage.AddPair('type', 'json_object');
@@ -210,6 +213,11 @@ begin
   end;
 
   LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
+end;
+
+class function TOpenAI.SupportsStructuredOutput: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TOpenAI.HandleErrorResponse(AResponse: TRESTResponse);

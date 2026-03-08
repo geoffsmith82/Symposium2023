@@ -30,6 +30,7 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion: string; const AModel: string): string; override;
+    class function SupportsStructuredOutput: Boolean; override;
   end;
 
 implementation
@@ -126,11 +127,13 @@ begin
         LJSONBody.AddPair('n', ChatConfig.n);
       if ChatConfig.seed > 0 then
         LJSONBody.AddPair('seed', ChatConfig.seed);
-      if ChatConfig.json_mode then
+      if Assigned(ChatConfig.ResponseSchema) then
+        LJSONBody.AddPair('response_format', BuildResponseFormatJSON(ChatConfig.ResponseSchema, ChatConfig.ResponseSchemaName))
+      else if ChatConfig.json_mode then
       begin
-      LJSONMessage := TJSONObject.Create;
-      LJSONMessage.AddPair('type', 'json_object');
-      LJSONBody.AddPair('response_format', LJSONMessage);
+        LJSONMessage := TJSONObject.Create;
+        LJSONMessage.AddPair('type', 'json_object');
+        LJSONBody.AddPair('response_format', LJSONMessage);
       end;
 
     // Include available functions in the request
@@ -202,6 +205,11 @@ begin
   end;
 
   LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
+end;
+
+class function TGroqLLM.SupportsStructuredOutput: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TGroqLLM.HandleErrorResponse(AResponse: TRESTResponse);

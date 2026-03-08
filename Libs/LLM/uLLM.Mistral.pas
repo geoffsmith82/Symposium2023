@@ -53,6 +53,7 @@ type
     destructor Destroy; override;
     function ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse; override;
     function Completion(const AQuestion, AModel: string): string; override;
+    class function SupportsStructuredOutput: Boolean; override;
 
     property OnLog: TOnLog read FOnLog write FOnLog;
   end;
@@ -222,6 +223,15 @@ begin
   if ChatConfig.max_tokens > 0 then
     JSONBody.AddPair('max_tokens', TJSONNumber.Create(ChatConfig.max_tokens));
 
+  if Assigned(ChatConfig.ResponseSchema) then
+    JSONBody.AddPair('response_format', BuildResponseFormatJSON(ChatConfig.ResponseSchema, ChatConfig.ResponseSchemaName))
+  else if ChatConfig.json_mode then
+  begin
+    var LJSONFmt := TJSONObject.Create;
+    LJSONFmt.AddPair('type', 'json_object');
+    JSONBody.AddPair('response_format', LJSONFmt);
+  end;
+
   if FFunctions.Count > 0 then
     JSONBody.AddPair('tools', FFunctions.GetAvailableFunctionsJSON(False));
 end;
@@ -293,6 +303,11 @@ begin
   finally
     FreeAndNil(Messages);
   end;
+end;
+
+class function TMistral.SupportsStructuredOutput: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TMistral.DoOnLog(const Msg: string);

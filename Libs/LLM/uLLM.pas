@@ -96,6 +96,8 @@ type
      frequency_penalty : Double;
      user : string;
      store : Boolean;
+     ResponseSchema : TClass;
+     ResponseSchemaName : string;
      class operator Initialize (out Dest: TChatSettings);
   end;
 
@@ -164,6 +166,7 @@ type
     FFunctions : TFunctionRegistry;
     FModelInfo : TObjectList<TBaseModelInfo>;
     function GetModelInfo: TObjectList<TBaseModelInfo>; virtual; abstract;
+    function BuildResponseFormatJSON(ASchema: TClass; const ASchemaName: string): TJSONObject; virtual;
   public
     constructor Create(const APIKey: string);
     destructor Destroy; override;
@@ -171,6 +174,8 @@ type
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
     class function CreateChatMessage: TChatMessage; virtual;
     class function CreateChatVisionMessage: TChatVisionMessage; virtual;
+    class function SupportsStructuredOutput: Boolean; virtual;
+    class function SchemaFallbackPrompt(ASchema: TClass): string;
     procedure Log(const AMessage: string);
     property OnLog: TOnLog read FOnLog write FOnLog;
   published
@@ -187,7 +192,8 @@ procedure NotifyRESTClientCreated(AClient: TObject; ARequest: TObject);
 implementation
 
 uses
-  NetEncoding
+  NetEncoding,
+  PasDantic.SchemaGenerator
   ;
 
 procedure NotifyRESTClientCreated(AClient: TObject; ARequest: TObject);
@@ -289,6 +295,91 @@ begin
   inherited;
 end;
 
+class function TBaseLLM.SupportsStructuredOutput: Boolean;
+begin
+  Result := False;
+end;
+
+procedure EnforceStrictSchema(AObj: TJSONObject); forward;
+
+procedure EnforceStrictSchema(AObj: TJSONObject);
+var
+  LType: TJSONValue;
+  LProps: TJSONObject;
+  LItems: TJSONValue;
+  LRequired: TJSONArray;
+  I: Integer;
+begin
+  LType := AObj.GetValue('type');
+  if not Assigned(LType) then
+    Exit;
+
+  if LType.Value = 'object' then
+  begin
+    // Add additionalProperties: false if not present
+    if AObj.GetValue('additionalProperties') = nil then
+      AObj.AddPair('additionalProperties', TJSONBool.Create(False));
+
+    // Ensure ALL properties are in required array (OpenAI strict mode)
+    LProps := AObj.GetValue<TJSONObject>('properties');
+    if Assigned(LProps) then
+    begin
+      LRequired := TJSONArray.Create;
+      for I := 0 to LProps.Count - 1 do
+      begin
+        LRequired.Add(LProps.Pairs[I].JsonString.Value);
+        // Recurse into each property
+        if LProps.Pairs[I].JsonValue is TJSONObject then
+          EnforceStrictSchema(TJSONObject(LProps.Pairs[I].JsonValue));
+      end;
+      // Remove existing required array and replace with complete one
+      AObj.RemovePair('required').Free;
+      AObj.AddPair('required', LRequired);
+    end;
+  end
+  else if LType.Value = 'array' then
+  begin
+    LItems := AObj.GetValue('items');
+    if Assigned(LItems) and (LItems is TJSONObject) then
+      EnforceStrictSchema(TJSONObject(LItems));
+  end;
+end;
+
+function TBaseLLM.BuildResponseFormatJSON(ASchema: TClass; const ASchemaName: string): TJSONObject;
+var
+  LSchema: TJSONObject;
+  LSchemaWrapper: TJSONObject;
+begin
+  // Default: OpenAI-compatible json_schema response_format
+  LSchema := GenerateJSONSchema(ASchema);
+
+  // Recursively enforce strict mode requirements:
+  // - additionalProperties: false on all objects
+  // - all properties listed in required array
+  EnforceStrictSchema(LSchema);
+
+  LSchemaWrapper := TJSONObject.Create;
+  LSchemaWrapper.AddPair('name', ASchemaName);
+  LSchemaWrapper.AddPair('strict', TJSONBool.Create(True));
+  LSchemaWrapper.AddPair('schema', LSchema);
+
+  Result := TJSONObject.Create;
+  Result.AddPair('type', 'json_schema');
+  Result.AddPair('json_schema', LSchemaWrapper);
+end;
+
+class function TBaseLLM.SchemaFallbackPrompt(ASchema: TClass): string;
+var
+  LSchema: TJSONObject;
+begin
+  LSchema := GenerateJSONSchema(ASchema);
+  try
+    Result := 'You must respond with valid JSON matching this schema:' + sLineBreak +
+              LSchema.Format;
+  finally
+    LSchema.Free;
+  end;
+end;
 
 { TChatVisionMessage }
 
@@ -462,6 +553,8 @@ class operator TChatSettings.Initialize(out Dest: TChatSettings);
 begin
   Dest.n := 1;
   Dest.json_mode := False;
+  Dest.ResponseSchema := nil;
+  Dest.ResponseSchemaName := '';
 end;
 
 end.
