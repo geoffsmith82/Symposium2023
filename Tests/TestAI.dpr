@@ -8,11 +8,13 @@ uses
   FastMM4,
   DUnitX.MemoryLeakMonitor.FastMM4,
   System.SysUtils,
+  FMX.Types,
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
+  DUnitX.Extensibility,
   {$ENDIF }
   DUnitX.TestFramework,
   TestBase.AI in 'TestBase.AI.pas',
@@ -51,7 +53,36 @@ uses
   Test.LLM.AzureOpenAI in 'Test.LLM.AzureOpenAI.pas',
   Test.LLM.Gemini in 'Test.LLM.Gemini.pas',
   Test.LLM.DeepSeek in 'Test.LLM.DeepSeek.pas',
-  Test.LLM.Mistral in 'Test.LLM.Mistral.pas';
+  Test.LLM.Mistral in 'Test.LLM.Mistral.pas',
+  Test.StructuredOutput in 'Test.StructuredOutput.pas',
+  uSchemaModels in '..\StructuredOutputDemo\uSchemaModels.pas';
+
+procedure DisableSpecificTests(const Runner: ITestRunner);
+var
+  Fixtures: ITestFixtureList;
+  Fixture: ITestFixture;
+  Test: ITest;
+begin
+  Fixtures := Runner.BuildFixtures as ITestFixtureList;
+
+ // Fixtures[0].
+//   TDUnitX.RegisteredFixtures.
+
+  for var i := 0 to Fixtures.Count - 1 do
+  begin
+    Fixture := Fixtures[i];
+    Log.d(Fixture.FullName);
+    for var j := 0 to Fixture.Tests.Count - 1 do
+    begin
+      Test := Fixture.Tests[j];
+      if SameText(Test.FullName, 'TDeepSeekLLMTests.Chat_Vision_Test') then
+      begin
+        Test.Enabled := False;
+        Exit; // remove if you want to keep scanning
+      end;
+    end;
+  end;
+end;
 
 { keep comment here to protect the following conditional from being removed by the IDE when adding a unit }
 {$IFNDEF TESTINSIGHT}
@@ -66,6 +97,9 @@ begin
   TestInsight.DUnitX.RunRegisteredTests;
 {$ELSE}
   try
+    if GetEnvironmentVariable('RESTDEBUG') = '1' then
+      TBaseAITest.EnableRESTDebug;
+
     //Check command line options, will exit if invalid
     TDUnitX.CheckCommandLine;
     //Create the test runner
@@ -74,6 +108,8 @@ begin
     runner.UseRTTI := True;
     //When true, Assertions must be made during tests;
     runner.FailsOnNoAsserts := False;
+
+
 
     //tell the runner how we will log things
     //Log to the console window if desired
@@ -85,7 +121,9 @@ begin
     //Generate an NUnit compatible XML File
     nunitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
     runner.AddLogger(nunitLogger);
+     Runner.BuildFixtures;
 
+    DisableSpecificTests(runner);
     //Run tests
     results := runner.Execute;
     if not results.AllPassed then

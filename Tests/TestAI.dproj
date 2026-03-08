@@ -93,7 +93,7 @@
         <UsingDelphiRTL>true</UsingDelphiRTL>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_UnitSearchPath>$(DUnitX);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(DUnitX);C:\Programming\Components\PasDantic\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>TestAI</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
@@ -203,6 +203,8 @@
         <DCCReference Include="Test.LLM.Gemini.pas"/>
         <DCCReference Include="Test.LLM.DeepSeek.pas"/>
         <DCCReference Include="Test.LLM.Mistral.pas"/>
+        <DCCReference Include="Test.StructuredOutput.pas"/>
+        <DCCReference Include="..\StructuredOutputDemo\uSchemaModels.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
