@@ -224,9 +224,9 @@ begin
     AResponse.Log_Id := txt;
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
-  LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
-  LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
-  LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
+  LUsage.TryGetValue('input_tokens', AResponse.Prompt_Tokens);
+  LUsage.TryGetValue('output_tokens', AResponse.Completion_Tokens);
+  AResponse.Total_Tokens := AResponse.Prompt_Tokens + AResponse.Completion_Tokens;
   if LChoices.Count > 0 then      
   begin
     if (LChoices.Items[0] as TJSONObject).TryGetValue<string>('text', txt) then
