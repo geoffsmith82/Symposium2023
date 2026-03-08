@@ -8,7 +8,6 @@ uses
   System.JSON,
   System.Rtti,
   System.TypInfo,
-  FMX.Types,
   System.Generics.Collections,
   uAttributes
   ;
@@ -23,9 +22,12 @@ type
     destructor Destroy; override;
   end;
 
+  TFunctionLogProc = reference to procedure(const AMessage: string);
+
   TFunctionRegistry = class
   protected
     FMethods: TObjectDictionary<string, TFunctionDescription>;
+    FOnLog: TFunctionLogProc;
     procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); virtual;
     function GenerateParameterJSON(Method: TRttiMethod): TJSONObject; virtual;
     function GetJSONTypeFromRTTI(AType: TRttiType): string;
@@ -36,9 +38,13 @@ type
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string); virtual;
     function GetAvailableFunctionsJSON(UseStrict: Boolean = True): TJSONArray; virtual;
     function Count: Integer;
+    property OnLog: TFunctionLogProc read FOnLog write FOnLog;
   end;
 
 implementation
+
+uses
+  uLLM;
 
 constructor TFunctionDescription.Create(const AName, ADescription: string; const AParameters: TJSONObject);
 begin
@@ -183,7 +189,7 @@ begin
     InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
   end
   else
-    raise Exception.Create('Function not registered');
+    raise ELLMFunctionError.Create('Function not registered');
 end;
 
 procedure TFunctionRegistry.InvokeFunctionFromJSON(const Method: TMethod; const JSONObject: TJSONObject; out ReturnValue: string);
@@ -198,14 +204,15 @@ var
   ResultValue: TValue;
   argString : String;
 begin
-  Log.d(JSONObject.ToJSON);
+  if Assigned(FOnLog) then
+    FOnLog(JSONObject.ToJSON);
 
   // Extract the 'input' JSON object properly
   argString := JSONObject.GetValue<string>('arguments');
   ArgsObject := TJSONObject.ParseJSONValue(argString) as TJSONObject;
 
   if ArgsObject = nil then
-    raise Exception.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
+    raise ELLMFunctionError.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
 
   Context := TRttiContext.Create;
   try
@@ -221,7 +228,7 @@ begin
         ParamValue := ArgsObject.GetValue(Params[I].Name);
 
         if ParamValue = nil then
-          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
 
         case Params[I].ParamType.TypeKind of
           tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
@@ -231,11 +238,11 @@ begin
             if Params[I].ParamType.Handle = TypeInfo(Boolean) then
               Args[I] := SameText(ParamValue.Value, 'true')
             else
-              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+              raise ELLMFunctionError.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
           tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
           tkChar: Args[I] := ParamValue.Value[1];
         else
-          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
         end;
       end;
 
@@ -246,7 +253,7 @@ begin
         ReturnValue := '';
     end
     else
-      raise Exception.Create('Method not found');
+      raise ELLMFunctionError.Create('Method not found');
   finally
     Context.Free;
   end;

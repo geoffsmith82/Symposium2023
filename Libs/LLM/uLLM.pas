@@ -12,6 +12,7 @@ uses
 
 type
   TOnLog = reference to procedure(inLog:string);
+  TRESTClientCreatedProc = reference to procedure(AClient: TObject; ARequest: TObject);
 
   TChatMessage = class
     Role: string;
@@ -134,8 +135,19 @@ type
   end;
 
   ELLMException = class(Exception)
-
+  private
+    FStatusCode: Integer;
+    FErrorType: string;
+  public
+    constructor Create(const AMessage: string); overload;
+    constructor Create(const AErrorType, AMessage: string); overload;
+    constructor CreateFmt(const AErrorType: string; AStatusCode: Integer; const AMessage: string); overload;
+    property StatusCode: Integer read FStatusCode;
+    property ErrorType: string read FErrorType;
   end;
+
+  ELLMFunctionError = class(ELLMException);
+  ELLMJSONError = class(ELLMException);
 
 
   TBaseModelInfo = class
@@ -145,6 +157,8 @@ type
 
 {$M+}
   TBaseLLM = class abstract
+  private
+    FOnLog: TOnLog;
   protected
     FAPIKey : string;
     FFunctions : TFunctionRegistry;
@@ -157,17 +171,59 @@ type
     function Completion(const AQuestion: string; const AModel: string): string; virtual; abstract;
     class function CreateChatMessage: TChatMessage; virtual;
     class function CreateChatVisionMessage: TChatVisionMessage; virtual;
+    procedure Log(const AMessage: string);
+    property OnLog: TOnLog read FOnLog write FOnLog;
   published
     property ModelInfo: TObjectList<TBaseModelInfo> read GetModelInfo;
     property Functions: TFunctionRegistry read FFunctions;
   end;
 {$M-}
 
+var
+  OnRESTClientCreated: TRESTClientCreatedProc;
+
+procedure NotifyRESTClientCreated(AClient: TObject; ARequest: TObject);
+
 implementation
 
 uses
   NetEncoding
   ;
+
+procedure NotifyRESTClientCreated(AClient: TObject; ARequest: TObject);
+begin
+  if Assigned(OnRESTClientCreated) then
+    OnRESTClientCreated(AClient, ARequest);
+end;
+
+{ ELLMException }
+
+constructor ELLMException.Create(const AMessage: string);
+begin
+  inherited Create(AMessage);
+  FStatusCode := 0;
+  FErrorType := '';
+end;
+
+constructor ELLMException.Create(const AErrorType, AMessage: string);
+begin
+  inherited Create(AMessage);
+  FStatusCode := 0;
+  FErrorType := AErrorType;
+end;
+
+constructor ELLMException.CreateFmt(const AErrorType: string; AStatusCode: Integer; const AMessage: string);
+begin
+  inherited Create(AMessage);
+  FStatusCode := AStatusCode;
+  FErrorType := AErrorType;
+end;
+
+procedure TBaseLLM.Log(const AMessage: string);
+begin
+  if Assigned(FOnLog) then
+    FOnLog(AMessage);
+end;
 
 { TPrompt }
 

@@ -16,8 +16,14 @@ uses
   ;
 
 type
+  EDeepSeekError = class(ELLMException);
+
   TDeepSeekFunctionRegistry = class(TFunctionRegistry)
+  private
+    FLLM: TBaseLLM;
+  public
     procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); override;
+    constructor Create(ALLM: TBaseLLM);
   end;
 
   TDeepSeek = class(TBaseLLM)
@@ -41,8 +47,7 @@ type
 implementation
 
 uses
-  System.TypInfo,
-  FMX.Types
+  System.TypInfo
   ;
 
 function TDeepSeek.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
@@ -100,6 +105,7 @@ begin
   ARequest.Resource := '/v1/chat/completions';
   ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 procedure TDeepSeek.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -154,7 +160,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    Log.d(LJSONBody.ToJSON);
+    Log(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);
@@ -176,22 +182,20 @@ var
   content : string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
-  if Assigned(LJSONResponse.GetValue('model')) then
-    AResponse.Model := LJSONResponse.GetValue('model').Value;
-
-  if Assigned(LJSONResponse.GetValue('id')) then
-    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+  LJSONResponse.TryGetValue<string>('model', AResponse.Model);
+  LJSONResponse.TryGetValue<string>('id', AResponse.Log_Id);
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
   LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
   LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
-  LMessageJSON := LChoice.GetValue('message') as TJSONObject;
+  if not LChoice.TryGetValue<TJSONObject>('message', LMessageJSON) then
+    raise EDeepSeekError.Create('Invalid response: missing message');
   Content := '';
   LMessageJSON.TryGetValue<string>('content', Content);
   AResponse.Content := Content;
-  AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+  LChoice.TryGetValue<string>('finish_reason', AResponse.Finish_Reason);
 
   // Handle function calls
   if Assigned(LMessageJSON) then
@@ -219,8 +223,7 @@ begin
     end;
   end;
 
-  if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
-    AResponse.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
+  LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
 end;
 
 procedure TDeepSeek.HandleErrorResponse(AResponse: TRESTResponse);
@@ -233,25 +236,21 @@ begin
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
-      raise Exception.CreateFmt(
-        'Error: %s - %s. Param: %s',
-        [LJSONMsg.GetValue<string>('type'),
-         LJSONMsg.GetValue<string>('message'),
-         LJSONMsg.GetValue<string>('param')])
+      raise EDeepSeekError.CreateFmt(LJSONMsg.GetValue<string>('type'), AResponse.StatusCode, LJSONMsg.GetValue<string>('message'))
     end
     else
-      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+      raise EDeepSeekError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
   finally
     FreeAndNil(LJSONResponse);
   end
   else
-    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+    raise EDeepSeekError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
 end;
 
 constructor TDeepSeek.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
-  FFunctions := TDeepSeekFunctionRegistry.Create;
+  FFunctions := TDeepSeekFunctionRegistry.Create(Self);
 end;
 
 destructor TDeepSeek.Destroy;
@@ -301,6 +300,7 @@ begin
     LClient.BaseURL := 'https://api.deepseek.com';
     LRequest.Resource := '/v1/completions';
 
+    NotifyRESTClientCreated(LClient, LRequest);
     // Execute the HTTPS POST request synchronously (last param Async = false)
     LRequest.Execute;
     // Process returned JSON when request was successful
@@ -316,7 +316,7 @@ begin
       end;
     end
     else
-      raise Exception.Create('HTTP response code: ' + LResponse.StatusCode.ToString);
+      raise EDeepSeekError.Create('HTTP response code: ' + LResponse.StatusCode.ToString);
   finally
     FreeAndNil(LResponse);
     FreeAndNil(LRequest);
@@ -379,6 +379,7 @@ begin
     // Add your API key to the request header
     LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
+    NotifyRESTClientCreated(LRESTClient, LRESTRequest);
     LRESTRequest.Execute;
 
     if LRESTResponse.StatusCode = 200 then
@@ -406,6 +407,12 @@ end;
 
 { TDeepSeekFunctionRegistry }
 
+constructor TDeepSeekFunctionRegistry.Create(ALLM: TBaseLLM);
+begin
+  FLLM := ALLM;
+  inherited Create;
+end;
+
 procedure TDeepSeekFunctionRegistry.InvokeFunctionFromJSON(
   const Method: System.TMethod; const JSONObject: TJSONObject;
   out ReturnValue: string);
@@ -421,19 +428,19 @@ var
   I: Integer;
   ResultValue: TValue;
 begin
-  Log.d(JSONObject.ToJSON);
+  FLLM.Log(JSONObject.ToJSON);
 
   // Get the 'arguments' field, which is a string of JSON
   ArgumentsValue := JSONObject.GetValue('arguments');
   if not Assigned(ArgumentsValue) then
-    raise Exception.Create('Invalid JSON: "arguments" field is missing');
+    raise ELLMFunctionError.Create('Invalid JSON: "arguments" field is missing');
 
   ArgumentsString := ArgumentsValue.Value;
 
   // Parse the string into a JSON object
   ArgsObject := TJSONObject.ParseJSONValue(ArgumentsString) as TJSONObject;
   if ArgsObject = nil then
-    raise Exception.Create('Invalid JSON: "arguments" field is not valid JSON object');
+    raise ELLMFunctionError.Create('Invalid JSON: "arguments" field is not valid JSON object');
 
   Context := TRttiContext.Create;
   try
@@ -449,7 +456,7 @@ begin
         ParamValue := ArgsObject.GetValue(Params[I].Name);
 
         if ParamValue = nil then
-          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
 
         case Params[I].ParamType.TypeKind of
           tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
@@ -459,11 +466,11 @@ begin
             if Params[I].ParamType.Handle = TypeInfo(Boolean) then
               Args[I] := SameText(ParamValue.Value, 'true')
             else
-              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+              raise ELLMFunctionError.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
           tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
           tkChar: Args[I] := ParamValue.Value[1];
         else
-          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
         end;
       end;
 
@@ -474,7 +481,7 @@ begin
         ReturnValue := '';
     end
     else
-      raise Exception.Create('Method not found');
+      raise ELLMFunctionError.Create('Method not found');
   finally
     FreeAndNil(ArgsObject);
     Context.Free;

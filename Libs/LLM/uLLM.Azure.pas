@@ -14,6 +14,8 @@ uses
   uLLM.Functions
   ;
 type
+  EAzureOpenAIError = class(ELLMException);
+
   TCapabilities = class
     fine_tune: Boolean;
     inference: Boolean;
@@ -67,11 +69,6 @@ type
 
 implementation
 { TMicrosoftOpenAI }
-
-uses
-  FMX.Types
-  ;
-
 
 function TMicrosoftOpenAI.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 const
@@ -131,7 +128,8 @@ begin
   ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('api-version', API_Version, TRESTRequestParameterKind.pkQUERY);
   ARequest.Params.AddItem('deploymentId', FDeploymentId, TRESTRequestParameterKind.pkURLSEGMENT);
-  ARequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);  
+  ARequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 procedure TMicrosoftOpenAI.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -183,7 +181,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    Log.d(LJSONBody.ToJSON);
+    Log(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);
@@ -205,22 +203,21 @@ var
   content : string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
-  if Assigned(LJSONResponse.GetValue('model')) then
-    AResponse.Model := LJSONResponse.GetValue('model').Value;
+  LJSONResponse.TryGetValue<string>('model', AResponse.Model);
 
-  if Assigned(LJSONResponse.GetValue('id')) then
-    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+  LJSONResponse.TryGetValue<string>('id', AResponse.Log_Id);
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
   LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
   LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
-  LMessageJSON := LChoice.GetValue('message') as TJSONObject;
+  if not LChoice.TryGetValue<TJSONObject>('message', LMessageJSON) then
+    raise EAzureOpenAIError.Create('Invalid response: missing message');
   Content := '';
   LMessageJSON.TryGetValue<string>('content', Content);
   AResponse.Content := Content;
-  AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+  LChoice.TryGetValue<string>('finish_reason', AResponse.Finish_Reason);
 
   // Handle function calls
   if Assigned(LMessageJSON) then
@@ -248,8 +245,7 @@ begin
     end;
   end;
 
-  if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
-    AResponse.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
+  LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
 end;
 
 
@@ -263,18 +259,15 @@ begin
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
-      raise Exception.CreateFmt(
-        'Error: %s - %s',
-        [LJSONMsg.GetValue<string>('code'),
-         LJSONMsg.GetValue<string>('message')])
+      raise EAzureOpenAIError.CreateFmt(LJSONMsg.GetValue<string>('code'), AResponse.StatusCode, LJSONMsg.GetValue<string>('message'))
     end
     else
-      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+      raise EAzureOpenAIError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
   finally
     LJSONResponse.Free;
   end
   else
-    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+    raise EAzureOpenAIError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
 end;
 
 
@@ -295,7 +288,7 @@ end;
 
 function TMicrosoftOpenAI.Completion(const AQuestion, AModel: string): string;
 begin
-  raise Exception.Create('Not Implemented');
+  raise EAzureOpenAIError.Create('Not Implemented');
 end;
 
 function TMicrosoftOpenAI.GetAzureModels: TModelsResponse;
@@ -322,6 +315,7 @@ begin
     LRestRequest.Resource := '/openai/models?api-version=2024-08-01-preview';
     LRestRequest.AddParameter('api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER);
 
+    NotifyRESTClientCreated(LRestClient, LRestRequest);
     LRestRequest.Execute;
 
     if LRestResponse.StatusCode = 200 then
@@ -338,7 +332,7 @@ begin
       end;
     end
     else
-      raise Exception.CreateFmt('Error: %s (%d)', [LRestResponse.StatusText, LRestResponse.StatusCode]);
+      raise EAzureOpenAIError.CreateFmt('', LRestResponse.StatusCode, LRestResponse.StatusText);
   finally
     LRestClient.Free;
     LRestRequest.Free;

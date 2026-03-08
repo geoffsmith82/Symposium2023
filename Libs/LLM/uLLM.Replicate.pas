@@ -12,6 +12,8 @@ uses
   ;
 
 type
+  EReplicateError = class(ELLMException);
+
   TUrls = record
     cancel: string;
     get: string;
@@ -64,7 +66,7 @@ uses
 
 function TReplicateLLM.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 begin
-  raise Exception.Create('Not Implemented Yet!');
+  raise EReplicateError.Create('Not Implemented Yet!');
 end;
 
 function TReplicateLLM.GetPredictionDetails(const Prediction: TPredictionInfo; out IsCompleted: Boolean): string;
@@ -79,7 +81,7 @@ begin
   IsCompleted := False;
 
   if not Assigned(Prediction) then
-    raise Exception.Create('Prediction object is not assigned');
+    raise EReplicateError.Create('Prediction object is not assigned');
 
   LRestClient := TRESTClient.Create(FEndPoint);
   try
@@ -96,6 +98,7 @@ begin
 
       // Adding the Authorization header
       LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      NotifyRESTClientCreated(LRestClient, LRestRequest);
 
       // Execute the request
       LRestRequest.Execute;
@@ -119,7 +122,7 @@ begin
       end
       else
       begin
-        raise Exception.CreateFmt('Error fetching prediction details: %s', [LRestResponse.Content]);
+        raise EReplicateError.CreateFmt('Error fetching prediction details: %s', [LRestResponse.Content]);
       end;
 
     finally
@@ -143,7 +146,7 @@ begin
 
   LJsonValue := TJSONObject.ParseJSONValue(AJsonStr);
   if not Assigned(LJsonValue) then
-    raise Exception.Create('Invalid JSON string');
+    raise EReplicateError.Create('Invalid JSON string');
 
   try
     if LJsonValue is TJSONObject then
@@ -204,7 +207,7 @@ begin
     end;
   end;
   if LVersion.IsEmpty then
-    raise Exception.Create('Could not find model ' + AModel);
+    raise EReplicateError.Create('Could not find model ' + AModel);
   // Create and setup REST client, request and response
   LRestClient := TRESTClient.Create(FEndPoint);
   try
@@ -225,6 +228,7 @@ begin
         LJSONInput.AddPair('prompt', AQuestion);
         LJSONRoot.AddPair('input', LJSONInput);
         LRestRequest.AddBody(LJSONRoot.ToString, TRESTContentType.ctAPPLICATION_JSON);
+        NotifyRESTClientCreated(LRestClient, LRestRequest);
         // Execute the request
         LRestRequest.Execute;
         if (LRestResponse.StatusCode = 200) or (LRestResponse.StatusCode = 201) then
@@ -245,7 +249,7 @@ begin
         else
         begin
           // Handle errors or exceptions if needed
-          raise Exception.CreateFmt('Error making prediction: %s', [LRestResponse.Content]);
+          raise EReplicateError.CreateFmt('Error making prediction: %s', [LRestResponse.Content]);
         end;
       finally
         LJSONRoot.Free;
@@ -292,6 +296,7 @@ begin
       LRestRequest.Method := rmGET;
 
       LRestRequest.AddParameter('Authorization', 'Token ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [TRESTRequestParameterOption.poDoNotEncode]);
+      NotifyRESTClientCreated(LRestClient, LRestRequest);
 
       LRestRequest.Execute;
 
@@ -299,9 +304,8 @@ begin
       begin
         LJSONValue := TJSONObject.ParseJSONValue(LRestResponse.Content) as TJSONObject;
 
-        if Assigned(LJSONValue) and Assigned(LJSONValue.GetValue('models')) then
+        if Assigned(LJSONValue) and LJSONValue.TryGetValue<TJSONArray>('models', LJSONArray) then
         begin
-          LJSONArray := LJSONValue.GetValue('models') as TJSONArray;
           for I := 0 to LJSONArray.Count - 1 do
           begin
             LModelInfo := TBaseModelInfo.Create;

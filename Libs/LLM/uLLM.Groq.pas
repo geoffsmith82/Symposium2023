@@ -14,6 +14,8 @@ uses
   ;
 
 type
+  EGroqError = class(ELLMException);
+
   TGroqLLM = class(TBaseLLM)
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
@@ -31,10 +33,6 @@ type
   end;
 
 implementation
-
-uses
-  FMX.Types
-  ;
 
 { TGroqLLM }
 
@@ -91,6 +89,7 @@ begin
   ARequest.Resource := '/v1/chat/completions';
   ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 procedure TGroqLLM.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -141,7 +140,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    Log.d(LJSONBody.ToJSON);
+    Log(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);
@@ -163,22 +162,20 @@ var
   content : string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
-  if Assigned(LJSONResponse.GetValue('model')) then
-    AResponse.Model := LJSONResponse.GetValue('model').Value;
-
-  if Assigned(LJSONResponse.GetValue('id')) then
-    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+  LJSONResponse.TryGetValue<string>('model', AResponse.Model);
+  LJSONResponse.TryGetValue<string>('id', AResponse.Log_Id);
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
   LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
   LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
-  LMessageJSON := LChoice.GetValue('message') as TJSONObject;
+  if not LChoice.TryGetValue<TJSONObject>('message', LMessageJSON) then
+    raise EGroqError.Create('Invalid response: missing message');
   Content := '';
   LMessageJSON.TryGetValue<string>('content', Content);
   AResponse.Content := Content;
-  AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+  LChoice.TryGetValue<string>('finish_reason', AResponse.Finish_Reason);
 
   // Handle function calls
   if Assigned(LMessageJSON) then
@@ -204,35 +201,31 @@ begin
     end;
   end;
 
-  if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
-    AResponse.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
+  LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
 end;
 
 procedure TGroqLLM.HandleErrorResponse(AResponse: TRESTResponse);
 var
   LJSONResponse: TJSONObject;
   LJSONMsg: TJSONObject;
-  param: string;
 begin
   LJSONResponse := TJSONObject.ParseJSONValue(AResponse.Content) as TJSONObject;
   if Assigned(LJSONResponse) then
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
-      LJSONMsg.TryGetValue<string>('param', param);
-      raise Exception.CreateFmt(
-        'Error: %s - %s. Param: %s',
-        [LJSONMsg.GetValue<string>('type'),
-         LJSONMsg.GetValue<string>('message'),
-         param])
+      raise EGroqError.CreateFmt(
+        LJSONMsg.GetValue<string>('type'),
+        AResponse.StatusCode,
+        LJSONMsg.GetValue<string>('message'))
     end
     else
-      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+      raise EGroqError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
   finally
     LJSONResponse.Free;
   end
   else
-    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+    raise EGroqError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
 end;
 
 constructor TGroqLLM.Create(const APIKey: string);
@@ -249,7 +242,7 @@ end;
 
 function TGroqLLM.Completion(const AQuestion, AModel: string): string;
 begin
-  raise Exception.Create('Completion Not implemented. Use ChatCompletion instead');
+  raise EGroqError.Create('Completion Not implemented. Use ChatCompletion instead');
 end;
 
 function TGroqLLM.GetModelInfo: TObjectList<TBaseModelInfo>;
@@ -307,6 +300,7 @@ begin
     // Add your API key to the request header
     LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
+    NotifyRESTClientCreated(LRESTClient, LRESTRequest);
     LRESTRequest.Execute;
 
     if LRESTResponse.StatusCode = 200 then

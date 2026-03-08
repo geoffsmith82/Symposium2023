@@ -14,6 +14,8 @@ uses
   ;
 
 type
+  EOpenRouterError = class(ELLMException);
+
   TOpenRouter = class(TBaseLLM)
   protected
     function GetModelInfo: TObjectList<TBaseModelInfo>; override;
@@ -33,10 +35,6 @@ type
 
 
 implementation
-
-uses
-  FMX.Types
-  ;
 
 function TOpenRouter.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
 var
@@ -93,6 +91,7 @@ begin
   ARequest.Resource := '/api/v1/chat/completions';
   ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 procedure TOpenRouter.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -144,7 +143,7 @@ begin
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
       LJSONBody.AddPair('tool_choice', 'auto');
     end;
-    Log.d(LJSONBody.ToJSON);
+    Log(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);
@@ -166,22 +165,20 @@ var
   content : string;
 begin
   LChoices := LJSONResponse.GetValue<TJSONArray>('choices');
-  if Assigned(LJSONResponse.GetValue('model')) then
-    AResponse.Model := LJSONResponse.GetValue('model').Value;
-
-  if Assigned(LJSONResponse.GetValue('id')) then
-    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+  LJSONResponse.TryGetValue<string>('model', AResponse.Model);
+  LJSONResponse.TryGetValue<string>('id', AResponse.Log_Id);
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
   LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
   LUsage.TryGetValue('prompt_tokens', AResponse.Prompt_Tokens);
   LUsage.TryGetValue('total_tokens', AResponse.Total_Tokens);
   LChoice := LChoices.Items[0] as TJSONObject;
-  LMessageJSON := LChoice.GetValue('message') as TJSONObject;
+  if not LChoice.TryGetValue<TJSONObject>('message', LMessageJSON) then
+    raise EOpenRouterError.Create('Invalid response: missing message');
   Content := '';
   LMessageJSON.TryGetValue<string>('content', Content);
   AResponse.Content := Content;
-  AResponse.Finish_Reason := LChoice.GetValue('finish_reason').Value;
+  LChoice.TryGetValue<string>('finish_reason', AResponse.Finish_Reason);
 
   // Handle function calls
   if Assigned(LMessageJSON) then
@@ -209,8 +206,7 @@ begin
     end;
   end;
 
-  if Assigned(LJSONResponse.GetValue('system_fingerprint')) then
-    AResponse.System_Fingerprint := LJSONResponse.GetValue('system_fingerprint').Value;
+  LJSONResponse.TryGetValue<string>('system_fingerprint', AResponse.System_Fingerprint);
 end;
 
 procedure TOpenRouter.HandleErrorResponse(AResponse: TRESTResponse);
@@ -223,19 +219,15 @@ begin
   try
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
-      raise Exception.CreateFmt(
-        'Error: %s - %s. Param: %s',
-        [LJSONMsg.GetValue<string>('type'),
-         LJSONMsg.GetValue<string>('message'),
-         LJSONMsg.GetValue<string>('param')])
+      raise EOpenRouterError.CreateFmt(LJSONMsg.GetValue<string>('type'), AResponse.StatusCode, LJSONMsg.GetValue<string>('message'))
     end
     else
-      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+      raise EOpenRouterError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
   finally
     LJSONResponse.Free;
   end
   else
-    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+    raise EOpenRouterError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
 end;
 
 constructor TOpenRouter.Create(const APIKey: string);
@@ -291,6 +283,7 @@ begin
     LClient.BaseURL := 'https://openrouter.ai';
     LRequest.Resource := '/api/v1/completions';
 
+    NotifyRESTClientCreated(LClient, LRequest);
     // Execute the HTTPS POST request synchronously (last param Async = false)
     LRequest.Execute;
     // Process returned JSON when request was successful
@@ -306,7 +299,7 @@ begin
       end;
     end
     else
-      raise Exception.Create('HTTP response code: ' + LResponse.StatusCode.ToString);
+      raise EOpenRouterError.Create('HTTP response code: ' + LResponse.StatusCode.ToString);
   finally
     FreeAndNil(LResponse);
     FreeAndNil(LRequest);
@@ -369,6 +362,7 @@ begin
     // Add your API key to the request header
     LRESTRequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
+    NotifyRESTClientCreated(LRESTClient, LRESTRequest);
     LRESTRequest.Execute;
 
     if LRESTResponse.StatusCode = 200 then

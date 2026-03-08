@@ -175,6 +175,7 @@ type
     FFiles : TOpenAIFiles;
     FThreads: TOpenAIThreadList;
     FVectorStores : TOpenAIVectorStoreList;
+    FOnLog: TOnLog;
     function GetVectorStores: TOpenAIVectorStoreList;
     function GetThreads: TOpenAIThreadList;
   public
@@ -182,12 +183,15 @@ type
     constructor Create(const APIKey: string);
     destructor Destroy; override;
 
+    procedure Log(AMessage: String);
+
     function CreateAssistant(const model: string; const name: string; const instructions: string): string;
 
   published
     property Files: TOpenAIFiles read FFiles;
     property VectorStores: TOpenAIVectorStoreList read GetVectorStores;
     property Threads: TOpenAIThreadList read GetThreads;
+    property OnLog: TOnLog read FOnLog write FOnLog;
   end;
 {$M-}
 
@@ -196,8 +200,7 @@ type
 implementation
 
 uses
-  FMX.Types
-  ;
+  uLLM.OpenAI;
 
 procedure ResetRequestToDefault(FRESTRequest : TRestRequest; FRESTClient : TRESTClient; FRESTResponse : TRESTResponse; const APIkey: string);
 begin
@@ -246,6 +249,12 @@ begin
   Result := FVectorStores;
 end;
 
+procedure TOpenAIAssistant.Log(AMessage: String);
+begin
+  if Assigned(FOnLog) then
+    FOnLog(AMessage);
+end;
+
 function TOpenAIAssistant.CreateAssistant(const model: string; const name: string; const instructions: string): string;
 var
   JsonBody: TJSONObject;
@@ -260,7 +269,7 @@ begin
     JsonBody.AddPair('instructions', instructions);
 
     JsonBody.AddPair('tools', TJSONArray.Create(TJSONObject.Create.AddPair('type', 'file_search')));
-    Log.d(JsonBody.ToJSON);
+    Log(JsonBody.ToJSON);
     FRESTRequest.AddBody(JsonBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
     FRESTRequest.Execute;
     Result := TJSONObject.ParseJSONValue(FRESTResponse.Content).GetValue<string>('id');
@@ -474,13 +483,13 @@ begin
   end
   else
   begin
-    raise Exception.Create('No starting ```json found in the input string.');
+    raise EOpenAIError.Create('No starting ```json found in the input string.');
   end;
   // Find the position of the trailing ```
   EndPos := PosEx('```', Input, StartPos);
   if EndPos = 0 then
   begin
-    raise Exception.Create('No trailing ``` found in the input string.');
+    raise EOpenAIError.Create('No trailing ``` found in the input string.');
   end;
   // Extract the JSON part of the string
   Result := Trim(Copy(Input, StartPos, EndPos - StartPos));
@@ -556,7 +565,7 @@ begin
       end;
     end
     else
-      raise Exception.CreateFmt('Failed to create vector store. Status Code: %d', [FRESTResponse.StatusCode]);
+      raise EOpenAIError.CreateFmt('Failed to create vector store. Status Code: %d', [FRESTResponse.StatusCode]);
 
   finally
     JSONObject.Free;
@@ -648,11 +657,11 @@ begin
         end;
       end
       else
-        raise Exception.CreateFmt('Failed to load stores. Status Code: %d', [FRESTResponse.StatusCode]);
+        raise EOpenAIError.CreateFmt('Failed to load stores. Status Code: %d', [FRESTResponse.StatusCode]);
 
     except
       on E: Exception do
-        raise Exception.CreateFmt('Error loading vector stores: %s', [E.Message]);
+        raise EOpenAIError.CreateFmt('Error loading vector stores: %s', [E.Message]);
     end;
   end;
 end;
@@ -724,7 +733,7 @@ begin
       end;
     end
     else
-      raise Exception.CreateFmt('Failed to add file to vector store. Status Code: %d', [FRESTResponse.StatusCode]);
+      raise EOpenAIError.CreateFmt('Failed to add file to vector store. Status Code: %d', [FRESTResponse.StatusCode]);
 
   finally
     JSONObject.Free;
@@ -795,7 +804,7 @@ begin
     end;
   end
   else
-    raise Exception.CreateFmt('Failed to retrieve files. Status Code: %d', [FRESTResponse.StatusCode]);
+    raise EOpenAIError.CreateFmt('Failed to retrieve files. Status Code: %d', [FRESTResponse.StatusCode]);
 end;
 
 

@@ -9,7 +9,6 @@ uses
   System.SysUtils,
   System.Rtti,
   System.TypInfo,
-  FMX.Types,
   System.Generics.Collections,
   REST.Client,
   REST.Types,
@@ -18,13 +17,7 @@ uses
   ;
 
 type
-  EAnthropicError = class(ELLMException)
-  private
-    FErrorType: string;
-  public
-    constructor Create(const AErrorType, AMessage: string);
-    property ErrorType: string read FErrorType;
-  end;
+  EAnthropicError = class(ELLMException);
 
   TClaudeJSONFunctionMessage = class(TChatMessage)
   private
@@ -53,8 +46,10 @@ type
   end;
 
   TClaudeFunctionRegistry = class(TFunctionRegistry)
+  private
+    FLLM: TBaseLLM;
   public
-    constructor Create;
+    constructor Create(ALLM: TBaseLLM);
     destructor Destroy; override;
     procedure InvokeFunctionFromJSON(const Method: System.TMethod; const JSONObject: TJSONObject; out ReturnValue: string); override;
     procedure InvokeFunction(const JSONObject: TJSONObject; out ReturnValue: string); override;
@@ -70,7 +65,6 @@ type
     procedure BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
     procedure ProcessResponse(LJSONResponse: TJSONObject; var AResponse: TChatResponse; out FunctionReturnValue: string; AMessages : TObjectList<TChatMessage>);
     procedure HandleErrorResponse(AResponse: TRESTResponse);
-    procedure DoOnLog(const inLog: string);
   public
     constructor Create(const APIKey: string);
     destructor Destroy; override;
@@ -83,12 +77,6 @@ type
   end;
 
 implementation
-
-constructor EAnthropicError.Create(const AErrorType, AMessage: string);
-begin
-  inherited Create(AMessage);
-  FErrorType := AErrorType;
-end;
 
 { TAnthropic }
 
@@ -145,13 +133,11 @@ begin
   ARequest.Method := TRESTRequestMethod.rmPOST;
   ARequest.Timeout := 80000; // Set the timeout as needed
   ARequest.Resource := '/v1/messages';
-  ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-  ARequest.Params.AddItem('Content-Type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-
 
   ARequest.Params.AddItem('anthropic-version', '2023-06-01', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('content-type', 'application/json', TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('x-api-key', FAPIKey, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 procedure TAnthropic.BuildJSONRequestBody(ARequest: TRESTRequest; ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>);
@@ -208,7 +194,7 @@ begin
       LJSONFunctions := Functions.GetAvailableFunctionsJSON(False);
       LJSONBody.AddPair('tools', LJSONFunctions as TJSONArray);
     end;
-    Log.d(LJSONBody.ToJSON);
+    Log(LJSONBody.ToJSON);
     ARequest.AddBody(LJSONBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
   finally
     FreeAndNil(LJSONBody);
@@ -224,17 +210,18 @@ var
   FunctionName: string;
   txt : string;
 begin
-  LChoices := LJSONResponse.GetValue('content') as TJSONArray;
-  if Assigned(LJSONResponse.GetValue('model')) then
-      AResponse.Model := LJSONResponse.GetValue('model').Value;
-  Log.d('Choices  ' + LChoices.ToJSON);
+  if not LJSONResponse.TryGetValue<TJSONArray>('content', LChoices) then
+    raise EAnthropicError.Create('Invalid response: missing content array');
+  if LJSONResponse.TryGetValue<string>('model', txt) then
+    AResponse.Model := txt;
+  Log('Choices  ' + LChoices.ToJSON);
 
-  DoOnLog('');
-  DoOnLog('');
-  DoOnLog(LJSONResponse.ToJSON);
+  Log('');
+  Log('');
+  Log(LJSONResponse.ToJSON);
 
-  if Assigned(LJSONResponse.GetValue('id')) then
-    AResponse.Log_Id := LJSONResponse.GetValue('id').Value;
+  if LJSONResponse.TryGetValue<string>('id', txt) then
+    AResponse.Log_Id := txt;
 
   LUsage := LJSONResponse.GetValue<TJSONObject>('usage');
   LUsage.TryGetValue('completion_tokens', AResponse.Completion_Tokens);
@@ -247,7 +234,7 @@ begin
     LChoice := LChoices.Items[0] as TJSONObject;
   end;
 
-  AResponse.Finish_Reason := LJSONResponse.GetValue('stop_reason').Value;
+  LJSONResponse.TryGetValue<string>('stop_reason', AResponse.Finish_Reason);
   for LChoice in LChoices do
   begin
       var msgType : string;
@@ -282,25 +269,21 @@ begin
     if LJSONResponse.TryGetValue<TJSONObject>('error', LJSONMsg) then
     begin
       LJSONMsg.TryGetValue<string>('param', param);
-      raise Exception.CreateFmt(
-        'Error: %s - %s. Param: %s',
-        [LJSONMsg.GetValue<string>('type'),
-         LJSONMsg.GetValue<string>('message'),
-         param])
+      raise EAnthropicError.CreateFmt(LJSONMsg.GetValue<string>('type'), AResponse.StatusCode, LJSONMsg.GetValue<string>('message'))
     end
     else
-      raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+      raise EAnthropicError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
   finally
     LJSONResponse.Free;
   end
   else
-    raise Exception.CreateFmt('Error: %d - %s', [AResponse.StatusCode, AResponse.StatusText]);
+    raise EAnthropicError.CreateFmt('', AResponse.StatusCode, AResponse.StatusText);
 end;
 
 constructor TAnthropic.Create(const APIKey: string);
 begin
   inherited Create(APIKey);
-  FFunctions := TClaudeFunctionRegistry.Create;
+  FFunctions := TClaudeFunctionRegistry.Create(Self);
 end;
 
 class function TAnthropic.CreateChatVisionMessage: TChatVisionMessage;
@@ -312,12 +295,6 @@ destructor TAnthropic.Destroy;
 begin
   FreeAndNil(FFunctions);
   inherited;
-end;
-
-procedure TAnthropic.DoOnLog(const inLog: string);
-begin
-  if Assigned(FOnLog) then
-    FOnLog(inLog);
 end;
 
 function TAnthropic.Completion(const AQuestion, AModel: string): string;
@@ -518,13 +495,13 @@ var
   I: Integer;
   ResultValue: TValue;
 begin
-  Log.d(JSONObject.ToJSON);
+  FLLM.Log(JSONObject.ToJSON);
 
   // Extract the 'input' JSON object properly
   ArgsObject := JSONObject.GetValue<TJSONObject>('input');
 
   if ArgsObject = nil then
-    raise Exception.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
+    raise ELLMFunctionError.Create('Invalid JSON: "arguments" field is missing or not a valid JSON object');
 
   Context := TRttiContext.Create;
   try
@@ -540,7 +517,7 @@ begin
         ParamValue := ArgsObject.GetValue(Params[I].Name);
 
         if ParamValue = nil then
-          raise Exception.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Missing required parameter: %s', [Params[I].Name]);
 
         case Params[I].ParamType.TypeKind of
           tkInteger: Args[I] := StrToIntDef(ParamValue.Value, 0);
@@ -550,11 +527,11 @@ begin
             if Params[I].ParamType.Handle = TypeInfo(Boolean) then
               Args[I] := SameText(ParamValue.Value, 'true')
             else
-              raise Exception.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
+              raise ELLMFunctionError.CreateFmt('Unsupported enumeration type for parameter %s', [Params[I].Name]);
           tkClass: Args[I] := TObject(StrToIntDef(ParamValue.Value, 0));
           tkChar: Args[I] := ParamValue.Value[1];
         else
-          raise Exception.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
+          raise ELLMFunctionError.CreateFmt('Unsupported parameter type for %s', [Params[I].Name]);
         end;
       end;
 
@@ -565,7 +542,7 @@ begin
         ReturnValue := '';
     end
     else
-      raise Exception.Create('Method not found');
+      raise ELLMFunctionError.Create('Method not found');
   finally
     Context.Free;
   end;
@@ -583,11 +560,12 @@ begin
     InvokeFunctionFromJSON(Method.Method, JSONObject, ReturnValue);
   end
   else
-    raise Exception.Create('Function not registered');
+    raise ELLMFunctionError.Create('Function not registered');
 end;
 
-constructor TClaudeFunctionRegistry.Create;
+constructor TClaudeFunctionRegistry.Create(ALLM: TBaseLLM);
 begin
+  FLLM := ALLM;
   inherited Create;
 end;
 

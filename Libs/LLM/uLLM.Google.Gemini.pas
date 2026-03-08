@@ -9,7 +9,6 @@ uses
   System.Generics.Collections,
   System.StrUtils,
   System.Rtti,
-  FMX.Types,
   REST.Client,
   REST.Types,
   NetEncoding,
@@ -123,11 +122,6 @@ uses
   System.Net.HttpClient, // Needed for TNetEncoding
   System.IOUtils,
   System.Net.Mime; // Needed for TNetEncoding
-
-procedure Log(const msg: string);
-begin
-  FMX.Types.Log.d(msg);
-end;
 
 // --- TGeminiFunctionCall ---
 // (No methods needed for this simple record)
@@ -409,6 +403,7 @@ begin
 
   // Common headers can be added here if necessary
   // ARequest.Params.AddHeader('Content-Type', 'application/json'); // Added automatically by AddBody(TJSONObject)
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 
@@ -702,7 +697,7 @@ end;
 
 function TGemini.Completion(const AQuestion, AModel: string): string;
 begin
-  raise Exception.Create('Completion Not implemented. Use ChatCompletion instead');
+  raise EGeminiError.Create('Completion Not implemented. Use ChatCompletion instead');
 end;
 
 

@@ -75,11 +75,11 @@ begin
   ArgsStr := JSONObject.GetValue<string>('arguments');
 
   if ArgsStr.IsEmpty then
-    raise Exception.Create('Missing "arguments" for function call');
+    raise EMistralError.Create('Missing "arguments" for function call');
 
   InputObj := TJSONObject.ParseJSONValue(ArgsStr) as TJSONObject;
   if not Assigned(InputObj) then
-    raise Exception.Create('Invalid arguments JSON string');
+    raise EMistralError.Create('Invalid arguments JSON string');
 
   WrappedJSON := nil;
   try
@@ -164,6 +164,7 @@ begin
 
   ARequest.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
   ARequest.Params.AddItem('Content-Type', 'application/json', pkHTTPHEADER, [poDoNotEncode]);
+  NotifyRESTClientCreated(AClient, ARequest);
 end;
 
 function TMistral.ChatCompletion(ChatConfig: TChatSettings; AMessages: TObjectList<TChatMessage>): TChatResponse;
@@ -187,6 +188,8 @@ begin
         raise EMistralError.CreateFmt('Mistral Error: %s', [Response.StatusText]);
 
       JSONResult := TJSONObject.ParseJSONValue(Response.Content) as TJSONObject;
+      if not Assigned(JSONResult) then
+        raise EMistralError.Create('Invalid JSON response');
       try
         ProcessResponse(JSONResult, Result, AMessages, FuncResult);
       finally
@@ -322,6 +325,7 @@ begin
     Request.Resource := 'models';
     Request.Params.AddItem('Authorization', 'Bearer ' + FAPIKey, pkHTTPHEADER, [poDoNotEncode]);
 
+    NotifyRESTClientCreated(Client, Request);
     Request.Execute;
 
     if Response.StatusCode = 200 then
