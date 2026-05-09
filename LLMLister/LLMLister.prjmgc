@@ -1,15 +1,17 @@
 [Settings]
 AutoLibSuffix=0
-ClearChildAppSettings=0
+ClearChildAppSettings=1
 ClearChildPackageSettings=0
-ClearChildVersionInfo=0
+ClearChildVersionInfo=1
 NormalizeDproj=1
 SplitDproj=0
 EnableMissingPlatforms=0
-RemoveUnusedPlatforms=0
+RemoveUnusedPlatforms=1
 RefreshFormType=0
-RemoveExcludedPackages=1
-RemoveDeployment=1
-RemoveUWP=1
+RemoveExcludedPackages=0
+RemoveDeployment=0
+RemoveUWP=0
 RemoveExplicits=1
+UseIDEAuto=0
+RemoveUnusedOptionSets=0
 
