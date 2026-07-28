@@ -156,10 +156,14 @@ begin
         until ReadCount = 0;
 
       finally
-//        RespStream.Free;
+        // RespStream is the response's ContentStream and is owned by
+        // the response, so it must not be freed here.
       end;
     finally
-//      ReqStream.Free;
+      // ReqStream is ours: THTTPClient does not take ownership of
+      // SourceStream. Execute has returned by now, so releasing it here
+      // is safe -- including on the Exit taken when '[DONE]' arrives.
+      ReqStream.Free;
     end;
   finally
     FreeAndNil(HttpClient);
